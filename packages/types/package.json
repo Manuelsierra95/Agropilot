@@ -1,0 +1,13 @@
+{
+  "name": "@workspace/types",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@workspace/typescript-config": "workspace:*",
+    "typescript": "^5.9.2"
+  },
+  "exports": {
+    ".": "./src/*.ts"
+  }
+}

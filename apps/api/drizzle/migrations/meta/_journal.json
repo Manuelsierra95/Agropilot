@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1762686231486,
+      "tag": "0000_black_darwin",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1762712395876,
+      "tag": "0001_soft_true_believers",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1763028036652,
+      "tag": "0002_late_karen_page",
+      "breakpoints": true
+    }
+  ]
+}

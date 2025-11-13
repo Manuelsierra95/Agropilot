@@ -1,0 +1,30 @@
+{
+  "name": "api",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --env production",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "db:up": "drizzle-kit up",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply agropilot_db --local",
+    "db:migrate:prod": "wrangler d1 migrations apply agropilot_db --remote"
+  },
+  "dependencies": {
+    "@workspace/types": "workspace:*",
+    "@better-auth/cli": "^1.3.34",
+    "@hono-rate-limiter/cloudflare": "^0.2.2",
+    "@hono/zod-validator": "^0.7.4",
+    "better-auth": "^1.3.34",
+    "dayjs": "^1.11.18",
+    "drizzle-orm": "^0.44.7",
+    "hono": "^4.10.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251014.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "drizzle-kit": "^0.31.5",
+    "wrangler": "^4.4.0"
+  }
+}

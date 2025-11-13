@@ -1,0 +1,17 @@
+name = "agropilot-api"
+main = "src/index.ts"
+compatibility_date = "2025-10-26"
+
+[vars]
+NODE_ENV = "development"
+API_CORS = "http://localhost:3000"
+
+[env.production.vars]
+NODE_ENV = "production"
+API_CORS = "https://agropilot.vercel.app"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "agropilot_db"
+database_id = "230fb790-81bf-4364-8d7d-cad0230d7a20"
+migrations_dir = "drizzle/migrations"
