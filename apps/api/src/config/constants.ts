@@ -1,9 +1,5 @@
 export const AUTH_COOKIE_NAME = 'better-auth.session_token'
 
-export const ORIGINS = [
-  'http://localhost:3000',
-  'http://localhost:8787',
-  'https://agropilot.vercel.app',
-]
+export const ORIGINS = 'https://agropilot.vercel.app'
 
 export const DB_BATCH_SIZE = 5

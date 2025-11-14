@@ -23,7 +23,6 @@ export async function regenerateDemoDataIfNeeded(
   db: DrizzleD1Database<DBSchema>,
   user: DemoUser
 ) {
-  console.log('Regenerating demo data if needed for user:', user.email)
   const now = Date.now()
   const lastSeed = await db
     .select()
@@ -32,46 +31,29 @@ export async function regenerateDemoDataIfNeeded(
     .get()
     .then((u) => (u?.lastDemoSeed ? new Date(u.lastDemoSeed).getTime() : 0))
   const oneDay = 24 * 60 * 60 * 1000
-  console.log(
-    'Last seed timestamp:',
-    lastSeed,
-    'Current timestamp:',
-    now,
-    'Time diff (ms):',
-    now - lastSeed
-  )
+
+  console.log('Last seed time:', new Date(lastSeed), 'for user:', user.email)
 
   // No regenerar si no ha pasado un día completo
   if (now - lastSeed < oneDay) {
-    console.log('Skipping regeneration: less than 24 hours since last seed')
     return
   }
-  console.log('Proceeding with demo data regeneration...')
 
   // Borrar datos anteriores del usuario
-  console.log('Deleting existing demo data for user:', user.id)
   await db.delete(events).where(eq(events.userId, user.id))
   await db.delete(metrics).where(eq(metrics.userId, user.id))
   await db.delete(transactions).where(eq(transactions.userId, user.id))
   await db.delete(parcels).where(eq(parcels.userId, user.id))
-  console.log('Existing data deleted successfully')
 
   const parcelsToInsert = demoParcels.map((parcel) => ({
     ...parcel,
     userId: user.id,
   }))
-  console.log('Inserting', parcelsToInsert.length, 'parcels')
 
   const insertedParcels = await db
     .insert(parcels)
     .values(parcelsToInsert)
     .returning()
-  console.log(
-    'Inserted parcels:',
-    insertedParcels.length,
-    'IDs:',
-    insertedParcels.map((p) => p.id)
-  )
 
   const eventsToInsert = demoEvents.map((event) => {
     const startTime = dayjs()
@@ -99,30 +81,16 @@ export async function regenerateDemoDataIfNeeded(
       isRead: event.isRead,
     }
   })
-  console.log('Prepared', eventsToInsert.length, 'events to insert')
 
   // Insertar eventos en lotes para evitar el límite de variables SQL
   for (let i = 0; i < eventsToInsert.length; i += DB_BATCH_SIZE) {
     const batch = eventsToInsert.slice(i, i + DB_BATCH_SIZE)
-    console.log(
-      `Inserting event batch ${Math.floor(i / DB_BATCH_SIZE) + 1}/${Math.ceil(eventsToInsert.length / DB_BATCH_SIZE)}:`,
-      batch.length,
-      'events'
-    )
     try {
       await db.insert(events).values(batch)
-      console.log(
-        `✓ Batch ${Math.floor(i / DB_BATCH_SIZE) + 1} inserted successfully`
-      )
     } catch (error) {
-      console.error(
-        `✗ Error inserting event batch ${Math.floor(i / DB_BATCH_SIZE) + 1}:`,
-        error
-      )
       throw error
     }
   }
-  console.log('All events inserted successfully')
 
   const transactionsToInsert = demoTransactions.map((transaction) => ({
     userId: user.id,
@@ -136,30 +104,16 @@ export async function regenerateDemoDataIfNeeded(
     date: dayjs().subtract(transaction.daysAgo, 'days').toDate(),
     description: transaction.description,
   }))
-  console.log('Prepared', transactionsToInsert.length, 'transactions to insert')
 
   // Insertar transacciones en lotes
   for (let i = 0; i < transactionsToInsert.length; i += DB_BATCH_SIZE) {
     const batch = transactionsToInsert.slice(i, i + DB_BATCH_SIZE)
-    console.log(
-      `Inserting transaction batch ${Math.floor(i / DB_BATCH_SIZE) + 1}/${Math.ceil(transactionsToInsert.length / DB_BATCH_SIZE)}:`,
-      batch.length,
-      'transactions'
-    )
     try {
       await db.insert(transactions).values(batch)
-      console.log(
-        `✓ Batch ${Math.floor(i / DB_BATCH_SIZE) + 1} inserted successfully`
-      )
     } catch (error) {
-      console.error(
-        `✗ Error inserting transaction batch ${Math.floor(i / DB_BATCH_SIZE) + 1}:`,
-        error
-      )
       throw error
     }
   }
-  console.log('All transactions inserted successfully')
 
   const metricsToInsert = demoMetrics.map((metric) => ({
     userId: user.id,
@@ -171,39 +125,20 @@ export async function regenerateDemoDataIfNeeded(
     source: metric.source,
     date: dayjs().toDate(),
   }))
-  console.log('Prepared', metricsToInsert.length, 'metrics to insert')
 
   // Insertar métricas en lotes
   for (let i = 0; i < metricsToInsert.length; i += DB_BATCH_SIZE) {
     const batch = metricsToInsert.slice(i, i + DB_BATCH_SIZE)
-    console.log(
-      `Inserting metric batch ${Math.floor(i / DB_BATCH_SIZE) + 1}/${Math.ceil(metricsToInsert.length / DB_BATCH_SIZE)}:`,
-      batch.length,
-      'metrics'
-    )
     try {
       await db.insert(metrics).values(batch)
-      console.log(
-        `✓ Batch ${Math.floor(i / DB_BATCH_SIZE) + 1} inserted successfully`
-      )
     } catch (error) {
-      console.error(
-        `✗ Error inserting metric batch ${Math.floor(i / DB_BATCH_SIZE) + 1}:`,
-        error
-      )
       throw error
     }
   }
-  console.log('All metrics inserted successfully')
 
   // Actualizar el campo lastDemoSeed del usuario
-  console.log('Updating lastDemoSeed for user:', user.id)
   await db
     .update(users)
     .set({ lastDemoSeed: new Date(now) })
     .where(eq(users.id, user.id))
-  console.log(
-    'Demo data regeneration completed successfully for user:',
-    user.email
-  )
 }

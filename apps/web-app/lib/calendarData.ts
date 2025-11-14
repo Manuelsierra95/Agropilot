@@ -59,7 +59,7 @@ export async function getUserEvents(params?: {
     searchParams.set('todayEvents', params.todayEvents.toString())
 
   const query = searchParams.toString()
-  const response = await apiClient.get<ApiResponse>(
+  const response = await apiClient.post<ApiResponse>(
     `/events${query ? `?${query}` : ''}`
   )
   return response.data
@@ -85,7 +85,7 @@ export async function getParcelEvents(
     searchParams.set('todayEvents', params.todayEvents.toString())
 
   const query = searchParams.toString()
-  const response = await apiClient.get<ApiResponse>(
+  const response = await apiClient.post<ApiResponse>(
     `/events/parcel/${parcelId}${query ? `?${query}` : ''}`
   )
   return response.data

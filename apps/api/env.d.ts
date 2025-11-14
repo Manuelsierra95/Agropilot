@@ -6,7 +6,7 @@ export type Env = {
   RATE_LIMITER: RateLimit
   CACHE_MAX_AGE: number
   CACHE_STALE_WHILE_REVALIDATE: number
-  ORIGINS: string[]
+  ORIGINS: string
   CORS_MAX_AGE: number
   FRONTEND_URI: string
   BETTER_AUTH_SECRET: string

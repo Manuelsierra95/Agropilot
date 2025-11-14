@@ -21,7 +21,7 @@ const routes = honoFactory
   .get('/healthz', (c) => c.text('OK'))
   .on(['POST', 'GET'], '/auth/*', (c) => getAuth(c).handler(c.req.raw))
   .basePath('/v1')
-  .use(authorizationMiddleware)
+  // .use(authorizationMiddleware)
   // .use(cacheMiddleware)
   .route('/parcels', parcelsRoutes)
   .route('/events', eventsRoutes)

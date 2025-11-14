@@ -14,14 +14,16 @@ let authInstance: ReturnType<typeof betterAuth>
 
 export function getAuth(c: Context<{ Bindings: Env } & CustomContext>) {
   if (!authInstance) {
+    const isProduction = c.env.NODE_ENV === 'production'
+
     authInstance = betterAuth({
       advanced: {
         defaultCookieAttributes: {
-          httpOnly: true,
-          sameSite: 'lax',
+          sameSite: 'none',
+          secure: true,
         },
       },
-      trustedOrigins: ORIGINS,
+      trustedOrigins: [ORIGINS],
       secret: c.env.BETTER_AUTH_SECRET,
       baseURL: c.env.BETTER_AUTH_URL,
       emailAndPassword: {
@@ -33,7 +35,7 @@ export function getAuth(c: Context<{ Bindings: Env } & CustomContext>) {
           clientSecret: c.env.GOOGLE_CLIENT_SECRET!,
         },
       },
-      plugins: [...(c.env.NODE_ENV !== 'production' ? [openAPI()] : [])],
+      plugins: [...(!isProduction ? [openAPI()] : [])],
       database: drizzleAdapter(
         drizzleD1(c.env.DB, {
           schema: {
@@ -46,7 +48,7 @@ export function getAuth(c: Context<{ Bindings: Env } & CustomContext>) {
         }
       ),
       hooks: {
-        after: afterHook(c),
+        // after: afterHook(c),
         before: beforeHook(c),
       },
     })

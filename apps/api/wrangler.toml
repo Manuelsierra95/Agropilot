@@ -3,12 +3,12 @@ main = "src/index.ts"
 compatibility_date = "2025-10-26"
 
 [vars]
-NODE_ENV = "development"
-API_CORS = "http://localhost:3000"
-
-[env.production.vars]
 NODE_ENV = "production"
 API_CORS = "https://agropilot.vercel.app"
+
+[env.development.vars]
+NODE_ENV = "development"
+API_CORS = "http://localhost:3000"
 
 [[d1_databases]]
 binding = "DB"

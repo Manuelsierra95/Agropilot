@@ -19,7 +19,7 @@ export const corsMiddleware: MiddlewareHandler<{ Bindings: Env }> = async (
       'Cookie',
       'Set-Cookie',
     ],
-    exposeHeaders: ['Set-Cookie'],
+    exposeHeaders: ['Set-Cookie', 'X-CSRF-Token'],
     credentials: true,
     maxAge,
   })(c, next)
