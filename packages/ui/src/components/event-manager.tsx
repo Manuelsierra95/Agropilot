@@ -50,7 +50,7 @@ export interface Event {
   description?: string
   startTime: Date
   endTime: Date
-  color: string
+  color?: string
   category?: string
   attendees?: string[]
   tags?: string[]
@@ -117,7 +117,7 @@ export function EventManager({
   const [newEvent, setNewEvent] = useState<Partial<Event>>({
     title: '',
     description: '',
-    color: colors[0].value,
+    color: colors[0]?.value,
     category: categories[0],
     tags: [],
   })
@@ -142,7 +142,10 @@ export function EventManager({
       }
 
       // Color filter
-      if (selectedColors.length > 0 && !selectedColors.includes(event.color)) {
+      if (
+        selectedColors.length > 0 &&
+        !selectedColors.includes(event.color || '')
+      ) {
         return false
       }
 
@@ -188,7 +191,7 @@ export function EventManager({
       description: newEvent.description,
       startTime: newEvent.startTime,
       endTime: newEvent.endTime,
-      color: newEvent.color || colors[0].value,
+      color: newEvent.color || colors[0]?.value,
       category: newEvent.category,
       attendees: newEvent.attendees,
       tags: newEvent.tags || [],
@@ -201,7 +204,7 @@ export function EventManager({
     setNewEvent({
       title: '',
       description: '',
-      color: colors[0].value,
+      color: colors[0]?.value,
       category: categories[0],
       tags: [],
     })
@@ -285,9 +288,9 @@ export function EventManager({
   )
 
   const getColorClasses = useCallback(
-    (colorValue: string) => {
+    (colorValue?: string) => {
       const color = colors.find((c) => c.value === colorValue)
-      return color || colors[0]
+      return color || colors[0]!
     },
     [colors]
   )
@@ -746,8 +749,8 @@ export function EventManager({
             const color = getColorClasses(colorValue)
             return (
               <Badge key={colorValue} variant="secondary" className="gap-1">
-                <div className={cn('h-2 w-2 rounded-full', color.bg)} />
-                {color.name}
+                <div className={cn('h-2 w-2 rounded-full', color?.bg)} />
+                {color?.name}
                 <button
                   onClick={() =>
                     setSelectedColors((prev) =>
@@ -1103,7 +1106,12 @@ function EventCard({
   onEventClick: (event: Event) => void
   onDragStart: (event: Event) => void
   onDragEnd: () => void
-  getColorClasses: (color: string) => { bg: string; text: string }
+  getColorClasses: (color?: string) => {
+    bg: string
+    text: string
+    name: string
+    value: string
+  }
   variant?: 'default' | 'compact' | 'detailed'
 }) {
   const [isHovered, setIsHovered] = useState(false)
@@ -1325,7 +1333,12 @@ function MonthView({
   onDragStart: (event: Event) => void
   onDragEnd: () => void
   onDrop: (date: Date) => void
-  getColorClasses: (color: string) => { bg: string; text: string }
+  getColorClasses: (color?: string) => {
+    bg: string
+    text: string
+    name: string
+    value: string
+  }
 }) {
   const firstDayOfMonth = new Date(
     currentDate.getFullYear(),
@@ -1439,7 +1452,12 @@ function WeekView({
   onDragStart: (event: Event) => void
   onDragEnd: () => void
   onDrop: (date: Date, hour: number) => void
-  getColorClasses: (color: string) => { bg: string; text: string }
+  getColorClasses: (color?: string) => {
+    bg: string
+    text: string
+    name: string
+    value: string
+  }
 }) {
   const startOfWeek = new Date(currentDate)
   startOfWeek.setDate(currentDate.getDay())
@@ -1548,7 +1566,12 @@ function DayView({
   onDragStart: (event: Event) => void
   onDragEnd: () => void
   onDrop: (date: Date, hour: number) => void
-  getColorClasses: (color: string) => { bg: string; text: string }
+  getColorClasses: (color?: string) => {
+    bg: string
+    text: string
+    name: string
+    value: string
+  }
 }) {
   const hours = Array.from({ length: 24 }, (_, i) => i)
 
@@ -1611,7 +1634,12 @@ function ListView({
 }: {
   events: Event[]
   onEventClick: (event: Event) => void
-  getColorClasses: (color: string) => { bg: string; text: string }
+  getColorClasses: (color?: string) => {
+    bg: string
+    text: string
+    name: string
+    value: string
+  }
 }) {
   const sortedEvents = [...events].sort(
     (a, b) => a.startTime.getTime() - b.startTime.getTime()
