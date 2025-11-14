@@ -7,6 +7,7 @@ import { DrizzleD1Database } from 'drizzle-orm/d1'
 import { serviceWrapper } from '@/handlers/serviceWrapper'
 import { transactions } from '@/db/app-schema.sql'
 import dayjs from 'dayjs'
+import { DB_BATCH_SIZE } from '@/config/constants'
 
 export const getTransactions = (
   db: DrizzleD1Database<any>,
@@ -169,10 +170,16 @@ export const createBulkTransactions = (
         userId,
       }))
 
-      const result = await db
-        .insert(transactions)
-        .values(transactionsToInsert)
-        .returning()
+      // Insertar en lotes para evitar el límite de variables SQL
+      const result = []
+      for (let i = 0; i < transactionsToInsert.length; i += DB_BATCH_SIZE) {
+        const batch = transactionsToInsert.slice(i, i + DB_BATCH_SIZE)
+        const batchResult = await db
+          .insert(transactions)
+          .values(batch)
+          .returning()
+        result.push(...batchResult)
+      }
       return {
         created: result.length,
         transactions: result,

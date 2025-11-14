@@ -8,7 +8,8 @@
     "db:up": "drizzle-kit up",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply agropilot_db --local",
-    "db:migrate:prod": "wrangler d1 migrations apply agropilot_db --remote"
+    "db:migrate:prod": "wrangler d1 migrations apply agropilot_db --remote",
+    "db:studio": "npx d1s"
   },
   "dependencies": {
     "@workspace/types": "workspace:*",

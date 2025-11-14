@@ -4,6 +4,7 @@ import { cacheMiddleware } from '@/middlewares/cache'
 import { csrfMiddleware } from '@/middlewares/csrf'
 import { rateLimitMiddleware } from '@/middlewares/rateLimit'
 import { sessionMiddleware } from '@/middlewares/session'
+import { authorizationMiddleware } from '@/middlewares/authorization'
 import { eventsRoutes } from '@/routes/events'
 import { getAuth } from '@/lib/auth'
 import { parcelsRoutes } from '@/routes/parcels'
@@ -20,6 +21,7 @@ const routes = honoFactory
   .get('/healthz', (c) => c.text('OK'))
   .on(['POST', 'GET'], '/auth/*', (c) => getAuth(c).handler(c.req.raw))
   .basePath('/v1')
+  .use(authorizationMiddleware)
   // .use(cacheMiddleware)
   .route('/parcels', parcelsRoutes)
   .route('/events', eventsRoutes)

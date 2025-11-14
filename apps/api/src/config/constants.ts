@@ -5,3 +5,5 @@ export const ORIGINS = [
   'http://localhost:8787',
   'https://agropilot.vercel.app',
 ]
+
+export const DB_BATCH_SIZE = 5

@@ -6,10 +6,9 @@ import type { Env } from '@env'
 import type { CustomContext } from 'globals'
 
 import * as schema from '@/db/auth-schema.sql'
-
 import { ORIGINS } from '@/config/constants'
-
 import { openAPI } from 'better-auth/plugins'
+import { beforeHook, afterHook } from '@/lib/hooks'
 
 let authInstance: ReturnType<typeof betterAuth>
 
@@ -34,7 +33,7 @@ export function getAuth(c: Context<{ Bindings: Env } & CustomContext>) {
           clientSecret: c.env.GOOGLE_CLIENT_SECRET!,
         },
       },
-      plugins: [openAPI()],
+      plugins: [...(c.env.NODE_ENV !== 'production' ? [openAPI()] : [])],
       database: drizzleAdapter(
         drizzleD1(c.env.DB, {
           schema: {
@@ -46,6 +45,10 @@ export function getAuth(c: Context<{ Bindings: Env } & CustomContext>) {
           usePlural: true,
         }
       ),
+      hooks: {
+        after: afterHook(c),
+        before: beforeHook(c),
+      },
     })
   }
   return authInstance

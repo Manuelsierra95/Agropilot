@@ -11,7 +11,7 @@ import { Loader2, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { signInWithGoogle } from '@/lib/auth'
+import { signInWithGoogle, signInWithCredentials } from '@/lib/auth'
 
 export function LoginForm({
   className,
@@ -39,17 +39,17 @@ export function LoginForm({
   const handleGuestLogin = async () => {
     try {
       setIsGuestLoading(true)
-      // TODO: crear una sesión temporal o redirigir directamente
-      toast.success('Iniciando como invitado...')
-
-      // Simular un pequeño delay para mejor UX
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      router.push('/dashboard')
-      router.refresh()
+      await signInWithCredentials('demo@example.com', 'demo1234')
+      toast.success('Sesión iniciada como invitado')
+      // router.push('/dashboard')
+      // router.refresh()
     } catch (error) {
       console.error('Error al iniciar como invitado:', error)
-      toast.error('Error al iniciar sesión como invitado')
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Error al iniciar sesión como invitado'
+      )
       setIsGuestLoading(false)
     }
   }

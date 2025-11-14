@@ -4,6 +4,7 @@ import { DrizzleD1Database } from 'drizzle-orm/d1'
 import { serviceWrapper } from '@/handlers/serviceWrapper'
 import { metrics } from '@/db/app-schema.sql'
 import dayjs from 'dayjs'
+import { DB_BATCH_SIZE } from '@/config/constants'
 
 export const getMetrics = (
   db: DrizzleD1Database<any>,
@@ -350,10 +351,13 @@ export const createBulkMetrics = (
         userId,
       }))
 
-      const result = await db
-        .insert(metrics)
-        .values(metricsToInsert)
-        .returning()
+      // Insertar en lotes para evitar el límite de variables SQL
+      const result = []
+      for (let i = 0; i < metricsToInsert.length; i += DB_BATCH_SIZE) {
+        const batch = metricsToInsert.slice(i, i + DB_BATCH_SIZE)
+        const batchResult = await db.insert(metrics).values(batch).returning()
+        result.push(...batchResult)
+      }
       return {
         created: result.length,
         metrics: result,
