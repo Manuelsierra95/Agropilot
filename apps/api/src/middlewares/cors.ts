@@ -1,7 +1,7 @@
 import { cors } from 'hono/cors'
 import type { MiddlewareHandler } from 'hono'
 import type { Env } from '@env'
-import { ORIGINS } from '@/config/constants'
+import { DEVORIGINS, ORIGINS } from '@/config/constants'
 
 export const corsMiddleware: MiddlewareHandler<{ Bindings: Env }> = async (
   c,
@@ -10,7 +10,7 @@ export const corsMiddleware: MiddlewareHandler<{ Bindings: Env }> = async (
   const maxAge = c.env.CORS_MAX_AGE || 86400 // Default 1 día
 
   return cors({
-    origin: ORIGINS,
+    origin: c.env.NODE_ENV === 'production' ? ORIGINS : DEVORIGINS,
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: [
       'Content-Type',

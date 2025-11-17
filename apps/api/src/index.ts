@@ -9,7 +9,7 @@ import { eventsRoutes } from '@/routes/events'
 import { getAuth } from '@/lib/auth'
 import { parcelsRoutes } from '@/routes/parcels'
 import { metricsRoutes } from '@/routes/metrics'
-import { transactionsRoutes } from './routes/transactions'
+import { transactionsRoutes } from '@/routes/transactions'
 
 const routes = honoFactory
   .createApp()

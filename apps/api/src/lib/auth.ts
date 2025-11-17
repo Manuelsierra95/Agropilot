@@ -6,7 +6,7 @@ import type { Env } from '@env'
 import type { CustomContext } from 'globals'
 
 import * as schema from '@/db/auth-schema.sql'
-import { ORIGINS } from '@/config/constants'
+import { DEVORIGINS, ORIGINS } from '@/config/constants'
 import { openAPI } from 'better-auth/plugins'
 import { beforeHook, afterHook } from '@/lib/hooks'
 
@@ -23,7 +23,7 @@ export function getAuth(c: Context<{ Bindings: Env } & CustomContext>) {
           secure: true,
         },
       },
-      trustedOrigins: [ORIGINS],
+      trustedOrigins: isProduction ? ORIGINS : DEVORIGINS,
       secret: c.env.BETTER_AUTH_SECRET,
       baseURL: c.env.BETTER_AUTH_URL,
       emailAndPassword: {
