@@ -2,7 +2,7 @@ import { fontSans, fontMono } from '@/utils/fonts'
 import '@workspace/ui/globals.css'
 import { Providers } from '@/components/providers'
 import type { Metadata } from 'next'
-import { Analytics } from '@vercel/analytics/react'
+import { Analytics } from '@vercel/analytics/next'
 
 export const metadata: Metadata = {
   title: 'Agropilot - Gestión Inteligente para tu Explotación Agrícola',
