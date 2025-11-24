@@ -6,7 +6,6 @@ import {
   metricsPutSchema,
   metricsQuerySchema,
   metricsParcelQuerySchema,
-  metricsLatestsSchema,
   metricsLatestsQuerySchema,
 } from '@/schemas/metrics'
 import {
@@ -45,37 +44,61 @@ export const metricsRoutes = honoFactory
       return handleServiceResponse(c, res)
     }
   )
-  .post(
+  .get(
     '/parcel/:parcelId/latests',
-    zValidator('json', metricsLatestsSchema),
     zValidator('query', metricsLatestsQuerySchema),
     async (c) => {
       const userId = c.get('user')!.id
       const parcelId = Number(c.req.param('parcelId'))
-      const { metricTypes } = c.req.valid('json')
+      const { metricTypes } = c.req.valid('query')
       const queryParams = c.req.valid('query')
       const res = await getLatestsMetricsByParcelId(
         c.get('db'),
         parcelId,
-        metricTypes,
+        // metricTypes may be a string or array depending on query; service expects array
+        Array.isArray(metricTypes)
+          ? metricTypes
+          : metricTypes
+            ? [metricTypes]
+            : [],
         userId,
         queryParams
       )
       return handleServiceResponse(c, res)
     }
   )
-  .post(
+  //  .post(
+  //   '/latests',
+  //   zValidator('json', metricsLatestsSchema),
+  //   zValidator('query', metricsLatestsQuerySchema),
+  //   async (c) => {
+  //     const userId = c.get('user')!.id
+  //     const { metricTypes } = c.req.valid('json')
+  //     const queryParams = c.req.valid('query')
+  //     const res = await getUserLatestsMetrics(
+  //       c.get('db'),
+  //       userId,
+  //       metricTypes,
+  //       queryParams
+  //     )
+  //     return handleServiceResponse(c, res)
+  //   }
+  // )
+  .get(
     '/latests',
-    zValidator('json', metricsLatestsSchema),
     zValidator('query', metricsLatestsQuerySchema),
     async (c) => {
       const userId = c.get('user')!.id
-      const { metricTypes } = c.req.valid('json')
+      const { metricTypes } = c.req.valid('query')
       const queryParams = c.req.valid('query')
       const res = await getUserLatestsMetrics(
         c.get('db'),
         userId,
-        metricTypes,
+        Array.isArray(metricTypes)
+          ? metricTypes
+          : metricTypes
+            ? [metricTypes]
+            : [],
         queryParams
       )
       return handleServiceResponse(c, res)
