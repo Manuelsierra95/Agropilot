@@ -21,8 +21,8 @@ export const authorizationMiddleware = createMiddleware<
   if (userEmail === 'demo@example.com' && c.req.method !== 'GET') {
     return c.json(
       {
-        error: 'Forbidden',
-        message: 'El usuario demo solo tiene permisos de lectura',
+        error: 'El usuario demo solo tiene permisos de lectura',
+        status: 403,
       },
       403
     )
