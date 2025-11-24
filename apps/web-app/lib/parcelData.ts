@@ -1,5 +1,11 @@
 import { apiClient } from '@/lib/apiClient'
 
+type ParcelResponse = {
+  data?: ApiParcel[]
+  status: number
+  error: string | null
+}
+
 type ApiParcel = {
   id: number
   userId: string
@@ -72,7 +78,7 @@ export async function getUserParcels(params?: {
   limit?: number
   type?: string
   irrigationType?: string
-}): Promise<{ data: ApiParcel[]; status: number; error: string | null }> {
+}): Promise<ParcelResponse> {
   const searchParams = new URLSearchParams()
   if (params?.page) searchParams.set('page', params.page.toString())
   if (params?.limit) searchParams.set('limit', params.limit.toString())
@@ -94,17 +100,23 @@ export async function getParcelById(id: number): Promise<ApiParcel> {
 
 export async function createParcel(
   parcel: CreateParcelInput
-): Promise<ApiParcel> {
-  const { data } = await apiClient.post<ApiResponse>('/parcels', parcel)
-  return data?.data[0] as ApiParcel
+): Promise<ParcelResponse> {
+  const { data, status, error } = await apiClient.post<ApiResponse>(
+    '/parcels',
+    parcel
+  )
+  return { data: data?.data, status, error: error ?? null }
 }
 
 export async function updateParcel(
   id: number,
   parcel: UpdateParcelInput
-): Promise<ApiParcel> {
-  const { data } = await apiClient.put<ApiResponse>(`/parcels/${id}`, parcel)
-  return data?.data[0] as ApiParcel
+): Promise<ParcelResponse> {
+  const { data, status, error } = await apiClient.put<ApiResponse>(
+    `/parcels/${id}`,
+    parcel
+  )
+  return { data: data?.data, status, error: error ?? null }
 }
 
 export async function deleteParcel(id: number): Promise<void> {

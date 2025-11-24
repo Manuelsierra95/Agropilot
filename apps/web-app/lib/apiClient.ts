@@ -32,8 +32,11 @@ class ApiClient {
     let status: number = 0
     try {
       const response = await fetch(url, config)
+      console.log(`Request to ${url} responded with status ${response.status}`)
       status = response.status
+      console.log(`Response status: ${status}`)
       data = await response.json().catch(() => null)
+      console.log('Response data:', data)
       if (!response.ok) {
         if (status === 401) {
           error = 'No autenticado. Por favor inicia sesión.'

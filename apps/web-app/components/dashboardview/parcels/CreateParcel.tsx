@@ -88,10 +88,9 @@ export function CreateParcel({ trigger, onSubmit }: CreateParcelProps) {
         description: formData.description || null,
       }
 
-      console.log('Datos de la parcela:', parcelData)
+      const { data, error, status } = await createParcel(parcelData)
 
-      const response = await createParcel(parcelData)
-      console.log('Respuesta de la API:', response)
+      if (error) throw new Error(error)
 
       if (onSubmit) {
         onSubmit(parcelData)
@@ -112,9 +111,10 @@ export function CreateParcel({ trigger, onSubmit }: CreateParcelProps) {
         { x: '', y: '' },
         { x: '', y: '' },
       ])
-    } catch (error) {
-      console.error('Error al crear la parcela:', error)
-      toast.error('Error al crear la parcela. Por favor, intenta de nuevo.')
+    } catch (err: any) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Error al crear la parcela'
+      toast.error(errorMessage)
     } finally {
       setIsSubmitting(false)
     }

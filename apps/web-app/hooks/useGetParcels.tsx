@@ -24,7 +24,7 @@ export function useGetParcels() {
     try {
       const { data, error } = await getUserParcels()
       if (error) throw new Error(error)
-      initParcels(data)
+      initParcels(data ?? [])
     } catch (err: any) {
       const errorMessage =
         err instanceof Error ? err.message : 'Error al cargar las parcelas'

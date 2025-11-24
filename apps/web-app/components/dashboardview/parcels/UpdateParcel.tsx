@@ -130,8 +130,12 @@ export function UpdateParcel({ trigger, onUpdate }: UpdateParcelProps) {
         description: formData.description || null,
       }
 
-      const response = await updateParcel(selectedParcel.id, parcelData)
-      console.log('Respuesta de la API:', response)
+      const { data, error, status } = await updateParcel(
+        selectedParcel.id,
+        parcelData
+      )
+
+      if (error) throw new Error(error)
 
       if (onUpdate) {
         onUpdate(parcelData)
@@ -140,11 +144,10 @@ export function UpdateParcel({ trigger, onUpdate }: UpdateParcelProps) {
       toast.success('¡Parcela actualizada exitosamente!')
 
       setOpen(false)
-    } catch (error) {
-      console.error('Error al actualizar la parcela:', error)
-      toast.error(
-        'Error al actualizar la parcela. Por favor, intenta de nuevo.'
-      )
+    } catch (err: any) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Error al actualizar la parcela'
+      toast.error(errorMessage)
     } finally {
       setIsSubmitting(false)
     }
