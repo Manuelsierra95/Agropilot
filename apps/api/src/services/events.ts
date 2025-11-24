@@ -87,12 +87,18 @@ export const getEvents = (
     },
     onNotFound: {
       condition: (result: any) => !result?.data || result.data.length === 0,
-      message: parcelId
-        ? 'No se encontraron eventos de calendario para esta parcela'
-        : 'No se encontraron eventos de calendario',
-      details: parcelId
-        ? `No existen eventos de calendario para el usuario ${userId} y la parcela ${parcelId}`
-        : 'No existen eventos de calendario en la base de datos',
+      message:
+        todayEvents === 1
+          ? `No se han encontrado eventos para hoy ${dayjs().format('DD/MM/YYYY')}`
+          : parcelId
+            ? 'No se encontraron eventos de calendario para esta parcela'
+            : 'No se encontraron eventos de calendario',
+      details:
+        todayEvents === 1
+          ? `No existen eventos de calendario para hoy ${dayjs().format('DD/MM/YYYY')} para el usuario ${userId}`
+          : parcelId
+            ? `No existen eventos de calendario para el usuario ${userId} y la parcela ${parcelId}`
+            : 'No existen eventos de calendario en la base de datos',
       status: 404,
     },
   })
