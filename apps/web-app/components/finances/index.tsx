@@ -53,7 +53,7 @@ export function Finances() {
       }
 
       // Guardar en el store
-      setTransactions(data, parcelId, nextPage)
+      setTransactions(data.data, parcelId, nextPage)
     } catch (err) {
       console.error('Error al hacer prefetch:', err)
     }
