@@ -3,6 +3,8 @@ import { env } from '@/lib/env'
 /**
  * Cliente API configurado para hacer peticiones autenticadas con credentials: 'include'
  */
+type ApiResponse<T> = { data: T; status: number; error: string | null }
+
 class ApiClient {
   private baseURL: string
 
@@ -13,59 +15,58 @@ class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<T> {
+  ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`
-
-    console.log(`API Request: ${options.method || 'GET'} ${url}`)
 
     const config: RequestInit = {
       ...options,
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers,
+        ...(options.headers || {}),
       },
     }
 
-    console.log('API Request Config:', config)
-
+    let error: string | null = null
+    let data: any = null
+    let status: number = 0
     try {
       const response = await fetch(url, config)
-
+      status = response.status
+      data = await response.json().catch(() => null)
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('No autenticado. Por favor inicia sesión.')
+        if (status === 401) {
+          error = 'No autenticado. Por favor inicia sesión.'
+        } else {
+          error = data?.error || 'Error en la petición'
         }
-        const error = await response.json().catch(() => ({}))
-        throw new Error(error.message || 'Error en la petición')
       }
-
-      return response.json()
-    } catch (error) {
-      console.error('API Error:', error)
-      throw error
+    } catch (err: any) {
+      console.error('API Error:', err)
+      error = err?.message || 'Error de red o inesperado'
     }
+    return { data, status, error }
   }
 
-  async get<T>(endpoint: string): Promise<T> {
+  async get<T>(endpoint: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { method: 'GET' })
   }
 
-  async post<T>(endpoint: string, data?: unknown): Promise<T> {
+  async post<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
     })
   }
 
-  async put<T>(endpoint: string, data?: unknown): Promise<T> {
+  async put<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data),
     })
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
+  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { method: 'DELETE' })
   }
 }

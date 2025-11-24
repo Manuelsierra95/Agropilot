@@ -57,21 +57,30 @@ export function useGetDashboardMetrics(options: UseGetMetricsOptions = {}) {
       setError(null)
 
       try {
-        let data
+        let data, status
 
-        if (parcelId === 'all')
-          data = await getUserLatestMetrics(metricTypes, {
+        if (parcelId === 'all') {
+          const response = await getUserLatestMetrics(metricTypes, {
             page,
             limit,
           })
-        else
-          data = await getParcelLatestMetrics(Number(parcelId), metricTypes, {
-            page,
-            limit,
-          })
+          data = response.data
+          status = response.status
+        } else {
+          const response = await getParcelLatestMetrics(
+            Number(parcelId),
+            metricTypes,
+            {
+              page,
+              limit,
+            }
+          )
+          data = response.data
+          status = response.status
+        }
 
         setMetrics(data, parcelId)
-      } catch (err) {
+      } catch (err: any) {
         const errorMessage =
           err instanceof Error ? err.message : 'Error al cargar las métricas'
         setError(errorMessage)

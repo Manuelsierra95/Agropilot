@@ -1,5 +1,11 @@
 import { apiClient } from '@/lib/apiClient'
 
+type MetricsResponse = {
+  data: ApiMetric[]
+  status: number
+  error: string | null
+}
+
 type ApiMetric = {
   id: number
   userId: string
@@ -38,7 +44,7 @@ export async function getUserMetrics(params?: {
   source?: 'manual' | 'api' | 'sensor' | 'calculated'
   startDate?: Date
   endDate?: Date
-}): Promise<ApiMetric[]> {
+}): Promise<MetricsResponse> {
   const searchParams = new URLSearchParams()
   if (params?.page) searchParams.set('page', params.page.toString())
   if (params?.limit) searchParams.set('limit', params.limit.toString())
@@ -50,10 +56,10 @@ export async function getUserMetrics(params?: {
   if (params?.endDate) searchParams.set('endDate', params.endDate.toISOString())
 
   const query = searchParams.toString()
-  const response = await apiClient.get<ApiResponse>(
+  const { data, status, error } = await apiClient.get<ApiResponse>(
     `/metrics${query ? `?${query}` : ''}`
   )
-  return response.data
+  return { data: data?.data ?? [], status, error: error ?? null }
 }
 
 export async function getParcelMetrics(
@@ -66,7 +72,7 @@ export async function getParcelMetrics(
     startDate?: Date
     endDate?: Date
   }
-): Promise<ApiMetric[]> {
+): Promise<MetricsResponse> {
   const searchParams = new URLSearchParams()
   if (params?.page) searchParams.set('page', params.page.toString())
   if (params?.limit) searchParams.set('limit', params.limit.toString())
@@ -77,14 +83,15 @@ export async function getParcelMetrics(
   if (params?.endDate) searchParams.set('endDate', params.endDate.toISOString())
 
   const query = searchParams.toString()
-  const response = await apiClient.get<ApiResponse>(
+  const { data, status, error } = await apiClient.get<ApiResponse>(
     `/metrics/parcel/${parcelId}${query ? `?${query}` : ''}`
   )
-  return response.data
+  return { data: data?.data ?? [], status, error: error ?? null }
 }
 
 export async function getMetricById(id: number): Promise<ApiMetric> {
-  return apiClient.get<ApiMetric>(`/metrics/${id}`)
+  const { data } = await apiClient.get<ApiResponse>(`/metrics/${id}`)
+  return data?.data?.[0] as ApiMetric
 }
 
 export async function createMetric(metric: {
@@ -97,7 +104,8 @@ export async function createMetric(metric: {
   metadata?: Record<string, any> | null
   date: Date
 }): Promise<ApiMetric> {
-  return apiClient.post<ApiMetric>('/metrics', metric)
+  const { data } = await apiClient.post<ApiResponse>('/metrics', metric)
+  return data?.data?.[0] as ApiMetric
 }
 
 export async function createBulkMetrics(
@@ -112,7 +120,8 @@ export async function createBulkMetrics(
     date: Date
   }>
 ): Promise<ApiMetric[]> {
-  return apiClient.post<ApiMetric[]>('/metrics/bulk', metrics)
+  const { data } = await apiClient.post<ApiResponse>('/metrics/bulk', metrics)
+  return data?.data as ApiMetric[]
 }
 
 export async function updateMetric(
@@ -128,9 +137,10 @@ export async function updateMetric(
     date: Date
   }>
 ): Promise<ApiMetric> {
-  return apiClient.put<ApiMetric>(`/metrics/${id}`, metric)
+  const { data } = await apiClient.put<ApiResponse>(`/metrics/${id}`, metric)
+  return data?.data?.[0] as ApiMetric
 }
 
 export async function deleteMetric(id: number): Promise<void> {
-  return apiClient.delete(`/metrics/${id}`)
+  await apiClient.delete(`/metrics/${id}`)
 }

@@ -11,6 +11,12 @@ export type Event = {
   tags: string[]
 }
 
+type EventResponse = {
+  data?: ApiEvent[]
+  status: number
+  error: string | null
+}
+
 type ApiEvent = {
   id: number
   userId: string
@@ -48,7 +54,7 @@ export async function getUserEvents(params?: {
   category?: string
   isRead?: 0 | 1
   todayEvents?: 0 | 1
-}): Promise<ApiEvent[]> {
+}): Promise<EventResponse> {
   const searchParams = new URLSearchParams()
   if (params?.page) searchParams.set('page', params.page.toString())
   if (params?.limit) searchParams.set('limit', params.limit.toString())
@@ -59,10 +65,10 @@ export async function getUserEvents(params?: {
     searchParams.set('todayEvents', params.todayEvents.toString())
 
   const query = searchParams.toString()
-  const response = await apiClient.get<ApiResponse>(
+  const { data, status, error } = await apiClient.get<ApiResponse>(
     `/events${query ? `?${query}` : ''}`
   )
-  return response.data
+  return { data: data?.data ?? [], status, error: error ?? null }
 }
 
 export async function getParcelEvents(
@@ -74,7 +80,7 @@ export async function getParcelEvents(
     isRead?: 0 | 1
     todayEvents?: 0 | 1
   }
-): Promise<ApiEvent[]> {
+): Promise<EventResponse> {
   const searchParams = new URLSearchParams()
   if (params?.page) searchParams.set('page', params.page.toString())
   if (params?.limit) searchParams.set('limit', params.limit.toString())
@@ -85,10 +91,11 @@ export async function getParcelEvents(
     searchParams.set('todayEvents', params.todayEvents.toString())
 
   const query = searchParams.toString()
-  const response = await apiClient.get<ApiResponse>(
+  const { data, status, error } = await apiClient.get<ApiResponse>(
     `/events/parcel/${parcelId}${query ? `?${query}` : ''}`
   )
-  return response.data
+
+  return { data: data?.data ?? [], status, error: error ?? null }
 }
 
 export async function getTodayParcelEvents(
@@ -99,7 +106,7 @@ export async function getTodayParcelEvents(
     category?: string
     isRead?: 0 | 1
   }
-): Promise<ApiEvent[]> {
+): Promise<EventResponse> {
   if (parcelId === 'all') {
     return getUserEvents({ ...params, todayEvents: 1 })
   }
@@ -114,7 +121,7 @@ export async function getAllParcelEvents(
     category?: string
     isRead?: 0 | 1
   }
-): Promise<ApiEvent[]> {
+): Promise<EventResponse> {
   if (parcelId === 'all') {
     return getUserEvents(params)
   }
@@ -127,6 +134,10 @@ export async function createEvent(event: {
   description: string
   priority: 'low' | 'medium' | 'high' | 'critical'
   parcelId: number
-}): Promise<ApiEvent> {
-  return apiClient.post<ApiEvent>('/events', event)
+}): Promise<{ data: ApiEvent | null; status: number; error: string | null }> {
+  const { data, status, error } = await apiClient.post<ApiEvent>(
+    '/events',
+    event
+  )
+  return { data, status, error: error ?? null }
 }

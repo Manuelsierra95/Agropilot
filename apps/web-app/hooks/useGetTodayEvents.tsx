@@ -33,9 +33,14 @@ export function useGetTodayEvents(options: UseGetTodayEventsOptions = {}) {
       setError(null)
 
       try {
-        const data = await getTodayParcelEvents(
+        const { data, status, error } = await getTodayParcelEvents(
           parcelId === 'all' ? 'all' : Number(parcelId)
         )
+
+        // if (status === 404) toast.info(error ?? 'No hay eventos para hoy')
+
+        if (data === undefined)
+          throw new Error(error || 'Datos de eventos no disponibles')
 
         const transformedEvents: Event[] = data.map((event) => ({
           id: event.id.toString(),
@@ -49,7 +54,7 @@ export function useGetTodayEvents(options: UseGetTodayEventsOptions = {}) {
         }))
 
         setEvents(transformedEvents, parcelId)
-      } catch (err) {
+      } catch (err: any) {
         const errorMessage =
           err instanceof Error
             ? err.message

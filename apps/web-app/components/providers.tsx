@@ -5,6 +5,12 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import { Toaster } from 'sonner'
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const isMobile =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(max-width: 768px)').matches
+
+  const position = isMobile ? 'top-left' : 'bottom-left'
+
   return (
     <NextThemesProvider
       attribute="class"
@@ -14,7 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableColorScheme
     >
       {children}
-      <Toaster position="bottom-left" richColors />
+      <Toaster position={position} richColors />
     </NextThemesProvider>
   )
 }

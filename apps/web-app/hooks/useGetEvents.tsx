@@ -33,9 +33,12 @@ export function useGetEvents(options: UseGetEventsOptions = {}) {
       setError(null)
 
       try {
-        const data = await getAllParcelEvents(
+        const { data } = await getAllParcelEvents(
           parcelId === 'all' ? 'all' : Number(parcelId)
         )
+
+        if (data === undefined)
+          throw new Error(error || 'Datos de eventos no disponibles')
 
         const transformedEvents: Event[] = data.map((event) => ({
           id: event.id.toString(),
@@ -49,7 +52,7 @@ export function useGetEvents(options: UseGetEventsOptions = {}) {
         }))
 
         setEvents(transformedEvents, parcelId)
-      } catch (err) {
+      } catch (err: any) {
         const errorMessage =
           err instanceof Error ? err.message : 'Error al cargar los eventos'
         setError(errorMessage)

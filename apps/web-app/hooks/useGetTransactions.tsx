@@ -57,10 +57,10 @@ export function useGetTransactions(options: UseGetTransactionsOptions = {}) {
       setError(null)
 
       try {
-        let data
+        let data, status
 
         if (parcelId === 'all') {
-          data = await getUserTransactions({
+          const response = await getUserTransactions({
             page,
             limit,
             type,
@@ -69,8 +69,10 @@ export function useGetTransactions(options: UseGetTransactionsOptions = {}) {
             startDate,
             endDate,
           })
+          data = response.data
+          status = response.status
         } else {
-          data = await getParcelTransactions(Number(parcelId), {
+          const response = await getParcelTransactions(Number(parcelId), {
             page,
             limit,
             type,
@@ -79,10 +81,12 @@ export function useGetTransactions(options: UseGetTransactionsOptions = {}) {
             startDate,
             endDate,
           })
+          data = response.data
+          status = response.status
         }
 
         setTransactions(data, parcelId, page)
-      } catch (err) {
+      } catch (err: any) {
         const errorMessage =
           err instanceof Error
             ? err.message

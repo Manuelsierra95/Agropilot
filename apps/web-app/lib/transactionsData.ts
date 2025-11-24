@@ -32,7 +32,11 @@ type ApiResponse = {
  */
 export async function getUserTransactions(
   params?: TransactionQueryParams
-): Promise<TransactionsResponse> {
+): Promise<{
+  data: TransactionsResponse
+  status: number
+  error: string | null
+}> {
   const searchParams = new URLSearchParams()
 
   if (params?.page) searchParams.set('page', params.page.toString())
@@ -46,13 +50,16 @@ export async function getUserTransactions(
   if (params?.endDate) searchParams.set('endDate', params.endDate.toISOString())
 
   const query = searchParams.toString()
-  const response = await apiClient.get<ApiResponse>(
+  const { data, status, error } = await apiClient.get<ApiResponse>(
     `/transactions${query ? `?${query}` : ''}`
   )
-
   return {
-    transactions: response.data,
-    pagination: response.pagination,
+    data: {
+      transactions: data?.data ?? [],
+      pagination: data?.pagination ?? undefined,
+    },
+    status,
+    error: error ?? null,
   }
 }
 
@@ -64,7 +71,11 @@ export async function getUserTransactions(
 export async function getParcelTransactions(
   parcelId: number,
   params?: Omit<TransactionQueryParams, 'parcelId'>
-): Promise<TransactionsResponse> {
+): Promise<{
+  data: TransactionsResponse
+  status: number
+  error: string | null
+}> {
   const searchParams = new URLSearchParams()
 
   if (params?.page) searchParams.set('page', params.page.toString())
@@ -78,13 +89,16 @@ export async function getParcelTransactions(
   if (params?.endDate) searchParams.set('endDate', params.endDate.toISOString())
 
   const query = searchParams.toString()
-  const response = await apiClient.get<ApiResponse>(
+  const { data, status, error } = await apiClient.get<ApiResponse>(
     `/transactions/parcel/${parcelId}${query ? `?${query}` : ''}`
   )
-
   return {
-    transactions: response.data,
-    pagination: response.pagination,
+    data: {
+      transactions: data?.data ?? [],
+      pagination: data?.pagination ?? undefined,
+    },
+    status,
+    error: error ?? null,
   }
 }
 
@@ -93,13 +107,13 @@ export async function getParcelTransactions(
  * @param id - ID de la transacción
  */
 export async function getTransactionById(id: number) {
-  const response = await apiClient.get<{
+  const { data, status, error } = await apiClient.get<{
     message: string
     timestamp: string
     status: number
     data: Transaction
   }>(`/transactions/${id}`)
-  return response.data
+  return { data: data, status, error: error ?? null }
 }
 
 /**
@@ -117,13 +131,13 @@ export async function createTransaction(transaction: {
   date: Date
   description?: string | null
 }) {
-  const response = await apiClient.post<{
+  const { data, status, error } = await apiClient.post<{
     message: string
     timestamp: string
     status: number
     data: Transaction
   }>('/transactions', transaction)
-  return response.data
+  return { data: data, status, error: error ?? null }
 }
 
 /**
@@ -143,7 +157,7 @@ export async function createBulkTransactions(
     description?: string | null
   }>
 ) {
-  const response = await apiClient.post<{
+  const { data, status, error } = await apiClient.post<{
     message: string
     timestamp: string
     status: number
@@ -152,7 +166,7 @@ export async function createBulkTransactions(
       failed: any[]
     }
   }>('/transactions/bulk', transactions)
-  return response.data
+  return { data: data, status, error: error ?? null }
 }
 
 /**
@@ -174,13 +188,13 @@ export async function updateTransaction(
     description: string | null
   }>
 ) {
-  const response = await apiClient.put<{
+  const { data, status, error } = await apiClient.put<{
     message: string
     timestamp: string
     status: number
     data: Transaction
   }>(`/transactions/${id}`, transaction)
-  return response.data
+  return { data: data, status, error: error ?? null }
 }
 
 /**
@@ -188,11 +202,11 @@ export async function updateTransaction(
  * @param id - ID de la transacción
  */
 export async function deleteTransaction(id: number) {
-  const response = await apiClient.delete<{
+  const { data, status, error } = await apiClient.delete<{
     message: string
     timestamp: string
     status: number
     data: { id: number }
   }>(`/transactions/${id}`)
-  return response.data
+  return { data: data, status, error: error ?? null }
 }

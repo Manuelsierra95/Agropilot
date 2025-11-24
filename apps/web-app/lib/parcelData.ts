@@ -16,8 +16,8 @@ type ApiParcel = {
     | 'MultiLineString'
   geometryCoordinates: number[][][]
   description: string | null
-  createdAt: string
-  updatedAt: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 type ApiResponse = {
@@ -72,7 +72,7 @@ export async function getUserParcels(params?: {
   limit?: number
   type?: string
   irrigationType?: string
-}): Promise<ApiParcel[]> {
+}): Promise<{ data: ApiParcel[]; status: number; error: string | null }> {
   const searchParams = new URLSearchParams()
   if (params?.page) searchParams.set('page', params.page.toString())
   if (params?.limit) searchParams.set('limit', params.limit.toString())
@@ -81,29 +81,32 @@ export async function getUserParcels(params?: {
     searchParams.set('irrigationType', params.irrigationType)
 
   const query = searchParams.toString()
-  const response = await apiClient.get<ApiResponse>(
+  const { data, status, error } = await apiClient.get<ApiResponse>(
     `/parcels${query ? `?${query}` : ''}`
   )
-  return response.data
+  return { data: data?.data ?? [], status, error: error ?? null }
 }
 
 export async function getParcelById(id: number): Promise<ApiParcel> {
-  return apiClient.get<ApiParcel>(`/parcels/${id}`)
+  const { data } = await apiClient.get<ApiResponse>(`/parcels/${id}`)
+  return data?.data[0] as ApiParcel
 }
 
 export async function createParcel(
   parcel: CreateParcelInput
 ): Promise<ApiParcel> {
-  return apiClient.post<ApiParcel>('/parcels', parcel)
+  const { data } = await apiClient.post<ApiResponse>('/parcels', parcel)
+  return data?.data[0] as ApiParcel
 }
 
 export async function updateParcel(
   id: number,
   parcel: UpdateParcelInput
 ): Promise<ApiParcel> {
-  return apiClient.put<ApiParcel>(`/parcels/${id}`, parcel)
+  const { data } = await apiClient.put<ApiResponse>(`/parcels/${id}`, parcel)
+  return data?.data[0] as ApiParcel
 }
 
 export async function deleteParcel(id: number): Promise<void> {
-  return apiClient.delete(`/parcels/${id}`)
+  await apiClient.delete(`/parcels/${id}`)
 }

@@ -56,28 +56,8 @@ export async function getParcelLatestMetrics(
     page?: number
     limit?: number
   }
-): Promise<
-  GroupedMetricsData & {
-    pagination: {
-      currentPage: number
-      totalPages: number
-      totalItems: number
-      itemsPerPage: number
-      hasNextPage: boolean
-      hasPreviousPage: boolean
-    }
-  }
-> {
-  const searchParams = new URLSearchParams()
-  if (params?.page) searchParams.set('page', params.page.toString())
-  if (params?.limit) searchParams.set('limit', params.limit.toString())
-
-  const query = searchParams.toString()
-  const response = await apiClient.post<ApiResponse>(
-    `/metrics/parcel/${parcelId}/latests${query ? `?${query}` : ''}`,
-    { metricTypes }
-  )
-  return response.data
+) {
+  return getDashboardMetricsData('parcel', parcelId, metricTypes, params)
 }
 
 /**
@@ -91,8 +71,36 @@ export async function getUserLatestMetrics(
     page?: number
     limit?: number
   }
-): Promise<
-  GroupedMetricsData & {
+) {
+  return getDashboardMetricsData('user', 0, metricTypes, params)
+}
+
+function buildMetricsQuery(
+  metricTypes: string[],
+  params?: { page?: number; limit?: number }
+): string {
+  const searchParams = new URLSearchParams()
+
+  if (metricTypes.length > 0) {
+    searchParams.set('metricTypes', metricTypes.join(','))
+  }
+  if (params?.page) searchParams.set('page', params.page.toString())
+  if (params?.limit) searchParams.set('limit', params.limit.toString())
+
+  const queryString = searchParams.toString()
+  return queryString ? `?${queryString}` : ''
+}
+
+async function getDashboardMetricsData(
+  type: 'user' | 'parcel',
+  parcelId: number,
+  metricTypes: string[],
+  params?: {
+    page?: number
+    limit?: number
+  }
+): Promise<{
+  data: GroupedMetricsData & {
     pagination: {
       currentPage: number
       totalPages: number
@@ -102,15 +110,17 @@ export async function getUserLatestMetrics(
       hasPreviousPage: boolean
     }
   }
-> {
-  const searchParams = new URLSearchParams()
-  if (params?.page) searchParams.set('page', params.page.toString())
-  if (params?.limit) searchParams.set('limit', params.limit.toString())
+  status: number
+  error: string | null
+}> {
+  const query = buildMetricsQuery(metricTypes, params)
+  const basePath =
+    type === 'parcel'
+      ? `/metrics/parcel/${parcelId}/latests`
+      : `/metrics/latests`
 
-  const query = searchParams.toString()
-  const response = await apiClient.post<ApiResponse>(
-    `/metrics/latests${query ? `?${query}` : ''}`,
-    { metricTypes }
+  const { data, status, error } = await apiClient.get<ApiResponse>(
+    `${basePath}${query}`
   )
-  return response.data
+  return { data: data?.data ?? {}, status, error: error ?? null }
 }
