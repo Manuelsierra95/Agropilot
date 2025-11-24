@@ -19,8 +19,9 @@ export function getAuth(c: Context<{ Bindings: Env } & CustomContext>) {
     authInstance = betterAuth({
       advanced: {
         defaultCookieAttributes: {
-          sameSite: 'none',
+          sameSite: isProduction ? 'lax' : 'none',
           secure: true,
+          domain: isProduction ? '.agropilotapp.es' : undefined,
         },
       },
       trustedOrigins: isProduction ? ORIGINS : DEVORIGINS,

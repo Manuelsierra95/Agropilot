@@ -1,8 +1,8 @@
 export const AUTH_COOKIE_NAME = 'better-auth.session_token'
 
 export const ORIGINS = [
-  'https://agropilot.vercel.app',
-  'https://agropilot-api.manuelsierramunoz.workers.dev',
+  'https://agropilotapp.es',
+  'https://www.agropilotapp.es',
 ]
 export const DEVORIGINS = ['http://localhost:3000', 'http://localhost:8787']
 
