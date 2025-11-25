@@ -65,15 +65,15 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           <Link
             href="/login"
-            className="hidden md:block text-sm font-medium text-neutral-600 hover:text-black transition-colors"
+            className="text-sm font-medium text-neutral-600 hover:text-black transition-colors"
           >
-            Log in
+            Demo
           </Link>
           <Link
             href="/login"
             className="px-4 py-2 text-sm font-medium text-white bg-black rounded-full hover:bg-neutral-800 transition-all shadow-lg shadow-neutral-500/20 hover:shadow-neutral-500/40"
           >
-            Demo
+            Log in
           </Link>
         </div>
       </div>
