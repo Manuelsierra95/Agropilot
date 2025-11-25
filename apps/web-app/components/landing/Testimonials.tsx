@@ -24,7 +24,7 @@ export default function Testimonials() {
   ]
 
   return (
-    <section className="w-full max-w-7xl py-20">
+    <section className="w-full max-w-7xl py-20 flex flex-col items-center justify-center mx-auto">
       <div className="text-center mb-16">
         <h2 className="text-4xl md:text-5xl font-bold text-green-900 mb-4">
           Lo que dicen nuestros usuarios
@@ -34,7 +34,7 @@ export default function Testimonials() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center w-full">
         {testimonials.map((testimonial, index) => (
           <div
             key={index}

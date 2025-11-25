@@ -1,19 +1,38 @@
+'use client'
+
+import { motion } from 'framer-motion'
+
 interface FeatureCardProps {
   icon: string
   title: string
   description: string
+  className?: string
+  delay?: number
 }
 
 export default function FeatureCard({
   icon,
   title,
   description,
+  delay = 0,
+  className = '',
 }: FeatureCardProps) {
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-lg border border-green-100 hover:shadow-xl hover:border-green-300 transition-all duration-300 transform hover:-translate-y-1">
-      <div className="text-5xl mb-4">{icon}</div>
-      <h3 className="text-2xl font-bold text-green-900 mb-3">{title}</h3>
-      <p className="text-gray-600 leading-relaxed">{description}</p>
-    </div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{
+        duration: 0.7,
+        delay,
+        ease: 'easeOut',
+      }}
+      className={`relative p-6 md:p-8 bg-white border border-neutral-200 rounded-xl shadow-lg shadow-neutral-100/50 overflow-hidden ${className}`}
+    >
+      <div className="text-4xl mb-4">{icon}</div>
+      <h3 className="text-xl font-semibold text-black mb-2">{title}</h3>
+      <p className="text-neutral-600 text-base">{description}</p>
+      <div className="absolute top-0 right-0 w-8 h-8 rounded-bl-xl bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+    </motion.div>
   )
 }

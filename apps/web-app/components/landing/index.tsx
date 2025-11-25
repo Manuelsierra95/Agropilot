@@ -1,6 +1,9 @@
-import Navbar from '@/components/landing/Navbar'
+'use client'
+
+import { motion } from 'framer-motion'
+import Navbar from '@/components/landing/Navbar' // Tu nuevo Navbar
 import Hero from '@/components/landing/Hero'
-import CTAButtons from '@/components/landing/CTAButtons'
+import AnimatedBackground from '@/components/landing/AnimatedBackground' // Tu nuevo fondo
 import Stats from '@/components/landing/Stats'
 import Features from '@/components/landing/Features'
 import HowItWorks from '@/components/landing/HowItWorks'
@@ -9,55 +12,67 @@ import Testimonials from '@/components/landing/Testimonials'
 import CTA from '@/components/landing/CTA'
 import Footer from '@/components/landing/Footer'
 
+const SectionWrapper = ({
+  children,
+  className = '',
+  id = '',
+}: {
+  children: React.ReactNode
+  className?: string
+  id?: string
+}) => (
+  <motion.section
+    id={id}
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: '-100px' }}
+    transition={{ duration: 0.6, ease: 'easeOut' }}
+    className={`container mx-auto px-4 py-20 md:py-28 ${className}`}
+  >
+    {children}
+  </motion.section>
+)
+
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 via-white to-green-50">
+    <div className="min-h-screen text-neutral-950 selection:bg-black selection:text-white font-sans">
       <Navbar />
 
-      <main>
-        <section className="container mx-auto px-4 py-20 md:py-32">
-          <div className="flex flex-col items-center text-center space-y-8">
+      <main className="flex flex-col w-full">
+        <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden">
+          <AnimatedBackground />
+
+          <div className="container mx-auto px-4 relative z-10">
             <Hero />
-            <CTAButtons />
           </div>
-        </section>
 
-        <section className="container mx-auto px-4">
+          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white to-transparent z-10 pointer-events-none"></div>
+        </section>
+        <SectionWrapper>
           <Stats />
-        </section>
+        </SectionWrapper>
 
-        <section id="features" className="container mx-auto px-4 py-20">
-          <div className="flex flex-col items-center">
-            <Features />
-          </div>
-        </section>
+        <SectionWrapper id="caracteristicas">
+          <Features />
+        </SectionWrapper>
 
-        <section className="container mx-auto px-4 py-20 bg-gradient-to-b from-white to-green-50">
-          <div className="flex flex-col items-center">
+        <div className="bg-neutral-50/50 border-y border-neutral-100">
+          <SectionWrapper id="como-funciona">
             <HowItWorks />
-          </div>
-        </section>
+          </SectionWrapper>
+        </div>
 
-        <section id="benefits" className="container mx-auto px-4 py-20">
-          <div className="flex flex-col items-center">
-            <Benefits />
-          </div>
-        </section>
+        <SectionWrapper id="beneficios">
+          <Benefits />
+        </SectionWrapper>
 
-        <section
-          id="testimonials"
-          className="container mx-auto px-4 py-20 bg-white"
-        >
-          <div className="flex flex-col items-center">
-            <Testimonials />
-          </div>
-        </section>
+        <SectionWrapper id="testimonios">
+          <Testimonials />
+        </SectionWrapper>
 
-        <section className="container mx-auto px-4 py-20">
-          <div className="flex flex-col items-center">
-            <CTA />
-          </div>
-        </section>
+        <SectionWrapper className="mb-20">
+          <CTA />
+        </SectionWrapper>
       </main>
 
       <Footer />

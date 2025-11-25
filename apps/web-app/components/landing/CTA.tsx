@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function CTA() {
   return (
-    <section className="w-full max-w-7xl py-20">
+    <section className="w-full max-w-7xl py-20 flex flex-col items-center justify-center mx-auto">
       <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-3xl p-12 md:p-16 text-center shadow-2xl">
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
           ¿Listo para transformar tu explotación agrícola?
@@ -24,7 +24,7 @@ export default function CTA() {
           </Link>
         </div>
         <p className="text-green-100 mt-8 text-sm">
-          No necesitas tarjeta de crédito • Configuración en 5 minutos
+          Configuración en 5 minutos
         </p>
       </div>
     </section>
