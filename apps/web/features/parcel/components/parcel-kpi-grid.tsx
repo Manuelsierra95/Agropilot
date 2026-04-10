@@ -1,4 +1,5 @@
 import { mockParcels } from "@/store/mockParcels"
+import type { ParcelApiResponse } from "./parcel-types"
 import type { WeatherMetrics } from "@/store/parcel-weather.mock"
 
 import {
@@ -18,6 +19,7 @@ type ParcelKpiGridProps = {
   allModeSummary: AllModeSummary
   olivePriceValue: number
   cropHealthValue: number
+  apiResponse?: ParcelApiResponse
 }
 
 export function ParcelKpiGrid({
@@ -26,70 +28,99 @@ export function ParcelKpiGrid({
   allModeSummary,
   olivePriceValue,
   cropHealthValue,
+  apiResponse,
 }: ParcelKpiGridProps) {
+  const apiMetrics = apiResponse?.metrics
+
   return (
     <section className="mt-4 grid md:grid-cols-2 xl:grid-cols-4">
       <Card>
         <CardHeader>
           <CardDescription>
-            {isAllSelected ? "Superficie total" : "Estrés hídrico 7 días"}
+            {isAllSelected ? "Superficie total" : "Déficit hídrico"}
           </CardDescription>
           <CardTitle className="text-2xl">
             {isAllSelected
               ? `${formatNumber(allModeSummary.totalArea)} ha`
-              : `${formatNumber(metrics?.waterDeficit7d ?? 0)} mm`}
+              : apiResponse
+                ? `${formatNumber(apiMetrics?.water.deficit7d ?? 0)} mm`
+                : `${formatNumber(metrics?.waterDeficit7d ?? 0)} mm`}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
           {isAllSelected
             ? `Parcelas activas: ${mockParcels.length}`
-            : `Déficit 15d: ${formatNumber(metrics?.waterDeficit15d ?? 0)} mm`}
+            : apiResponse
+              ? `15d: ${formatNumber(apiMetrics?.water.deficit15d ?? 0)} mm · 30d: ${formatNumber(apiMetrics?.water.deficit30d ?? 0)} mm`
+              : `Déficit 15d: ${formatNumber(metrics?.waterDeficit15d ?? 0)} mm`}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
           <CardDescription>
-            {isAllSelected ? "Lluvia media 30d" : "Lluvia acumulada"}
+            {isAllSelected ? "Lluvia media 30d" : "Lluvia y sequía"}
           </CardDescription>
           <CardTitle className="text-2xl">
             {isAllSelected
               ? `${formatNumber(allModeSummary.avgRain30d)} mm`
-              : `${formatNumber(metrics?.rain30d ?? 0)} mm`}
+              : apiResponse
+                ? `${formatNumber(apiMetrics?.rain.rain7d ?? 0)} mm`
+                : `${formatNumber(metrics?.rain30d ?? 0)} mm`}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
           {isAllSelected
             ? "Promedio calculado sobre todas las parcelas"
-            : `Últimos 7 días: ${formatNumber(metrics?.rain7d ?? 0)} mm`}
+            : apiResponse
+              ? `30d: ${formatNumber(apiMetrics?.rain.rain30d ?? 0)} mm · secos: ${formatNumber(apiMetrics?.rain.dryDaysConsecutive ?? 0)} días`
+              : `Últimos 7 días: ${formatNumber(metrics?.rain7d ?? 0)} mm`}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardDescription>Temperatura media</CardDescription>
+          <CardDescription>
+            {isAllSelected ? "Temperatura media" : "Temperatura y estrés"}
+          </CardDescription>
           <CardTitle className="text-2xl">
             {isAllSelected
               ? `${formatNumber(allModeSummary.avgTemp)}°C`
-              : `${formatNumber(metrics?.tempAvg ?? 0)}°C`}
+              : apiResponse
+                ? `${formatNumber(apiMetrics?.temperature.avg7d ?? 0)}°C`
+                : `${formatNumber(metrics?.tempAvg ?? 0)}°C`}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
           {isAllSelected
             ? "Media ponderada simple entre parcelas"
-            : `Tendencia térmica: ${formatNumber(metrics?.tempTrend ?? 0, 2)}`}
+            : apiResponse
+              ? `30d: ${formatNumber(apiMetrics?.temperature.avg30d ?? 0)}°C · tendencia: ${formatNumber(apiMetrics?.temperature.trend ?? 0, 1)}°C`
+              : `Tendencia térmica: ${formatNumber(metrics?.tempTrend ?? 0, 2)}`}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardDescription>Mercado y salud del cultivo</CardDescription>
+          <CardDescription>
+            {isAllSelected
+              ? "Mercado y salud del cultivo"
+              : "Cultivo y ambiente"}
+          </CardDescription>
           <CardTitle className="text-2xl">
-            {formatNumber(olivePriceValue, 2)} €/kg
+            {isAllSelected
+              ? `${formatNumber(olivePriceValue, 2)} €/kg`
+              : apiResponse
+                ? apiMetrics?.crop.stage
+                : `${formatNumber(olivePriceValue, 2)} €/kg`}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
-          Índice de salud: {formatNumber(cropHealthValue, 0)} / 100
+          {isAllSelected
+            ? `Índice de salud: ${formatNumber(cropHealthValue, 0)} / 100`
+            : apiResponse
+              ? `GDD: ${formatNumber(apiMetrics?.crop.gdd ?? 0, 0)} · Kc: ${formatNumber(apiMetrics?.crop.kc ?? 0, 2)} · HR: ${formatNumber(apiMetrics?.environment.humidityAvg7d ?? 0, 0)}%`
+              : `Índice de salud: ${formatNumber(cropHealthValue, 0)} / 100`}
         </CardContent>
       </Card>
     </section>

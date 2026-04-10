@@ -4,6 +4,140 @@ import type { mockParcels } from "@/store/mockParcels"
 export type ParcelItem = (typeof mockParcels)[number]
 export type WeatherRiskLevel = WeatherRisks["waterStress"]
 
+export type ParcelApiDailyItem = {
+  date: string
+  icon: string
+  tempMin: number
+  tempMax: number
+  precipitation: number
+  waterBalance: number
+  hasWaterDeficit: boolean
+}
+
+export type ParcelApiMetrics = {
+  water: {
+    deficit7d: number
+    deficit15d: number
+    deficit30d: number
+    eto7d: number
+    eto30d: number
+  }
+  temperature: {
+    avg7d: number
+    avg30d: number
+    trend: number
+    heatStressDays: number
+    coldStressDays: number
+  }
+  rain: {
+    rain7d: number
+    rain30d: number
+    trend: number
+    dryDaysConsecutive: number
+    dryDays7d: number
+  }
+  crop: {
+    gdd: number
+    gdd30d: number
+    kc: number
+    stage: string
+    isCritical: boolean
+  }
+  environment: {
+    humidityAvg7d: number
+    humidityAvg30d: number
+    variabilityIndex: number
+  }
+}
+
+export type ParcelApiRiskDetail = {
+  level: WeatherRiskLevel
+  score: number
+  reasons: string[]
+}
+
+export type ParcelApiResponse = {
+  request: {
+    parcelId: string
+    coords: {
+      lat: number
+      lng: number
+    }
+    cropType: string
+    cropName: string
+    days: number
+  }
+  summary: {
+    stationId: string
+    lastUpdate: string
+  }
+  dataRange: {
+    start: string
+    end: string
+  }
+  daily: {
+    data: ParcelApiDailyItem[]
+    recent: ParcelApiDailyItem[]
+  }
+  metrics: ParcelApiMetrics
+  risks: {
+    waterStress: ParcelApiRiskDetail
+    fungalRisk: ParcelApiRiskDetail
+    insectRisk: ParcelApiRiskDetail
+    thermalStress: ParcelApiRiskDetail
+  }
+  units: {
+    daily: {
+      tempMin: string
+      tempMax: string
+      precipitation: string
+      waterBalance: string
+    }
+    metrics: {
+      water: {
+        deficit7d: string
+        deficit15d: string
+        deficit30d: string
+        eto7d: string
+        eto30d: string
+      }
+      temperature: {
+        avg7d: string
+        avg30d: string
+        trend: string
+        heatStressDays: string
+        coldStressDays: string
+      }
+      rain: {
+        rain7d: string
+        rain30d: string
+        trend: string
+        dryDaysConsecutive: string
+        dryDays7d: string
+      }
+      crop: {
+        gdd: string
+        gdd30d: string
+        kc: string
+      }
+      environment: {
+        humidityAvg7d: string
+        humidityAvg30d: string
+        variabilityIndex: string
+      }
+    }
+    risks: {
+      score: string
+    }
+  }
+  recommendations: Array<{
+    type: string
+    priority: "low" | "medium" | "high"
+    message: string
+    details: string
+  }>
+}
+
 export type ParcelComparisonItem = {
   name: string
   area: number
