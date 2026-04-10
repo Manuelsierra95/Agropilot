@@ -1,19 +1,33 @@
-import { Button } from "@workspace/ui/components/button"
+import { Navigation } from "@/features/landing/navigation"
+import { HeroSection } from "@/features/landing/hero-section"
+import { FeaturesSection } from "@/features/landing/features-section"
+import { HowItWorksSection } from "@/features/landing/how-it-works-section"
+import { InfrastructureSection } from "@/features/landing/infrastructure-section"
+import { MetricsSection } from "@/features/landing/metrics-section"
+import { IntegrationsSection } from "@/features/landing/integrations-section"
+import { SecuritySection } from "@/features/landing/security-section"
+import { DevelopersSection } from "@/features/landing/developers-section"
+import { TestimonialsSection } from "@/features/landing/testimonials-section"
+import { PricingSection } from "@/features/landing/pricing-section"
+import { CtaSection } from "@/features/landing/cta-section"
+import { FooterSection } from "@/features/landing/footer-section"
 
-export default function Page() {
+export default function Landing() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="text-muted-foreground font-mono text-xs">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
-    </div>
+    <main className="noise-overlay relative min-h-screen overflow-x-hidden">
+      <Navigation />
+      <HeroSection />
+      <FeaturesSection />
+      <HowItWorksSection />
+      <InfrastructureSection />
+      <MetricsSection />
+      <IntegrationsSection />
+      <SecuritySection />
+      <DevelopersSection />
+      <TestimonialsSection />
+      <PricingSection />
+      <CtaSection />
+      <FooterSection />
+    </main>
   )
 }
