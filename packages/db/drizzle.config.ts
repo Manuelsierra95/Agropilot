@@ -1,10 +1,16 @@
 import { defineConfig } from "drizzle-kit"
 
+const databaseUrl = process.env.DATABASE_URL
+
+if (!databaseUrl) {
+  throw new Error("Missing database URL. Set DATABASE_URL.")
+}
+
 export default defineConfig({
-  schema: "./src/tables",
-  out: "./src/migrations",
   dialect: "postgresql",
+  schema: "src/schemas/index.ts",
+  out: "src/migrations",
   dbCredentials: {
-    url: process.env.DATABASE_URL || "",
+    url: databaseUrl,
   },
 })

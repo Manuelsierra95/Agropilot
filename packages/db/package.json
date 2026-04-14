@@ -1,5 +1,5 @@
 {
-  "name": "db",
+  "name": "@workspace/db",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,16 +10,18 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
-    "drizzle-orm": "^0.33.0",
-    "pg": "^8.20.0"
+    "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
-    "@types/node": "^25.1.0",
+    "@types/node": "^25.2.3",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "drizzle-kit": "^0.22.8",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^8.57.1",
     "prettier": "^3.3.3",
     "typescript": "^5.9.3"
+  },
+  "exports": {
+    ".": "./src/index.ts"
   }
 }

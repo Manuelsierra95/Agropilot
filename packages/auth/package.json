@@ -7,14 +7,18 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "better-auth": "^1.6.2",
-    "@workspace/db": "workspace:*"
+    "@workspace/db": "workspace:*",
+    "better-auth": "^1.6.2"
   },
   "devDependencies": {
+    "@types/node": "^25.1.0",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "^8.57.1",
     "prettier": "^3.3.3",
     "typescript": "^5.9.3"
+  },
+  "exports": {
+    ".": "./src/index.ts"
   }
 }

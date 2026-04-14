@@ -11,6 +11,8 @@
 - Next.js 16.1.16 with App Router
 - React 19.2.0
 - TypeScript 5.7.2 with strict mode enabled
+- Server components by default; use `'use client'` only when necessary
+- Better Auth for authentication (with Drizzle adapter)
 - Styling & UI:
   - Tailwind CSS v4 (using `@import 'tailwindcss'` syntax)
   - PostCSS with `@tailwindcss/postcss` plugin
@@ -92,7 +94,6 @@ This workspace is configured to use custom Copilot skills located in the `.githu
 ## External Documentation
 
 - [Next.js App Router](https://nextjs.org/docs/app)
-- [Clerk Next.js SDK](https://clerk.com/docs/references/nextjs)
 - [shadcn/ui](https://ui.shadcn.com/docs)
 - [Tailwind CSS v4](https://tailwindcss.com/docs)
 - [TanStack Table](https://tanstack.com/table/latest)
