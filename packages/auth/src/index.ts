@@ -48,7 +48,6 @@ const auth = betterAuth({
 export { auth }
 export type AuthInstance = typeof auth
 export type User = BetterAuthUser & {
-  teamId: string
-  role: "admin" | "member"
+  activeTeamId: string | null
 }
 export type { Auth, Session }

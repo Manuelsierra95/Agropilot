@@ -24,8 +24,7 @@ export const verificationUpdateSchema = createUpdateSchema(schema.verifications)
 const authUserBaseSchema = userSelectSchema.pick({
   id: true,
   email: true,
-  teamId: true,
-  role: true,
+  activeTeamId: true,
 })
 
 export const authUserSchema = authUserBaseSchema
@@ -33,10 +32,9 @@ export const authUserSchema = authUserBaseSchema
 export type AuthUser = {
   id: string
   email: string
-  teamId: string
-  role: "admin" | "member"
+  activeTeamId: string | null
 }
-export type TeamRole = AuthUser["role"]
+export type TeamRole = "owner" | "admin" | "editor" | "viewer"
 
 export const authSessionSchema = sessionSelectSchema.pick({
   id: true,
@@ -54,7 +52,7 @@ export type AuthContext = {
   team: {
     id: string
     role: TeamRole
-  }
+  } | null
 }
 
 export const parseAuthUser = (value: unknown): AuthUser | null => {
@@ -69,14 +67,12 @@ export const parseAuthSession = (value: unknown): AuthSession | null => {
 
 export const buildAuthContext = (
   user: AuthUser,
-  session: AuthSession
+  session: AuthSession,
+  team?: { id: string; role: TeamRole } | null
 ): AuthContext => ({
   user,
   session,
-  team: {
-    id: user.teamId,
-    role: user.role,
-  },
+  team: team ?? null,
 })
 
 export type UserSelect = typeof userSelectSchema.type
