@@ -1,31 +1,42 @@
 import type { MiddlewareHandler } from "hono"
 import type { ApiVariables } from "@/types/variables"
-import { TEAM_ROLE_HIERARCHY, type TeamRole } from "@workspace/schemas"
+import {
+  ROLE_HIERARCHY,
+  type OrganizationRole,
+} from "@workspace/auth/permissions"
 
-const hasRequiredRole = (currentRole: TeamRole, requiredRole: TeamRole) =>
-  TEAM_ROLE_HIERARCHY[currentRole] >= TEAM_ROLE_HIERARCHY[requiredRole]
+const hasRequiredRole = (
+  currentRole: OrganizationRole,
+  requiredRole: OrganizationRole
+) => ROLE_HIERARCHY[currentRole] >= ROLE_HIERARCHY[requiredRole]
 
 export const requireRole = (
-  roles: TeamRole | TeamRole[]
+  roles: OrganizationRole | OrganizationRole[]
 ): MiddlewareHandler<{
   Variables: ApiVariables
 }> => {
   return async (c, next) => {
-    const team = c.get("team")
+    const member = c.get("member")
 
-    if (!team) {
+    if (!member) {
       return c.json({ error: "Unauthorized" }, 401)
     }
 
+    const role = member.role as OrganizationRole
+
+    if (!(role in ROLE_HIERARCHY)) {
+      return c.json({ error: "Forbidden" }, 403)
+    }
+
     if (Array.isArray(roles)) {
-      if (!roles.includes(team.role)) {
+      if (!roles.includes(role)) {
         return c.json({ error: "Forbidden" }, 403)
       }
 
       return next()
     }
 
-    if (!hasRequiredRole(team.role, roles)) {
+    if (!hasRequiredRole(role, roles)) {
       return c.json({ error: "Forbidden" }, 403)
     }
 

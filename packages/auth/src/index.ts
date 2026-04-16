@@ -1,9 +1,10 @@
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { betterAuth } from "better-auth"
 import type { Auth, Session, User as BetterAuthUser } from "better-auth"
-import { openAPI } from "better-auth/plugins"
+import { openAPI, organization } from "better-auth/plugins"
 
 import { db } from "@workspace/db"
+import { ac, organizationRoles } from "./permissions"
 
 const env = {
   NODE_ENV: process.env.NODE_ENV,
@@ -38,7 +39,22 @@ const auth = betterAuth({
       clientSecret: env.GOOGLE_CLIENT_SECRET!,
     },
   },
-  plugins: [openAPI()],
+  plugins: [
+    organization({
+      ac,
+      roles: organizationRoles,
+      teams: {
+        enabled: true,
+        allowRemovingAllTeams: false,
+      },
+      dynamicAccessControl: {
+        enabled: true,
+      },
+      requireEmailVerificationOnInvitation: false,
+      cancelPendingInvitationsOnReInvite: true,
+    }),
+    openAPI(),
+  ],
   database: drizzleAdapter(db, {
     provider: "pg",
     usePlural: true,
@@ -48,6 +64,8 @@ const auth = betterAuth({
 export { auth }
 export type AuthInstance = typeof auth
 export type User = BetterAuthUser & {
-  activeTeamId: string | null
+  activeOrganizationId: string | null
 }
 export type { Auth, Session }
+export { ac, organizationRoles }
+export type { OrganizationRole } from "./permissions"

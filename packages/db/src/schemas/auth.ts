@@ -5,29 +5,8 @@ import {
   timestamp,
   boolean,
   index,
-  pgEnum,
-  unique,
   integer,
 } from "drizzle-orm/pg-core"
-
-export const teamRoleEnum = pgEnum("team_role", [
-  "owner",
-  "admin",
-  "editor",
-  "viewer",
-])
-
-export const teams = pgTable("teams", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  isPersonal: boolean("is_personal").default(false).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
-    .notNull(),
-  deletedAt: timestamp("deleted_at"),
-})
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -35,9 +14,6 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
-  activeTeamId: text("active_team_id").references(() => teams.id, {
-    onDelete: "set null",
-  }),
   onboardingStatus: text("onboarding_status", {
     enum: ["not_started", "in_progress", "completed"],
   })
@@ -51,22 +27,32 @@ export const users = pgTable("users", {
     .notNull(),
 })
 
-export const memberships = pgTable(
-  "memberships",
+export const organizations = pgTable("organizations", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  logo: text("logo"),
+  metadata: text("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
+export const members = pgTable(
+  "members",
   {
     id: text("id").primaryKey(),
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    teamId: text("team_id")
+    organizationId: text("organization_id")
       .notNull()
-      .references(() => teams.id, { onDelete: "cascade" }),
-    role: teamRoleEnum("role").default("viewer").notNull(),
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    role: text("role").notNull().default("member"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => ({
-    uniqueMembership: unique().on(table.userId, table.teamId),
-  })
+  (table) => [
+    index("members_user_id_idx").on(table.userId),
+    index("members_organization_id_idx").on(table.organizationId),
+  ]
 )
 
 export const invitations = pgTable(
@@ -74,21 +60,85 @@ export const invitations = pgTable(
   {
     id: text("id").primaryKey(),
     email: text("email").notNull(),
-    teamId: text("team_id")
+    inviterId: text("inviter_id")
       .notNull()
-      .references(() => teams.id, { onDelete: "cascade" }),
-    role: teamRoleEnum("role").default("viewer").notNull(),
-    invitedBy: text("invited_by").references(() => users.id, {
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    role: text("role"),
+    status: text("status").notNull().default("pending"),
+    teamId: text("team_id").references(() => teams.id, {
       onDelete: "set null",
     }),
     expiresAt: timestamp("expires_at").notNull(),
-    acceptedAt: timestamp("accepted_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => ({
-    invitationsTeamIdIdx: index("invitations_team_id_idx").on(table.teamId),
+    invitationsOrganizationIdIdx: index("invitations_organization_id_idx").on(
+      table.organizationId
+    ),
     invitationsEmailIdx: index("invitations_email_idx").on(table.email),
   })
+)
+
+export const teams = pgTable(
+  "teams",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, {
+        onDelete: "cascade",
+      }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
+  },
+  (table) => [index("teams_organization_id_idx").on(table.organizationId)]
+)
+
+export const teamMembers = pgTable(
+  "team_members",
+  {
+    id: text("id").primaryKey(),
+    teamId: text("team_id")
+      .notNull()
+      .references(() => teams.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("team_members_team_id_idx").on(table.teamId),
+    index("team_members_user_id_idx").on(table.userId),
+  ]
+)
+
+export const organizationRoles = pgTable(
+  "organization_roles",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, {
+        onDelete: "cascade",
+      }),
+    role: text("role").notNull(),
+    permission: text("permission").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
+  },
+  (table) => [
+    index("organization_roles_organization_id_idx").on(table.organizationId),
+  ]
 )
 
 export const sessions = pgTable(
@@ -106,6 +156,13 @@ export const sessions = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    activeOrganizationId: text("active_organization_id").references(
+      () => organizations.id,
+      { onDelete: "set null" }
+    ),
+    activeTeamId: text("active_team_id").references(() => teams.id, {
+      onDelete: "set null",
+    }),
   },
   (table) => [index("sessions_userId_idx").on(table.userId)]
 )
@@ -153,40 +210,73 @@ export const verifications = pgTable(
 export const usersRelations = relations(users, ({ many, one }) => ({
   sessions: many(sessions),
   accounts: many(accounts),
-  memberships: many(memberships),
+  members: many(members),
   invitationsSent: many(invitations),
-  activeTeam: one(teams, {
-    fields: [users.activeTeamId],
-    references: [teams.id],
-  }),
+  teamMembers: many(teamMembers),
 }))
 
-export const teamsRelations = relations(teams, ({ many }) => ({
-  memberships: many(memberships),
+export const organizationsRelations = relations(organizations, ({ many }) => ({
+  members: many(members),
+  invitations: many(invitations),
+  teams: many(teams),
+  roles: many(organizationRoles),
+}))
+
+export const teamsRelations = relations(teams, ({ many, one }) => ({
+  organization: one(organizations, {
+    fields: [teams.organizationId],
+    references: [organizations.id],
+  }),
+  members: many(teamMembers),
   invitations: many(invitations),
 }))
 
-export const membershipsRelations = relations(memberships, ({ one }) => ({
+export const membersRelations = relations(members, ({ one }) => ({
   user: one(users, {
-    fields: [memberships.userId],
+    fields: [members.userId],
     references: [users.id],
   }),
-  team: one(teams, {
-    fields: [memberships.teamId],
-    references: [teams.id],
+  organization: one(organizations, {
+    fields: [members.organizationId],
+    references: [organizations.id],
   }),
 }))
 
 export const invitationsRelations = relations(invitations, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [invitations.organizationId],
+    references: [organizations.id],
+  }),
   team: one(teams, {
     fields: [invitations.teamId],
     references: [teams.id],
   }),
   inviter: one(users, {
-    fields: [invitations.invitedBy],
+    fields: [invitations.inviterId],
     references: [users.id],
   }),
 }))
+
+export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
+  team: one(teams, {
+    fields: [teamMembers.teamId],
+    references: [teams.id],
+  }),
+  user: one(users, {
+    fields: [teamMembers.userId],
+    references: [users.id],
+  }),
+}))
+
+export const organizationRolesRelations = relations(
+  organizationRoles,
+  ({ one }) => ({
+    organization: one(organizations, {
+      fields: [organizationRoles.organizationId],
+      references: [organizations.id],
+    }),
+  })
+)
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   users: one(users, {

@@ -4,7 +4,6 @@ import type { ApiVariables } from "@/types/variables"
 import { optionalAuth } from "@/middlewares/optional-auth"
 import { requireAuth } from "@/middlewares/require-auth"
 import { requireRole } from "@/middlewares/require-role"
-import { switchActiveTeam } from "@/services/team-membership"
 
 /**
  * Guia de referencia para futuras implantaciones de rutas en la API.
@@ -19,14 +18,14 @@ import { switchActiveTeam } from "@/services/team-membership"
  * 2) GET /feed (con optionalAuth)
  *    - Uso: endpoint que funciona con y sin sesion.
  *    - Middleware: optionalAuth.
- *    - Multi-tenant: cuando hay sesion, `team` puede resolverse por `x-team-id`
- *      o por `activeTeamId` del usuario.
+ *    - Multi-tenant: cuando hay sesion, `organizationId` se resuelve desde
+ *      `activeOrganizationId` o con header `x-organization-id`.
  *    - Cuando aplicarlo: experiencias mixtas (anonimo + logueado), personalizacion opcional.
  *
  * 3) GET /profile (con requireAuth)
  *    - Uso: endpoint privado para usuario autenticado.
  *    - Middleware: requireAuth.
- *    - Multi-tenant: valida contexto de tenant para evitar acceso sin equipo valido.
+ *    - Multi-tenant: valida contexto de organization y membership activo.
  *    - Cuando aplicarlo: perfil, configuracion, datos privados del usuario.
  *
  * 4) GET /admin (con requireAuth + requireRole)
@@ -39,12 +38,12 @@ import { switchActiveTeam } from "@/services/team-membership"
  * - Opcional auth: .use("/ruta", optionalAuth).get("/ruta", handler)
  * - Protegida: .use("/ruta", requireAuth).get("/ruta", handler)
  * - RBAC: .use("/ruta", requireAuth, requireRole("admin"))
- * - Team switching request-scoped: enviar header `x-team-id`.
- * - Team switching persistente: POST /tenant/active con body `{ teamId }`.
+ * - Organization request-scoped: enviar header `x-organization-id`.
+ * - Organization persistente: usar endpoint Better Auth `/auth/organization/set-active`.
  *
  * Regla de seguridad multi-tenant:
  * - Nunca filtrar por `userId` en recursos compartidos.
- * - Siempre filtrar por `team.id` del contexto resuelto.
+ * - Siempre filtrar por `organizationId` del contexto resuelto.
  */
 
 export const exampleRoutes = new Hono<{
@@ -62,8 +61,9 @@ export const exampleRoutes = new Hono<{
     return c.json({
       user: c.get("user"),
       session: c.get("session"),
-      team: c.get("team"),
-      requestedTeamId: c.req.header("x-team-id") ?? null,
+      organizationId: c.get("organizationId"),
+      member: c.get("member"),
+      requestedOrganizationId: c.req.header("x-organization-id") ?? null,
     })
   })
 
@@ -73,51 +73,30 @@ export const exampleRoutes = new Hono<{
     return c.json({
       user: c.get("user"),
       session: c.get("session"),
-      team: c.get("team"),
+      organizationId: c.get("organizationId"),
+      member: c.get("member"),
     })
   })
 
-  // Ruta de tenant activo: util para validar seleccion de equipo.
+  // Ruta de tenant activo: util para validar seleccion de organization.
   .use("/tenant", requireAuth)
   .get("/tenant", (c) => {
     return c.json({
-      team: c.get("team"),
-      note: "Puedes enviar x-team-id para resolver otro tenant por request",
+      organizationId: c.get("organizationId"),
+      member: c.get("member"),
+      note: "Puedes enviar x-organization-id para resolver otro tenant por request",
     })
   })
 
-  // Switch persistente de activeTeamId para siguientes requests.
+  // El cambio persistente de organization activa vive en Better Auth:
+  // POST /api/v1/auth/organization/set-active
   .use("/tenant/active", requireAuth)
-  .post("/tenant/active", async (c) => {
-    const user = c.get("user")
-
-    if (!user) {
-      return c.json({ error: "Unauthorized" }, 401)
-    }
-
-    const body = await c.req.json<{ teamId?: unknown }>().catch(() => null)
-    const teamId = typeof body?.teamId === "string" ? body.teamId.trim() : ""
-
-    if (!teamId) {
-      return c.json({ error: "teamId is required" }, 400)
-    }
-
-    try {
-      const result = await switchActiveTeam(user.id, teamId)
-
-      return c.json({
-        ok: true,
-        activeTeamId: result.activeTeamId,
-        role: result.role,
-        note: "Para reflejarlo en esta request, envia tambien x-team-id",
-      })
-    } catch (error) {
-      if (error instanceof Error && error.message === "FORBIDDEN_TEAM") {
-        return c.json({ error: "Forbidden for target team" }, 403)
-      }
-
-      throw error
-    }
+  .post("/tenant/active", (c) => {
+    return c.json({
+      ok: true,
+      message:
+        "Usa POST /api/v1/auth/organization/set-active del plugin organization para cambiar el tenant activo",
+    })
   })
 
   // Ruta RBAC jerarquico: owner/admin/editor pueden acceder.
@@ -125,7 +104,7 @@ export const exampleRoutes = new Hono<{
   .get("/editor-tools", (c) => {
     return c.json({
       ok: true,
-      role: c.get("team")?.role ?? null,
+      role: c.get("member")?.role ?? null,
     })
   })
 
@@ -134,6 +113,6 @@ export const exampleRoutes = new Hono<{
   .get("/admin", (c) => {
     return c.json({
       secret: true,
-      role: c.get("team")?.role ?? null,
+      role: c.get("member")?.role ?? null,
     })
   })

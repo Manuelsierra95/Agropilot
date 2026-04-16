@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation"
 import { Button } from "@workspace/ui/components/button"
-import { authApi } from "@/lib/api/routes/auth"
+import { signIn } from "@/lib/auth-client"
 import { toast } from "sonner"
 import { useTransition } from "react"
 
@@ -20,18 +20,29 @@ export default function GoogleSignInButton({
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
 
-  const callbackUrl =
+  const callbackPath =
     callbackURL ?? searchParams.get("callbackUrl") ?? "/dashboard"
 
   const onSignIn = () => {
+    const callbackUrl = /^https?:\/\//i.test(callbackPath)
+      ? callbackPath
+      : new URL(callbackPath, window.location.origin).toString()
+
     startTransition(async () => {
       try {
-        const response = await authApi.signInWithGoogle({
+        const { data, error } = await signIn.social({
+          provider: "google",
           callbackURL: callbackUrl,
+          disableRedirect: true,
         })
 
-        if (response?.url) {
-          window.location.assign(response.url)
+        if (error) {
+          toast.error(error.message)
+          return
+        }
+
+        if (data?.url) {
+          window.location.assign(data.url)
           return
         }
 

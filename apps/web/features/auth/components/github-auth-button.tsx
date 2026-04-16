@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation"
 import { Button } from "@workspace/ui/components/button"
-import { authApi } from "@/lib/api/routes/auth"
+import { signIn } from "@/lib/auth-client"
 import { toast } from "sonner"
 import { useTransition } from "react"
 
@@ -26,16 +26,21 @@ export default function GithubSignInButton({
   const onSignIn = () => {
     startTransition(async () => {
       try {
-        // TODO: Implementar endpoint de autenticación con Github
+        const { data, error } = await signIn.social({
+          provider: "github",
+          callbackURL: callbackUrl,
+          disableRedirect: true,
+        })
 
-        // const response = await authApi.signInWithGithub({
-        //   callbackURL: callbackUrl,
-        // })
+        if (error) {
+          toast.error(error.message)
+          return
+        }
 
-        // if (response?.url) {
-        //   window.location.assign(response.url)
-        //   return
-        // }
+        if (data?.url) {
+          window.location.assign(data.url)
+          return
+        }
 
         toast.error("No se pudo iniciar el flujo de Github")
       } catch (error) {

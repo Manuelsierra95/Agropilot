@@ -2,8 +2,12 @@ import type { MiddlewareHandler } from "hono"
 import type { Env } from "@env"
 import type { ApiVariables } from "@/types/variables"
 import { auth } from "@workspace/auth"
-import { resolveTeamContext } from "@/services/auth-context"
-import { parseAuthSession, parseAuthUser } from "@workspace/schemas"
+import {
+  parseAuthMember,
+  parseAuthSession,
+  parseAuthUser,
+} from "@workspace/schemas"
+import { resolveOrganizationContext } from "@/services/organization-context"
 
 export const requireAuth: MiddlewareHandler<{
   Bindings: Env
@@ -21,16 +25,21 @@ export const requireAuth: MiddlewareHandler<{
       return c.json({ error: "Unauthorized" }, 401)
     }
 
-    const requestedTeamId = c.req.header("x-team-id")
-    const team = await resolveTeamContext({ user, requestedTeamId })
+    const requestedOrganizationId = c.req.header("x-organization-id")
+    const context = await resolveOrganizationContext({
+      user,
+      session,
+      requestedOrganizationId,
+    })
 
-    if (!team) {
-      return c.json({ error: "Team context not available" }, 403)
+    if (!context.organizationId || !context.member) {
+      return c.json({ error: "Organization context not available" }, 403)
     }
 
     c.set("user", user)
     c.set("session", session)
-    c.set("team", team)
+    c.set("organizationId", context.organizationId)
+    c.set("member", parseAuthMember(context.member))
 
     return next()
   } catch (error) {

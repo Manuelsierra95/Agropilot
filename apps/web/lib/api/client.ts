@@ -1,21 +1,12 @@
 import { hc } from "hono/client"
 import type { AppType } from "@workspace/api"
+import { versionedApiUrl } from "@/lib/env"
 
 const TOKEN_KEYS = [
   "access_token",
   "token",
   "better-auth.session_token",
 ] as const
-
-function getApiUrl() {
-  const url = process.env.NEXT_PUBLIC_API_URL
-
-  if (!url) {
-    throw new Error("NEXT_PUBLIC_API_URL is required")
-  }
-
-  return url
-}
 
 function readTokenFromCookieString(cookieValue: string) {
   const parsed = new Map(
@@ -99,6 +90,9 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
   }
 }
 
-export const client = hc<AppType>(getApiUrl(), {
+export const client = hc<AppType>(versionedApiUrl, {
+  init: {
+    credentials: "include",
+  },
   headers: getAuthHeaders,
 })

@@ -80,14 +80,70 @@ This workspace is configured to use custom Copilot skills located in the `.githu
 - Always load and consume all skills found in `.github/skills`.
 - Each skill in this folder provides domain-specific knowledge or best practices for the project.
 - When a user request matches the domain of a skill, ensure that the skill is loaded and its guidance is applied.
-- Skills may include frontend design, web best practices, Hono framework, React/Next.js optimization, and more.
 - If a new skill is added to `.github/skills`, it should be automatically available for Copilot to use.
+
+---
+
+### Available Skills
+
+#### 🌐 Web Design Guidelines — React & Next.js Best Practices
+
+- **Path:** `.github/skills/web-design-guidelines/SKILL.md`
+- **Use when:** Writing or optimizing any React or Next.js code: component architecture, App Router patterns, SSR/SSG, hydration, performance, accessibility, and general frontend best practices.
+
+#### ⚡ Hono Framework
+
+- **Path:** `.github/skills/hono/SKILL.md`
+- **Use when:** Writing or modifying API routes, middleware, RPC handlers, or any server-side logic using Hono.
+
+#### ✅ Vercel React Best Practices
+
+- **Path:** `.github/skills/vercel-react-best-practices/SKILL.md`
+- **Use when:** Optimizing React rendering, managing re-renders, implementing async patterns, handling bundles, or writing server components. Includes granular rules in `.github/skills/vercel-react-best-practices/rules/`.
+- **Key rule categories:**
+  - `rendering-*` — SSR, hydration, SVG, resource hints
+  - `rerender-*` — memo, derived state, transitions, refs
+  - `async-*` — suspense, parallel fetching, deferred loading
+  - `bundle-*` — dynamic imports, barrel imports, tree-shaking
+  - `js-*` — DOM batching, caching, set/map lookups, early exit
+  - `server-*` — auth actions, LRU cache, static IO hoisting
+  - `client-*` — localStorage schema, passive listeners, SWR dedup
+
+#### 🔐 Better Auth
+
+- **Path:** `.github/skills/betterauth-skills/better-auth/`
+- **Use when:** Implementing or modifying authentication flows.
+- **Sub-skills:**
+  - `create-auth/SKILL.md` — Initial auth setup with Drizzle adapter
+  - `emailAndPassword/SKILL.md` — Email & password authentication
+  - `organization/SKILL.md` — Multi-tenant / organization support
+  - `twoFactor/SKILL.md` — Two-factor authentication
+  - `best-practices/SKILL.md` — Auth security best practices
+  - `commands/explain-error.md` — Diagnosing Better Auth errors
+  - `commands/providers.md` — OAuth provider configuration
+
+#### 🛡️ Security
+
+- **Path:** `.github/skills/betterauth-skills/security/SKILL.MD`
+- **Use when:** Reviewing or writing any code that handles authentication, authorization, secrets, user data, or API security.
+
+#### 🏢 Awesome Design — UI & Visual Design Reference
+
+- **Path:** `.github/skills/awesome-design/design-md/<brand>/README.md`
+- **Use when:** Designing or building any UI component, page layout, or visual interface. Load the most relevant brand as inspiration for aesthetics, spacing, typography, color, and component patterns. Default to brands known for clean, modern product design (e.g. Linear, Vercel, Stripe, Notion, Raycast) unless a specific brand is requested.
+- **Available brands:** Airbnb, Airtable, Apple, BMW, Cal, Claude, Clay, ClickHouse, Cohere, Coinbase, Composio, Cursor, ElevenLabs, Expo, Ferrari, Figma, Framer, HashiCorp, IBM, Intercom, Kraken, Lamborghini, Linear, Lovable, Minimax, Mintlify, Miro, Mistral, MongoDB, Notion, NVIDIA, Ollama, Opencode, Pinterest, PostHog, Raycast, Renault, Replicate, Resend, Revolut, RunwayML, Sanity, Semrush, Sentry, SpaceX, Spotify, Stripe, Supabase, Superhuman, Tesla, Together.ai, Uber, Vercel, VoltAgent, Warp, Webflow, Wise, xAI, Zapier
+
+---
 
 **How it works:**
 
 1. On every user request, scan `.github/skills` for relevant skills.
-2. Load the instructions from each skill file as needed.
-3. Apply the knowledge and recommendations from the skills to code generation, review, and suggestions.
+2. Load the instructions from each matching skill file.
+3. Apply the knowledge and recommendations to code generation, review, and suggestions.
+4. **For UI/visual design:** always load `.github/skills/awesome-design/design-md/<brand>/README.md` using the most relevant brand as reference.
+5. **For React/Next.js best practices:** always load `.github/skills/web-design-guidelines/SKILL.md` alongside `vercel-react-best-practices`.
+6. **For `vercel-react-best-practices`:** also scan the `rules/` subdirectory for the most specific applicable rule.
+7. **For `betterauth-skills`:** load the sub-skill that matches the feature being implemented.
 
 ---
 

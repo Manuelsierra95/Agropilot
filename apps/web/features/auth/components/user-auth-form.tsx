@@ -27,7 +27,7 @@ export default function UserAuthForm({
   return (
     <div className="w-full space-y-6">
       <Link
-        href="#"
+        href="/"
         className="flex items-center justify-center gap-2 self-center font-medium"
       >
         {logo} {company}

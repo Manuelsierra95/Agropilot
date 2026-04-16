@@ -24,7 +24,6 @@ export const verificationUpdateSchema = createUpdateSchema(schema.verifications)
 const authUserBaseSchema = userSelectSchema.pick({
   id: true,
   email: true,
-  activeTeamId: true,
 })
 
 export const authUserSchema = authUserBaseSchema
@@ -32,34 +31,42 @@ export const authUserSchema = authUserBaseSchema
 export type AuthUser = {
   id: string
   email: string
-  activeTeamId: string | null
 }
-export type TeamRole = "owner" | "admin" | "editor" | "viewer"
-
-export const TEAM_ROLE_HIERARCHY: Record<TeamRole, number> = {
-  owner: 4,
-  admin: 3,
-  editor: 2,
-  viewer: 1,
-}
+export type OrganizationRole = "owner" | "admin" | "editor" | "member" | "viewer"
 
 export const authSessionSchema = sessionSelectSchema.pick({
   id: true,
   userId: true,
+  activeOrganizationId: true,
+  activeTeamId: true,
 })
 
 export type AuthSession = {
   id: string
   userId: string
+  activeOrganizationId: string | null
+  activeTeamId: string | null
+}
+
+export const authMemberSchema = createSelectSchema(schema.members).pick({
+  id: true,
+  userId: true,
+  organizationId: true,
+  role: true,
+})
+
+export type AuthMember = {
+  id: string
+  userId: string
+  organizationId: string
+  role: string
 }
 
 export type AuthContext = {
   user: AuthUser
   session: AuthSession
-  team: {
-    id: string
-    role: TeamRole
-  } | null
+  organizationId: string | null
+  member: AuthMember | null
 }
 
 export const parseAuthUser = (value: unknown): AuthUser | null => {
@@ -72,14 +79,20 @@ export const parseAuthSession = (value: unknown): AuthSession | null => {
   return parsed.success ? (parsed.data as AuthSession) : null
 }
 
+export const parseAuthMember = (value: unknown): AuthMember | null => {
+  const parsed = authMemberSchema.safeParse(value)
+  return parsed.success ? (parsed.data as AuthMember) : null
+}
+
 export const buildAuthContext = (
   user: AuthUser,
   session: AuthSession,
-  team?: { id: string; role: TeamRole } | null
+  member?: AuthMember | null
 ): AuthContext => ({
   user,
   session,
-  team: team ?? null,
+  organizationId: session.activeOrganizationId,
+  member: member ?? null,
 })
 
 export type UserSelect = typeof userSelectSchema.type
