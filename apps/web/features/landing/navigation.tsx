@@ -72,7 +72,7 @@ export function Navigation() {
           {/* Desktop CTA */}
           <div className="hidden items-center gap-4 md:flex">
             <a
-              href="#"
+              href="/auth/sign-in"
               className={`text-foreground/70 transition-all duration-500 hover:text-foreground ${isScrolled ? "text-xs" : "text-sm"}`}
             >
               Sign in

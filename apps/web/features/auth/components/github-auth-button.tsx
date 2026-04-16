@@ -1,10 +1,10 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
 import { Button } from "@workspace/ui/components/button"
 import { signIn } from "@/lib/auth-client"
 import { toast } from "sonner"
 import { useTransition } from "react"
+import { env } from "@/lib/env"
 
 type Props = {
   callbackURL?: string
@@ -13,22 +13,18 @@ type Props = {
 }
 
 export default function GithubSignInButton({
-  callbackURL,
+  callbackURL = env.PUBLIC_REDIRECT_URL,
   label = "Continuar con Github",
   className,
 }: Props) {
-  const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
-
-  const callbackUrl =
-    callbackURL ?? searchParams.get("callbackUrl") ?? "/dashboard"
 
   const onSignIn = () => {
     startTransition(async () => {
       try {
         const { data, error } = await signIn.social({
           provider: "github",
-          callbackURL: callbackUrl,
+          callbackURL: callbackURL,
           disableRedirect: true,
         })
 
