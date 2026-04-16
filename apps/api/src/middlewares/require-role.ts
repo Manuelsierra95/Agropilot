@@ -1,6 +1,9 @@
 import type { MiddlewareHandler } from "hono"
 import type { ApiVariables } from "@/types/variables"
-import type { TeamRole } from "@workspace/schemas"
+import { TEAM_ROLE_HIERARCHY, type TeamRole } from "@workspace/schemas"
+
+const hasRequiredRole = (currentRole: TeamRole, requiredRole: TeamRole) =>
+  TEAM_ROLE_HIERARCHY[currentRole] >= TEAM_ROLE_HIERARCHY[requiredRole]
 
 export const requireRole = (
   roles: TeamRole | TeamRole[]
@@ -8,15 +11,21 @@ export const requireRole = (
   Variables: ApiVariables
 }> => {
   return async (c, next) => {
-    const authContext = c.get("auth")
+    const team = c.get("team")
 
-    if (!authContext) {
+    if (!team) {
       return c.json({ error: "Unauthorized" }, 401)
     }
 
-    const allowedRoles = Array.isArray(roles) ? roles : [roles]
+    if (Array.isArray(roles)) {
+      if (!roles.includes(team.role)) {
+        return c.json({ error: "Forbidden" }, 403)
+      }
 
-    if (!allowedRoles.includes(authContext.team.role)) {
+      return next()
+    }
+
+    if (!hasRequiredRole(team.role, roles)) {
       return c.json({ error: "Forbidden" }, 403)
     }
 

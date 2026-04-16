@@ -1,5 +1,10 @@
-import type { AuthContext } from "@workspace/schemas"
+import type { AuthSession, AuthUser, TeamRole } from "@workspace/schemas"
 
 export type ApiVariables = {
-  auth: AuthContext | null
+  user: AuthUser | null
+  session: AuthSession | null
+  team: {
+    id: string
+    role: TeamRole
+  } | null
 }

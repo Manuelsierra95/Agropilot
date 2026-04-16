@@ -9,8 +9,6 @@ import { csrfMiddleware } from "./middlewares/csrf"
 import { rateLimitMiddleware } from "./middlewares/rateLimit"
 
 const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
-
-app
   .basePath("/api/v1")
   .use(corsMiddleware)
   // .use(csrfMiddleware)
@@ -25,4 +23,5 @@ app
 
   .route("/parcel", parcelRoutes)
 
+export type AppType = typeof app
 export default app

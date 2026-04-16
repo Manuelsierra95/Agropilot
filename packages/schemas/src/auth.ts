@@ -36,6 +36,13 @@ export type AuthUser = {
 }
 export type TeamRole = "owner" | "admin" | "editor" | "viewer"
 
+export const TEAM_ROLE_HIERARCHY: Record<TeamRole, number> = {
+  owner: 4,
+  admin: 3,
+  editor: 2,
+  viewer: 1,
+}
+
 export const authSessionSchema = sessionSelectSchema.pick({
   id: true,
   userId: true,
