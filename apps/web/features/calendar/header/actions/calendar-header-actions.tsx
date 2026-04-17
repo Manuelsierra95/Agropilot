@@ -4,7 +4,7 @@ export default function CalendarHeaderActions({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex md:justify-start justify-between items-center gap-2">
+    <div className="flex items-center justify-between gap-2 md:justify-start">
       {children}
     </div>
   )

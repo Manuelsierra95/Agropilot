@@ -56,7 +56,7 @@ export function DashboardMap() {
   }, [parcels])
 
   return (
-    <Card className="col-span-1 h-[45vh] overflow-hidden border-r p-0 sm:col-span-2 md:col-span-4 lg:col-span-8">
+    <Card className="col-span-1 h-[45vh] overflow-hidden p-px sm:col-span-2 md:col-span-4 lg:col-span-8">
       <Map
         className="h-full w-full"
         styles={{

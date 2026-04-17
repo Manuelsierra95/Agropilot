@@ -5,20 +5,25 @@ import { DataTable } from "./finance"
 import { mockTransactions as data } from "@/store/mockTransactions"
 import { EventsList } from "./events"
 import { DashboardPageContainer } from "@/components/dashboard-page-container"
+import { StripesGridSeparator } from "@/components/stripes-grid-separator"
 
 export default function DashboardOverview() {
   return (
     // TODO: Implementar los skeletons con boneyard-js
-    <DashboardPageContainer className="mx-4 mt-4 border md:mx-6 md:mt-0">
+    <DashboardPageContainer className="radius-0 m-4 border md:mx-6 md:mt-0">
       <SectionCards />
+      <StripesGridSeparator cardClassName="h-4" position="full" />
+
       <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-12">
         <DashboardMap />
         <EventsList />
       </div>
+      <StripesGridSeparator cardClassName="h-4" position="full" />
 
       {/* TODO: Mostrar grafico relevante, con datos sobre ganancias, variaciones de precio, etc */}
       {/* Los precios los variare dependiendo de la ubicacion de la parcela! */}
       <ChartAreaInteractive />
+      <StripesGridSeparator cardClassName="h-4" position="full" />
 
       {/* TODO: Mas graficos en Donuts y diferentes formas, sobre cambios en el riego en la ubicacion de la parcela, y demas */}
       {/* TODO: Mostrar solo las ultimas transacciones */}

@@ -220,7 +220,7 @@ export const mockTransactions: Transaction[] = [
 
 export default function Finance() {
   return (
-    <DashboardPageContainer className="mx-4 mt-4 border md:mx-6 md:mt-0">
+    <DashboardPageContainer className="radius-0 mx-4 mt-4 border md:mx-6 md:mt-0">
       <KpiCard items={oils} />
       <ChartArea />
       <TransactionTable2 data={mockTransactions} />

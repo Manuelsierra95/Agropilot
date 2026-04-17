@@ -38,7 +38,7 @@ export function ParcelHero({
     : []
 
   return (
-    <section className="rounded-xl border bg-linear-to-br from-card via-card to-muted/30 p-4 md:p-6">
+    <section className="rounded-xl bg-linear-to-br from-card via-card to-muted/30 p-4 md:p-6">
       <div className="flex flex-col gap-4">
         <div className="space-y-2">
           <p className="text-xs tracking-[0.18em] text-muted-foreground uppercase">
