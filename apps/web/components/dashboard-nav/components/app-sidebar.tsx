@@ -2,11 +2,11 @@
 
 import * as React from "react"
 
-import { NavMain } from "@/components/nav/components/nav-main"
-import { NavModules } from "@/components/nav/components/nav-modules"
-import { NavSettings } from "@/components/nav/components/nav-settings"
-import { NavUser } from "@/components/nav/components/nav-user"
-import { ParcelSwitcher } from "@/components/nav/components/parcel-switcher"
+import { NavMain } from "@/components/dashboard-nav/components/nav-main"
+import { NavModules } from "@/components/dashboard-nav/components/nav-modules"
+import { NavSettings } from "@/components/dashboard-nav/components/nav-settings"
+import { NavUser } from "@/components/dashboard-nav/components/nav-user"
+import { ParcelSwitcher } from "@/components/dashboard-nav/components/parcel-switcher"
 import {
   SidebarContent,
   SidebarFooter,

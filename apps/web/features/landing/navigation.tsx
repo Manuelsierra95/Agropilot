@@ -3,13 +3,9 @@
 import { useState, useEffect } from "react"
 import { Button } from "@workspace/ui/components/button"
 import { Menu, X } from "lucide-react"
-
-const navLinks = [
-  { name: "Features", href: "#features" },
-  { name: "How it works", href: "#how-it-works" },
-  { name: "Developers", href: "#developers" },
-  { name: "Pricing", href: "#pricing" },
-]
+import Link from "next/link"
+import { navigation } from "@/config/navigation/landing"
+import { siteConfig } from "@/config/app/site"
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -46,7 +42,7 @@ export function Navigation() {
             <span
               className={`font-display tracking-tight transition-all duration-500 ${isScrolled ? "text-xl" : "text-2xl"}`}
             >
-              Agropilot
+              {siteConfig.name}
             </span>
             <span
               className={`font-mono text-muted-foreground transition-all duration-500 ${isScrolled ? "mt-0.5 text-[10px]" : "mt-1 text-xs"}`}
@@ -57,7 +53,7 @@ export function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden items-center gap-12 md:flex">
-            {navLinks.map((link) => (
+            {navigation.links.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
@@ -71,18 +67,18 @@ export function Navigation() {
 
           {/* Desktop CTA */}
           <div className="hidden items-center gap-4 md:flex">
-            <a
+            <Link
               href="/auth/sign-in"
               className={`text-foreground/70 transition-all duration-500 hover:text-foreground ${isScrolled ? "text-xs" : "text-sm"}`}
             >
-              Sign in
-            </a>
-            <Button
-              size="sm"
-              className={`rounded-full bg-foreground text-background transition-all duration-500 hover:bg-foreground/90 ${isScrolled ? "h-8 px-4 text-xs" : "px-6"}`}
+              {navigation.register.name}
+            </Link>
+            <Link
+              href="/dashboard"
+              className={`flex items-center justify-center rounded-full bg-foreground text-background transition-all duration-500 hover:bg-foreground/90 ${isScrolled ? "h-6 px-4 text-xs" : "h-8 px-6 text-sm"}`}
             >
-              Start creating
-            </Button>
+              {navigation.login.name}
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -112,7 +108,7 @@ export function Navigation() {
         <div className="flex h-full flex-col px-8 pt-28 pb-8">
           {/* Navigation Links */}
           <div className="flex flex-1 flex-col justify-center gap-8">
-            {navLinks.map((link, i) => (
+            {navigation.links.map((link, i) => (
               <a
                 key={link.name}
                 href={link.href}
@@ -145,13 +141,13 @@ export function Navigation() {
               className="h-14 flex-1 rounded-full text-base"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Sign in
+              {navigation.login.name}
             </Button>
             <Button
               className="h-14 flex-1 rounded-full bg-foreground text-base text-background"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Start creating
+              {navigation.register.name}
             </Button>
           </div>
         </div>

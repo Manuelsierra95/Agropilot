@@ -1,6 +1,6 @@
 import { DockToggle } from "./dock-toggle"
 import { SidebarProvider } from "@workspace/ui/components/sidebar"
-import { AppSidebar } from "@/components/nav/components/app-sidebar"
+import { AppSidebar } from "@/components/dashboard-nav/components/app-sidebar"
 
 export default function NavDock() {
   return (

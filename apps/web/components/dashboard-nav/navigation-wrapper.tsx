@@ -1,5 +1,5 @@
-import NavSidebar from "@/components/nav/nav-sidebar"
-import NavDock from "@/components/nav/nav-dock"
+import NavSidebar from "@/components/dashboard-nav/nav-sidebar"
+import NavDock from "@/components/dashboard-nav/nav-dock"
 
 export function NavigationWrapper({ children }: { children: React.ReactNode }) {
   return (

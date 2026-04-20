@@ -1,7 +1,7 @@
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import NextTopLoader from "nextjs-toploader"
-import { NavigationWrapper } from "@/components/nav/navigation-wrapper"
-import KBar from "@/components/nav/kbar"
+import { NavigationWrapper } from "@/components/dashboard-nav/navigation-wrapper"
+import KBar from "@/components/dashboard-nav/kbar"
 
 export default function DashboardLayout({
   children,

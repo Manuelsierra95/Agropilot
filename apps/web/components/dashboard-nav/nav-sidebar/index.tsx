@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/nav/components/app-sidebar"
+import { AppSidebar } from "@/components/dashboard-nav/components/app-sidebar"
 import SearchInput from "@/components/search-input"
 import { ThemeModeToggle } from "@/components/theme-mode-toggle"
 import {
