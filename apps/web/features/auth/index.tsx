@@ -1,5 +1,5 @@
 import UserAuthForm from "./components/user-auth-form"
-import { RippleBackground } from "./components/ripple-background"
+import { RippleBackground } from "../../components/ripple-background"
 
 export default function SignInViewPage() {
   const company = "Agropilot"
@@ -32,7 +32,7 @@ export default function SignInViewPage() {
 
         {/* Tagline */}
         <div className="relative z-20 mt-auto space-y-3">
-          <h1 className="max-w-sm text-3xl leading-tight font-semibold tracking-tight text-balance text-foreground">
+          <h1 className="max-w-4xl text-3xl leading-tight font-semibold tracking-tight text-balance text-foreground">
             Agricultura de precisión con decisiones guiadas por datos.
           </h1>
           <p className="max-w-md text-sm leading-relaxed text-muted-foreground">

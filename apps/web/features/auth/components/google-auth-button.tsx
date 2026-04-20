@@ -4,7 +4,6 @@ import { Button } from "@workspace/ui/components/button"
 import { signIn } from "@/lib/auth-client"
 import { toast } from "sonner"
 import { useTransition } from "react"
-import { env } from "@/lib/env"
 
 type Props = {
   callbackURL?: string
@@ -13,7 +12,7 @@ type Props = {
 }
 
 export default function GoogleSignInButton({
-  callbackURL = env.PUBLIC_REDIRECT_URL,
+  callbackURL,
   label = "Continuar con Google",
   className,
 }: Props) {

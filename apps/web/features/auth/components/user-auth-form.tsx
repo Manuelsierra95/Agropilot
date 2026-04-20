@@ -10,12 +10,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
+import { env } from "@/lib/env"
 
 export interface UserAuthFormProps {
   company?: string
   logo?: React.ReactNode
   title?: string
   subtitle?: string
+  callbackURL?: string
 }
 
 export default function UserAuthForm({
@@ -23,7 +25,14 @@ export default function UserAuthForm({
   logo,
   title,
   subtitle,
+  callbackURL,
 }: UserAuthFormProps) {
+  const resolvedCallbackURL =
+    callbackURL ??
+    (typeof window !== "undefined"
+      ? `${window.location.origin}/onboarding`
+      : env.PUBLIC_REDIRECT_URL)
+
   return (
     <div className="w-full space-y-6">
       <Link
@@ -40,8 +49,14 @@ export default function UserAuthForm({
         <CardContent>
           <div className="grid gap-6">
             <div className="flex flex-col gap-4">
-              <GoogleSignInButton label="Entrar con Google" />
-              <GithubSignInButton label="Entrar con GitHub" />
+              <GoogleSignInButton
+                label="Entrar con Google"
+                callbackURL={resolvedCallbackURL}
+              />
+              <GithubSignInButton
+                label="Entrar con GitHub"
+                callbackURL={resolvedCallbackURL}
+              />
             </div>
           </div>
         </CardContent>
