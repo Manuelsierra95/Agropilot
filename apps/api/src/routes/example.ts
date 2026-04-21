@@ -4,11 +4,13 @@ import type { ApiVariables } from "@/types/variables"
 import { optionalAuth } from "@/middlewares/optional-auth"
 import { requireAuth } from "@/middlewares/require-auth"
 import { requireRole } from "@/middlewares/require-role"
+import { db, parcels } from "@workspace/db"
+import { eq } from "drizzle-orm"
 
 /**
  * Guia de referencia para futuras implantaciones de rutas en la API.
  *
- * Este archivo muestra patrones base de autenticacion/autorizacion multitenant:
+ * Este archivo muestra patrones base de autenticacion/autorizacion multiorganization:
  *
  * 1) GET /public
  *    - Uso: endpoint totalmente publico.
@@ -18,20 +20,37 @@ import { requireRole } from "@/middlewares/require-role"
  * 2) GET /feed (con optionalAuth)
  *    - Uso: endpoint que funciona con y sin sesion.
  *    - Middleware: optionalAuth.
- *    - Multi-tenant: cuando hay sesion, `organizationId` se resuelve desde
+ *    - Multi-organization: cuando hay sesion, `organizationId` se resuelve desde
  *      `activeOrganizationId` o con header `x-organization-id`.
  *    - Cuando aplicarlo: experiencias mixtas (anonimo + logueado), personalizacion opcional.
  *
  * 3) GET /profile (con requireAuth)
  *    - Uso: endpoint privado para usuario autenticado.
  *    - Middleware: requireAuth.
- *    - Multi-tenant: valida contexto de organization y membership activo.
+ *    - Multi-organization: valida contexto de organization y membership activo.
  *    - Cuando aplicarlo: perfil, configuracion, datos privados del usuario.
  *
  * 4) GET /admin (con requireAuth + requireRole)
  *    - Uso: control de acceso por rol (RBAC).
  *    - Middleware: requireAuth, requireRole("admin").
  *    - Cuando aplicarlo: paneles administrativos, operaciones sensibles.
+ *
+ * 5) GET /organization
+ *    - Uso: obtener el contexto de la organizacion activa del usuario.
+ *    - Middleware: requireAuth.
+ *    - Multi-organization: organizationId resuelto desde activeOrganizationId o header.
+ *    - Cuando aplicarlo: validar seleccion de org, debug de contexto.
+ *
+ * 6) POST /organization/active
+ *    - Uso: referencia al endpoint de Better Auth para cambiar la org activa.
+ *    - Middleware: requireAuth.
+ *    - Nota: el cambio real se hace en /auth/organization/set-active.
+ *
+ * 7) GET /parcels
+ *    - Uso: obtener las parcelas de la organizacion activa del usuario.
+ *    - Middleware: requireAuth.
+ *    - Multi-organization: filtra SIEMPRE por organizationId, nunca por userId.
+ *    - Cuando aplicarlo: cualquier recurso compartido dentro de una org.
  *
  * Plantilla recomendada para nuevas rutas:
  * - Publica: .get("/ruta", handler)
@@ -41,7 +60,7 @@ import { requireRole } from "@/middlewares/require-role"
  * - Organization request-scoped: enviar header `x-organization-id`.
  * - Organization persistente: usar endpoint Better Auth `/auth/organization/set-active`.
  *
- * Regla de seguridad multi-tenant:
+ * Regla de seguridad multi-organization:
  * - Nunca filtrar por `userId` en recursos compartidos.
  * - Siempre filtrar por `organizationId` del contexto resuelto.
  */
@@ -78,24 +97,24 @@ export const exampleRoutes = new Hono<{
     })
   })
 
-  // Ruta de tenant activo: util para validar seleccion de organization.
-  .use("/tenant", requireAuth)
-  .get("/tenant", (c) => {
+  // Contexto de la organizacion activa del usuario.
+  .use("/organization", requireAuth)
+  .get("/organization", (c) => {
     return c.json({
       organizationId: c.get("organizationId"),
       member: c.get("member"),
-      note: "Puedes enviar x-organization-id para resolver otro tenant por request",
+      note: "Puedes enviar x-organization-id para resolver otro organization por request",
     })
   })
 
-  // El cambio persistente de organization activa vive en Better Auth:
+  // El cambio persistente de organizacion activa vive en Better Auth:
   // POST /api/v1/auth/organization/set-active
-  .use("/tenant/active", requireAuth)
-  .post("/tenant/active", (c) => {
+  .use("/organization/active", requireAuth)
+  .post("/organization/active", (c) => {
     return c.json({
       ok: true,
       message:
-        "Usa POST /api/v1/auth/organization/set-active del plugin organization para cambiar el tenant activo",
+        "Usa POST /api/v1/auth/organization/set-active del plugin organization para cambiar la organizacion activa",
     })
   })
 
@@ -115,4 +134,30 @@ export const exampleRoutes = new Hono<{
       secret: true,
       role: c.get("member")?.role ?? null,
     })
+  })
+
+  // Parcelas de la organizacion activa.
+  // - requireAuth garantiza sesion valida y membership en la org.
+  // - organizationId viene resuelto por el middleware (activeOrganizationId o header x-organization-id).
+  // - Nunca se filtra por userId: las parcelas son de la org, no del usuario.
+  .use("/parcels", requireAuth)
+  .get("/parcels", async (c) => {
+    const organizationId = c.get("organizationId")
+
+    if (!organizationId) {
+      return c.json(
+        {
+          error:
+            "No hay organizacion activa. Usa x-organization-id o set-active.",
+        },
+        400
+      )
+    }
+
+    const result = await db
+      .select()
+      .from(parcels)
+      .where(eq(parcels.organizationId, organizationId))
+
+    return c.json({ parcels: result })
   })

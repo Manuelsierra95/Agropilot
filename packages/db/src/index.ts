@@ -32,4 +32,5 @@ const db = new Proxy({} as DatabaseInstance, {
 export type Schema = typeof schema
 export type Database = typeof db
 
+export * from "./schemas"
 export { db, schema, resolveDatabase as getDb }

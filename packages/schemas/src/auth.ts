@@ -1,25 +1,31 @@
-import { schema } from "@workspace/db"
+import {
+  accounts,
+  members,
+  sessions,
+  users,
+  verifications,
+} from "@workspace/db"
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod"
 
-export const userSelectSchema = createSelectSchema(schema.users)
-export const userInsertSchema = createInsertSchema(schema.users)
-export const userUpdateSchema = createUpdateSchema(schema.users)
+export const userSelectSchema = createSelectSchema(users)
+export const userInsertSchema = createInsertSchema(users)
+export const userUpdateSchema = createUpdateSchema(users)
 
-export const sessionSelectSchema = createSelectSchema(schema.sessions)
-export const sessionInsertSchema = createInsertSchema(schema.sessions)
-export const sessionUpdateSchema = createUpdateSchema(schema.sessions)
+export const sessionSelectSchema = createSelectSchema(sessions)
+export const sessionInsertSchema = createInsertSchema(sessions)
+export const sessionUpdateSchema = createUpdateSchema(sessions)
 
-export const accountSelectSchema = createSelectSchema(schema.accounts)
-export const accountInsertSchema = createInsertSchema(schema.accounts)
-export const accountUpdateSchema = createUpdateSchema(schema.accounts)
+export const accountSelectSchema = createSelectSchema(accounts)
+export const accountInsertSchema = createInsertSchema(accounts)
+export const accountUpdateSchema = createUpdateSchema(accounts)
 
-export const verificationSelectSchema = createSelectSchema(schema.verifications)
-export const verificationInsertSchema = createInsertSchema(schema.verifications)
-export const verificationUpdateSchema = createUpdateSchema(schema.verifications)
+export const verificationSelectSchema = createSelectSchema(verifications)
+export const verificationInsertSchema = createInsertSchema(verifications)
+export const verificationUpdateSchema = createUpdateSchema(verifications)
 
 const authUserBaseSchema = userSelectSchema.pick({
   id: true,
@@ -32,23 +38,26 @@ export type AuthUser = {
   id: string
   email: string
 }
-export type OrganizationRole = "owner" | "admin" | "editor" | "member" | "viewer"
+export type OrganizationRole =
+  | "owner"
+  | "admin"
+  | "editor"
+  | "member"
+  | "viewer"
 
 export const authSessionSchema = sessionSelectSchema.pick({
   id: true,
   userId: true,
   activeOrganizationId: true,
-  activeTeamId: true,
 })
 
 export type AuthSession = {
   id: string
   userId: string
   activeOrganizationId: string | null
-  activeTeamId: string | null
 }
 
-export const authMemberSchema = createSelectSchema(schema.members).pick({
+export const authMemberSchema = createSelectSchema(members).pick({
   id: true,
   userId: true,
   organizationId: true,

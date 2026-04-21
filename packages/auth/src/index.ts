@@ -4,6 +4,10 @@ import type { Auth, Session, User as BetterAuthUser } from "better-auth"
 import { openAPI, organization } from "better-auth/plugins"
 
 import { db } from "@workspace/db"
+import {
+  createOrganizationForUser,
+  setActiveOrgOnSession,
+} from "./hooks/organization"
 import { ac, organizationRoles } from "./permissions"
 
 const env = {
@@ -39,14 +43,28 @@ const auth = betterAuth({
       clientSecret: env.GOOGLE_CLIENT_SECRET!,
     },
   },
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          await createOrganizationForUser(user, auth.api)
+        },
+      },
+    },
+    session: {
+      create: {
+        after: async (session) => {
+          if (!session.activeOrganizationId) {
+            await setActiveOrgOnSession(session)
+          }
+        },
+      },
+    },
+  },
   plugins: [
     organization({
       ac,
       roles: organizationRoles,
-      teams: {
-        enabled: true,
-        allowRemovingAllTeams: false,
-      },
       dynamicAccessControl: {
         enabled: true,
       },

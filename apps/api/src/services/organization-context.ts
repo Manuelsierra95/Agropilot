@@ -22,7 +22,18 @@ export const resolveOrganizationContext = async ({
   const organizationId = requestedOrganizationId || session.activeOrganizationId
 
   if (!organizationId) {
-    return { organizationId: null, member: null }
+    const fallbackMember = await db.query.members.findFirst({
+      where: eq(schema.members.userId, user.id),
+    })
+
+    if (!fallbackMember) {
+      return { organizationId: null, member: null }
+    }
+
+    return {
+      organizationId: fallbackMember.organizationId,
+      member: fallbackMember,
+    }
   }
 
   const member = await db.query.members.findFirst({

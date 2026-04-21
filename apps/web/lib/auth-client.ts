@@ -10,9 +10,6 @@ export const authClient: ReturnType<typeof createAuthClient> = createAuthClient(
         dynamicAccessControl: {
           enabled: true,
         },
-        teams: {
-          enabled: true,
-        },
       }),
     ],
   }
