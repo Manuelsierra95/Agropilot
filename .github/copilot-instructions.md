@@ -140,7 +140,7 @@ This workspace is configured to use custom Copilot skills located in the `.githu
 1. On every user request, scan `.github/skills` for relevant skills.
 2. Load the instructions from each matching skill file.
 3. Apply the knowledge and recommendations to code generation, review, and suggestions.
-4. **For UI/visual design:** always load `.github/skills/awesome-design/design-md/<brand>/README.md` using the most relevant brand as reference.
+4. **For UI/visual design:** always load `.github/skills/awesome-design/design-md/vercel/README.md` using the most relevant brand as reference.
 5. **For React/Next.js best practices:** always load `.github/skills/web-design-guidelines/SKILL.md` alongside `vercel-react-best-practices`.
 6. **For `vercel-react-best-practices`:** also scan the `rules/` subdirectory for the most specific applicable rule.
 7. **For `betterauth-skills`:** load the sub-skill that matches the feature being implemented.
