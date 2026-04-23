@@ -15,7 +15,7 @@ interface KpiCardProps {
 
 export function KpiCard({ items }: KpiCardProps) {
   return (
-    <section className="overflow-hidden">
+    <section className="overflow-hidden border-b">
       <div
         className="grid w-full grid-cols-1 gap-px bg-border md:grid-cols-[repeat(var(--cols),minmax(0,1fr))]"
         style={{ "--cols": items.length } as React.CSSProperties}

@@ -36,6 +36,16 @@ export const organizations = pgTable("organizations", {
   slug: text("slug").notNull().unique(),
   logo: text("logo"),
   metadata: text("metadata"),
+  status: text("status", {
+    enum: ["active", "suspended", "deleted"],
+  })
+    .notNull()
+    .default("active"),
+  plan: text("plan", {
+    enum: ["free", "pro", "enterprise"],
+  })
+    .notNull()
+    .default("free"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 

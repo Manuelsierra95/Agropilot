@@ -220,13 +220,15 @@ export const mockTransactions: Transaction[] = [
 
 export default function Finance() {
   return (
-    <DashboardPageContainer className="radius-0 mx-4 mt-4 border md:mx-6 md:mt-0">
-      <KpiCard items={oils} />
-      <ChartArea />
-      <TransactionTable2 data={mockTransactions} />
-      {/* <TransactionTable data={data} /> */}
+    <DashboardPageContainer className="radius-0">
+      <div className="rounded-lg border">
+        <KpiCard items={oils} />
+        <ChartArea />
+        <TransactionTable2 data={mockTransactions} />
+        {/* <TransactionTable data={data} /> */}
 
-      {/* TODO: Mostrar grafico variaciones de precio con riego, y demas condiciones y contextos climaticos y de la parcela */}
+        {/* TODO: Mostrar grafico variaciones de precio con riego, y demas condiciones y contextos climaticos y de la parcela */}
+      </div>
     </DashboardPageContainer>
   )
 }

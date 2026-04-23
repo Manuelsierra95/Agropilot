@@ -29,7 +29,7 @@ export default function Calendar() {
   }
 
   return (
-    <DashboardPageContainer className="grid grid-cols-1 gap-8 px-4 pt-4 md:grid-cols-3 md:px-6 md:pt-0">
+    <DashboardPageContainer className="grid grid-cols-1 gap-8 md:grid-cols-3">
       <div className="col-span-1 flex h-full flex-col gap-4">
         <TimeWeatherCard />
         <WeeklyEventsCard

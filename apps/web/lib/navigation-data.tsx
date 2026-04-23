@@ -137,32 +137,21 @@ export const navigationData: NavigationData = {
   ],
   settings: [
     {
-      title: "Team",
-      url: "#",
+      title: "Settings",
+      url: "/dashboard/settings/profile",
       icon: Settings2Icon,
       items: [
         {
-          title: "Permisos",
-          url: "#",
+          title: "Profile",
+          url: "/dashboard/settings/profile",
         },
         {
-          title: "Ajustes",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Billing",
-      url: "#",
-      icon: Settings2Icon,
-      items: [
-        {
-          title: "Payment methods",
-          url: "#",
+          title: "Organization",
+          url: "/dashboard/settings/organization",
         },
         {
-          title: "Subscriptions",
-          url: "#",
+          title: "Billing",
+          url: "/dashboard/settings/billing",
         },
       ],
     },

@@ -8,6 +8,13 @@
       "when": 1776761508317,
       "tag": "0000_wild_doctor_doom",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776932904434,
+      "tag": "0001_lovely_starhawk",
+      "breakpoints": true
     }
   ]
 }

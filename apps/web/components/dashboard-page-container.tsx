@@ -7,7 +7,7 @@ export const DashboardPageContainer = ({
 }) => {
   return (
     <main
-      className={`@container/main flex flex-1 flex-col pb-4 ${className || ""}`}
+      className={`@container/main flex flex-1 flex-col px-2 py-2 md:px-6 ${className || ""}`}
     >
       {children}
     </main>
