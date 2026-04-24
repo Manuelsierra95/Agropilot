@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "motion/react"
 import { MapPin } from "lucide-react"
 
 import { OnboardingFooter } from "./components/onboarding-footer"

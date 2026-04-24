@@ -12,7 +12,7 @@ import {
 } from "date-fns"
 import { cn } from "@workspace/ui/lib/utils"
 import CalendarEvent from "../../calendar-event"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion } from "motion/react"
 
 export default function CalendarBodyMonth() {
   const { date, events, setDate, setMode } = useCalendarContext()

@@ -1,4 +1,4 @@
-import { SettingsBillingSection } from "@/features/settings/components/billing"
+import { SettingsBillingSection } from "@/features/settings/billing"
 
 export default function SettingsBillingPage() {
   return <SettingsBillingSection />

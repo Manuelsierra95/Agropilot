@@ -7,7 +7,7 @@ import {
 import { Mode, calendarModes } from "../../calendar-types"
 import { useCalendarContext } from "../../calendar-context"
 import { calendarModeIconMap } from "../../calendar-mode-icon-map"
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion"
+import { motion, AnimatePresence, LayoutGroup } from "motion/react"
 import { cn } from "@workspace/ui/lib/utils"
 
 export default function CalendarHeaderActionsMode() {

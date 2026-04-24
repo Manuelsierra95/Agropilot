@@ -2,7 +2,7 @@ import { CalendarEvent as CalendarEventType } from "@/features/calendar/calendar
 import { useCalendarContext } from "@/features/calendar/calendar-context"
 import { format, isSameDay, isSameMonth } from "date-fns"
 import { cn } from "@workspace/ui/lib/utils"
-import { motion, MotionConfig, AnimatePresence } from "framer-motion"
+import { motion, MotionConfig, AnimatePresence } from "motion/react"
 
 interface EventPosition {
   left: string

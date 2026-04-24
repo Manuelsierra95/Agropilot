@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion } from "motion/react"
 
 import { ChipButton } from "./chip-button"
 import { IrrigationCard } from "./irrigation-card"

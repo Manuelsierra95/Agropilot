@@ -12,6 +12,7 @@ import {
 } from "@workspace/ui/components/avatar"
 import { AlertTriangle, Camera, User } from "lucide-react"
 import { type ActiveOrganizationData } from "@workspace/schemas"
+import DeleteButton from "./components/delete-button"
 
 export function SettingsProfileSection({
   org,
@@ -121,9 +122,7 @@ export function SettingsProfileSection({
                 permanente.
               </p>
             </div>
-            <Button variant="destructive" size="sm">
-              Eliminar cuenta
-            </Button>
+            <DeleteButton />
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { SettingsProfileSection } from "@/features/settings/components/profile"
+import { SettingsProfileSection } from "@/features/settings/profile"
 import { api } from "@/lib/api"
 
 export default async function SettingsProfilePage() {
