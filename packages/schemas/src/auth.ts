@@ -5,6 +5,7 @@ import {
   users,
   verifications,
 } from "@workspace/db"
+import type { AuthMember } from "./organization"
 import {
   createInsertSchema,
   createSelectSchema,
@@ -27,49 +28,21 @@ export const verificationSelectSchema = createSelectSchema(verifications)
 export const verificationInsertSchema = createInsertSchema(verifications)
 export const verificationUpdateSchema = createUpdateSchema(verifications)
 
-const authUserBaseSchema = userSelectSchema.pick({
-  id: true,
-  email: true,
-})
-
-export const authUserSchema = authUserBaseSchema
-
-export type AuthUser = {
-  id: string
-  email: string
-}
-export type OrganizationRole =
-  | "owner"
-  | "admin"
-  | "editor"
-  | "member"
-  | "viewer"
-
-export const authSessionSchema = sessionSelectSchema.pick({
+const authUserFields = { id: true, email: true } as const
+const authSessionFields = {
   id: true,
   userId: true,
   activeOrganizationId: true,
-})
+} as const
 
-export type AuthSession = {
-  id: string
-  userId: string
-  activeOrganizationId: string | null
-}
+export const authUserSchema = userSelectSchema.pick(authUserFields)
+export const authSessionSchema = sessionSelectSchema.pick(authSessionFields)
 
-export const authMemberSchema = createSelectSchema(members).pick({
-  id: true,
-  userId: true,
-  organizationId: true,
-  role: true,
-})
-
-export type AuthMember = {
-  id: string
-  userId: string
-  organizationId: string
-  role: string
-}
+export type AuthUser = ReturnType<typeof authUserSchema.parse>
+export type AuthSession = ReturnType<typeof authSessionSchema.parse>
+export type OrganizationRole = NonNullable<
+  (typeof members.$inferSelect)["role"]
+>
 
 export type AuthContext = {
   user: AuthUser
@@ -78,19 +51,36 @@ export type AuthContext = {
   member: AuthMember | null
 }
 
+export type UserSelect = ReturnType<typeof userSelectSchema.parse>
+export type UserInsert = ReturnType<typeof userInsertSchema.parse>
+export type UserUpdate = ReturnType<typeof userUpdateSchema.parse>
+
+export type SessionSelect = ReturnType<typeof sessionSelectSchema.parse>
+export type SessionInsert = ReturnType<typeof sessionInsertSchema.parse>
+export type SessionUpdate = ReturnType<typeof sessionUpdateSchema.parse>
+
+export type AccountSelect = ReturnType<typeof accountSelectSchema.parse>
+export type AccountInsert = ReturnType<typeof accountInsertSchema.parse>
+export type AccountUpdate = ReturnType<typeof accountUpdateSchema.parse>
+
+export type VerificationSelect = ReturnType<
+  typeof verificationSelectSchema.parse
+>
+export type VerificationInsert = ReturnType<
+  typeof verificationInsertSchema.parse
+>
+export type VerificationUpdate = ReturnType<
+  typeof verificationUpdateSchema.parse
+>
+
 export const parseAuthUser = (value: unknown): AuthUser | null => {
   const parsed = authUserSchema.safeParse(value)
-  return parsed.success ? (parsed.data as AuthUser) : null
+  return parsed.success ? parsed.data : null
 }
 
 export const parseAuthSession = (value: unknown): AuthSession | null => {
   const parsed = authSessionSchema.safeParse(value)
-  return parsed.success ? (parsed.data as AuthSession) : null
-}
-
-export const parseAuthMember = (value: unknown): AuthMember | null => {
-  const parsed = authMemberSchema.safeParse(value)
-  return parsed.success ? (parsed.data as AuthMember) : null
+  return parsed.success ? parsed.data : null
 }
 
 export const buildAuthContext = (
@@ -103,19 +93,3 @@ export const buildAuthContext = (
   organizationId: session.activeOrganizationId,
   member: member ?? null,
 })
-
-export type UserSelect = typeof userSelectSchema.type
-export type UserInsert = typeof userInsertSchema.type
-export type UserUpdate = typeof userUpdateSchema.type
-
-export type SessionSelect = typeof sessionSelectSchema.type
-export type SessionInsert = typeof sessionInsertSchema.type
-export type SessionUpdate = typeof sessionUpdateSchema.type
-
-export type AccountSelect = typeof accountSelectSchema.type
-export type AccountInsert = typeof accountInsertSchema.type
-export type AccountUpdate = typeof accountUpdateSchema.type
-
-export type VerificationSelect = typeof verificationSelectSchema.type
-export type VerificationInsert = typeof verificationInsertSchema.type
-export type VerificationUpdate = typeof verificationUpdateSchema.type

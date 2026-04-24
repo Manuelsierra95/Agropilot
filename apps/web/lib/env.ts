@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 const envSchema = z.object({
-  PUBLIC_API_URL: z.string().url().default("http://localhost:8787/api"),
+  PUBLIC_API_URL: z.string().url().default("http://localhost:8787"),
   PUBLIC_API_VERSION: z.string().default("v1"),
   PUBLIC_REDIRECT_URL: z
     .string()
@@ -24,4 +24,5 @@ if (!result.success) {
 export const env = result.data
 export type env = z.infer<typeof envSchema>
 
-export const versionedApiUrl = `${env.PUBLIC_API_URL}/${env.PUBLIC_API_VERSION}`
+export const apiBaseUrl = env.PUBLIC_API_URL
+export const versionedApiUrl = `${apiBaseUrl}/api/${env.PUBLIC_API_VERSION}`

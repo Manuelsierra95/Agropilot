@@ -16,8 +16,6 @@ export default async function DashboardLayout({
     headers: await headers(),
   })
 
-  console.log("Session in layout:", session) // Debugging line
-
   if (!session) {
     redirect("/auth/sign-in")
   }

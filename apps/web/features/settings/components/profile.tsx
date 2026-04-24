@@ -11,21 +11,40 @@ import {
   AvatarImage,
 } from "@workspace/ui/components/avatar"
 import { AlertTriangle, Camera, User } from "lucide-react"
+import { type ActiveOrganizationData } from "@workspace/schemas"
 
-export function SettingsProfileSection() {
+export function SettingsProfileSection({
+  org,
+}: {
+  org: ActiveOrganizationData
+}) {
+  const organization = org.organization
+  const member = org.member
+
+  const createdAtFormatted = new Date(
+    organization.createdAt
+  ).toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })
+
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-lg font-medium">Profile</h2>
         <p className="text-sm text-muted-foreground">
-          Administra tu informacion de usuario y seguridad basica de la cuenta.
+          Administra la informacion de tu organizacion y el acceso de tu cuenta.
         </p>
       </div>
 
       <div className="space-y-6">
         <div className="flex items-center gap-6">
           <Avatar className="h-20 w-20">
-            <AvatarImage src="/placeholder-avatar.jpg" alt="Profile" />
+            <AvatarImage
+              src={organization.logo || ""}
+              alt={organization.name}
+            />
             <AvatarFallback className="bg-muted">
               <User className="h-8 w-8 text-muted-foreground" />
             </AvatarFallback>
@@ -36,53 +55,51 @@ export function SettingsProfileSection() {
               Cambiar imagen
             </Button>
             <p className="text-xs text-muted-foreground">
-              Campo users.image (JPG, PNG o GIF. Max 2MB).
+              Logo de la organizacion (JPG, PNG o GIF. Max 2MB).
             </p>
           </div>
         </div>
 
         <div className="grid max-w-md gap-6">
           <div className="space-y-2">
-            <Label htmlFor="display-name">Nombre</Label>
+            <Label htmlFor="display-name">Nombre de organizacion</Label>
             <Input
               id="display-name"
               placeholder="Nombre visible"
-              defaultValue="John Doe"
+              defaultValue={organization.name}
             />
-            <p className="text-xs text-muted-foreground">Campo users.name.</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email actual</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="email"
-                type="email"
-                defaultValue="john@example.com"
-                readOnly
-              />
-              <Badge variant="secondary" className="font-normal">
-                Verificado
-              </Badge>
-            </div>
             <p className="text-xs text-muted-foreground">
-              Campos users.email y users.emailVerified.
+              Campo organization.name.
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="new-email">Cambiar email</Label>
-            <Input id="new-email" type="email" placeholder="nuevo@email.com" />
+            <Label htmlFor="email">Slug actual</Label>
+            <div className="flex items-center gap-2">
+              <Input id="email" defaultValue={organization.slug} readOnly />
+              <Badge variant="secondary" className="font-normal">
+                {organization.status}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Campos organization.slug y organization.status.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="new-email">Rol del miembro</Label>
+            <Input id="new-email" defaultValue={member.role} readOnly />
             <Button variant="outline" className="w-fit">
-              Solicitar cambio de email
+              Gestionar rol
             </Button>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="bio">Bio</Label>
+            <Label htmlFor="bio">Metadata</Label>
             <Textarea
               id="bio"
-              placeholder="Descripcion breve"
+              placeholder="Metadata de la organizacion"
+              defaultValue={`Plan: ${organization.plan}\nCreada: ${createdAtFormatted}`}
               rows={3}
               className="resize-none"
             />

@@ -7,7 +7,7 @@ import {
   parseAuthSession,
   parseAuthUser,
 } from "@workspace/schemas"
-import { resolveOrganizationContext } from "@/services/organization-context"
+import { resolveOrganizationContext } from "@/utils/organization-context"
 
 export const optionalAuth: MiddlewareHandler<{
   Bindings: Env
