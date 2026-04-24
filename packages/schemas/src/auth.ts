@@ -5,7 +5,6 @@ import {
   users,
   verifications,
 } from "@workspace/db"
-import type { AuthMember } from "./organization"
 import {
   createInsertSchema,
   createSelectSchema,
@@ -28,28 +27,29 @@ export const verificationSelectSchema = createSelectSchema(verifications)
 export const verificationInsertSchema = createInsertSchema(verifications)
 export const verificationUpdateSchema = createUpdateSchema(verifications)
 
-const authUserFields = { id: true, email: true } as const
-const authSessionFields = {
+export const authUserSchema = userSelectSchema.pick({
+  id: true,
+  email: true,
+})
+
+export const authSessionSchema = sessionSelectSchema.pick({
   id: true,
   userId: true,
   activeOrganizationId: true,
-} as const
-
-export const authUserSchema = userSelectSchema.pick(authUserFields)
-export const authSessionSchema = sessionSelectSchema.pick(authSessionFields)
+})
 
 export type AuthUser = ReturnType<typeof authUserSchema.parse>
 export type AuthSession = ReturnType<typeof authSessionSchema.parse>
-export type OrganizationRole = NonNullable<
-  (typeof members.$inferSelect)["role"]
->
 
 export type AuthContext = {
   user: AuthUser
   session: AuthSession
-  organizationId: string | null
-  member: AuthMember | null
+  organizationId: string
 }
+
+export type OrganizationRole = NonNullable<
+  (typeof members.$inferSelect)["role"]
+>
 
 export type UserSelect = ReturnType<typeof userSelectSchema.parse>
 export type UserInsert = ReturnType<typeof userInsertSchema.parse>
@@ -82,14 +82,3 @@ export const parseAuthSession = (value: unknown): AuthSession | null => {
   const parsed = authSessionSchema.safeParse(value)
   return parsed.success ? parsed.data : null
 }
-
-export const buildAuthContext = (
-  user: AuthUser,
-  session: AuthSession,
-  member?: AuthMember | null
-): AuthContext => ({
-  user,
-  session,
-  organizationId: session.activeOrganizationId,
-  member: member ?? null,
-})

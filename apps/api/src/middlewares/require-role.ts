@@ -4,39 +4,20 @@ import {
   ROLE_HIERARCHY,
   type OrganizationRole,
 } from "@workspace/auth/permissions"
-
-const hasRequiredRole = (
-  currentRole: OrganizationRole,
-  requiredRole: OrganizationRole
-) => ROLE_HIERARCHY[currentRole] >= ROLE_HIERARCHY[requiredRole]
+import { AuthMember } from "@workspace/schemas"
 
 export const requireRole = (
-  roles: OrganizationRole | OrganizationRole[]
-): MiddlewareHandler<{
-  Variables: ApiVariables
-}> => {
+  requiredRole: OrganizationRole
+): MiddlewareHandler<{ Variables: ApiVariables }> => {
   return async (c, next) => {
     const member = c.get("member")
+    const role = member?.role as OrganizationRole
 
-    if (!member) {
+    if (!member || !(role in ROLE_HIERARCHY)) {
       return c.json({ error: "Unauthorized" }, 401)
     }
 
-    const role = member.role as OrganizationRole
-
-    if (!(role in ROLE_HIERARCHY)) {
-      return c.json({ error: "Forbidden" }, 403)
-    }
-
-    if (Array.isArray(roles)) {
-      if (!roles.includes(role)) {
-        return c.json({ error: "Forbidden" }, 403)
-      }
-
-      return next()
-    }
-
-    if (!hasRequiredRole(role, roles)) {
+    if (ROLE_HIERARCHY[role] < ROLE_HIERARCHY[requiredRole]) {
       return c.json({ error: "Forbidden" }, 403)
     }
 

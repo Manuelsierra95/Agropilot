@@ -21,7 +21,7 @@ import { eq } from "drizzle-orm"
  *    - Uso: endpoint que funciona con y sin sesion.
  *    - Middleware: optionalAuth.
  *    - Multi-organization: cuando hay sesion, `organizationId` se resuelve desde
- *      `activeOrganizationId` o con header `x-organization-id`.
+ *      `activeOrganizationId` .
  *    - Cuando aplicarlo: experiencias mixtas (anonimo + logueado), personalizacion opcional.
  *
  * 3) GET /profile (con requireAuth)
@@ -57,7 +57,6 @@ import { eq } from "drizzle-orm"
  * - Opcional auth: .use("/ruta", optionalAuth).get("/ruta", handler)
  * - Protegida: .use("/ruta", requireAuth).get("/ruta", handler)
  * - RBAC: .use("/ruta", requireAuth, requireRole("admin"))
- * - Organization request-scoped: enviar header `x-organization-id`.
  * - Organization persistente: usar endpoint Better Auth `/auth/organization/set-active`.
  *
  * Regla de seguridad multi-organization:
@@ -82,7 +81,6 @@ export const exampleRoutes = new Hono<{
       session: c.get("session"),
       organizationId: c.get("organizationId"),
       member: c.get("member"),
-      requestedOrganizationId: c.req.header("x-organization-id") ?? null,
     })
   })
 
@@ -103,7 +101,6 @@ export const exampleRoutes = new Hono<{
     return c.json({
       organizationId: c.get("organizationId"),
       member: c.get("member"),
-      note: "Puedes enviar x-organization-id para resolver otro organization por request",
     })
   })
 
@@ -138,7 +135,7 @@ export const exampleRoutes = new Hono<{
 
   // Parcelas de la organizacion activa.
   // - requireAuth garantiza sesion valida y membership en la org.
-  // - organizationId viene resuelto por el middleware (activeOrganizationId o header x-organization-id).
+  // - organizationId viene resuelto por el middleware.
   // - Nunca se filtra por userId: las parcelas son de la org, no del usuario.
   .use("/parcels", requireAuth)
   .get("/parcels", async (c) => {
@@ -147,8 +144,7 @@ export const exampleRoutes = new Hono<{
     if (!organizationId) {
       return c.json(
         {
-          error:
-            "No hay organizacion activa. Usa x-organization-id o set-active.",
+          error: "No hay organizacion activa.",
         },
         400
       )

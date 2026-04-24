@@ -2,12 +2,9 @@ import type { MiddlewareHandler } from "hono"
 import type { Env } from "@env"
 import type { ApiVariables } from "@/types/variables"
 import { auth } from "@workspace/auth"
-import {
-  parseAuthMember,
-  parseAuthSession,
-  parseAuthUser,
-} from "@workspace/schemas"
-import { resolveOrganizationContext } from "@/utils/organization-context"
+import { parseAuthSession, parseAuthUser } from "@workspace/schemas"
+import { eq, and } from "drizzle-orm"
+import { db, schema } from "@workspace/db"
 
 export const requireAuth: MiddlewareHandler<{
   Bindings: Env
@@ -25,27 +22,29 @@ export const requireAuth: MiddlewareHandler<{
       return c.json({ error: "Unauthorized" }, 401)
     }
 
-    const requestedOrganizationId = c.req.header("x-organization-id")
-    const context = await resolveOrganizationContext({
-      user,
-      session,
-      requestedOrganizationId,
+    if (!session.activeOrganizationId) {
+      return c.json({ error: "Organization context not available" }, 403)
+    }
+
+    const member = await db.query.members.findFirst({
+      where: and(
+        eq(schema.members.userId, user.id),
+        eq(schema.members.organizationId, session.activeOrganizationId)
+      ),
     })
 
-    if (!context.organizationId || !context.member) {
+    if (!member) {
       return c.json({ error: "Organization context not available" }, 403)
     }
 
     c.set("user", user)
     c.set("session", session)
-    c.set("organizationId", context.organizationId)
-    c.set("member", parseAuthMember(context.member))
+    c.set("organizationId", session.activeOrganizationId)
+    c.set("member", member)
 
     return next()
   } catch (error) {
-    const traceId = c.req.header("x-request-id") ?? crypto.randomUUID()
     console.error("[requireAuth] unexpected error", {
-      traceId,
       method: c.req.method,
       path: c.req.path,
       error,

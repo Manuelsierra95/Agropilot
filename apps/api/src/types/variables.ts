@@ -6,3 +6,10 @@ export type ApiVariables = {
   organizationId: string | null
   member: AuthMember | null
 }
+
+export type AuthVariables = {
+  user: AuthUser
+  session: AuthSession
+  organizationId: string
+  member: AuthMember
+}
