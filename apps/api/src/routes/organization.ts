@@ -7,12 +7,10 @@ import { getActiveOrganization } from "@/services/organization"
 export const organizationRoutes = new Hono<{
   Bindings: Env
   Variables: AuthVariables
-}>()
-  .use("/active", requireAuth)
-  .get("/active", async (c) => {
-    const data = await getActiveOrganization(
-      c.get("organizationId"),
-      c.get("member")
-    )
-    return c.json(data, 200)
-  })
+}>().get("/active", requireAuth, async (c) => {
+  const data = await getActiveOrganization(
+    c.get("organizationId"),
+    c.get("member")
+  )
+  return c.json(data, 200)
+})

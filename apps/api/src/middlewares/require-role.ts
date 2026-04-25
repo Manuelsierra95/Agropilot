@@ -4,7 +4,7 @@ import {
   ROLE_HIERARCHY,
   type OrganizationRole,
 } from "@workspace/auth/permissions"
-import { AuthMember } from "@workspace/schemas"
+import { HTTPException } from "hono/http-exception"
 
 export const requireRole = (
   requiredRole: OrganizationRole
@@ -14,13 +14,13 @@ export const requireRole = (
     const role = member?.role as OrganizationRole
 
     if (!member || !(role in ROLE_HIERARCHY)) {
-      return c.json({ error: "Unauthorized" }, 401)
+      throw new HTTPException(401, { message: "Unauthorized" })
     }
 
     if (ROLE_HIERARCHY[role] < ROLE_HIERARCHY[requiredRole]) {
-      return c.json({ error: "Forbidden" }, 403)
+      throw new HTTPException(403, { message: "Forbidden" })
     }
 
-    return next()
+    await next()
   }
 }

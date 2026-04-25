@@ -4,13 +4,15 @@ import { parcelRoutes } from "@/routes/parcel"
 import { exampleRoutes } from "@/routes/example"
 import type { Env } from "@env"
 import type { ApiVariables } from "@/types/variables"
-import { corsMiddleware } from "./middlewares/cors"
-import { csrfMiddleware } from "./middlewares/csrf"
-import { rateLimitMiddleware } from "./middlewares/rateLimit"
-import { organizationRoutes } from "./routes/organization"
+import { errorHandler } from "@/middlewares/error-handler"
+import { corsMiddleware } from "@/middlewares/cors"
+import { csrfMiddleware } from "@/middlewares/csrf"
+import { rateLimitMiddleware } from "@/middlewares/rateLimit"
+import { organizationRoutes } from "@/routes/organization"
 
 const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .basePath("/api/v1")
+  .onError(errorHandler)
   .use(corsMiddleware)
   // .use(csrfMiddleware)
   // .use(rateLimitMiddleware)

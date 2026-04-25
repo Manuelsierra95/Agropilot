@@ -70,6 +70,10 @@ const auth = betterAuth({
       },
       requireEmailVerificationOnInvitation: false,
       cancelPendingInvitationsOnReInvite: true,
+
+      organizationCreation: {
+        disabled: true, // no user can call createOrganization from client
+      },
     }),
     openAPI(),
   ],
