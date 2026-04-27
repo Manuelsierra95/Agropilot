@@ -1,6 +1,6 @@
 import { client } from "@/lib/api/client"
 import type {
-  AuthMember,
+  OrganizationMember,
   UpdateOrganizationInput,
   ActiveOrganizationData,
 } from "@workspace/schemas"
@@ -12,10 +12,10 @@ const getActiveOrganization = cache(
 )
 
 const getOrganizationMembers = cache(
-  (): Promise<AuthMember[]> =>
+  (): Promise<OrganizationMember[]> =>
     client.api.v1.organization.members
       .$get()
-      .then((response) => response.json())
+      .then((response) => response.json().then((data) => data.members))
 )
 
 const updateOrganization = (data: UpdateOrganizationInput) =>

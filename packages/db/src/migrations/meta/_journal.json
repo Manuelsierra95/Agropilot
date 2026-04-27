@@ -15,6 +15,20 @@
       "when": 1776932904434,
       "tag": "0001_lovely_starhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777287802872,
+      "tag": "0002_acoustic_pestilence",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777287862215,
+      "tag": "0003_stiff_magik",
+      "breakpoints": true
     }
   ]
 }

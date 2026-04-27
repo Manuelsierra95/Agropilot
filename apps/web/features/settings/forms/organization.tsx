@@ -21,7 +21,6 @@ export function OrganizationForm({ org }: Props) {
     resolver: zodResolver(updateOrganizationSchema),
     defaultValues: {
       name: org.name,
-      slug: org.slug,
     },
   })
 
@@ -40,20 +39,6 @@ export function OrganizationForm({ org }: Props) {
         {form.formState.errors.name && (
           <p className="text-sm text-destructive">
             {form.formState.errors.name.message}
-          </p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="org-slug">URL slug</Label>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
-            app.example.com/
-          </span>
-          <Input id="org-slug" {...form.register("slug")} className="flex-1" />
-        </div>
-        {form.formState.errors.slug && (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.slug.message}
           </p>
         )}
       </div>

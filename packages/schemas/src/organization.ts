@@ -6,11 +6,9 @@ export const organizationSchema = createSelectSchema(organizations)
 export const memberSchema = createSelectSchema(members)
 export const updateOrganizationSchema = createUpdateSchema(organizations, {
   name: (schema) => schema.min(1).max(100).trim(),
-  slug: (schema) => schema.min(1).max(50).trim(),
 })
   .pick({
     name: true,
-    slug: true,
     logo: true,
   })
   .refine((data) => Object.keys(data).length > 0, {
