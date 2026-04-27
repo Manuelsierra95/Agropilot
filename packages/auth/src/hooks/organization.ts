@@ -1,6 +1,5 @@
 import type { User } from "better-auth"
-import { db, sessions, members } from "@workspace/db"
-import { and, eq } from "drizzle-orm"
+import { and, eq, db, sessions, members } from "@workspace/db"
 
 // Create a slug for the organization based on the user's name or email, ensuring it's unique by appending part of the user ID
 function buildSlug(user: User): string {

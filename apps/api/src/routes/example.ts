@@ -4,8 +4,7 @@ import type { ApiVariables } from "@/types/variables"
 import { optionalAuth } from "@/middlewares/optional-auth"
 import { requireAuth } from "@/middlewares/require-auth"
 import { requireRole } from "@/middlewares/require-role"
-import { db, parcels } from "@workspace/db"
-import { eq } from "drizzle-orm"
+import { eq, db, parcels } from "@workspace/db"
 
 /**
  * Guia de referencia para futuras implantaciones de rutas en la API.

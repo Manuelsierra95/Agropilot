@@ -3,8 +3,7 @@ import type { Env } from "@env"
 import type { ApiVariables } from "@/types/variables"
 import { auth } from "@workspace/auth"
 import { parseAuthSession, parseAuthUser } from "@workspace/schemas"
-import { eq, and } from "drizzle-orm"
-import { db, schema } from "@workspace/db"
+import { eq, and, db, schema } from "@workspace/db"
 import { HTTPException } from "hono/http-exception"
 
 export const requireAuth: MiddlewareHandler<{

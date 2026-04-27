@@ -32,5 +32,8 @@ const db = new Proxy({} as DatabaseInstance, {
 export type Schema = typeof schema
 export type Database = typeof db
 
+// Export drizzle-orm utilities
+export * from "drizzle-orm"
+
 export * from "./schemas"
 export { db, schema, resolveDatabase as getDb }

@@ -1,5 +1,4 @@
-import { eq } from "drizzle-orm"
-import { db, schema } from "@workspace/db"
+import { eq, db, schema } from "@workspace/db"
 import type { ActiveOrganizationData, AuthMember } from "@workspace/schemas"
 import { HTTPException } from "hono/http-exception"
 
