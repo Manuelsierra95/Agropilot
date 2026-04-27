@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@hono-rate-limiter/cloudflare": "^0.2.2",
+    "@hono/zod-validator": "^0.7.6",
     "@workspace/auth": "workspace:*",
     "@workspace/db": "workspace:*",
     "@workspace/schemas": "workspace:*",

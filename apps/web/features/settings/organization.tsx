@@ -1,8 +1,6 @@
 "use client"
 
 import { Button } from "@workspace/ui/components/button"
-import { Input } from "@workspace/ui/components/input"
-import { Label } from "@workspace/ui/components/label"
 import {
   Avatar,
   AvatarFallback,
@@ -16,19 +14,28 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
 import { Building2, Users, MoreHorizontal, Mail, UserPlus } from "lucide-react"
+import { OrganizationForm } from "@/features/settings/forms/organization"
+import type {
+  ActiveOrganizationData,
+  OrganizationMember,
+} from "@workspace/schemas"
 
-const teamMembers = [
-  { name: "John Doe", email: "john@acme.com", role: "Owner", avatar: null },
-  { name: "Jane Smith", email: "jane@acme.com", role: "Admin", avatar: null },
-  {
-    name: "Mike Johnson",
-    email: "mike@acme.com",
-    role: "Member",
-    avatar: null,
-  },
-]
+export function SettingsOrganizationSection({
+  org,
+  members,
+}: {
+  org: ActiveOrganizationData["organization"]
+  members: OrganizationMember[]
+}) {
+  const createdAtFormatted = new Date(org.createdAt).toLocaleDateString(
+    "es-ES",
+    {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }
+  )
 
-export function SettingsOrganizationSection() {
   return (
     <div className="space-y-8">
       <div>
@@ -46,29 +53,13 @@ export function SettingsOrganizationSection() {
               <Building2 className="h-8 w-8 text-muted-foreground" />
             </div>
             <div className="flex-1 space-y-1">
-              <h3 className="font-medium">Acme Inc</h3>
+              <h3 className="font-medium">{org.name}</h3>
               <p className="text-sm text-muted-foreground">
-                Created on Jan 15, 2025
+                Created on {createdAtFormatted}
               </p>
             </div>
           </div>
-
-          <div className="grid max-w-md gap-4 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="org-name">Organization name</Label>
-              <Input id="org-name" defaultValue="Acme Inc" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="org-slug">URL slug</Label>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">
-                  app.example.com/
-                </span>
-                <Input id="org-slug" defaultValue="acme" className="flex-1" />
-              </div>
-            </div>
-            <Button className="w-fit">Save changes</Button>
-          </div>
+          <OrganizationForm org={org} />
         </div>
 
         {/* Team members */}
@@ -88,22 +79,22 @@ export function SettingsOrganizationSection() {
           </div>
 
           <div className="divide-y rounded-lg border">
-            {teamMembers.map((member, i) => (
+            {members.map((member, i) => (
               <div key={i} className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src={member.avatar || ""} />
+                    <AvatarImage src={member.user.image || ""} />
                     <AvatarFallback className="bg-muted text-xs">
-                      {member.name
+                      {member.user.name
                         .split(" ")
                         .map((n) => n[0])
                         .join("")}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium">{member.name}</p>
+                    <p className="text-sm font-medium">{member.user.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {member.email}
+                      {member.user.email}
                     </p>
                   </div>
                 </div>

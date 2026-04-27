@@ -29,7 +29,9 @@ export const verificationUpdateSchema = createUpdateSchema(verifications)
 
 export const authUserSchema = userSelectSchema.pick({
   id: true,
+  name: true,
   email: true,
+  image: true,
 })
 
 export const authSessionSchema = sessionSelectSchema.pick({

@@ -1,10 +1,25 @@
-import { createSelectSchema } from "drizzle-zod"
+import { createSelectSchema, createUpdateSchema } from "drizzle-zod"
 import { organizations, members } from "@workspace/db"
-import type { AuthSession, AuthUser } from "./auth"
+import { AuthUser } from "./auth"
 
 export const organizationSchema = createSelectSchema(organizations)
 export const memberSchema = createSelectSchema(members)
+export const updateOrganizationSchema = createUpdateSchema(organizations, {
+  name: (schema) => schema.min(1).max(100).trim(),
+  slug: (schema) => schema.min(1).max(50).trim(),
+})
+  .pick({
+    name: true,
+    slug: true,
+    logo: true,
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+  })
 
+export type UpdateOrganizationInput = ReturnType<
+  typeof updateOrganizationSchema.parse
+>
 export type AuthOrganization = ReturnType<typeof organizationSchema.parse>
 export type AuthMember = ReturnType<typeof memberSchema.parse>
 
@@ -14,21 +29,16 @@ export type ActiveOrganizationContext = {
   member: AuthMember | null
 }
 
-export type GetActiveOrganizationInput = {
-  user: AuthUser
-  session: AuthSession
-  requestedOrganizationId?: string | null
-}
-
-export type GetActiveOrganizationRouteInput = {
-  user: AuthUser | null | undefined
-  session: AuthSession | null | undefined
-  requestedOrganizationId?: string | null
-}
-
 export type ActiveOrganizationData = {
   organization: AuthOrganization
   member: AuthMember
+}
+
+export type OrganizationMember = Pick<
+  AuthMember,
+  "id" | "role" | "createdAt"
+> & {
+  user: Pick<AuthUser, "id" | "name" | "email" | "image">
 }
 
 export const parseAuthOrganization = (
