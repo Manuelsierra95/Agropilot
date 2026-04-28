@@ -4,16 +4,22 @@ import { Undo2 } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
 import React, { useEffect, useState } from "react"
 
-const DeleteButton = () => {
+interface DeleteButtonProps {
+  deleteText?: string
+  cancelText?: string
+}
+
+const DeleteButton = ({
+  deleteText = "Borrar",
+  cancelText = "Cancelar Eliminación",
+}: DeleteButtonProps) => {
   const [isDeleting, setIsDeleting] = useState(false)
   const [count, setCount] = useState(10)
   const [isAnimating, setIsAnimating] = useState(false)
 
   useEffect(() => {
     if (!isDeleting) return
-
     if (count === 0) return
-
     const timer = setTimeout(() => setCount((c) => c - 1), 1000)
     return () => clearTimeout(timer)
   }, [isDeleting, count])
@@ -23,20 +29,13 @@ const DeleteButton = () => {
     setIsAnimating(true)
     setIsDeleting(newState)
     if (newState) setCount(10)
-
-    // Release lock after animation completes
     setTimeout(() => setIsAnimating(false), 400)
   }
-
-  // Change Here
-  const deleteText = "Borrar Cuenta"
-  const cancelText = "Cancelar Eliminación"
 
   return (
     <div className="flex items-center justify-center">
       <AnimatePresence mode="popLayout" initial={false}>
         {!isDeleting ? (
-          // STATE A
           <motion.button
             key="delete"
             layoutId="deleteButton"
@@ -93,7 +92,6 @@ const DeleteButton = () => {
             </motion.span>
           </motion.button>
         ) : (
-          // STATE B
           <motion.button
             key="cancel"
             layoutId="deleteButton"
@@ -169,17 +167,9 @@ const DeleteButton = () => {
               <AnimatePresence mode="popLayout">
                 <motion.span
                   key={count}
-                  initial={{
-                    opacity: 0,
-                    y: 10,
-                    scale: 0.8,
-                  }}
+                  initial={{ opacity: 0, y: 10, scale: 0.8 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{
-                    opacity: 0,
-                    y: -10,
-                    scale: 0.8,
-                  }}
+                  exit={{ opacity: 0, y: -10, scale: 0.8 }}
                   transition={{ duration: 0.2, ease: [0.33, 1, 0.68, 1] }}
                   className="absolute"
                 >

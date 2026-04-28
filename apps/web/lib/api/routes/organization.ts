@@ -3,6 +3,7 @@ import type {
   OrganizationMember,
   UpdateOrganizationInput,
   ActiveOrganizationData,
+  OrganizationMeResponse,
 } from "@workspace/schemas"
 import { cache } from "react"
 
@@ -19,7 +20,7 @@ const getOrganizationMembers = cache(
 )
 
 const getOrganizationMe = cache(
-  (): Promise<OrganizationMember> =>
+  (): Promise<OrganizationMeResponse> =>
     client.api.v1.organization.me.$get().then((response) => response.json())
 )
 

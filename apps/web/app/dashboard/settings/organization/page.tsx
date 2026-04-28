@@ -4,8 +4,8 @@ import { api } from "@/lib/api"
 export default async function SettingsOrganizationPage() {
   const org = await api.organization.getMe()
 
-  const isOwner = org.role === "owner"
-  const isAdmin = org.role === "admin" || isOwner
+  const isOwner = org.viewerRole === "owner"
+  const isAdmin = org.viewerRole === "admin" || isOwner
 
   return (
     <SettingsOrganizationSection
