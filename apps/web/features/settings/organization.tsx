@@ -1,140 +1,199 @@
 "use client"
 
 import { Button } from "@workspace/ui/components/button"
+import { Input } from "@workspace/ui/components/input"
+import { Label } from "@workspace/ui/components/label"
+import { Badge } from "@workspace/ui/components/badge"
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@workspace/ui/components/avatar"
-import { Badge } from "@workspace/ui/components/badge"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@workspace/ui/components/dropdown-menu"
-import { Building2, Users, MoreHorizontal, Mail, UserPlus } from "lucide-react"
-import { OrganizationForm } from "@/features/settings/forms/organization"
-import type {
-  ActiveOrganizationData,
-  OrganizationMember,
-} from "@workspace/schemas"
+import { Camera, Crown, Shield, User } from "lucide-react"
+import type { OrganizationMeResponse } from "@workspace/schemas"
+
+const ROLE_LABELS: Record<string, string> = {
+  owner: "Propietario",
+  admin: "Administrador",
+  member: "Miembro",
+}
+
+const ROLE_ICONS: Record<string, React.ReactNode> = {
+  owner: <Crown className="h-3 w-3" />,
+  admin: <Shield className="h-3 w-3" />,
+  member: <User className="h-3 w-3" />,
+}
+
+const PLAN_LABELS: Record<string, string> = {
+  free: "Gratuito",
+  pro: "Pro",
+  enterprise: "Enterprise",
+}
+
+type Props = {
+  org: OrganizationMeResponse
+  canEdit: boolean
+  canManageMembers: boolean
+}
 
 export function SettingsOrganizationSection({
   org,
-  members,
-}: {
-  org: ActiveOrganizationData["organization"]
-  members: OrganizationMember[]
-}) {
-  const createdAtFormatted = new Date(org.createdAt).toLocaleDateString(
-    "es-ES",
-    {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }
-  )
+  canEdit,
+  canManageMembers,
+}: Props) {
+  const initials = org.name
+    .split(" ")
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
-        <h2 className="text-lg font-medium">Organization</h2>
+        <h2 className="text-lg font-medium">Organización</h2>
         <p className="text-sm text-muted-foreground">
-          Manage your organization settings and team members.
+          Gestiona los datos de tu explotación y los miembros del equipo.
         </p>
       </div>
 
-      <div className="space-y-6">
-        {/* Organization details */}
-        <div className="space-y-4 border-b pb-6">
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-muted">
-              <Building2 className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <div className="flex-1 space-y-1">
-              <h3 className="font-medium">{org.name}</h3>
-              <p className="text-sm text-muted-foreground">
-                Created on {createdAtFormatted}
-              </p>
-            </div>
+      <section className="space-y-6">
+        <h3 className="text-sm font-medium">Datos generales</h3>
+
+        <div className="flex items-center gap-4">
+          <Avatar className="h-16 w-16 rounded-lg">
+            <AvatarImage src={org.logo ?? ""} alt={org.name} />
+            <AvatarFallback className="rounded-lg bg-muted text-sm font-medium">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="space-y-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              disabled={!canEdit}
+            >
+              <Camera className="h-4 w-4" />
+              Cambiar logo
+            </Button>
+            <p className="text-xs text-muted-foreground">JPG, PNG · Máx. 2MB</p>
           </div>
-          <OrganizationForm org={org} />
         </div>
 
-        {/* Team members */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-muted-foreground" />
-              <h3 className="font-medium">Team members</h3>
-              <Badge variant="secondary" className="font-normal">
-                3
-              </Badge>
-            </div>
-            <Button size="sm" className="gap-2">
-              <UserPlus className="h-4 w-4" />
-              Invite
-            </Button>
+        <div className="grid max-w-md gap-5">
+          <div className="space-y-2">
+            <Label htmlFor="org-name">Nombre de la explotación</Label>
+            <Input
+              id="org-name"
+              defaultValue={org.name}
+              readOnly={!canEdit}
+              className={!canEdit ? "text-muted-foreground" : ""}
+            />
           </div>
 
-          <div className="divide-y rounded-lg border">
-            {members.map((member, i) => (
-              <div key={i} className="flex items-center justify-between p-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Plan actual</Label>
+              <Input
+                value={PLAN_LABELS[org.plan] ?? org.plan}
+                readOnly
+                className="text-muted-foreground"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Tu rol</Label>
+              <Input
+                value={ROLE_LABELS[org.viewerRole] ?? org.viewerRole}
+                readOnly
+                className="text-muted-foreground"
+              />
+            </div>
+          </div>
+        </div>
+
+        {canEdit && (
+          <div className="flex items-center gap-3 border-t pt-4">
+            <Button>Guardar cambios</Button>
+            <Button variant="ghost">Cancelar</Button>
+          </div>
+        )}
+      </section>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium">
+            Miembros{" "}
+            <span className="font-normal text-muted-foreground">
+              ({org.members.length})
+            </span>
+          </h3>
+          {canManageMembers && (
+            <Button size="sm" variant="outline">
+              Invitar miembro
+            </Button>
+          )}
+        </div>
+
+        <div className="divide-y rounded-lg border">
+          {org.members.map((m) => {
+            const memberInitials = m.name
+              .split(" ")
+              .slice(0, 2)
+              .map((n) => n[0])
+              .join("")
+              .toUpperCase()
+
+            const isSelf = m.userId === org.viewerUserId // ← fix
+            const canManage = canManageMembers && !isSelf
+
+            return (
+              <div
+                key={m.id}
+                className="flex items-center justify-between px-4 py-3"
+              >
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-9 w-9">
-                    <AvatarImage src={member.user.image || ""} />
-                    <AvatarFallback className="bg-muted text-xs">
-                      {member.user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={m.image ?? ""} alt={m.name} />
+                    <AvatarFallback className="text-xs">
+                      {memberInitials}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium">{member.user.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {member.user.email}
+                    <p className="text-sm leading-none font-medium">
+                      {m.name}
+                      {isSelf && (
+                        <span className="ml-2 text-xs text-muted-foreground">
+                          (tú)
+                        </span>
+                      )}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {m.email}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="font-normal">
-                    {member.role}
+
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="gap-1 text-xs">
+                    {ROLE_ICONS[m.role]}
+                    {ROLE_LABELS[m.role] ?? m.role}
                   </Badge>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Mail className="mr-2 h-4 w-4" />
-                        Send email
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>Change role</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
-                        Remove from team
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {canManage && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+                    >
+                      Expulsar
+                    </Button>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3 rounded-lg border border-dashed p-4">
-            <Mail className="h-5 w-5 text-muted-foreground" />
-            <div className="flex-1">
-              <p className="text-sm font-medium">Pending invitations</p>
-              <p className="text-xs text-muted-foreground">
-                No pending invitations
-              </p>
-            </div>
-          </div>
+            )
+          })}
         </div>
-      </div>
+      </section>
     </div>
   )
 }

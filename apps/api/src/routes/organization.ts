@@ -7,6 +7,7 @@ import {
   getActiveOrganization,
   updateOrganization,
   getOrganizationMembers,
+  getOrganizationMe,
 } from "@/services/organization"
 import { updateOrganizationSchema } from "@workspace/schemas"
 import { requireRole } from "@/middlewares/require-role"
@@ -26,6 +27,12 @@ export const organizationRoutes = new Hono<{
   .get("/members", async (c) => {
     const members = await getOrganizationMembers(c.get("organizationId"))
     return c.json({ members }, 200)
+  })
+  .get("/me", async (c) => {
+    const user = c.get("user")
+    const member = c.get("member")
+    const data = await getOrganizationMe(user, member)
+    return c.json(data, 200)
   })
   .use(requireRole("admin"))
   .put("/name", zValidator("json", updateOrganizationSchema), async (c) => {

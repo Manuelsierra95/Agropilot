@@ -1,109 +1,112 @@
 "use client"
 
 import { Button } from "@workspace/ui/components/button"
-import { Badge } from "@workspace/ui/components/badge"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
-import { Textarea } from "@workspace/ui/components/textarea"
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@workspace/ui/components/avatar"
-import { AlertTriangle, Camera, User } from "lucide-react"
-import { type ActiveOrganizationData } from "@workspace/schemas"
+import { Badge } from "@workspace/ui/components/badge"
+import type { UserMeResponse } from "@workspace/schemas"
 import DeleteButton from "./components/delete-button"
 
-export function SettingsProfileSection({
-  org,
-}: {
-  org: ActiveOrganizationData
-}) {
-  const organization = org.organization
-  const member = org.member
+const PROVIDER_LABELS: Record<string, string> = {
+  google: "Google",
+  github: "GitHub",
+  email: "Email / contraseña",
+}
 
-  const createdAtFormatted = new Date(
-    organization.createdAt
-  ).toLocaleDateString("es-ES", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  })
+const ROLE_LABELS: Record<string, string> = {
+  owner: "Propietario",
+  admin: "Administrador",
+  member: "Miembro",
+}
+
+export function SettingsProfileSection({ user }: { user: UserMeResponse }) {
+  const initials = user.name
+    .split(" ")
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+
+  const createdAtFormatted = new Date(user.createdAt).toLocaleDateString(
+    "es-ES",
+    {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    }
+  )
 
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-medium">Profile</h2>
+        <h2 className="text-lg font-medium">Perfil</h2>
         <p className="text-sm text-muted-foreground">
-          Administra la informacion de tu organizacion y el acceso de tu cuenta.
+          Gestiona tu información personal y el acceso a tu cuenta.
         </p>
       </div>
 
       <div className="space-y-6">
-        <div className="flex items-center gap-6">
-          <Avatar className="h-20 w-20">
-            <AvatarImage
-              src={organization.logo || ""}
-              alt={organization.name}
-            />
-            <AvatarFallback className="bg-muted">
-              <User className="h-8 w-8 text-muted-foreground" />
+        <div className="flex items-center gap-4">
+          <Avatar className="h-16 w-16">
+            <AvatarImage src={user.image ?? ""} alt={user.name} />
+            <AvatarFallback className="bg-muted text-sm font-medium">
+              {initials}
             </AvatarFallback>
           </Avatar>
-          <div className="space-y-2">
-            <Button variant="outline" size="sm" className="gap-2">
-              <Camera className="h-4 w-4" />
-              Cambiar imagen
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              Logo de la organizacion (JPG, PNG o GIF. Max 2MB).
-            </p>
-          </div>
         </div>
 
-        <div className="grid max-w-md gap-6">
+        <div className="grid max-w-md gap-5">
           <div className="space-y-2">
-            <Label htmlFor="display-name">Nombre de organizacion</Label>
-            <Input
-              id="display-name"
-              placeholder="Nombre visible"
-              defaultValue={organization.name}
-            />
+            <Label htmlFor="name">Nombre completo</Label>
+            <Input id="name" defaultValue={user.name} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" defaultValue={user.email} readOnly />
             <p className="text-xs text-muted-foreground">
-              Campo organization.name.
+              El email no se puede cambiar directamente.
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Slug actual</Label>
+            <Label>Proveedor de acceso</Label>
             <div className="flex items-center gap-2">
-              <Input id="email" defaultValue={organization.slug} readOnly />
-              <Badge variant="secondary" className="font-normal">
-                {organization.status}
-              </Badge>
+              <Input
+                value={PROVIDER_LABELS[user.provider] ?? user.provider}
+                readOnly
+                className="text-muted-foreground"
+              />
+              {user.provider !== "email" && (
+                <Badge variant="secondary" className="shrink-0">
+                  OAuth
+                </Badge>
+              )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Campos organization.slug y organization.status.
-            </p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="new-email">Rol del miembro</Label>
-            <Input id="new-email" defaultValue={member.role} readOnly />
-            <Button variant="outline" className="w-fit">
-              Gestionar rol
-            </Button>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="bio">Metadata</Label>
-            <Textarea
-              id="bio"
-              placeholder="Metadata de la organizacion"
-              defaultValue={`Plan: ${organization.plan}\nCreada: ${createdAtFormatted}`}
-              rows={3}
-              className="resize-none"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Rol en la organización</Label>
+              <Input
+                value={ROLE_LABELS[user.role] ?? user.role}
+                readOnly
+                className="text-muted-foreground"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Miembro desde</Label>
+              <Input
+                value={createdAtFormatted}
+                readOnly
+                className="text-muted-foreground"
+              />
+            </div>
           </div>
         </div>
 
@@ -112,17 +115,33 @@ export function SettingsProfileSection({
           <Button variant="ghost">Cancelar</Button>
         </div>
 
-        <div className="space-y-4 rounded-lg border border-destructive/20 bg-destructive/5 p-4">
-          <div className="flex items-center gap-3">
-            <AlertTriangle className="h-5 w-5 text-destructive" />
-            <div className="flex-1 space-y-1">
-              <Label className="text-destructive">Eliminar cuenta</Label>
-              <p className="text-sm text-muted-foreground">
-                Esta accion elimina tu usuario y datos asociados de forma
-                permanente.
+        <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-destructive">
+                Eliminar cuenta
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Elimina tu usuario y todos los datos asociados de forma
+                permanente. No afecta a la organización.
               </p>
             </div>
             <DeleteButton />
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-destructive">
+                Eliminar organización
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Elimina permanentemente tu organización, todos los usuarios y
+                datos asociados.
+              </p>
+            </div>
+            {/* <DeleteButton /> */}
           </div>
         </div>
       </div>

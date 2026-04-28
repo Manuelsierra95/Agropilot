@@ -18,11 +18,17 @@ const getOrganizationMembers = cache(
       .then((response) => response.json().then((data) => data.members))
 )
 
+const getOrganizationMe = cache(
+  (): Promise<OrganizationMember> =>
+    client.api.v1.organization.me.$get().then((response) => response.json())
+)
+
 const updateOrganization = (data: UpdateOrganizationInput) =>
   client.api.v1.organization.name.$put({ json: data }).then((r) => r.json())
 
 export const organizationApi = {
-  public: getActiveOrganization,
-  members: getOrganizationMembers,
+  getActive: getActiveOrganization,
+  getMembers: getOrganizationMembers,
+  getMe: getOrganizationMe,
   update: updateOrganization,
 }

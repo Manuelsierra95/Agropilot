@@ -6,7 +6,8 @@
   "scripts": {
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
-    "studio": "drizzle-kit studio"
+    "studio": "drizzle-kit studio",
+    "seeds": "dotenv -e .env -- tsx src/seeds/index.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
@@ -19,6 +20,7 @@
     "drizzle-kit": "^0.31.10",
     "eslint": "^8.57.1",
     "prettier": "^3.3.3",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "exports": {

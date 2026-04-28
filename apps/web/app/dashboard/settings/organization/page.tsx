@@ -2,11 +2,16 @@ import { SettingsOrganizationSection } from "@/features/settings/organization"
 import { api } from "@/lib/api"
 
 export default async function SettingsOrganizationPage() {
-  const { organization } = await api.organization.public()
-  const members = await api.organization.members()
+  const org = await api.organization.getMe()
 
-  console.log("Organization data:", organization)
-  console.log("Organization members:", members)
+  const isOwner = org.role === "owner"
+  const isAdmin = org.role === "admin" || isOwner
 
-  return <SettingsOrganizationSection org={organization} members={members} />
+  return (
+    <SettingsOrganizationSection
+      org={org}
+      canEdit={isOwner}
+      canManageMembers={isAdmin}
+    />
+  )
 }

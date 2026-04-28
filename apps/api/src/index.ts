@@ -8,6 +8,8 @@ import { csrfMiddleware } from "@/middlewares/csrf"
 import { rateLimitMiddleware } from "@/middlewares/rateLimit"
 import { parcelRoutes } from "./routes/parcel"
 import { organizationRoutes } from "./routes/organization"
+import { userRoutes } from "./routes/user"
+import { billingRoutes } from "./routes/billing"
 
 const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .basePath("/api/v1")
@@ -20,6 +22,8 @@ const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
 
   .on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw))
 
+  .route("/user", userRoutes)
+  .route("/billing", billingRoutes)
   .route("/parcel", parcelRoutes)
   .route("/organization", organizationRoutes)
 

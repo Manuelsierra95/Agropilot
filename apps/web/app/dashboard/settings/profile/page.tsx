@@ -2,7 +2,7 @@ import { SettingsProfileSection } from "@/features/settings/profile"
 import { api } from "@/lib/api"
 
 export default async function SettingsProfilePage() {
-  const org = await api.organization.public()
+  const user = await api.user.getMe()
 
-  return <SettingsProfileSection org={org} />
+  return <SettingsProfileSection user={user} />
 }

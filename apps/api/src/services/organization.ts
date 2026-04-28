@@ -3,7 +3,10 @@ import type {
   ActiveOrganizationData,
   AuthMember,
   AuthOrganization,
+  AuthUser,
   UpdateOrganizationInput,
+  OrganizationMeResponse,
+  OrganizationMemberWithUser,
 } from "@workspace/schemas"
 import { HTTPException } from "hono/http-exception"
 
@@ -40,7 +43,7 @@ export const updateOrganization = async (
 
 export const getOrganizationMembers = async (
   organizationId: string
-): Promise<AuthMember[]> => {
+): Promise<OrganizationMemberWithUser[]> => {
   const members = await db.query.members.findMany({
     where: eq(schema.members.organizationId, organizationId),
     with: {
@@ -56,4 +59,34 @@ export const getOrganizationMembers = async (
   })
 
   return members
+}
+
+export async function getOrganizationMe(
+  user: AuthUser,
+  member: AuthMember
+): Promise<OrganizationMeResponse> {
+  const [{ organization }, members] = await Promise.all([
+    getActiveOrganization(member.organizationId, member),
+    getOrganizationMembers(member.organizationId),
+  ])
+
+  return {
+    id: organization.id,
+    name: organization.name,
+    logo: organization.logo,
+    plan: organization.plan,
+    status: organization.status,
+    createdAt: organization.createdAt,
+    viewerRole: member.role,
+    viewerUserId: user.id,
+    members: members.map((m) => ({
+      id: m.id,
+      userId: m.userId,
+      name: m.user.name,
+      email: m.user.email,
+      image: m.user.image,
+      role: m.role,
+      joinedAt: m.createdAt,
+    })),
+  }
 }

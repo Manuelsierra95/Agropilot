@@ -21,6 +21,10 @@ export type UpdateOrganizationInput = ReturnType<
 export type AuthOrganization = ReturnType<typeof organizationSchema.parse>
 export type AuthMember = ReturnType<typeof memberSchema.parse>
 
+export type OrganizationMemberWithUser = AuthMember & {
+  user: Pick<AuthUser, "id" | "name" | "email" | "image">
+}
+
 export type ActiveOrganizationContext = {
   organizationId: string | null
   organization: AuthOrganization | null
@@ -37,6 +41,28 @@ export type OrganizationMember = Pick<
   "id" | "role" | "createdAt"
 > & {
   user: Pick<AuthUser, "id" | "name" | "email" | "image">
+}
+
+export type OrganizationMemberItem = {
+  id: string
+  userId: string
+  name: string
+  email: string
+  image: string | null
+  role: string
+  joinedAt: Date
+}
+
+export type OrganizationMeResponse = {
+  id: string
+  name: string
+  logo: string | null
+  plan: AuthOrganization["plan"]
+  status: AuthOrganization["status"]
+  createdAt: Date
+  viewerRole: string
+  viewerUserId: string
+  members: OrganizationMemberItem[]
 }
 
 export const parseAuthOrganization = (

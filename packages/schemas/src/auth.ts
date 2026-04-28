@@ -65,6 +65,13 @@ export type AccountSelect = ReturnType<typeof accountSelectSchema.parse>
 export type AccountInsert = ReturnType<typeof accountInsertSchema.parse>
 export type AccountUpdate = ReturnType<typeof accountUpdateSchema.parse>
 
+export const memberSelectSchema = createSelectSchema(members)
+export type MemberSelect = ReturnType<typeof memberSelectSchema.parse>
+export type MemberContext = Pick<
+  MemberSelect,
+  "role" | "organizationId" | "createdAt"
+>
+
 export type VerificationSelect = ReturnType<
   typeof verificationSelectSchema.parse
 >
@@ -74,6 +81,17 @@ export type VerificationInsert = ReturnType<
 export type VerificationUpdate = ReturnType<
   typeof verificationUpdateSchema.parse
 >
+
+export type UserMeResponse = {
+  id: string
+  name: string
+  email: string
+  image: string | null
+  role: string
+  organizationId: string
+  provider: AccountSelect["providerId"]
+  createdAt: Date
+}
 
 export const parseAuthUser = (value: unknown): AuthUser | null => {
   const parsed = authUserSchema.safeParse(value)

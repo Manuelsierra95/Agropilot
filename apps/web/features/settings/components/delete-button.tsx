@@ -29,8 +29,8 @@ const DeleteButton = () => {
   }
 
   // Change Here
-  const deleteText = "Delete Account"
-  const cancelText = "Cancel Deletion"
+  const deleteText = "Borrar Cuenta"
+  const cancelText = "Cancelar Eliminación"
 
   return (
     <div className="flex items-center justify-center">
@@ -58,7 +58,7 @@ const DeleteButton = () => {
               filter: "blur(1px)",
               opacity: 0,
             }}
-            className="flex items-center justify-center overflow-hidden rounded-full px-5 py-3 text-white"
+            className="flex items-center justify-center overflow-hidden rounded-full px-5 py-2 text-white"
             transition={{
               layout: { duration: 0.4, ease: [0.77, 0, 0.175, 1] },
               backgroundColor: { duration: 0.4, ease: "easeInOut" },
@@ -115,7 +115,7 @@ const DeleteButton = () => {
               filter: "blur(1px)",
               opacity: 0,
             }}
-            className="flex items-center gap-2 overflow-hidden rounded-full px-3 py-3"
+            className="flex items-center gap-2 overflow-hidden rounded-full px-3 py-2"
             transition={{
               layout: { duration: 0.4, ease: [0.77, 0, 0.175, 1] },
               backgroundColor: { duration: 0.4, ease: "easeInOut" },
