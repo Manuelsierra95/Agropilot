@@ -10,7 +10,7 @@ export const DashboardPageContainer = ({
   return (
     <main
       className={cn(
-        "@container/main flex flex-1 flex-col px-2 py-2 md:px-6",
+        "@container/main flex flex-1 flex-col px-4 py-4",
         className
       )}
     >

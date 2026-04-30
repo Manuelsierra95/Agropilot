@@ -16,7 +16,7 @@ import {
 export type NavigationParcel = {
   name: string
   crop: string
-  icon: LucideIcon
+  icon: LucideIcon | string
 }
 
 export type NavigationNavSubItem = {
@@ -37,13 +37,13 @@ export type NavigationNavItem = {
   title: string
   url: string
   icon: LucideIcon
-  items?: NavigationNavSubItem[]
 }
 
 export type NavigationNavModulesItem = NavigationNavItem & {
   status: ModuleStatus
   isActive: boolean
   isLocked: boolean
+  items?: NavigationNavSubItem[]
   purchaseUrl?: string
 }
 
@@ -68,9 +68,9 @@ export const navigationData: NavigationData = {
     avatar: "/avatars/shadcn.jpg",
   },
   parcels: [
-    { name: "Alivos Cazorla", crop: "Olivos", icon: TreePine },
-    { name: "Almendros Sierra", crop: "Almendros", icon: TreePine },
-    { name: "Cortijo Peal", crop: "Tomates", icon: Circle },
+    { name: "Alivos Cazorla", crop: "Olivos", icon: "TreePine" },
+    { name: "Almendros Sierra", crop: "Almendros", icon: "TreePine" },
+    { name: "Cortijo Peal", crop: "Tomates", icon: "Circle" },
   ],
   navMain: [
     { title: "Dashboard", url: "/dashboard", icon: Home },
@@ -137,23 +137,19 @@ export const navigationData: NavigationData = {
   ],
   settings: [
     {
-      title: "Settings",
+      title: "Profile",
       url: "/dashboard/settings/profile",
       icon: Settings2Icon,
-      items: [
-        {
-          title: "Profile",
-          url: "/dashboard/settings/profile",
-        },
-        {
-          title: "Organization",
-          url: "/dashboard/settings/organization",
-        },
-        {
-          title: "Billing",
-          url: "/dashboard/settings/billing",
-        },
-      ],
+    },
+    {
+      title: "Organization",
+      url: "/dashboard/settings/organization",
+      icon: Settings2Icon,
+    },
+    {
+      title: "Billing",
+      url: "/dashboard/settings/billing",
+      icon: Settings2Icon,
     },
   ],
 }

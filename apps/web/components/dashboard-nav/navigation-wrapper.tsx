@@ -1,11 +1,13 @@
 import NavSidebar from "@/components/dashboard-nav/nav-sidebar"
 import NavDock from "@/components/dashboard-nav/nav-dock"
+import { NavDockHeader } from "./nav-dock/nav-dock-header"
 
 export function NavigationWrapper({ children }: { children: React.ReactNode }) {
   return (
     <nav>
       {/* Mobile: Navbar Dock */}
       <div className="min-h-screen md:hidden">
+        <NavDockHeader />
         {children}
         <NavDock />
       </div>

@@ -1,46 +1,56 @@
-'use client';
+"use client"
 
-import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
+import { usePathname } from "next/navigation"
+import { useMemo } from "react"
+import { navigationData } from "@/lib/navigation/navigation-data"
 
-type BreadcrumbItem = {
-  title: string;
-  link: string;
-};
+export type BreadcrumbItem = {
+  title: string
+  link: string
+}
 
-// This allows to add custom title as well
-const routeMapping: Record<string, BreadcrumbItem[]> = {
-  '/dashboard': [{ title: 'Dashboard', link: '/dashboard' }],
-  '/dashboard/employee': [
-    { title: 'Dashboard', link: '/dashboard' },
-    { title: 'Employee', link: '/dashboard/employee' }
-  ],
-  '/dashboard/product': [
-    { title: 'Dashboard', link: '/dashboard' },
-    { title: 'Product', link: '/dashboard/product' }
-  ]
-  // Add more custom mappings as needed
-};
+// Mapa plano de url → título construido desde navigationData
+function buildUrlMap(): Record<string, string> {
+  const map: Record<string, string> = {}
 
-export function useBreadcrumbs() {
-  const pathname = usePathname();
+  for (const item of navigationData.navMain) {
+    map[item.url] = item.title
+  }
 
-  const breadcrumbs = useMemo(() => {
-    // Check if we have a custom mapping for this exact path
-    if (routeMapping[pathname]) {
-      return routeMapping[pathname];
+  for (const item of navigationData.modules) {
+    map[item.url] = item.title
+    if (item.items) {
+      for (const sub of item.items) {
+        map[sub.url] = sub.title
+      }
     }
+  }
 
-    // If no exact match, fall back to generating breadcrumbs from the path
-    const segments = pathname.split('/').filter(Boolean);
-    return segments.map((segment, index) => {
-      const path = `/${segments.slice(0, index + 1).join('/')}`;
-      return {
-        title: segment.charAt(0).toUpperCase() + segment.slice(1),
-        link: path
-      };
-    });
-  }, [pathname]);
+  for (const item of navigationData.settings) {
+    map[item.url] = item.title
+  }
 
-  return breadcrumbs;
+  return map
+}
+
+const URL_MAP = buildUrlMap()
+
+export function useBreadcrumbs(): BreadcrumbItem[] {
+  const pathname = usePathname()
+
+  return useMemo(() => {
+    if (!pathname) return []
+
+    const segments = pathname.split("/").filter(Boolean)
+
+    return segments.reduce<BreadcrumbItem[]>((acc, segment, index) => {
+      const url = "/" + segments.slice(0, index + 1).join("/")
+      const title =
+        URL_MAP[url] ?? segment.charAt(0).toUpperCase() + segment.slice(1) // fallback
+
+      acc.push({ title, link: url })
+
+      return acc
+    }, [])
+  }, [pathname])
 }

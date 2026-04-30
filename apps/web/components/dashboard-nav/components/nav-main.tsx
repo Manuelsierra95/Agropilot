@@ -1,16 +1,14 @@
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar"
-import type { NavigationNavItem } from "@/lib/navigation-data"
+import type { NavigationNavItem } from "@/lib/navigation/navigation-data"
 
 export function NavMain({ items }: { items: NavigationNavItem[] }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>App</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>

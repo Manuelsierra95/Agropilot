@@ -12,8 +12,8 @@ import { ChevronRightIcon, Lock } from "lucide-react"
 import type {
   NavigationNavModulesItem,
   NavigationNavSubItem,
-} from "@/lib/navigation-data"
-import { ModuleStatusIcons } from "@/lib/navigation-data"
+} from "@/lib/navigation/navigation-data"
+import { ModuleStatusIcons } from "@/lib/navigation/navigation-data"
 import {
   Collapsible,
   CollapsibleTrigger,
