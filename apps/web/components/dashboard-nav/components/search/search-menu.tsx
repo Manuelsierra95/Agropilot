@@ -361,7 +361,7 @@ export function SearchMenu({
     onFocus?.()
   }, [open, onFocus])
 
-  // Pill: input always visible, like sidebar — no button trigger
+  // ——— Dock ———
   if (variant === "dock") {
     return (
       <div

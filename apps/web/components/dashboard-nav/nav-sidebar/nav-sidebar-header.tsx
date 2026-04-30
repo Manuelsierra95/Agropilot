@@ -8,7 +8,7 @@ export function NavSidebarHeader() {
   const parcels = navigationData.parcels
 
   return (
-    <header className="sticky top-0 z-10 flex h-10 shrink-0 items-center gap-2 border-b bg-background transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 lg:px-2">
+    <header className="sticky top-0 z-10 flex h-10 shrink-0 items-center gap-2 border-b bg-sidebar transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 lg:px-2">
       <div className="flex items-center gap-2 px-2">
         <SidebarTriggerWithSeparator />
         <ParcelSwitcher parcels={parcels} />
