@@ -6,7 +6,7 @@ export default function DashboardSettingsLayout({
   children: React.ReactNode
 }) {
   return (
-    <DashboardPageContainer className="mx-4 mt-4 border md:mx-6 md:mt-0">
+    <DashboardPageContainer>
       <div className="p-4 md:p-6">{children}</div>
     </DashboardPageContainer>
   )
