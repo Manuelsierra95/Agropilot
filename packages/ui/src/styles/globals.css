@@ -131,6 +131,11 @@
     scroll-behavior: smooth;
   }
 
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   ::-webkit-scrollbar {
     width: 5px;
   }

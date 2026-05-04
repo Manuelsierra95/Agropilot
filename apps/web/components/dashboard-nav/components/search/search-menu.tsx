@@ -432,7 +432,7 @@ export function SearchMenu({
         )}
       >
         {/* Input row */}
-        <div className="flex h-10 items-center gap-2 px-3">
+        <div className="flex h-9 items-center gap-2 px-3">
           <SearchIcon className="size-4 shrink-0 text-muted-foreground" />
           <input
             ref={inputRef}
