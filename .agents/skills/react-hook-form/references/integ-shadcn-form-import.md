@@ -13,7 +13,7 @@ React Hook Form exports its own `<Form>` component. When using shadcn/ui, ensure
 
 ```typescript
 import { useForm, Form } from 'react-hook-form'  // Wrong Form!
-import { FormField, FormItem, FormLabel } from '@/components/ui/form'
+import { FormField, FormItem, FormLabel } from '@workspace/ui/components/form'
 
 function LoginForm() {
   const form = useForm()
@@ -39,7 +39,7 @@ function LoginForm() {
 
 ```typescript
 import { useForm } from 'react-hook-form'
-import { Form, FormField, FormItem, FormLabel } from '@/components/ui/form'
+import { Form, FormField, FormItem, FormLabel } from '@workspace/ui/components/form'
 
 function LoginForm() {
   const form = useForm()

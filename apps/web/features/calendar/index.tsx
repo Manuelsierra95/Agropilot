@@ -1,52 +1,17 @@
-"use client"
-
 import { DashboardPageContainer } from "@/components/dashboard-page-container"
-import { useState } from "react"
-import CalendarComponent from "@/features/calendar/calendar"
-import { CalendarEvent, Mode } from "@/features/calendar/calendar-types"
 import { calendarMockData } from "@/lib/calendar-mock"
-import { WeeklyEventsCard } from "@/features/calendar/sidecards/weekly-events-card"
-import { TimeWeatherCard } from "@/features/calendar/sidecards/time-weather-card"
+import { CalendarClient } from "@/features/calendar/calendar-client"
+import {
+  TimeWeatherCard,
+  mockForecast,
+  mockWeatherData,
+} from "@/features/calendar/sidecards/time-weather-card"
 
 export default function Calendar() {
-  const [events, setEvents] = useState<CalendarEvent[]>(calendarMockData)
-  const [mode, setMode] = useState<Mode>("month")
-  const [date, setDate] = useState<Date>(new Date())
-
-  const filteredEvents = events.filter((event) => {
-    const eventDate = new Date(event.date)
-    return (
-      eventDate.getFullYear() === date.getFullYear() &&
-      eventDate.getMonth() === date.getMonth()
-    )
-  })
-
-  const handleEventClick = (event: CalendarEvent) => {
-    // Aquí podrías abrir un modal con los detalles del evento o algo similar
-    alert(
-      `Evento: ${event.title}\nFecha: ${new Date(event.date).toLocaleString()}`
-    )
-  }
-
   return (
-    <DashboardPageContainer className="grid grid-cols-1 gap-8 md:grid-cols-3">
-      <div className="col-span-1 flex h-full flex-col gap-4">
-        <TimeWeatherCard />
-        <WeeklyEventsCard
-          events={filteredEvents}
-          onEventClick={handleEventClick}
-        />
-      </div>
-      <div className="col-span-2">
-        <CalendarComponent
-          events={events}
-          setEvents={setEvents}
-          mode={mode}
-          setMode={setMode}
-          date={date}
-          setDate={setDate}
-        />
-      </div>
+    <DashboardPageContainer className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)] lg:items-start">
+      <TimeWeatherCard weather={mockWeatherData} forecast={mockForecast} />
+      <CalendarClient initialEvents={calendarMockData} />
     </DashboardPageContainer>
   )
 }

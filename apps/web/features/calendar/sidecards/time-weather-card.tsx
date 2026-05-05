@@ -1,9 +1,3 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
-
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Separator } from "@workspace/ui/components/separator"
 
@@ -18,7 +12,7 @@ import {
   Thermometer,
 } from "lucide-react"
 
-interface WeatherData {
+export interface WeatherData {
   condition: "sunny" | "cloudy" | "partly-cloudy" | "rainy" | "snowy"
   temperature: number
   humidity: number
@@ -26,7 +20,7 @@ interface WeatherData {
   location: string
 }
 
-interface ForecastDay {
+export interface ForecastDay {
   day: string
   condition: "sunny" | "cloudy" | "partly-cloudy" | "rainy" | "snowy"
   tempMax: number
@@ -34,7 +28,7 @@ interface ForecastDay {
   humidity: number
 }
 
-const mockWeatherData: WeatherData = {
+export const mockWeatherData: WeatherData = {
   condition: "partly-cloudy",
   temperature: 22,
   humidity: 65,
@@ -42,7 +36,7 @@ const mockWeatherData: WeatherData = {
   location: "Parcela Principal",
 }
 
-const mockForecast: ForecastDay[] = [
+export const mockForecast: ForecastDay[] = [
   { day: "Lun", condition: "sunny", tempMax: 24, tempMin: 14, humidity: 55 },
   {
     day: "Mar",
@@ -78,90 +72,41 @@ const weatherLabels = {
   snowy: "Nieve",
 }
 
-export function TimeWeatherCard() {
-  const [currentTime, setCurrentTime] = useState(() => new Date())
-  const [weather] = useState<WeatherData>(mockWeatherData)
-  const [forecast] = useState<ForecastDay[]>(mockForecast)
+interface TimeWeatherCardProps {
+  weather?: WeatherData
+  forecast?: ForecastDay[]
+}
 
-  useEffect(() => {
-    const updateTime = () => setCurrentTime(new Date())
-
-    updateTime()
-
-    const now = new Date()
-    const delay = (60 - now.getSeconds()) * 1000
-
-    let interval: NodeJS.Timeout
-
-    const timeout = setTimeout(() => {
-      updateTime()
-      interval = setInterval(updateTime, 60000)
-    }, delay)
-
-    return () => {
-      clearTimeout(timeout)
-      if (interval) clearInterval(interval)
-    }
-  }, [])
-
-  const formatTime = (date: Date) => {
-    return format(date, "HH:mm", { locale: es })
-  }
-
-  const formatDate = (date: Date) => {
-    return format(date, "EEEE, d 'de' MMMM", { locale: es })
-  }
-
+export function TimeWeatherCard({
+  weather = mockWeatherData,
+  forecast = mockForecast,
+}: TimeWeatherCardProps) {
   const WeatherIcon = weatherIcons[weather.condition]
 
   return (
-    <Card className="w-full border-border/50">
-      <CardContent className="pt-6">
-        {/* Desktop */}
-        <div className="hidden xl:flex xl:items-start xl:justify-between xl:gap-8">
-          {/* Hora */}
-          <div className="space-y-1">
-            <p className="text-xs tracking-widest text-muted-foreground uppercase">
-              Hora local
-            </p>
-            <p className="text-4xl font-light tracking-tight text-foreground tabular-nums">
-              {formatTime(currentTime)}
-            </p>
-            <p className="text-sm text-muted-foreground capitalize">
-              {formatDate(currentTime)}
-            </p>
-          </div>
-
-          <Separator orientation="vertical" className="h-24" />
-
-          {/* Clima */}
-          <div className="flex-1 space-y-4">
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <p className="text-xs tracking-widest text-muted-foreground uppercase">
-                  {weather.location}
-                </p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-light tracking-tight text-foreground">
-                    {weather.temperature}
-                  </span>
-                  <span className="text-xl text-muted-foreground">°C</span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {weatherLabels[weather.condition]}
-                </p>
+    <Card className="w-full overflow-hidden border-border/60 bg-linear-to-br from-background via-background to-muted/30 shadow-sm">
+      <CardContent className="space-y-5 p-4 sm:p-5">
+        <section className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <p className="text-[11px] font-medium tracking-[0.22em] text-muted-foreground uppercase">
+                {weather.location}
+              </p>
+              <div className="flex items-end gap-1">
+                <span className="text-4xl font-light tracking-tight text-foreground sm:text-5xl">
+                  {weather.temperature}
+                </span>
+                <span className="pb-1 text-lg text-muted-foreground sm:text-xl">
+                  °C
+                </span>
               </div>
-              <div className="rounded-lg bg-secondary p-3">
-                <WeatherIcon
-                  className="h-8 w-8 text-foreground"
-                  strokeWidth={1.5}
-                />
-              </div>
+              <p className="max-w-xs text-sm text-muted-foreground">
+                {weatherLabels[weather.condition]}
+              </p>
             </div>
 
-            {/* Métricas */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="flex flex-col items-center gap-1 rounded-lg bg-secondary/50 p-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="flex items-center justify-between rounded-xl border border-border/60 bg-secondary/40 px-4 py-3 sm:flex-col sm:items-center sm:justify-center sm:gap-1.5 sm:px-3">
                 <Thermometer
                   className="h-4 w-4 text-muted-foreground"
                   strokeWidth={1.5}
@@ -171,7 +116,7 @@ export function TimeWeatherCard() {
                   {weather.temperature + 2}°
                 </span>
               </div>
-              <div className="flex flex-col items-center gap-1 rounded-lg bg-secondary/50 p-3">
+              <div className="flex items-center justify-between rounded-xl border border-border/60 bg-secondary/40 px-4 py-3 sm:flex-col sm:items-center sm:justify-center sm:gap-1.5 sm:px-3">
                 <Droplets
                   className="h-4 w-4 text-muted-foreground"
                   strokeWidth={1.5}
@@ -181,7 +126,7 @@ export function TimeWeatherCard() {
                   {weather.humidity}%
                 </span>
               </div>
-              <div className="flex flex-col items-center gap-1 rounded-lg bg-secondary/50 p-3">
+              <div className="flex items-center justify-between rounded-xl border border-border/60 bg-secondary/40 px-4 py-3 sm:flex-col sm:items-center sm:justify-center sm:gap-1.5 sm:px-3">
                 <Wind
                   className="h-4 w-4 text-muted-foreground"
                   strokeWidth={1.5}
@@ -193,22 +138,30 @@ export function TimeWeatherCard() {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Forecast Desktop */}
-        <div className="hidden xl:block">
-          <Separator className="my-5" />
-          <div className="space-y-3">
-            <p className="text-xs tracking-widest text-muted-foreground uppercase">
+          <div className="flex items-center justify-start sm:justify-end">
+            <div className="flex size-14 items-center justify-center rounded-2xl border border-border/60 bg-background/80 shadow-sm sm:size-16">
+              <WeatherIcon
+                className="h-8 w-8 text-foreground sm:h-9 sm:w-9"
+                strokeWidth={1.5}
+              />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <Separator className="my-0" />
+          <div className="space-y-3 pt-4">
+            <p className="text-[11px] font-medium tracking-[0.22em] text-muted-foreground uppercase">
               Próximos 5 días
             </p>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
               {forecast.map((day) => {
                 const DayIcon = weatherIcons[day.condition]
                 return (
                   <div
                     key={day.day}
-                    className="flex flex-col items-center gap-2 rounded-lg bg-secondary/30 p-3"
+                    className="flex min-h-28 flex-col items-center gap-2 rounded-xl border border-border/50 bg-secondary/30 px-3 py-3 text-center"
                   >
                     <span className="text-xs font-medium text-foreground">
                       {day.day}
@@ -239,51 +192,7 @@ export function TimeWeatherCard() {
               })}
             </div>
           </div>
-        </div>
-
-        {/* Mobile */}
-        <div className="xl:hidden">
-          <div className="space-y-1">
-            <p className="text-xs tracking-widest text-muted-foreground uppercase">
-              Hora local
-            </p>
-            <p className="text-4xl font-light tracking-tight text-foreground tabular-nums">
-              {formatTime(currentTime)}
-            </p>
-            <p className="text-sm text-muted-foreground capitalize">
-              {formatDate(currentTime)}
-            </p>
-          </div>
-
-          <Separator className="my-5" />
-
-          <div className="space-y-4">
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <p className="text-xs tracking-widest text-muted-foreground uppercase">
-                  {weather.location}
-                </p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-light tracking-tight text-foreground">
-                    {weather.temperature}
-                  </span>
-                  <span className="text-xl text-muted-foreground">°C</span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {weatherLabels[weather.condition]}
-                </p>
-              </div>
-              <div className="rounded-lg bg-secondary p-3">
-                <WeatherIcon
-                  className="h-8 w-8 text-foreground"
-                  strokeWidth={1.5}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">{/* mismos bloques */}</div>
-          </div>
-        </div>
+        </section>
       </CardContent>
     </Card>
   )
