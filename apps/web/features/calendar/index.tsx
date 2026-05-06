@@ -9,9 +9,12 @@ import {
 
 export default function Calendar() {
   return (
-    <DashboardPageContainer className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)] lg:items-start">
+    <DashboardPageContainer className="grid h-full grid-cols-1 gap-6 overflow-hidden lg:grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)] lg:items-start">
       <TimeWeatherCard weather={mockWeatherData} forecast={mockForecast} />
-      <CalendarClient initialEvents={calendarMockData} />
+      <CalendarClient
+        initialEvents={calendarMockData}
+        forecast={mockForecast}
+      />
     </DashboardPageContainer>
   )
 }

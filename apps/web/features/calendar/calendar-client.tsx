@@ -4,12 +4,14 @@ import { useState } from "react"
 
 import CalendarComponent from "@/features/calendar/calendar"
 import type { CalendarEvent, Mode } from "@/features/calendar/calendar-types"
+import type { ForecastDay } from "@/features/calendar/sidecards/time-weather-card"
 
 interface CalendarClientProps {
   initialEvents: CalendarEvent[]
+  forecast?: ForecastDay[]
 }
 
-export function CalendarClient({ initialEvents }: CalendarClientProps) {
+export function CalendarClient({ initialEvents, forecast }: CalendarClientProps) {
   const [events, setEvents] = useState<CalendarEvent[]>(initialEvents)
   const [mode, setMode] = useState<Mode>("month")
   const [date, setDate] = useState<Date>(new Date())
@@ -23,6 +25,7 @@ export function CalendarClient({ initialEvents }: CalendarClientProps) {
         setMode={setMode}
         date={date}
         setDate={setDate}
+        forecast={forecast}
       />
     </div>
   )

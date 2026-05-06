@@ -1,8 +1,9 @@
-import { CalendarContext } from './calendar-context'
-import { CalendarEvent, Mode } from './calendar-types'
-import { useState } from 'react'
-import CalendarNewEventDialog from './dialog/calendar-new-event-dialog'
-import CalendarManageEventDialog from './dialog/calendar-manage-event-dialog'
+import { CalendarContext } from "./calendar-context"
+import type { CalendarEvent, Mode } from "./calendar-types"
+import type { ForecastDay } from "./sidecards/time-weather-card"
+import { useState } from "react"
+import CalendarNewEventDialog from "./dialog/calendar-new-event-dialog"
+import CalendarManageEventDialog from "./dialog/calendar-manage-event-dialog"
 
 export default function CalendarProvider({
   events,
@@ -12,6 +13,7 @@ export default function CalendarProvider({
   date,
   setDate,
   calendarIconIsToday = true,
+  forecast,
   children,
 }: {
   events: CalendarEvent[]
@@ -21,6 +23,7 @@ export default function CalendarProvider({
   date: Date
   setDate: (date: Date) => void
   calendarIconIsToday: boolean
+  forecast?: ForecastDay[]
   children: React.ReactNode
 }) {
   const [newEventDialogOpen, setNewEventDialogOpen] = useState(false)
@@ -43,6 +46,7 @@ export default function CalendarProvider({
         setManageEventDialogOpen,
         selectedEvent,
         setSelectedEvent,
+        forecast,
       }}
     >
       <CalendarNewEventDialog />

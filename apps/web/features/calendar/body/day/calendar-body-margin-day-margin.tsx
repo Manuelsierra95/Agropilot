@@ -18,7 +18,7 @@ export default function CalendarBodyMarginDayMargin({
       <div className="sticky top-0 left-0 z-20 h-[33px] border-b bg-background" />
       <div className="sticky left-0 z-10 flex w-12 flex-col bg-background">
         {hours.map((hour) => (
-          <div key={hour} className="relative h-32 first:mt-0">
+          <div key={hour} className="relative h-32 first:mt-0 last:border-b">
             {hour !== 0 && (
               <span className="absolute -top-2.5 left-2 text-xs text-muted-foreground">
                 {format(new Date().setHours(hour, 0, 0, 0), "h a")}

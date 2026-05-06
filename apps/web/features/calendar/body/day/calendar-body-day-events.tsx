@@ -1,5 +1,5 @@
-import { useCalendarContext } from '../../calendar-context'
-import { isSameDay } from 'date-fns'
+import { useCalendarContext } from "../../calendar-context"
+import { isSameDay } from "date-fns"
 
 export default function CalendarBodyDayEvents() {
   const { events, date, setManageEventDialogOpen, setSelectedEvent } =
@@ -8,12 +8,12 @@ export default function CalendarBodyDayEvents() {
 
   return !!dayEvents.length ? (
     <div className="flex flex-col gap-2">
-      <p className="font-medium p-2 pb-0 font-heading">Events</p>
+      <p className="font-heading p-2 pb-0 font-medium">Events</p>
       <div className="flex flex-col gap-2">
         {dayEvents.map((event) => (
           <div
             key={event.id}
-            className="flex items-center gap-2 px-2 cursor-pointer"
+            className="flex cursor-pointer items-center gap-2 px-2"
             onClick={() => {
               setSelectedEvent(event)
               setManageEventDialogOpen(true)
@@ -21,7 +21,7 @@ export default function CalendarBodyDayEvents() {
           >
             <div className="flex items-center gap-2">
               <div className={`size-2 rounded-full bg-${event.color}-500`} />
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 {event.title}
               </p>
             </div>

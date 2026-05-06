@@ -7,7 +7,7 @@ export default function CalendarBody() {
   const { mode } = useCalendarContext()
 
   return (
-    <div className="border-t border-l">
+    <div className="border-t border-r border-l">
       {mode === "day" && <CalendarBodyDay />}
       {mode === "week" && <CalendarBodyWeek />}
       {mode === "month" && <CalendarBodyMonth />}

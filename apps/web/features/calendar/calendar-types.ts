@@ -1,3 +1,5 @@
+import type { ForecastDay } from "@/features/calendar/sidecards/time-weather-card"
+
 export type CalendarProps = {
   events: CalendarEvent[]
   setEvents: (events: CalendarEvent[]) => void
@@ -6,6 +8,7 @@ export type CalendarProps = {
   date: Date
   setDate: (date: Date) => void
   calendarIconIsToday?: boolean
+  forecast?: ForecastDay[]
 }
 
 export type CalendarContextType = CalendarProps & {
@@ -24,5 +27,5 @@ export type CalendarEvent = {
   end: Date
 }
 
-export const calendarModes = ['day', 'week', 'month'] as const
+export const calendarModes = ["day", "week", "month"] as const
 export type Mode = (typeof calendarModes)[number]
