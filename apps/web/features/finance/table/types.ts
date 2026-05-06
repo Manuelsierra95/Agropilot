@@ -5,6 +5,7 @@ export const paymentMethodEnum = z.enum([
   "transferencia",
   "tarjeta",
   "efectivo",
+  "cheque",
   "otro",
 ])
 

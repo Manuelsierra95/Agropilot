@@ -1,3 +1,4 @@
+import * as React from "react"
 import { TrendingUp, TrendingDown } from "lucide-react"
 
 export interface KpiItem {
@@ -6,6 +7,7 @@ export interface KpiItem {
   priceMin: number
   priceMax: number
   unit: string
+  currency?: string
   updatedAt: string
 }
 
@@ -15,7 +17,7 @@ interface KpiCardProps {
 
 export function KpiCard({ items }: KpiCardProps) {
   return (
-    <section className="h-full overflow-hidden border">
+    <section className="radius-0 overflow-hidden border">
       <div
         className="grid w-full grid-cols-1 gap-px bg-border md:grid-cols-[repeat(var(--cols),minmax(0,1fr))]"
         style={{ "--cols": items.length } as React.CSSProperties}
@@ -47,6 +49,11 @@ export function KpiCard({ items }: KpiCardProps) {
               </div>
 
               <div className="flex items-baseline gap-1">
+                {item.currency && (
+                  <span className="text-lg font-medium text-muted-foreground">
+                    {item.currency}
+                  </span>
+                )}
                 <span className="text-3xl font-semibold tracking-tight text-foreground">
                   {item.price.toFixed(2)}
                 </span>
@@ -83,7 +90,7 @@ export function KpiCard({ items }: KpiCardProps) {
               </div>
 
               <div className="-mx-6 flex items-center justify-start gap-1.5 border-t border-border px-6 py-3">
-                <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_5px_theme(colors.emerald.500)]" />
+                <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_5px_var(--color-emerald-500)]" />
                 <span className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
                   Act. {item.updatedAt}
                 </span>

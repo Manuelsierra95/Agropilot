@@ -1,11 +1,12 @@
 import { DashboardPageContainer } from "@/components/dashboard-page-container"
 import { KpiCard, type KpiItem } from "./kpi-card/price-kpi-card"
-import { TransactionTable } from "./components/transaction-table"
+import { ExpensesPieChart } from "./chart/expenses-pie-chart"
+import { IncomePieChart } from "./chart/income-pie-chart"
 
-import { TransactionTable as TransactionTable2 } from "./table"
+import { TransactionTable } from "./table"
 
 import { mockTransactions as data } from "@/store/mockTransactions"
-import ChartArea from "./chart"
+import { ChartAreaInteractive } from "./chart/lines-chart"
 
 // Aceites
 const oils: KpiItem[] = [
@@ -35,200 +36,26 @@ const oils: KpiItem[] = [
   },
 ]
 
-export const mockTransactions: Transaction[] = [
-  {
-    id: 1,
-    userId: "user_01",
-    parcelId: 3,
-    type: "gasto",
-    category: "Semillas",
-    concept: "Semillas de trigo blando variedad Chamorro",
-    amount: 840.0,
-    paymentMethod: "transferencia",
-    invoiceNumber: "FAC-2024-0312",
-    date: new Date("2024-03-10"),
-    description: "Compra para la siembra de otoño, 120 kg a 7 €/kg.",
-    createdAt: new Date("2024-03-10T09:00:00"),
-    updatedAt: new Date("2024-03-10T09:00:00"),
-  },
-  {
-    id: 2,
-    userId: "user_01",
-    parcelId: 3,
-    type: "gasto",
-    category: "Fertilizantes",
-    concept: "Abono nitroamoniacal 27%",
-    amount: 1250.5,
-    paymentMethod: "tarjeta",
-    invoiceNumber: "FAC-2024-0389",
-    date: new Date("2024-03-22"),
-    description: null,
-    createdAt: new Date("2024-03-22T11:30:00"),
-    updatedAt: new Date("2024-03-22T11:30:00"),
-  },
-  {
-    id: 3,
-    userId: "user_01",
-    parcelId: 3,
-    type: "gasto",
-    category: "Fitosanitarios",
-    concept: "Herbicida selectivo postemergencia",
-    amount: 320.0,
-    paymentMethod: "efectivo",
-    invoiceNumber: null,
-    date: new Date("2024-04-05"),
-    description: "Aplicación para control de malas hierbas gramíneas.",
-    createdAt: new Date("2024-04-05T08:00:00"),
-    updatedAt: new Date("2024-04-05T08:00:00"),
-  },
-  {
-    id: 4,
-    userId: "user_01",
-    parcelId: 5,
-    type: "gasto",
-    category: "Combustible",
-    concept: "Gasóleo B para tractor John Deere",
-    amount: 480.0,
-    paymentMethod: "tarjeta",
-    invoiceNumber: "FAC-2024-0421",
-    date: new Date("2024-04-12"),
-    description: null,
-    createdAt: new Date("2024-04-12T16:00:00"),
-    updatedAt: new Date("2024-04-12T16:00:00"),
-  },
-  {
-    id: 5,
-    userId: "user_01",
-    parcelId: 3,
-    type: "ingreso",
-    category: "Venta de cosecha",
-    concept: "Venta trigo blando cooperativa Arjona",
-    amount: 12400.0,
-    paymentMethod: "transferencia",
-    invoiceNumber: "FAC-2024-0501",
-    date: new Date("2024-07-18"),
-    description: "40 toneladas a 310 €/t. Calidad molinera.",
-    createdAt: new Date("2024-07-18T10:00:00"),
-    updatedAt: new Date("2024-07-18T10:00:00"),
-  },
-  {
-    id: 6,
-    userId: "user_01",
-    parcelId: 5,
-    type: "ingreso",
-    category: "Subvenciones",
-    concept: "PAC — Pago básico campaña 2024",
-    amount: 3870.0,
-    paymentMethod: "transferencia",
-    invoiceNumber: null,
-    date: new Date("2024-10-03"),
-    description: "Pago directo FEGA correspondiente a 18,5 ha declaradas.",
-    createdAt: new Date("2024-10-03T00:00:00"),
-    updatedAt: new Date("2024-10-03T00:00:00"),
-  },
-  {
-    id: 7,
-    userId: "user_01",
-    parcelId: 3,
-    type: "gasto",
-    category: "Mano de obra",
-    concept: "Cuadrilla recolección girasol",
-    amount: 960.0,
-    paymentMethod: "efectivo",
-    invoiceNumber: null,
-    date: new Date("2024-09-14"),
-    description: "4 jornaleros durante 3 días, 80 €/jornada.",
-    createdAt: new Date("2024-09-14T07:30:00"),
-    updatedAt: new Date("2024-09-14T07:30:00"),
-  },
-  {
-    id: 8,
-    userId: "user_01",
-    parcelId: 7,
-    type: "gasto",
-    category: "Riego",
-    concept: "Cuota comunidad de regantes T2 2024",
-    amount: 215.0,
-    paymentMethod: "transferencia",
-    invoiceNumber: "FAC-2024-0288",
-    date: new Date("2024-06-01"),
-    description: null,
-    createdAt: new Date("2024-06-01T09:00:00"),
-    updatedAt: new Date("2024-06-01T09:00:00"),
-  },
-  {
-    id: 9,
-    userId: "user_01",
-    parcelId: 7,
-    type: "ingreso",
-    category: "Venta de cosecha",
-    concept: "Venta algodón desmotado",
-    amount: 5600.0,
-    paymentMethod: "transferencia",
-    invoiceNumber: "FAC-2024-0611",
-    date: new Date("2024-11-05"),
-    description: "16 t a 350 €/t. Entrega en almacén de La Carolina.",
-    createdAt: new Date("2024-11-05T12:00:00"),
-    updatedAt: new Date("2024-11-05T12:00:00"),
-  },
-  {
-    id: 10,
-    userId: "user_01",
-    parcelId: 5,
-    type: "gasto",
-    category: "Seguros",
-    concept: "Seguro combinado de explotación agrícola 2024",
-    amount: 1120.0,
-    paymentMethod: "tarjeta",
-    invoiceNumber: "POL-2024-88321",
-    date: new Date("2024-01-15"),
-    description: "Póliza anual. Cubre pérdidas por sequía, granizo y helada.",
-    createdAt: new Date("2024-01-15T10:00:00"),
-    updatedAt: new Date("2024-01-15T10:00:00"),
-  },
-  {
-    id: 11,
-    userId: "user_01",
-    parcelId: 3,
-    type: "gasto",
-    category: "Maquinaria",
-    concept: "Reparación disco vertedera arado",
-    amount: 390.0,
-    paymentMethod: "efectivo",
-    invoiceNumber: null,
-    date: new Date("2024-02-28"),
-    description: null,
-    createdAt: new Date("2024-02-28T15:00:00"),
-    updatedAt: new Date("2024-02-28T15:00:00"),
-  },
-  {
-    id: 12,
-    userId: "user_01",
-    parcelId: 7,
-    type: "ingreso",
-    category: "Subvenciones",
-    concept: "Ayuda agroambiental olivar tradicional",
-    amount: 620.0,
-    paymentMethod: "transferencia",
-    invoiceNumber: null,
-    date: new Date("2024-12-01"),
-    description: "Convocatoria Junta de Andalucía, medida 10.1.",
-    createdAt: new Date("2024-12-01T00:00:00"),
-    updatedAt: new Date("2024-12-01T00:00:00"),
-  },
-]
-
 export default function Finance() {
   return (
-    <DashboardPageContainer className="radius-0">
-      <div className="rounded-lg border">
-        <KpiCard items={oils} />
-        <ChartArea />
-        <TransactionTable2 data={mockTransactions} />
-        {/* <TransactionTable data={data} /> */}
-
-        {/* TODO: Mostrar grafico variaciones de precio con riego, y demas condiciones y contextos climaticos y de la parcela */}
+    <DashboardPageContainer className="flex flex-col gap-4 md:gap-6">
+      <div className="grid grid-cols-3 gap-4">
+        <section className="col-span-2 grid grid-rows-3 gap-4">
+          <div className="row-span-1">
+            <KpiCard items={oils} />
+          </div>
+          <div className="row-span-2">
+            <ChartAreaInteractive />
+          </div>
+        </section>
+        <section className="col-start-3 flex flex-col gap-4">
+          <IncomePieChart data={data} />
+          <ExpensesPieChart data={data} />
+        </section>
       </div>
+      <TransactionTable data={data} />
+
+      {/* TODO: Mostrar grafico variaciones de precio con riego, y demas condiciones y contextos climaticos y de la parcela */}
     </DashboardPageContainer>
   )
 }

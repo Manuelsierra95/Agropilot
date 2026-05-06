@@ -17,6 +17,8 @@ import {
 
 import type { AllModeSummary, ParcelComparisonItem } from "./parcel-types"
 import { formatNumber } from "./parcel-utils"
+import { KpiCard } from "./price-kpi-card"
+import { genericPriceKpis } from "./price-kpi-mock"
 
 const comparisonChartConfig = {
   area: {
@@ -62,6 +64,12 @@ export function ParcelAllView({
 }: ParcelAllViewProps) {
   return (
     <>
+      <div className="mt-4">
+        <p className="mb-3 text-xs font-medium tracking-[0.16em] text-muted-foreground uppercase">
+          Precios de Mercado
+        </p>
+        <KpiCard items={genericPriceKpis} />
+      </div>
       <section className="mt-4 grid gap-4 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader>
