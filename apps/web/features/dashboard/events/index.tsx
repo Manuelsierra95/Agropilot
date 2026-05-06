@@ -8,9 +8,8 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
-import { Button } from "@workspace/ui/components/button"
 import { ScrollArea, ScrollBar } from "@workspace/ui/components/scroll-area"
-import { ArrowRight, Plus } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { mockEvents } from "@/store/mockEvents"
 import { FarmEventList } from "./event-list"
 import Link from "next/link"
@@ -19,24 +18,13 @@ export function EventsList() {
   return (
     <Card className="col-span-1 flex h-[65vh] w-full flex-col pb-0 sm:col-span-1 md:col-span-4 md:h-[45vh] lg:col-span-4">
       <CardHeader className="px-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-sm font-medium">
-              Próximos Eventos
-            </CardTitle>
-            <Badge variant="secondary" className="h-5 w-5 rounded-full text-xs">
-              {mockEvents.length}
-            </Badge>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7 px-2 text-xs text-muted-foreground"
-            onClick={() => console.log("nuevo evento")}
-          >
-            <Plus className="size-3.5" />
-            Nuevo
-          </Button>
+        <div className="flex items-center gap-2">
+          <CardTitle className="text-sm font-medium">
+            Próximos Eventos
+          </CardTitle>
+          <Badge variant="secondary" className="h-5 w-5 rounded-full text-xs">
+            {mockEvents.length}
+          </Badge>
         </div>
       </CardHeader>
 
