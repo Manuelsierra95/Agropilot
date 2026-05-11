@@ -265,7 +265,8 @@ export function FinancePieChart({
                           y={(viewBox.cy ?? 0) - (hasTwo ? 10 : 0)}
                           className="fill-foreground text-xl font-bold"
                         >
-                          {activeItem?.amount.toLocaleString("es-ES")} €
+                          {activeItem?.amount.toLocaleString("es-ES")}
+                          {"\u00A0"}€
                         </tspan>
                         <tspan
                           x={viewBox.cx}
@@ -355,14 +356,16 @@ export function FinancePieChart({
                         isActive ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
-                      {pct}%
+                      {pct}
+                      {"\u00A0"}%
                     </span>
                     <span
                       className={`w-[60px] shrink-0 pr-2 text-right text-xs font-semibold tabular-nums transition-colors ${
                         isActive ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
-                      {item.amount.toLocaleString("es-ES")} €
+                      {item.amount.toLocaleString("es-ES")}
+                      {"\u00A0"}€
                     </span>
                   </li>
                 )

@@ -13,8 +13,8 @@ import {
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
 import { ScrollArea } from "@workspace/ui/components/scroll-area"
-import { TransactionTable } from "../table"
-import type { Transaction as TableTransaction } from "../table/types"
+import { TransactionTable } from "../../table"
+import type { Transaction as TableTransaction } from "../../table/types"
 import {
   ChartContainer,
   ChartTooltip,
@@ -416,7 +416,17 @@ export function CategoryDrawer({
               <p className="mb-3 text-sm font-medium">
                 Transacciones ({transactions.length})
               </p>
-              <TransactionTable data={tableData} filtersSection={false} />
+              <TransactionTable
+                data={tableData}
+                filtersSection={true}
+                enabledFilters={[
+                  "columns",
+                  "amount",
+                  "dates",
+                  "paymentMethods",
+                  "searchBar",
+                ]}
+              />
             </div>
           </div>
         </ScrollArea>

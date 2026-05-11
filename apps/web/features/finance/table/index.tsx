@@ -17,7 +17,10 @@ import { toast } from "sonner"
 
 import { columns } from "./columns"
 import { EmptyState } from "./components/empty-state"
-import { TransactionFiltersSection } from "./filters-bar"
+import {
+  TransactionFiltersSection,
+  type FiltersBarFilterOption,
+} from "./filters-bar"
 import { formatDate } from "./helpers"
 import { useTransactionFilters } from "./hooks/use-transaction-filters"
 import { TransactionResultsTable } from "./transaction-table"
@@ -26,9 +29,11 @@ import type { Transaction } from "./types"
 export function TransactionTable({
   data: initialData,
   filtersSection = true,
+  enabledFilters,
 }: {
   data: Transaction[]
   filtersSection?: boolean
+  enabledFilters?: readonly FiltersBarFilterOption[]
 }) {
   const [data, setData] = React.useState(() => initialData)
 
@@ -139,6 +144,7 @@ export function TransactionTable({
               resetFilters={resetFilters}
               hasActiveFilters={hasActiveFilters}
               totalResults={filteredData.length}
+              enabledFilters={enabledFilters}
             />
           )}
           <TransactionResultsTable

@@ -3,10 +3,17 @@
 import type { ComponentProps } from "react"
 import type { Table as TanStackTable } from "@tanstack/react-table"
 
-import { FiltersBar } from "./components/filters-bar"
+import {
+  FILTERS_BAR_FILTER_OPTIONS,
+  FiltersBar,
+  type FiltersBarFilterOption,
+} from "./components/filters-bar"
 import type { Transaction } from "./types"
 
 type BaseFiltersBarProps = Omit<ComponentProps<typeof FiltersBar>, "columns">
+
+export { FILTERS_BAR_FILTER_OPTIONS }
+export type { FiltersBarFilterOption }
 
 type TransactionFiltersSectionProps = BaseFiltersBarProps & {
   table: TanStackTable<Transaction>

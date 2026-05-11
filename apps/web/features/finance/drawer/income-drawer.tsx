@@ -14,7 +14,7 @@ import {
   CategoryDrawer,
   type CategoryTransaction,
   type IconComponent,
-} from "./category-drawer"
+} from "./components/category-drawer"
 
 // ---------------------------------------------------------------------------
 // Re-export public props type

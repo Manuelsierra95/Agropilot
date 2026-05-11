@@ -4,25 +4,24 @@ import * as React from "react"
 import { type ChartConfig } from "@workspace/ui/components/chart"
 import { type Transaction } from "@/store/mockTransactions"
 import { IncomeDrawer } from "../drawer/income-drawer"
-import type { CategoryTransaction } from "../drawer/category-drawer"
-import { FinancePieChart, type PieChartDataItem } from "./pie-chart"
+import type { CategoryTransaction } from "../drawer/components/category-drawer"
+import { FinancePieChart, type PieChartDataItem } from "./components/pie-chart"
 
 const chartConfig = {
-  amount: { label: "Monto (€)" },
-  cereales: { label: "Venta de cereales", color: "var(--chart-1)" },
-  girasol: { label: "Venta de girasol", color: "var(--chart-2)" },
-  pac: { label: "Subvenciones PAC", color: "var(--chart-3)" },
-  arrendamiento: { label: "Arrendamiento de tierras", color: "var(--chart-4)" },
-  leguminosas: { label: "Venta de leguminosas", color: "var(--chart-5)" },
-  servicios: {
-    label: "Servicios agronómicos",
-    color: "var(--chart-6, var(--chart-1))",
+  cereales: { label: "Venta de cereales", color: "var(--pie-income-1)" },
+  girasol: { label: "Venta de girasol", color: "var(--pie-income-2)" },
+  pac: { label: "Subvenciones PAC", color: "var(--pie-income-3)" },
+  arrendamiento: {
+    label: "Arrendamiento de tierras",
+    color: "var(--pie-income-4)",
   },
+  leguminosas: { label: "Venta de leguminosas", color: "var(--pie-income-5)" },
+  servicios: { label: "Servicios agronómicos", color: "var(--pie-income-6)" },
   agroseguros: {
     label: "Agroseguros / indemnizaciones",
-    color: "var(--chart-7, var(--chart-2))",
+    color: "var(--pie-income-7)",
   },
-  otros: { label: "Otros ingresos", color: "var(--chart-8, var(--chart-3))" },
+  otros: { label: "Otros ingresos", color: "var(--pie-income-8)" },
 } satisfies ChartConfig
 
 const categoryToKey: Record<string, string> = {

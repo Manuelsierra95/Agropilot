@@ -4,19 +4,18 @@ import * as React from "react"
 import { type ChartConfig } from "@workspace/ui/components/chart"
 import { type Transaction } from "@/store/mockTransactions"
 import { ExpensesDrawer } from "../drawer/expenses-drawer"
-import type { CategoryTransaction } from "../drawer/category-drawer"
-import { FinancePieChart, type PieChartDataItem } from "./pie-chart"
+import type { CategoryTransaction } from "../drawer/components/category-drawer"
+import { FinancePieChart, type PieChartDataItem } from "./components/pie-chart"
 
 const chartConfig = {
-  amount: { label: "Monto (€)" },
-  semillas: { label: "Semillas", color: "var(--chart-1)" },
-  fertilizantes: { label: "Fertilizantes", color: "var(--chart-2)" },
-  fitosanitarios: { label: "Fitosanitarios", color: "var(--chart-3)" },
-  combustible: { label: "Combustible", color: "var(--chart-4)" },
-  manodeobra: { label: "Mano de obra", color: "var(--chart-5)" },
-  seguros: { label: "Seguros", color: "var(--chart-6, var(--chart-1))" },
-  maquinaria: { label: "Maquinaria", color: "var(--chart-7, var(--chart-2))" },
-  riego: { label: "Riego", color: "var(--chart-8, var(--chart-3))" },
+  semillas: { label: "Semillas", color: "var(--pie-expense-1)" },
+  fertilizantes: { label: "Fertilizantes", color: "var(--pie-expense-2)" },
+  fitosanitarios: { label: "Fitosanitarios", color: "var(--pie-expense-3)" },
+  combustible: { label: "Combustible", color: "var(--pie-expense-4)" },
+  manodeobra: { label: "Mano de obra", color: "var(--pie-expense-5)" },
+  seguros: { label: "Seguros", color: "var(--pie-expense-6)" },
+  maquinaria: { label: "Maquinaria", color: "var(--pie-expense-7)" },
+  riego: { label: "Riego", color: "var(--pie-expense-8)" },
 } satisfies ChartConfig
 
 const categoryToKey: Record<string, string> = {

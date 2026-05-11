@@ -1,12 +1,13 @@
 import { DashboardPageContainer } from "@/components/dashboard-page-container"
-import { KpiCard, type KpiItem } from "./kpi-card/price-kpi-card"
+import { KpiCard, type KpiItem } from "./top-cards/price-kpi-card"
 import { ExpensesPieChart } from "./chart/expenses-pie-chart"
 import { IncomePieChart } from "./chart/income-pie-chart"
 
 import { TransactionTable } from "./table"
 
 import { mockTransactions as data } from "@/store/mockTransactions"
-import { ChartAreaInteractive } from "./chart/lines-chart"
+import { ChartAreaInteractive } from "./chart/components/lines-chart"
+import { FinanceRecommendations } from "./top-cards/finance-recommendations"
 
 // Aceites
 const oils: KpiItem[] = [
@@ -39,14 +40,10 @@ const oils: KpiItem[] = [
 export default function Finance() {
   return (
     <DashboardPageContainer className="flex flex-col gap-4 md:gap-6">
-      <div className="grid grid-cols-3 gap-4">
-        <section className="col-span-2 grid grid-rows-3 gap-4">
-          <div className="row-span-1">
-            <KpiCard items={oils} />
-          </div>
-          <div className="row-span-2">
-            <ChartAreaInteractive />
-          </div>
+      <div className="relative grid grid-cols-3 gap-4">
+        <section className="col-span-2 grid grid-rows-[auto_1fr] gap-4">
+          <FinanceRecommendations transactions={data} oils={oils} />
+          <ChartAreaInteractive />
         </section>
         <section className="col-start-3 flex flex-col gap-4">
           <IncomePieChart data={data} />
@@ -54,8 +51,6 @@ export default function Finance() {
         </section>
       </div>
       <TransactionTable data={data} />
-
-      {/* TODO: Mostrar grafico variaciones de precio con riego, y demas condiciones y contextos climaticos y de la parcela */}
     </DashboardPageContainer>
   )
 }

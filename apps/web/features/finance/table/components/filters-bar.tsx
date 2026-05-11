@@ -39,6 +39,17 @@ import type { TransactionFilters } from "../hooks/use-transaction-filters"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+export const FILTERS_BAR_FILTER_OPTIONS = [
+  "columns",
+  "amount",
+  "dates",
+  "categories",
+  "paymentMethods",
+  "searchBar",
+] as const
+
+export type FiltersBarFilterOption = (typeof FILTERS_BAR_FILTER_OPTIONS)[number]
+
 interface FiltersBarProps {
   filters: TransactionFilters
   setField: <K extends keyof TransactionFilters>(
@@ -48,6 +59,7 @@ interface FiltersBarProps {
   resetFilters: () => void
   hasActiveFilters: boolean
   totalResults: number
+  enabledFilters?: readonly FiltersBarFilterOption[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: Column<any, unknown>[]
 }
@@ -62,16 +74,21 @@ function FilterPill({
   onRemove: () => void
 }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border bg-muted/50 px-2 py-0.5 text-xs text-muted-foreground">
-      {label}
-      <button onClick={onRemove} className="ml-0.5 hover:text-foreground">
+    <span className="inline-flex h-6 shrink-0 items-center gap-1 rounded-full border bg-muted/50 px-2 text-xs text-muted-foreground">
+      <span className="max-w-56 truncate">{label}</span>
+      <button
+        type="button"
+        onClick={onRemove}
+        aria-label={`Eliminar filtro ${label}`}
+        className="ml-0.5 rounded-sm hover:text-foreground"
+      >
         <IconX className="size-3" />
       </button>
     </span>
   )
 }
 
-// ─── MultiSelectDropdown ──────────────────────────────────────────────────────
+// ─── MultiSelectDropdown (used inside FiltersDropdown) ────────────────────────
 
 function MultiSelectDropdown({
   label,
@@ -150,168 +167,178 @@ function MultiSelectDropdown({
   )
 }
 
-// ─── AmountRangePopover ───────────────────────────────────────────────────────
+// ─── FiltersDropdown ──────────────────────────────────────────────────────────
 
-function AmountRangePopover({
-  amountMin,
-  amountMax,
-  setAmountMin,
-  setAmountMax,
+function FiltersDropdown({
+  filters,
+  setField,
+  isEnabled,
 }: {
-  amountMin: string
-  amountMax: string
-  setAmountMin: (v: string) => void
-  setAmountMax: (v: string) => void
+  filters: TransactionFilters
+  setField: <K extends keyof TransactionFilters>(
+    key: K,
+    value: TransactionFilters[K]
+  ) => void
+  isEnabled: (filter: FiltersBarFilterOption) => boolean
 }) {
-  const isActive = amountMin !== "" || amountMax !== ""
+  const activeCount = [
+    isEnabled("amount") && (filters.amountMin || filters.amountMax),
+    isEnabled("dates") && (filters.dateFrom || filters.dateTo),
+    ...(isEnabled("categories") ? filters.categories : []),
+    ...(isEnabled("paymentMethods") ? filters.paymentMethods : []),
+  ].filter(Boolean).length
+
+  function toggleCategory(cat: string) {
+    const next = filters.categories.includes(cat)
+      ? filters.categories.filter((c) => c !== cat)
+      : [...filters.categories, cat]
+    setField("categories", next)
+  }
+
+  function togglePaymentMethod(pm: string) {
+    const next = filters.paymentMethods.includes(pm)
+      ? filters.paymentMethods.filter((p) => p !== pm)
+      : [...filters.paymentMethods, pm]
+    setField("paymentMethods", next)
+  }
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant={isActive ? "default" : "outline"}
+          variant={activeCount > 0 ? "default" : "outline"}
           size="sm"
-          className="h-8 gap-1.5"
+          className="h-8 shrink-0 gap-1.5"
         >
-          <IconCurrencyEuro className="size-3.5" />
-          Importe
-          {isActive ? (
+          <IconAdjustmentsHorizontal className="size-3.5" />
+          <span className="hidden sm:inline">Filtros</span>
+          {activeCount > 0 ? (
             <Badge
               variant="secondary"
               className="ml-0.5 h-4 rounded-full px-1.5 text-[10px] font-semibold"
             >
-              ✓
+              {activeCount}
             </Badge>
           ) : (
             <IconChevronDown className="size-3.5 opacity-60" />
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-56 p-3">
-        <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-          Rango de importe
-        </p>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-1">
-            <Label className="text-xs">Mínimo (€)</Label>
-            <Input
-              type="number"
-              min={0}
-              step={0.01}
-              placeholder="0,00"
-              value={amountMin}
-              onChange={(e) => setAmountMin(e.target.value)}
-              className="h-8 text-sm"
-            />
+      <PopoverContent align="start" className="flex w-auto flex-col gap-3 p-3">
+        {/* Amount */}
+        {isEnabled("amount") && (
+          <div className="flex flex-col gap-1.5">
+            <p className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              <IconCurrencyEuro className="size-3.5" />
+              Rango de importe
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-1">
+                <Label className="text-xs">Mínimo (€)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  step={0.01}
+                  placeholder="0,00"
+                  value={filters.amountMin}
+                  onChange={(e) => setField("amountMin", e.target.value)}
+                  className="h-8 w-28 text-sm"
+                />
+              </div>
+              <span className="mt-5 shrink-0 text-xs text-muted-foreground">
+                –
+              </span>
+              <div className="flex flex-col gap-1">
+                <Label className="text-xs">Máximo (€)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  step={0.01}
+                  placeholder="Sin límite"
+                  value={filters.amountMax}
+                  onChange={(e) => setField("amountMax", e.target.value)}
+                  className="h-8 w-28 text-sm"
+                />
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col gap-1">
-            <Label className="text-xs">Máximo (€)</Label>
-            <Input
-              type="number"
-              min={0}
-              step={0.01}
-              placeholder="Sin límite"
-              value={amountMax}
-              onChange={(e) => setAmountMax(e.target.value)}
-              className="h-8 text-sm"
-            />
-          </div>
-        </div>
-        {isActive && (
-          <>
-            <Separator className="my-2" />
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 w-full text-xs text-muted-foreground"
-              onClick={() => {
-                setAmountMin("")
-                setAmountMax("")
-              }}
-            >
-              Limpiar
-            </Button>
-          </>
         )}
-      </PopoverContent>
-    </Popover>
-  )
-}
 
-// ─── DateRangePopover ─────────────────────────────────────────────────────────
-
-function DateRangePopover({
-  dateFrom,
-  dateTo,
-  setDateFrom,
-  setDateTo,
-}: {
-  dateFrom: string
-  dateTo: string
-  setDateFrom: (v: string) => void
-  setDateTo: (v: string) => void
-}) {
-  const isActive = dateFrom !== "" || dateTo !== ""
-
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant={isActive ? "default" : "outline"}
-          size="sm"
-          className="h-8 gap-1.5"
-        >
-          <IconCalendar className="size-3.5" />
-          Fechas
-          {isActive ? (
-            <Badge
-              variant="secondary"
-              className="ml-0.5 h-4 rounded-full px-1.5 text-[10px] font-semibold"
-            >
-              ✓
-            </Badge>
-          ) : (
-            <IconChevronDown className="size-3.5 opacity-60" />
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent align="start" className="w-56 p-3">
-        <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-          Rango de fechas
-        </p>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-1">
-            <Label className="text-xs">Desde</Label>
-            <Input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className="h-8 text-sm"
-            />
+        {/* Dates */}
+        {isEnabled("dates") && (
+          <div className="flex flex-col gap-1.5">
+            <p className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              <IconCalendar className="size-3.5" />
+              Rango de fechas
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-1">
+                <Label className="text-xs">Desde</Label>
+                <Input
+                  type="date"
+                  value={filters.dateFrom}
+                  onChange={(e) => setField("dateFrom", e.target.value)}
+                  className="h-8 text-sm"
+                />
+              </div>
+              <span className="mt-5 shrink-0 text-xs text-muted-foreground">
+                →
+              </span>
+              <div className="flex flex-col gap-1">
+                <Label className="text-xs">Hasta</Label>
+                <Input
+                  type="date"
+                  value={filters.dateTo}
+                  onChange={(e) => setField("dateTo", e.target.value)}
+                  className="h-8 text-sm"
+                />
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col gap-1">
-            <Label className="text-xs">Hasta</Label>
-            <Input
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-              className="h-8 text-sm"
-            />
+        )}
+
+        {/* Categories & Payment methods as the original multi-select dropdowns */}
+        {(isEnabled("categories") || isEnabled("paymentMethods")) && (
+          <div className="flex flex-wrap items-center gap-2">
+            {isEnabled("categories") && (
+              <MultiSelectDropdown
+                label="Categoría"
+                options={CATEGORIES}
+                selected={filters.categories}
+                onToggle={toggleCategory}
+                onClear={() => setField("categories", [])}
+              />
+            )}
+            {isEnabled("paymentMethods") && (
+              <MultiSelectDropdown
+                label="Método de pago"
+                options={Object.keys(PAYMENT_METHOD_LABELS)}
+                selected={filters.paymentMethods}
+                onToggle={togglePaymentMethod}
+                onClear={() => setField("paymentMethods", [])}
+                renderLabel={(v) => PAYMENT_METHOD_LABELS[v] ?? v}
+              />
+            )}
           </div>
-        </div>
-        {isActive && (
+        )}
+
+        {activeCount > 0 && (
           <>
-            <Separator className="my-2" />
+            <Separator />
             <Button
               variant="ghost"
               size="sm"
               className="h-7 w-full text-xs text-muted-foreground"
               onClick={() => {
-                setDateFrom("")
-                setDateTo("")
+                setField("amountMin", "")
+                setField("amountMax", "")
+                setField("dateFrom", "")
+                setField("dateTo", "")
+                setField("categories", [])
+                setField("paymentMethods", [])
               }}
             >
-              Limpiar
+              Limpiar filtros
             </Button>
           </>
         )}
@@ -328,8 +355,19 @@ export function FiltersBar({
   resetFilters,
   hasActiveFilters,
   totalResults,
+  enabledFilters = FILTERS_BAR_FILTER_OPTIONS,
   columns,
 }: FiltersBarProps) {
+  const enabledFiltersSet = new Set(enabledFilters)
+  const isEnabled = (filter: FiltersBarFilterOption) =>
+    enabledFiltersSet.has(filter)
+
+  const hasVisibleAdvancedFilters =
+    isEnabled("amount") ||
+    isEnabled("dates") ||
+    isEnabled("categories") ||
+    isEnabled("paymentMethods")
+
   function toggleCategory(cat: string) {
     const next = filters.categories.includes(cat)
       ? filters.categories.filter((c) => c !== cat)
@@ -345,88 +383,53 @@ export function FiltersBar({
   }
 
   return (
-    <div className="tablet:grid-rows-2 grid grid-rows-3 gap-2 pb-4 lg:grid-rows-1">
-      <div className="flex items-center justify-start gap-2">
-        {/* Column visibility dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 gap-1.5">
-              <IconLayoutColumns className="size-3.5" />
-              <span className="hidden sm:inline">Columnas</span>
-              <IconChevronDown className="size-3.5 opacity-60" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuLabel className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-              Columnas visibles
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {columns.map((col) => (
-              <DropdownMenuCheckboxItem
-                key={col.id}
-                className="capitalize"
-                checked={col.getIsVisible()}
-                onCheckedChange={(value) => col.toggleVisibility(!!value)}
-              >
-                {col.id}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Filter dropdowns */}
-        <div className="flex flex-wrap items-center gap-2">
-          <IconAdjustmentsHorizontal className="size-4 shrink-0 text-muted-foreground" />
-
-          <AmountRangePopover
-            amountMin={filters.amountMin}
-            amountMax={filters.amountMax}
-            setAmountMin={(v) => setField("amountMin", v)}
-            setAmountMax={(v) => setField("amountMax", v)}
-          />
-
-          <DateRangePopover
-            dateFrom={filters.dateFrom}
-            dateTo={filters.dateTo}
-            setDateFrom={(v) => setField("dateFrom", v)}
-            setDateTo={(v) => setField("dateTo", v)}
-          />
-
-          <MultiSelectDropdown
-            label="Categoría"
-            options={CATEGORIES}
-            selected={filters.categories}
-            onToggle={toggleCategory}
-            onClear={() => setField("categories", [])}
-          />
-
-          <MultiSelectDropdown
-            label="Método de pago"
-            options={Object.keys(PAYMENT_METHOD_LABELS)}
-            selected={filters.paymentMethods}
-            onToggle={togglePaymentMethod}
-            onClear={() => setField("paymentMethods", [])}
-            renderLabel={(v) => PAYMENT_METHOD_LABELS[v] ?? v}
-          />
-
-          {hasActiveFilters && (
-            <>
-              <Separator orientation="vertical" className="h-5" />
+    <div className="grid gap-2 pb-4">
+      {/* ── Single row ───────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-2">
+        {/* Column visibility */}
+        {isEnabled("columns") && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="h-8 gap-1 text-muted-foreground"
-                onClick={resetFilters}
+                className="h-8 shrink-0 gap-1.5"
               >
-                <IconX className="size-3.5" />
-                Limpiar filtros
+                <IconLayoutColumns className="size-3.5" />
+                <span className="hidden sm:inline">Columnas</span>
+                <IconChevronDown className="size-3.5 opacity-60" />
               </Button>
-            </>
-          )}
-        </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuLabel className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                Columnas visibles
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {columns.map((col) => (
+                <DropdownMenuCheckboxItem
+                  key={col.id}
+                  className="capitalize"
+                  checked={col.getIsVisible()}
+                  onCheckedChange={(value) => col.toggleVisibility(!!value)}
+                >
+                  {col.id}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
 
-        {/* Search + result count */}
-        <div className="flex items-center gap-2">
+        {/* Filters dropdown */}
+        {hasVisibleAdvancedFilters && (
+          <FiltersDropdown
+            filters={filters}
+            setField={setField}
+            isEnabled={isEnabled}
+          />
+        )}
+
+        {/* Search bar — fixed width like before */}
+        {isEnabled("searchBar") && (
           <div className="relative w-full lg:w-72">
             <IconSearch className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -437,6 +440,7 @@ export function FiltersBar({
             />
             {filters.globalSearch && (
               <button
+                type="button"
                 className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 onClick={() => setField("globalSearch", "")}
               >
@@ -444,61 +448,86 @@ export function FiltersBar({
               </button>
             )}
           </div>
+        )}
+
+        {/* Results count */}
+        {isEnabled("searchBar") && (
           <span className="hidden shrink-0 text-xs text-muted-foreground lg:inline">
             {totalResults} resultado{totalResults !== 1 ? "s" : ""}
           </span>
-        </div>
+        )}
 
-        {/* New transaction button */}
-        <Button size="sm" className="h-8 justify-end gap-1.5">
+        {/* Active filter pills + clear — inline after search */}
+        {hasActiveFilters && (
+          <>
+            <div className="flex items-center">
+              <Separator orientation="vertical" className="m-auto flex h-5" />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 shrink-0 gap-1 text-muted-foreground"
+                onClick={resetFilters}
+              >
+                <IconX className="size-3.5" />
+                Limpiar filtros
+              </Button>
+            </div>
+
+            <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto py-0.5">
+              {isEnabled("searchBar") && filters.globalSearch && (
+                <FilterPill
+                  label={`"${filters.globalSearch}"`}
+                  onRemove={() => setField("globalSearch", "")}
+                />
+              )}
+              {isEnabled("amount") &&
+                (filters.amountMin || filters.amountMax) && (
+                  <FilterPill
+                    label={`Importe: ${filters.amountMin || "0"} – ${filters.amountMax || "∞"} €`}
+                    onRemove={() => {
+                      setField("amountMin", "")
+                      setField("amountMax", "")
+                    }}
+                  />
+                )}
+              {isEnabled("dates") && (filters.dateFrom || filters.dateTo) && (
+                <FilterPill
+                  label={`Fecha: ${filters.dateFrom || "inicio"} → ${filters.dateTo || "hoy"}`}
+                  onRemove={() => {
+                    setField("dateFrom", "")
+                    setField("dateTo", "")
+                  }}
+                />
+              )}
+              {isEnabled("categories") &&
+                filters.categories.map((cat) => (
+                  <FilterPill
+                    key={cat}
+                    label={cat}
+                    onRemove={() => toggleCategory(cat)}
+                  />
+                ))}
+              {isEnabled("paymentMethods") &&
+                filters.paymentMethods.map((pm) => (
+                  <FilterPill
+                    key={pm}
+                    label={PAYMENT_METHOD_LABELS[pm] ?? pm}
+                    onRemove={() => togglePaymentMethod(pm)}
+                  />
+                ))}
+            </div>
+          </>
+        )}
+
+        {/* New transaction */}
+        <Button
+          size="sm"
+          className="ml-auto h-8 shrink-0 gap-1.5 bg-accent-foreground/80 text-background hover:bg-accent-foreground"
+        >
           <IconPlus className="size-3.5" />
           <span className="hidden sm:inline">Nueva transacción</span>
         </Button>
       </div>
-
-      {/* ── Active filter pills ──────────────────────────────────────────── */}
-      {hasActiveFilters && (
-        <div className="flex flex-wrap gap-1.5">
-          {filters.globalSearch && (
-            <FilterPill
-              label={`"${filters.globalSearch}"`}
-              onRemove={() => setField("globalSearch", "")}
-            />
-          )}
-          {(filters.amountMin || filters.amountMax) && (
-            <FilterPill
-              label={`Importe: ${filters.amountMin || "0"} – ${filters.amountMax || "∞"} €`}
-              onRemove={() => {
-                setField("amountMin", "")
-                setField("amountMax", "")
-              }}
-            />
-          )}
-          {(filters.dateFrom || filters.dateTo) && (
-            <FilterPill
-              label={`Fecha: ${filters.dateFrom || "inicio"} → ${filters.dateTo || "hoy"}`}
-              onRemove={() => {
-                setField("dateFrom", "")
-                setField("dateTo", "")
-              }}
-            />
-          )}
-          {filters.categories.map((cat) => (
-            <FilterPill
-              key={cat}
-              label={cat}
-              onRemove={() => toggleCategory(cat)}
-            />
-          ))}
-          {filters.paymentMethods.map((pm) => (
-            <FilterPill
-              key={pm}
-              label={PAYMENT_METHOD_LABELS[pm] ?? pm}
-              onRemove={() => togglePaymentMethod(pm)}
-            />
-          ))}
-        </div>
-      )}
     </div>
   )
 }
