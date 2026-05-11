@@ -6,14 +6,14 @@ export function NavigationWrapper({ children }: { children: React.ReactNode }) {
   return (
     <nav>
       {/* Mobile: Navbar Dock */}
-      <div className="min-h-screen md:hidden">
+      <div className="min-h-screen lg:hidden">
         <NavDockHeader />
         {children}
         <NavDock />
       </div>
 
       {/* Tablet y Desktop: Sidebar */}
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <NavSidebar>{children}</NavSidebar>
       </div>
     </nav>
