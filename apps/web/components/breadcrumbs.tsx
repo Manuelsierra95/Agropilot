@@ -19,7 +19,7 @@ export function Breadcrumbs() {
 
   return (
     <Breadcrumb>
-      <BreadcrumbList>
+      <BreadcrumbList className="flex-nowrap">
         {items.map((item, index) => (
           <Fragment key={item.title}>
             {index < items.length - 1 ? (

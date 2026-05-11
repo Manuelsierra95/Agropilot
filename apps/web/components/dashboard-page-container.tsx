@@ -8,12 +8,7 @@ export const DashboardPageContainer = ({
   className?: string
 }) => {
   return (
-    <main
-      className={cn(
-        "@container/main flex flex-1 flex-col px-4 py-4",
-        className
-      )}
-    >
+    <main className={cn("@container/main flex flex-1 flex-col p-4", className)}>
       {children}
     </main>
   )
