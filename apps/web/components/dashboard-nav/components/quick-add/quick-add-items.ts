@@ -1,0 +1,89 @@
+import {
+  Droplets,
+  Sprout,
+  Wheat,
+  Bug,
+  Receipt,
+  Banknote,
+  Map,
+  CalendarPlus,
+  type LucideIcon,
+} from "lucide-react"
+
+export type QuickAddItem = {
+  id: string
+  label: string
+  description: string
+  icon: LucideIcon
+}
+
+export type QuickAddGroup = {
+  group: string
+  items: QuickAddItem[]
+}
+
+export const quickAddItems: QuickAddGroup[] = [
+  {
+    group: "Eventos de campo",
+    items: [
+      {
+        id: "irrigation",
+        label: "Riego",
+        description: "Registrar evento de riego",
+        icon: Droplets,
+      },
+      {
+        id: "treatment",
+        label: "Tratamiento",
+        description: "Fitosanitario o abonado",
+        icon: Sprout,
+      },
+      {
+        id: "harvest",
+        label: "Cosecha",
+        description: "Registrar recolección",
+        icon: Wheat,
+      },
+      {
+        id: "pest",
+        label: "Plaga / Incidencia",
+        description: "Alerta fitosanitaria",
+        icon: Bug,
+      },
+    ],
+  },
+  {
+    group: "Finanzas",
+    items: [
+      {
+        id: "expense",
+        label: "Gasto",
+        description: "Semillas, combustible…",
+        icon: Receipt,
+      },
+      {
+        id: "income",
+        label: "Ingreso",
+        description: "Venta de cosecha u otro",
+        icon: Banknote,
+      },
+    ],
+  },
+  {
+    group: "Gestión",
+    items: [
+      {
+        id: "parcel",
+        label: "Nueva parcela",
+        description: "Registrar una parcela",
+        icon: Map,
+      },
+      {
+        id: "task",
+        label: "Tarea pendiente",
+        description: "Añadir al calendario",
+        icon: CalendarPlus,
+      },
+    ],
+  },
+]
