@@ -3,6 +3,7 @@
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -16,8 +17,8 @@ import Link from "next/link"
 
 export function EventsList() {
   return (
-    <Card className="col-span-1 flex h-[65vh] w-full flex-col pb-0 sm:col-span-1 md:col-span-4 md:h-[45vh] lg:col-span-4">
-      <CardHeader className="px-4">
+    <Card className="col-span-1 flex h-full w-full flex-col gap-0 pb-0">
+      <CardHeader className="px-4 pb-4">
         <div className="flex items-center gap-2">
           <CardTitle className="text-sm font-medium">
             Próximos Eventos
@@ -26,11 +27,13 @@ export function EventsList() {
             {mockEvents.length}
           </Badge>
         </div>
+        <CardDescription className="text-xs text-muted-foreground">
+          Haz click en un evento para ver más detalles.
+        </CardDescription>
       </CardHeader>
-
-      <CardContent className="flex-1 overflow-hidden p-0">
+      <CardContent className="m-0 flex-1 overflow-hidden p-0">
         <ScrollArea className="h-full w-full">
-          <div className="px-4 pb-4">
+          <div className="px-4 pb-2">
             <FarmEventList events={mockEvents} />
           </div>
           <ScrollBar orientation="vertical" />

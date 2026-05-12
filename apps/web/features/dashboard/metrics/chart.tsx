@@ -165,7 +165,7 @@ export function ChartAreaInteractive() {
   })
 
   return (
-    <Card className="@container/card border-0">
+    <Card className="@container/card h-full w-full border-0">
       <CardHeader>
         <CardTitle>Total Visitors</CardTitle>
         <CardDescription>
@@ -208,7 +208,7 @@ export function ChartAreaInteractive() {
           </Select>
         </CardAction>
       </CardHeader>
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+      <CardContent className="flex flex-1 flex-col justify-end px-2 pt-4 sm:px-6 sm:pt-6 sm:pb-4">
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"

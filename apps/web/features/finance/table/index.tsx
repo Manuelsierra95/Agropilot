@@ -15,6 +15,8 @@ import {
 } from "@tanstack/react-table"
 import { toast } from "sonner"
 
+import { Card, CardContent, CardHeader } from "@workspace/ui/components/card"
+
 import { columns } from "./columns"
 import { EmptyState } from "./components/empty-state"
 import {
@@ -135,25 +137,29 @@ export function TransactionTable({
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <>
-          {filtersSection && (
-            <TransactionFiltersSection
+        <Card className="gap-0">
+          {filtersSection ? (
+            <CardHeader>
+              <TransactionFiltersSection
+                table={table}
+                filters={filters}
+                setField={setField}
+                resetFilters={resetFilters}
+                hasActiveFilters={hasActiveFilters}
+                totalResults={filteredData.length}
+                enabledFilters={enabledFilters}
+              />
+            </CardHeader>
+          ) : null}
+          <CardContent className={filtersSection ? "pt-0" : undefined}>
+            <TransactionResultsTable
               table={table}
-              filters={filters}
-              setField={setField}
-              resetFilters={resetFilters}
-              hasActiveFilters={hasActiveFilters}
-              totalResults={filteredData.length}
-              enabledFilters={enabledFilters}
+              selectedCount={selectedCount}
+              onDeleteAction={handleBulkDelete}
+              onExportAction={handleBulkExport}
             />
-          )}
-          <TransactionResultsTable
-            table={table}
-            selectedCount={selectedCount}
-            onDeleteAction={handleBulkDelete}
-            onExportAction={handleBulkExport}
-          />
-        </>
+          </CardContent>
+        </Card>
       )}
     </div>
   )
