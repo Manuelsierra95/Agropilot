@@ -1,6 +1,12 @@
 "use client"
 
-import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts"
+import {
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
+  Radar,
+  RadarChart,
+} from "recharts"
 import {
   Card,
   CardContent,
@@ -17,7 +23,8 @@ import {
 } from "@workspace/ui/components/chart"
 import type { ParcelApiResponse } from "@/features/parcel/components/parcel-types"
 import { cn } from "@workspace/ui/lib/utils"
-import { TrendingUp } from "lucide-react"
+import { ArrowRight, TrendingUp } from "lucide-react"
+import Link from "next/link"
 
 type DashboardRiskRadarProps = {
   apiResponse?: Pick<ParcelApiResponse, "risks">
@@ -27,7 +34,7 @@ type DashboardRiskRadarProps = {
 const chartConfig = {
   score: {
     label: "Riesgo",
-    color: "var(--chart-1)",
+    color: "var(--risk-chart-primary)",
   },
 } satisfies ChartConfig
 
@@ -71,14 +78,14 @@ export function DashboardRiskRadar({
       ]
 
   return (
-    <Card className={cn("flex h-full w-full flex-col pb-0", className)}>
+    <Card className={cn("flex h-full w-full pb-0", className)}>
       <CardHeader className="items-center">
         <CardTitle>Mapa de Riesgos</CardTitle>
         <CardDescription>
           Puntuación por categoría de riesgo (0–100)
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex h-full items-center justify-center">
+      <CardContent className="flex h-full flex-col items-center justify-center gap-2 md:gap-6">
         <ChartContainer
           config={chartConfig}
           className="mx-auto aspect-square max-h-[300px] w-full"
@@ -86,10 +93,16 @@ export function DashboardRiskRadar({
           <RadarChart data={chartData}>
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <PolarGrid
-              className="fill-(--color-score) opacity-20"
+              className="fill-(--color-score) opacity-10"
               gridType="circle"
             />
-            <PolarAngleAxis dataKey="risk" />
+            <PolarAngleAxis dataKey="risk" tickSize={15} />
+            <PolarRadiusAxis
+              domain={[0, 100]}
+              tickCount={6} // area size -> 0, 20, 40, 60, 80, 100
+              tick={false}
+              axisLine={false}
+            />
             <Radar
               dataKey="score"
               fill="var(--color-score)"
@@ -97,15 +110,19 @@ export function DashboardRiskRadar({
             />
           </RadarChart>
         </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 leading-none font-medium">
           El riesgo ha subido un 5.2% este mes{" "}
-          <TrendingUp className="h-4 w-4" />
+          <TrendingUp className="h-4 w-4 text-(--risk-chart-high)" />
         </div>
-        <div className="leading-none text-muted-foreground">
-          Últimos datos: {apiResponse ? new Date().toLocaleDateString() : "—"}
-        </div>
+      </CardContent>
+      <CardFooter className="flex items-center justify-center border-t border-border/60 px-4 py-2">
+        <Link
+          href="/dashboard/finance"
+          className="flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <span>Ver análisis completo</span>
+          <ArrowRight className="size-3.5" />
+        </Link>
       </CardFooter>
     </Card>
   )

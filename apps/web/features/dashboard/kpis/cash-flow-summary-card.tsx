@@ -19,6 +19,8 @@ import {
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { Transaction } from "@/store/mockTransactions"
+import { Separator } from "@workspace/ui/components/separator"
+import { ArrowDown, ArrowUp } from "lucide-react"
 
 type CashFlowTransaction = Pick<Transaction, "type" | "amount" | "date">
 
@@ -129,9 +131,7 @@ function getWindowBalance(
 }
 
 function toneClass(value: number) {
-  return value >= 0
-    ? "text-emerald-600 dark:text-emerald-400"
-    : "text-red-600 dark:text-red-400"
+  return value >= 0 ? "text-(--primary-income)" : "text-(--primary-expense)"
 }
 
 function buildCashFlowChartData(
@@ -213,9 +213,66 @@ export function CashFlowSummaryCard({
         className
       )}
     >
-      <CardHeader className="items-center p-0">
-        <CardContent className="grid grid-cols-2 gap-3">
-          <div className="rounded-lg border border-border/60 bg-background/60 p-3">
+      <CardHeader className="space-y-1 pb-0">
+        <CardTitle className="text-sm font-medium">Flujo de Caja</CardTitle>
+        <CardDescription className="text-xs text-muted-foreground">
+          Resumen de ingresos y gastos recientes, con proyección a futuro.
+        </CardDescription>
+
+        <CardContent className="flex justify-center gap-20 pt-4">
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
+              Últimos 7 días
+            </span>
+            <div
+              className={cn(
+                "text-2xl font-semibold tracking-tight",
+                toneClass(last7.balance)
+              )}
+            >
+              {formatSignedCurrency(last7.balance)}
+            </div>
+            <ul className="flex gap-2 text-[10px] text-muted-foreground">
+              <li className="flex items-center gap-1">
+                <ArrowUp className="h-3 w-3 text-(--primary-income) opacity-80" />
+                {formatCurrency(last7.income)}
+              </li>
+              <li className="flex items-center gap-1">
+                <ArrowDown className="h-3 w-3 text-(--primary-expense) opacity-80" />
+                {formatCurrency(last7.expenses)}
+              </li>
+            </ul>
+          </div>
+
+          <Separator
+            orientation="vertical"
+            className="my-auto flex h-14 bg-border/70"
+          />
+
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
+              Últimos 30 días
+            </span>
+            <div
+              className={cn(
+                "text-2xl font-semibold tracking-tight",
+                toneClass(last30.balance)
+              )}
+            >
+              {formatSignedCurrency(last30.balance)}
+            </div>
+            <ul className="flex gap-2 text-[10px] text-muted-foreground">
+              <li className="flex items-center gap-1">
+                <ArrowUp className="h-3 w-3 text-(--primary-income) opacity-80" />
+                {formatCurrency(last30.income)}
+              </li>
+              <li className="flex items-center gap-1">
+                <ArrowDown className="h-3 w-3 text-(--primary-expense) opacity-80" />
+                {formatCurrency(last30.expenses)}
+              </li>
+            </ul>
+          </div>
+          {/* <div className="rounded-lg border border-border/60 bg-background/60 p-3">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
                 Balance 7 dias
@@ -265,7 +322,7 @@ export function CashFlowSummaryCard({
               Ingresos {formatCurrency(last30.income)} · Gastos{" "}
               {formatCurrency(last30.expenses)}
             </p>
-          </div>
+          </div> */}
         </CardContent>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col justify-end">

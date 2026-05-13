@@ -1,13 +1,24 @@
 "use client"
 
 import * as React from "react"
-import { AlertTriangle, Lightbulb, ShieldCheck, TrendingUp } from "lucide-react"
+import {
+  AlertTriangle,
+  ArrowRight,
+  Lightbulb,
+  ShieldCheck,
+  TrendingUp,
+} from "lucide-react"
 import { Label, Pie, PieChart, Sector, type SectorProps } from "recharts"
 
 import type { Transaction } from "@/store/mockTransactions"
 import type { KpiItem } from "./price-kpi-card"
 import { Badge } from "@workspace/ui/components/badge"
-import { Card, CardContent, CardFooter } from "@workspace/ui/components/card"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@workspace/ui/components/card"
 import {
   ChartContainer,
   ChartStyle,
@@ -16,6 +27,8 @@ import {
   type ChartConfig,
 } from "@workspace/ui/components/chart"
 import { cn } from "@workspace/ui/lib/utils"
+import Link from "next/link"
+import { Separator } from "@workspace/ui/components/separator"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -197,12 +210,12 @@ export function FinanceRecommendationsCompact({
   return (
     <Card
       data-chart={id}
-      className={cn("flex h-full flex-col overflow-hidden", className)}
+      className={cn("flex h-full flex-col gap-0 overflow-hidden", className)}
     >
-      <ChartStyle id={id} config={chartConfig} />
+      <CardHeader className="flex flex-col items-center gap-3 pb-4">
+        <ChartStyle id={id} config={chartConfig} />
 
-      {/* ── Donut + leyenda ── */}
-      <CardContent className="flex flex-col items-center gap-3 pb-2">
+        {/* ── Donut + leyenda ── */}
         <ChartContainer
           id={id}
           config={chartConfig}
@@ -277,7 +290,6 @@ export function FinanceRecommendationsCompact({
             </Pie>
           </PieChart>
         </ChartContainer>
-
         {/* Leyenda */}
         <div className="flex items-center justify-center gap-5">
           <div className="flex items-center gap-2">
@@ -297,10 +309,10 @@ export function FinanceRecommendationsCompact({
             </span>
           </div>
         </div>
-      </CardContent>
+      </CardHeader>
 
-      {/* ── Recommendations ── */}
-      <CardFooter className="flex h-full flex-col justify-center divide-y p-0 pt-2">
+      <CardContent className="flex flex-col items-center gap-0 p-0">
+        <Separator className="w-full bg-border/70" />
         {recs.map((rec) => {
           const cfg = priorityConfig[rec.priority]
           return (
@@ -330,6 +342,16 @@ export function FinanceRecommendationsCompact({
             </div>
           )
         })}
+      </CardContent>
+
+      <CardFooter className="flex items-center justify-center border-t border-border/60 px-4 py-2">
+        <Link
+          href="/dashboard/finance"
+          className="flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <span>Ver recomendaciones detalladas</span>
+          <ArrowRight className="size-3.5" />
+        </Link>
       </CardFooter>
     </Card>
   )
