@@ -4,6 +4,7 @@ import type { KpiItem } from "./kpi-card/price-kpi-card"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
 import { Progress } from "@workspace/ui/components/progress"
+import { cn } from "@workspace/ui/lib/utils"
 
 interface Recommendation {
   id: string
@@ -156,7 +157,7 @@ export function FinanceRecommendations({
               </div>
               <Progress
                 value={incomeWidth}
-                className="h-2 [&>div]:bg-emerald-500 dark:[&>div]:bg-emerald-400"
+                className="h-2 [&>div]:bg-(--primary-income-muted)"
               />
             </div>
 
@@ -172,7 +173,7 @@ export function FinanceRecommendations({
               </div>
               <Progress
                 value={expensesWidth}
-                className="h-2 [&>div]:bg-red-500 dark:[&>div]:bg-red-400"
+                className="h-2 [&>div]:bg-(--primary-expense-muted)"
               />
             </div>
           </div>
@@ -186,14 +187,14 @@ export function FinanceRecommendations({
               Balance
             </span>
             <span
-              className={`text-center text-3xl font-bold tracking-tight ${
-                isPositive
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-red-600 dark:text-red-400"
-              }`}
+              className={cn("text-center text-3xl font-bold tracking-tight", {
+                "text-(--primary-income)": isPositive,
+                "text-(--primary-expense)": !isPositive,
+              })}
             >
               {isPositive ? "+" : ""}
-              {balance.toLocaleString("es-ES")} €
+              {balance.toLocaleString("es-ES")}
+              {"\u00A0"}€
             </span>
           </div>
         </div>
@@ -207,7 +208,7 @@ export function FinanceRecommendations({
                 key={rec.id}
                 className="flex flex-1 items-start gap-4 px-5 py-5 transition-colors hover:bg-muted/40"
               >
-                <div className={`mt-0.5 shrink-0 ${cfg.iconClass}`}>
+                <div className={cn("mt-0.5 shrink-0", cfg.iconClass)}>
                   {rec.icon}
                 </div>
                 <div className="min-w-0 flex-1">

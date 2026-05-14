@@ -1,7 +1,7 @@
 import { ParcelSwitcher } from "@/components/dashboard-nav/components/parcel-switcher"
 import { navigationData } from "@/lib/navigation/navigation-data"
 import { CropSeasonSwitcher } from "@/components/dashboard-nav/components/crop-season-switcher"
-import { QuickAddButton } from "@/components/dashboard-nav/components/quick-add/quick-add-button"
+import { QuickActionsButton } from "@/components/dashboard-nav/components/quick-actions/quick-actions-button"
 import { NavDockBackButton } from "@/components/dashboard-nav/nav-dock/nav-dock-back-button"
 
 export function NavDockHeader() {
@@ -14,7 +14,7 @@ export function NavDockHeader() {
         <NavDockBackButton />
         <ParcelSwitcher parcels={parcels} variant="dock" />
         <CropSeasonSwitcher />
-        <QuickAddButton />
+        <QuickActionsButton />
       </div>
     </header>
   )

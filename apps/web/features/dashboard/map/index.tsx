@@ -47,7 +47,7 @@ export function DashboardMap() {
 
   return (
     <Card className="relative col-span-1 h-full min-h-[28rem] w-full overflow-hidden p-px lg:min-h-[32rem]">
-      <div className="absolute top-3 right-3 z-10">
+      <div className="absolute top-3 right-3 z-9">
         <Button
           variant="default"
           size="sm"
@@ -92,7 +92,7 @@ export function DashboardMap() {
         )}
       </Map>
 
-      <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-black/20 to-transparent px-4 py-3">
+      <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-9 bg-linear-to-t from-black/20 to-transparent px-4 py-3">
         <span className="text-[11px] text-muted-foreground drop-shadow">
           Haz clic en una parcela para ver detalles
         </span>

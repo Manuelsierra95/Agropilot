@@ -11,7 +11,7 @@ import {
 import { Label, Pie, PieChart, Sector, type SectorProps } from "recharts"
 
 import type { Transaction } from "@/store/mockTransactions"
-import type { KpiItem } from "./price-kpi-card"
+import type { KpiItem } from "./olive-price-card"
 import { Badge } from "@workspace/ui/components/badge"
 import {
   Card,
@@ -45,7 +45,7 @@ interface Recommendation {
   description: string
 }
 
-interface FinanceRecommendationsCompactProps {
+interface FinanceRecommendationsCardProps {
   transactions: TransactionSnapshot[]
   oils: KpiItem[]
   className?: string
@@ -175,11 +175,11 @@ const priorityConfig = {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function FinanceRecommendationsCompact({
+export function FinanceRecommendationsCard({
   transactions,
   oils,
   className,
-}: FinanceRecommendationsCompactProps) {
+}: FinanceRecommendationsCardProps) {
   const id = "finance-donut"
   const { recs, totalIncome, totalExpenses } = buildRecommendations(
     transactions,

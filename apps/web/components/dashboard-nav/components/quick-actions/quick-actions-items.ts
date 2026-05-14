@@ -10,19 +10,19 @@ import {
   type LucideIcon,
 } from "lucide-react"
 
-export type QuickAddItem = {
+export type QuickActionsItem = {
   id: string
   label: string
   description: string
   icon: LucideIcon
 }
 
-export type QuickAddGroup = {
+export type QuickActionsGroup = {
   group: string
-  items: QuickAddItem[]
+  items: QuickActionsItem[]
 }
 
-export const quickAddItems: QuickAddGroup[] = [
+export const quickActionsItems: QuickActionsGroup[] = [
   {
     group: "Eventos de campo",
     items: [

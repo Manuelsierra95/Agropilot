@@ -2,7 +2,7 @@ import { TrendingUp, TrendingDown } from "lucide-react"
 import { Card, CardContent, CardFooter } from "@workspace/ui/components/card"
 import { cn } from "@workspace/ui/lib/utils"
 
-export interface KpiItem {
+export interface Item {
   name: string
   price: number
   priceMin: number
@@ -11,11 +11,11 @@ export interface KpiItem {
   updatedAt: string
 }
 
-interface KpiCardProps {
-  items: KpiItem[]
+interface OlivePriceCardProps {
+  items: Item[]
 }
 
-export function KpiCard({ items }: KpiCardProps) {
+export function OlivePriceCard({ items }: OlivePriceCardProps) {
   return (
     <Card className="h-fit overflow-hidden p-0">
       <div

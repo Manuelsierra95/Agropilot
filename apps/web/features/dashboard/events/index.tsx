@@ -18,7 +18,7 @@ import Link from "next/link"
 export function EventsList() {
   return (
     <Card className="col-span-1 flex h-full w-full flex-col gap-0 pb-0">
-      <CardHeader className="px-4 pb-4">
+      <CardHeader className="border-b border-border/60 px-4">
         <div className="flex items-center gap-2">
           <CardTitle className="text-sm font-medium">
             Próximos Eventos
@@ -31,9 +31,9 @@ export function EventsList() {
           Haz click en un evento para ver más detalles.
         </CardDescription>
       </CardHeader>
-      <CardContent className="m-0 flex-1 overflow-hidden p-0">
-        <ScrollArea className="h-full w-full">
-          <div className="px-4 pb-2">
+      <CardContent className="flex-1 overflow-hidden p-0">
+        <ScrollArea className="h-full max-h-[405px] w-full">
+          <div className="px-4 py-3">
             <FarmEventList events={mockEvents} />
           </div>
           <ScrollBar orientation="vertical" />

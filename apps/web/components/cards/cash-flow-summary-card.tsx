@@ -234,11 +234,11 @@ export function CashFlowSummaryCard({
             </div>
             <ul className="flex gap-2 text-[10px] text-muted-foreground">
               <li className="flex items-center gap-1">
-                <ArrowUp className="h-3 w-3 text-(--primary-income) opacity-80" />
+                <ArrowUp className="h-3 w-3 text-(--primary-income-muted)" />
                 {formatCurrency(last7.income)}
               </li>
               <li className="flex items-center gap-1">
-                <ArrowDown className="h-3 w-3 text-(--primary-expense) opacity-80" />
+                <ArrowDown className="h-3 w-3 text-(--primary-expense-muted)" />
                 {formatCurrency(last7.expenses)}
               </li>
             </ul>
@@ -263,66 +263,15 @@ export function CashFlowSummaryCard({
             </div>
             <ul className="flex gap-2 text-[10px] text-muted-foreground">
               <li className="flex items-center gap-1">
-                <ArrowUp className="h-3 w-3 text-(--primary-income) opacity-80" />
+                <ArrowUp className="h-3 w-3 text-(--primary-income-muted)" />
                 {formatCurrency(last30.income)}
               </li>
               <li className="flex items-center gap-1">
-                <ArrowDown className="h-3 w-3 text-(--primary-expense) opacity-80" />
+                <ArrowDown className="h-3 w-3 text-(--primary-expense-muted)" />
                 {formatCurrency(last30.expenses)}
               </li>
             </ul>
           </div>
-          {/* <div className="rounded-lg border border-border/60 bg-background/60 p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
-                Balance 7 dias
-              </span>
-              <Badge
-                variant="outline"
-                className="h-4 px-2 text-[10px] font-medium uppercase"
-              >
-                7d
-              </Badge>
-            </div>
-            <div
-              className={cn(
-                "mt-2 text-xl font-semibold tracking-tight",
-                toneClass(last7.balance)
-              )}
-            >
-              {formatSignedCurrency(last7.balance)}
-            </div>
-            <p className="mt-1 text-[10px] text-muted-foreground">
-              Ingresos {formatCurrency(last7.income)} · Gastos{" "}
-              {formatCurrency(last7.expenses)}
-            </p>
-          </div>
-
-          <div className="rounded-lg border border-border/60 bg-background/60 p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
-                Balance 30 dias
-              </span>
-              <Badge
-                variant="outline"
-                className="h-4 px-2 text-[10px] font-medium uppercase"
-              >
-                30d
-              </Badge>
-            </div>
-            <div
-              className={cn(
-                "mt-2 text-xl font-semibold tracking-tight",
-                toneClass(last30.balance)
-              )}
-            >
-              {formatSignedCurrency(last30.balance)}
-            </div>
-            <p className="mt-1 text-[10px] text-muted-foreground">
-              Ingresos {formatCurrency(last30.income)} · Gastos{" "}
-              {formatCurrency(last30.expenses)}
-            </p>
-          </div> */}
         </CardContent>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col justify-end">

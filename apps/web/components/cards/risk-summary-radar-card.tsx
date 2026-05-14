@@ -77,6 +77,17 @@ export function DashboardRiskRadar({
         { risk: "Térmico", score: 0 },
       ]
 
+  const riskScore = apiResponse
+    ? Math.round(
+        ((apiResponse.risks.waterStress.score +
+          apiResponse.risks.fungalRisk.score +
+          apiResponse.risks.insectRisk.score +
+          apiResponse.risks.thermalStress.score) /
+          4) *
+          100
+      )
+    : null
+
   return (
     <Card className={cn("flex h-full w-full pb-0", className)}>
       <CardHeader className="items-center">
@@ -110,10 +121,19 @@ export function DashboardRiskRadar({
             />
           </RadarChart>
         </ChartContainer>
-        <div className="flex items-center gap-2 leading-none font-medium">
-          El riesgo ha subido un 5.2% este mes{" "}
-          <TrendingUp className="h-4 w-4 text-(--risk-chart-high)" />
-        </div>
+        <section className="flex flex-col items-center gap-2 leading-none font-medium">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-(--risk-chart-primary) shadow-[0_0_5px_var(--risk-chart-primary)]" />
+            <span>
+              Riesgo actual:{" "}
+              <span className="text-foreground">{riskScore}%</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <span>El riesgo ha subido un 5.2% este mes</span>
+            <TrendingUp className="h-4 w-4 text-(--risk-chart-high)" />
+          </div>
+        </section>
       </CardContent>
       <CardFooter className="flex items-center justify-center border-t border-border/60 px-4 py-2">
         <Link

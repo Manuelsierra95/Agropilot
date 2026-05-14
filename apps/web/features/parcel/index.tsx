@@ -276,7 +276,7 @@ export default function Parcel() {
   const daily = weather?.daily
 
   return (
-    <DashboardPageContainer className="radius-0">
+    <DashboardPageContainer className="">
       <ParcelHero
         isAllSelected={isAllSelected}
         activeParcel={activeParcel}

@@ -6,8 +6,9 @@ import { IncomePieChart } from "./chart/income-pie-chart"
 import { TransactionTable } from "./table"
 
 import { mockTransactions as data } from "@/store/mockTransactions"
-import { ChartAreaInteractive } from "./chart/components/lines-chart"
+import { ComparativeAreaChart } from "@/components/charts/comparative-area-chart"
 import { FinanceRecommendations } from "./top-cards/finance-recommendations"
+import { CropSeasonPredictionsCard } from "@/components/cards/crop-season-predictions-card"
 
 // Aceites
 const oils: KpiItem[] = [
@@ -42,8 +43,11 @@ export default function Finance() {
     <DashboardPageContainer className="flex flex-col gap-4 md:gap-6">
       <div className="relative grid grid-cols-3 gap-4">
         <section className="col-span-2 grid grid-rows-[auto_1fr] gap-4">
-          <FinanceRecommendations transactions={data} oils={oils} />
-          <ChartAreaInteractive />
+          <div className="grid grid-cols-[1fr_auto] gap-4">
+            <FinanceRecommendations transactions={data} oils={oils} />
+            <CropSeasonPredictionsCard />
+          </div>
+          <ComparativeAreaChart screen="expanded" />
         </section>
         <section className="col-start-3 flex flex-col gap-4">
           <IncomePieChart data={data} />

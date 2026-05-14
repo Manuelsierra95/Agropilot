@@ -1,9 +1,8 @@
 "use client"
 
-import * as React from "react"
+import { useState } from "react"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
-import { useIsMobile } from "@workspace/ui/hooks/use-mobile"
 import {
   Card,
   CardAction,
@@ -41,6 +40,8 @@ export type ComparisonMode =
   | "margen_rendimiento"
   | "coste_recoleccion_ingreso"
   | "subvenciones_gastos"
+
+export type ScreenMode = "full" | "expanded" | "none"
 
 // ---------------------------------------------------------------------------
 // Mock data
@@ -218,15 +219,30 @@ function formatYAxis(value: number): string {
 // Component
 // ---------------------------------------------------------------------------
 
-export function ChartAreaInteractive({
+export function ComparativeAreaChart({
   defaultComparison = "ingresos_gastos",
+  screen = "expanded",
 }: {
   defaultComparison?: ComparisonMode
+  screen?: ScreenMode
 }) {
-  const [mode, setMode] = React.useState<ComparisonMode>(defaultComparison)
-  const [isFullscreen, setIsFullscreen] = React.useState(false)
+  const [mode, setMode] = useState<ComparisonMode>(defaultComparison)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [chartKey, setChartKey] = useState(0)
 
-  const toggleFullscreen = () => setIsFullscreen((prev) => !prev)
+  const toggleFullscreen = () => {
+    setIsFullscreen((prev) => !prev)
+    setChartKey((prev) => prev + 1)
+    if (!isFullscreen && screen === "full")
+      document.documentElement.style.overflow = "hidden"
+    else document.documentElement.style.overflow = ""
+  }
+
+  const fullscreenClass = isFullscreen
+    ? screen === "full"
+      ? "fixed inset-0 z-50 rounded-none top-10 overflow-hidden"
+      : "absolute inset-0 z-9 max-h-screen"
+    : ""
 
   const meta = COMPARISONS[mode]
   const data = mockData[mode]
@@ -240,7 +256,7 @@ export function ChartAreaInteractive({
     <Card
       className={cn(
         "@container/card flex h-full flex-col bg-background transition-all duration-300 ease-in-out",
-        isFullscreen ? "absolute inset-0 z-50 max-h-screen" : "relative"
+        fullscreenClass
       )}
     >
       <CardHeader>
@@ -275,21 +291,25 @@ export function ChartAreaInteractive({
             </SelectContent>
           </Select>
 
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleFullscreen}
-            aria-label={
-              isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"
-            }
-            className="h-8 w-8 shrink-0"
-          >
-            {isFullscreen ? (
-              <Minimize2 className="h-4 w-4" />
-            ) : (
-              <Maximize2 className="h-4 w-4" />
-            )}
-          </Button>
+          {screen !== "none" && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleFullscreen}
+              aria-label={
+                isFullscreen
+                  ? "Salir de pantalla completa"
+                  : "Pantalla completa"
+              }
+              className="h-8 w-8 shrink-0"
+            >
+              {isFullscreen ? (
+                <Minimize2 className="h-4 w-4" />
+              ) : (
+                <Maximize2 className="h-4 w-4" />
+              )}
+            </Button>
+          )}
         </CardAction>
       </CardHeader>
 
@@ -300,6 +320,7 @@ export function ChartAreaInteractive({
         )}
       >
         <ChartContainer
+          key={chartKey}
           config={chartConfig}
           className={cn(
             "aspect-auto w-full",

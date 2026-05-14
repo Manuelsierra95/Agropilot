@@ -1,15 +1,14 @@
 import { DashboardMap } from "@/features/dashboard/map"
-import { ChartAreaInteractive } from "./metrics/chart"
+import { ComparativeAreaChart } from "@/components/charts/comparative-area-chart"
 import { FinanceOverview } from "./finance"
 import { EventsList } from "./events"
 import { DashboardPageContainer } from "@/components/dashboard-page-container"
-import { CashFlowSummaryCard } from "./kpis/cash-flow-summary-card"
-import { CropSeasonPredictionsCard } from "./kpis/crop-season-predictions-card"
-import { FinanceRecommendationsCompact } from "./kpis/finance-recommendations-compact"
-import { KpiCard } from "./kpis/price-kpi-card"
-import { dashboardPriceKpis } from "./kpis/price-kpi-mock"
-import { DashboardRiskDonut } from "./kpis/risk-summary-donut"
-import { DashboardRiskRadar } from "./kpis/risk-summary-radar"
+import { CashFlowSummaryCard } from "@/components/cards/cash-flow-summary-card"
+import { CropSeasonPredictionsCard } from "@/components/cards/crop-season-predictions-card"
+import { FinanceRecommendationsCard } from "@/components/cards/finance-recommendations-card"
+import { OlivePriceCard } from "@/components/cards/olive-price-card"
+import { DashboardRiskRadar } from "@/components/cards/risk-summary-radar-card"
+
 import { mockTransactions } from "@/store/mockTransactions"
 import { ParcelApiResponse } from "../parcel/components/parcel-types"
 
@@ -55,12 +54,39 @@ const dashboardRiskSummary = {
   },
 } satisfies Pick<ParcelApiResponse, "risks">
 
+export const dashboardPriceKpis = [
+  {
+    name: "Virgen Extra",
+    price: 5.42,
+    priceMin: 4.8,
+    priceMax: 6.1,
+    unit: "kg",
+    updatedAt: "09/04/2026",
+  },
+  {
+    name: "Virgen",
+    price: 4.85,
+    priceMin: 4.1,
+    priceMax: 5.5,
+    unit: "kg",
+    updatedAt: "09/04/2026",
+  },
+  {
+    name: "Lampante",
+    price: 0.78,
+    priceMin: 0.55,
+    priceMax: 0.95,
+    unit: "kg",
+    updatedAt: "09/04/2026",
+  },
+]
+
 export default function DashboardOverview() {
   return (
     // TODO: Implementar los skeletons con boneyard-js
     <DashboardPageContainer className="grid grid-cols-3 grid-rows-[auto] gap-4">
       <div className="col-span-2 row-span-1 flex flex-col gap-4">
-        <KpiCard items={dashboardPriceKpis} />
+        <OlivePriceCard items={dashboardPriceKpis} />
         <div className="flex gap-4">
           <CropSeasonPredictionsCard />
           <CashFlowSummaryCard transactions={dashboardTransactions} />
@@ -68,7 +94,7 @@ export default function DashboardOverview() {
       </div>
 
       <div className="col-span-1 row-span-1">
-        <FinanceRecommendationsCompact
+        <FinanceRecommendationsCard
           transactions={dashboardTransactions}
           oils={dashboardPriceKpis}
         />
@@ -86,11 +112,11 @@ export default function DashboardOverview() {
         </div>
       </div>
 
-      <div className="col-span-3 flex gap-4">
-        <ChartAreaInteractive />
+      <div className="col-span-2">
+        <ComparativeAreaChart screen="full" />
       </div>
 
-      <div className="col-span-3">
+      <div className="col-span-1">
         <FinanceOverview />
       </div>
     </DashboardPageContainer>

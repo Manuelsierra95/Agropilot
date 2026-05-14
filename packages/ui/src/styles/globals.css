@@ -44,6 +44,7 @@
 
   /* Income colors */
   --primary-income: oklch(76.5% 0.177 163.223);
+  --primary-income-muted: oklch(76.5% 0.177 163.223 / 0.8);
   --pie-income-1: oklch(0.71 0.16 155); /* Cereales — verde */
   --pie-income-2: oklch(0.62 0.21 259); /* Girasol — azul */
   --pie-income-3: oklch(0.63 0.24 28); /* PAC — naranja-rojo */
@@ -55,6 +56,7 @@
 
   /* Expenses colors */
   --primary-expense: oklch(70.4% 0.191 22.216);
+  --primary-expense-muted: oklch(70.4% 0.191 22.216 / 0.8);
   --pie-expense-1: oklch(0.5 0.1 155); /* Semillas — verde oscuro */
   --pie-expense-2: oklch(0.42 0.12 259); /* Fertilizantes — azul oscuro */
   --pie-expense-3: oklch(0.44 0.16 28); /* Fitosanitarios — rojo oscuro */
@@ -112,6 +114,8 @@
 
   /* Income colors */
   --primary-income: oklch(59.6% 0.145 163.225);
+  --primary-income-muted: oklch(76.5% 0.177 163.223 / 0.8);
+  --pie-income-1: oklch(0.72 0.16 155);
   --pie-income-2: oklch(0.72 0.16 259);
   --pie-income-3: oklch(0.72 0.2 28);
   --pie-income-4: oklch(0.8 0.16 52);
@@ -122,6 +126,8 @@
 
   /* Expenses colors */
   --primary-expense: oklch(57.7% 0.245 27.325);
+  --primary-expense-muted: oklch(70.4% 0.191 22.216 / 0.8);
+  --pie-expense-1: oklch(0.48 0.1 155);
   --pie-expense-2: oklch(0.55 0.12 259);
   --pie-expense-3: oklch(0.56 0.16 28);
   --pie-expense-4: oklch(0.63 0.13 52);

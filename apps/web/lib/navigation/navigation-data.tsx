@@ -1,4 +1,4 @@
-import { LucideIcon } from "lucide-react"
+import { LucideIcon, TriangleAlert } from "lucide-react"
 import {
   Cpu,
   BookOpen,
@@ -6,7 +6,6 @@ import {
   Calendar,
   DollarSign,
   TreePine,
-  Circle,
   CheckCircle,
   Clock,
   Zap,
@@ -77,6 +76,11 @@ export const navigationData: NavigationData = {
     { title: "Calendar", url: "/dashboard/calendar", icon: Calendar },
     { title: "Finance", url: "/dashboard/finance", icon: DollarSign },
     { title: "Parcel", url: "/dashboard/parcel", icon: TreePine },
+    {
+      title: "Notifications",
+      url: "/dashboard/notifications",
+      icon: TriangleAlert,
+    },
   ],
   modules: [
     {
