@@ -99,7 +99,7 @@ export function EventList({ events }: { events: FarmEvent[] }) {
   return (
     <MotionConfig transition={springConfig}>
       <motion.div
-        className="flex w-full items-start justify-start overflow-hidden bg-card"
+        className="flex w-full items-start justify-start overflow-hidden"
         animate={{ height: bounds.height > 0 ? bounds.height : "auto" }}
       >
         <div className="w-full" ref={ref}>
