@@ -1,4 +1,4 @@
-import { useCalendarContext } from "../../calendar-context"
+import { useCalendarContext } from "../../components/calendar/calendar-context"
 import {
   startOfMonth,
   endOfMonth,
@@ -12,7 +12,7 @@ import {
   differenceInDays,
 } from "date-fns"
 import { cn } from "@workspace/ui/lib/utils"
-import CalendarEvent from "../../calendar-event"
+import CalendarEvent from "../../components/calendar/calendar-event"
 import { AnimatePresence, motion } from "motion/react"
 import { Cloud, CloudRain, CloudSnow, Sun, CloudSun } from "lucide-react"
 
@@ -24,7 +24,13 @@ const weatherIcons = {
   snowy: CloudSnow,
 }
 
-export default function CalendarBodyMonth() {
+type CalendarBodyMonthProps = {
+  maxVisibleEvents?: number
+}
+
+export default function CalendarBodyMonth({
+  maxVisibleEvents = 5,
+}: CalendarBodyMonthProps) {
   const { date, events, setDate, setMode, forecast } = useCalendarContext()
 
   // Get the first day of the month
@@ -57,11 +63,11 @@ export default function CalendarBodyMonth() {
 
   return (
     <div className="flex flex-grow flex-col overflow-hidden">
-      <div className="hidden grid-cols-7 divide-x divide-border border-border md:grid">
+      <div className="hidden grid-cols-7 divide-x divide-border border-border/30 md:grid">
         {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
           <div
             key={day}
-            className="border-b border-border py-2 text-center text-sm font-medium text-muted-foreground"
+            className="border-b border-border/30 py-2 text-center text-sm font-medium text-muted-foreground"
           >
             {day}
           </div>
@@ -71,7 +77,7 @@ export default function CalendarBodyMonth() {
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={monthStart.toISOString()}
-          className="relative grid flex-grow overflow-y-auto md:grid-cols-7"
+          className="relative grid flex-grow md:grid-cols-7"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -104,14 +110,19 @@ export default function CalendarBodyMonth() {
             if (eventCount > 2) minHeightClass = "min-h-36"
             if (eventCount > 4) minHeightClass = "min-h-44"
 
+            const isLastColumn = calendarDays.indexOf(day) % 7 === 6
+            const totalDays = calendarDays.length
+            const isLastRow = calendarDays.indexOf(day) >= totalDays - 7
+
             return (
               <div
                 key={day.toISOString()}
                 className={cn(
-                  "relative flex cursor-pointer flex-col border-r border-b p-2",
+                  "relative flex cursor-pointer flex-col border-r border-b border-border/30 p-2",
                   minHeightClass,
                   !isCurrentMonth && "hidden bg-muted/50 md:flex",
-                  calendarDays.indexOf(day) % 7 === 6 && "border-r-0"
+                  isLastColumn && "border-r-0",
+                  isLastRow && "border-b-0"
                 )}
                 onClick={(e) => {
                   e.stopPropagation()
@@ -143,7 +154,7 @@ export default function CalendarBodyMonth() {
 
                 <AnimatePresence mode="wait">
                   <div className="mt-1 flex flex-col gap-1">
-                    {dayEvents.slice(0, 5).map((event) => (
+                    {dayEvents.slice(0, maxVisibleEvents).map((event) => (
                       <CalendarEvent
                         key={event.id}
                         event={event}
@@ -151,7 +162,7 @@ export default function CalendarBodyMonth() {
                         month
                       />
                     ))}
-                    {dayEvents.length > 5 && (
+                    {dayEvents.length > maxVisibleEvents && (
                       <motion.button
                         key={`more-${day.toISOString()}`}
                         initial={{ opacity: 0 }}
@@ -167,7 +178,7 @@ export default function CalendarBodyMonth() {
                           setMode("day")
                         }}
                       >
-                        +{dayEvents.length - 5} ver todos
+                        +{dayEvents.length - maxVisibleEvents} ver todos
                       </motion.button>
                     )}
                   </div>

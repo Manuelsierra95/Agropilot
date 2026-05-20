@@ -7,7 +7,7 @@ import CalendarHeaderDateBadge from "./calendar-header-date-badge"
 export default function CalendarHeaderDate() {
   const { date } = useCalendarContext()
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 text-primary">
       <CalendarHeaderDateIcon />
       <div>
         <div className="flex items-center gap-1">

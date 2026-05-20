@@ -1,7 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
+
+import {
+  Area,
+  ComposedChart,
+  Grid,
+  Line,
+  SeriesBar,
+  XAxis,
+  ChartTooltip,
+  curveCatmullRom,
+} from "@workspace/ui/components/charts"
 
 import {
   Card,
@@ -11,12 +21,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@workspace/ui/components/chart"
 import {
   Select,
   SelectContent,
@@ -41,71 +45,165 @@ export type ComparisonMode =
   | "coste_recoleccion_ingreso"
   | "subvenciones_gastos"
 
-export type ScreenMode = "full" | "expanded" | "none"
+type ChartRow = {
+  date: string
+  units: number
+  revenue: number
+  runRate: number
+}
 
 // ---------------------------------------------------------------------------
 // Mock data
+// Keys:
+//   revenue  → línea principal  (series A)
+//   runRate  → área de fondo    (series B)
+//   units    → barras de volumen (escala independiente ~18-95)
 // ---------------------------------------------------------------------------
 
-const mockData: Record<
-  ComparisonMode,
-  { date: string; a: number; b: number }[]
-> = {
-  ingresos_gastos: [
-    { date: "2024-09-01", a: 4200, b: 8100 },
-    { date: "2024-10-01", a: 6800, b: 9400 },
-    { date: "2024-11-01", a: 18500, b: 11200 },
-    { date: "2024-12-01", a: 34000, b: 13800 },
-    { date: "2025-01-01", a: 28000, b: 10500 },
-    { date: "2025-02-01", a: 19500, b: 8200 },
-    { date: "2025-03-01", a: 12000, b: 7600 },
-    { date: "2025-04-01", a: 9500, b: 6900 },
-    { date: "2025-05-01", a: 7800, b: 6400 },
-  ],
-  ingresos_precio_aceite: [
-    { date: "2024-09-01", a: 4200, b: 3800 },
-    { date: "2024-10-01", a: 6800, b: 4100 },
-    { date: "2024-11-01", a: 18500, b: 4900 },
-    { date: "2024-12-01", a: 34000, b: 5200 },
-    { date: "2025-01-01", a: 28000, b: 5100 },
-    { date: "2025-02-01", a: 19500, b: 4800 },
-    { date: "2025-03-01", a: 12000, b: 4600 },
-    { date: "2025-04-01", a: 9500, b: 4400 },
-    { date: "2025-05-01", a: 7800, b: 4200 },
-  ],
-  margen_rendimiento: [
-    { date: "2024-09-01", a: -3900, b: 0 },
-    { date: "2024-10-01", a: -2600, b: 1200 },
-    { date: "2024-11-01", a: 7300, b: 8200 },
-    { date: "2024-12-01", a: 20200, b: 14900 },
-    { date: "2025-01-01", a: 17500, b: 18200 },
-    { date: "2025-02-01", a: 11300, b: 20500 },
-    { date: "2025-03-01", a: 4400, b: 21800 },
-    { date: "2025-04-01", a: 2600, b: 22900 },
-    { date: "2025-05-01", a: 1400, b: 23800 },
-  ],
-  coste_recoleccion_ingreso: [
-    { date: "2024-09-01", a: 0, b: 0 },
-    { date: "2024-10-01", a: 2100, b: 1400 },
-    { date: "2024-11-01", a: 5800, b: 9200 },
-    { date: "2024-12-01", a: 7200, b: 22400 },
-    { date: "2025-01-01", a: 4900, b: 17600 },
-    { date: "2025-02-01", a: 2800, b: 10800 },
-    { date: "2025-03-01", a: 1600, b: 5400 },
-    { date: "2025-04-01", a: 900, b: 3200 },
-    { date: "2025-05-01", a: 600, b: 1800 },
-  ],
-  subvenciones_gastos: [
-    { date: "2024-09-01", a: 1200, b: 3100 },
-    { date: "2024-10-01", a: 1200, b: 3400 },
-    { date: "2024-11-01", a: 4800, b: 5200 },
-    { date: "2024-12-01", a: 4800, b: 6100 },
-    { date: "2025-01-01", a: 4800, b: 4800 },
-    { date: "2025-02-01", a: 4800, b: 4200 },
-    { date: "2025-03-01", a: 4800, b: 3900 },
-    { date: "2025-04-01", a: 4800, b: 3600 },
-    { date: "2025-05-01", a: 4800, b: 3300 },
-  ],
+const DAY_MS = 86_400_000
+const START_MS = Date.UTC(2024, 8, 1, 12, 0, 0) // 1 Sep 2024
+
+function isoDay(i: number) {
+  return new Date(START_MS + i * 30 * DAY_MS).toISOString()
+}
+
+function smoothCycle(i: number, phase: number, n = 9) {
+  return Math.sin((i / (n - 1)) * Math.PI * 2 + phase)
+}
+
+function clamp(v: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, v))
+}
+
+const mockData: Record<ComparisonMode, ChartRow[]> = {
+  // Ingresos suben en campaña de cosecha (nov-dic) y bajan. Gastos más estables.
+  ingresos_gastos: Array.from({ length: 9 }, (_, i) => ({
+    date: isoDay(i),
+    revenue: clamp(
+      Math.round(55 + 38 * smoothCycle(i, -0.4) + 8 * Math.sin(i / 3)),
+      20,
+      110
+    ),
+    runRate: clamp(
+      Math.round(72 + 12 * smoothCycle(i, 0.8) + 5 * Math.cos(i / 4)),
+      55,
+      95
+    ),
+    units: clamp(
+      Math.round(48 + 22 * smoothCycle(i, -0.3) + 6 * Math.sin(i / 2.5)),
+      18,
+      85
+    ),
+  })),
+
+  // Precio aceite sube sostenidamente; ingresos correlacionados.
+  ingresos_precio_aceite: Array.from({ length: 9 }, (_, i) => {
+    const u = i / 8
+    return {
+      date: isoDay(i),
+      revenue: clamp(
+        Math.round(
+          50 + 40 * u + 10 * smoothCycle(i, 0.5) + 4 * Math.sin(i / 3)
+        ),
+        30,
+        110
+      ),
+      runRate: clamp(
+        Math.round(60 + 30 * u + 6 * smoothCycle(i, 1.1) + 3 * Math.cos(i / 4)),
+        45,
+        100
+      ),
+      units: clamp(
+        Math.round(
+          75 - 20 * u + 12 * smoothCycle(i, -0.3) + 5 * Math.sin(i / 2)
+        ),
+        28,
+        88
+      ),
+    }
+  }),
+
+  // Margen negativo al inicio, sube en cosecha, baja. Rendimiento crece progresivamente.
+  margen_rendimiento: Array.from({ length: 9 }, (_, i) => {
+    const u = i / 8
+    return {
+      date: isoDay(i),
+      revenue: clamp(
+        Math.round(-10 + 80 * Math.sin(u * Math.PI) + 8 * smoothCycle(i, 0.6)),
+        -15,
+        95
+      ),
+      runRate: clamp(
+        Math.round(30 + 55 * u + 6 * smoothCycle(i, 1.4) + 4 * Math.cos(i / 4)),
+        22,
+        92
+      ),
+      units: clamp(
+        Math.round(35 + 30 * Math.sin(u * Math.PI) + 8 * smoothCycle(i, -0.2)),
+        14,
+        80
+      ),
+    }
+  }),
+
+  // Coste recolección y ventas con pico en nov-dic.
+  coste_recoleccion_ingreso: Array.from({ length: 9 }, (_, i) => {
+    const peak = Math.sin((i / 8) * Math.PI)
+    return {
+      date: isoDay(i),
+      revenue: clamp(
+        Math.round(
+          25 + 75 * peak + 8 * smoothCycle(i, 0.4) + 4 * Math.sin(i / 3)
+        ),
+        12,
+        108
+      ),
+      runRate: clamp(
+        Math.round(
+          18 + 52 * peak + 6 * smoothCycle(i, 0.7) + 3 * Math.cos(i / 4)
+        ),
+        8,
+        78
+      ),
+      units: clamp(
+        Math.round(
+          12 + 45 * peak + 7 * smoothCycle(i, -0.1) + 4 * Math.sin(i / 2.5)
+        ),
+        5,
+        65
+      ),
+    }
+  }),
+
+  // Subvenciones PAC en tramos escalonados; gastos más variables.
+  subvenciones_gastos: Array.from({ length: 9 }, (_, i) => {
+    const u = i / 8
+    return {
+      date: isoDay(i),
+      runRate: clamp(
+        Math.round(
+          45 +
+            25 * Math.min(u * 3, 1) +
+            5 * smoothCycle(i, 1.8) +
+            3 * Math.sin(i / 5)
+        ),
+        35,
+        82
+      ),
+      revenue: clamp(
+        Math.round(
+          55 + 18 * smoothCycle(i, 0.3) + 7 * Math.sin(i / 3) + u * 10
+        ),
+        38,
+        88
+      ),
+      units: clamp(
+        Math.round(30 + 14 * smoothCycle(i, -0.5) + 5 * Math.cos(i / 4)),
+        14,
+        55
+      ),
+    }
+  }),
 }
 
 // ---------------------------------------------------------------------------
@@ -121,8 +219,6 @@ interface ComparisonMeta {
   seriesB: string
   unitA: string
   unitB: string
-  colorA: string
-  colorB: string
 }
 
 const COMPARISONS: Record<ComparisonMode, ComparisonMeta> = {
@@ -135,8 +231,6 @@ const COMPARISONS: Record<ComparisonMode, ComparisonMeta> = {
     seriesB: "Gastos",
     unitA: "€",
     unitB: "€",
-    colorA: "var(--primary)",
-    colorB: "var(--destructive)",
   },
   ingresos_precio_aceite: {
     label: "Ingresos vs Precio aceite",
@@ -148,8 +242,6 @@ const COMPARISONS: Record<ComparisonMode, ComparisonMeta> = {
     seriesB: "Precio aceite",
     unitA: "€",
     unitB: "€/L",
-    colorA: "var(--primary)",
-    colorB: "var(--chart-4)",
   },
   margen_rendimiento: {
     label: "Margen neto vs Rendimiento",
@@ -160,8 +252,6 @@ const COMPARISONS: Record<ComparisonMode, ComparisonMeta> = {
     seriesB: "Rendimiento",
     unitA: "€",
     unitB: "kg/ha",
-    colorA: "var(--chart-2)",
-    colorB: "var(--chart-3)",
   },
   coste_recoleccion_ingreso: {
     label: "Coste recolección vs Ingreso",
@@ -173,8 +263,6 @@ const COMPARISONS: Record<ComparisonMode, ComparisonMeta> = {
     seriesB: "Ingreso venta",
     unitA: "€",
     unitB: "€",
-    colorA: "var(--chart-5)",
-    colorB: "var(--primary)",
   },
   subvenciones_gastos: {
     label: "Subvenciones PAC vs Gastos fijos",
@@ -186,8 +274,6 @@ const COMPARISONS: Record<ComparisonMode, ComparisonMeta> = {
     seriesB: "Gastos fijos",
     unitA: "€",
     unitB: "€",
-    colorA: "var(--chart-2)",
-    colorB: "var(--destructive)",
   },
 }
 
@@ -201,62 +287,25 @@ const SELECT_GROUPS: { label: string; modes: ComparisonMode[] }[] = [
 ]
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Chart
 // ---------------------------------------------------------------------------
 
-function formatValue(value: number, unit: string): string {
-  if (unit === "€/L") return `${(value / 1000).toFixed(2)} €/L`
-  if (unit === "kg/ha") return `${value.toLocaleString("es-ES")} kg/ha`
-  return `${value.toLocaleString("es-ES")} €`
-}
-
-function formatYAxis(value: number): string {
-  if (Math.abs(value) >= 1000) return `${(value / 1000).toFixed(0)}k`
-  return `${value}`
-}
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
+const smooth = curveCatmullRom.alpha(0.42)
 
 export function ComparativeAreaChart({
   defaultComparison = "ingresos_gastos",
-  screen = "expanded",
 }: {
   defaultComparison?: ComparisonMode
-  screen?: ScreenMode
 }) {
   const [mode, setMode] = useState<ComparisonMode>(defaultComparison)
-  const [isFullscreen, setIsFullscreen] = useState(false)
   const [chartKey, setChartKey] = useState(0)
 
-  const toggleFullscreen = () => {
-    setIsFullscreen((prev) => !prev)
-    setChartKey((prev) => prev + 1)
-    if (!isFullscreen && screen === "full")
-      document.documentElement.style.overflow = "hidden"
-    else document.documentElement.style.overflow = ""
-  }
-
-  const fullscreenClass = isFullscreen
-    ? screen === "full"
-      ? "fixed inset-0 z-50 rounded-none top-10 overflow-hidden"
-      : "absolute inset-0 z-9 max-h-screen"
-    : ""
-
   const meta = COMPARISONS[mode]
-  const data = mockData[mode]
-
-  const chartConfig = {
-    a: { label: meta.seriesA, color: meta.colorA },
-    b: { label: meta.seriesB, color: meta.colorB },
-  } satisfies ChartConfig
 
   return (
     <Card
       className={cn(
-        "@container/card flex h-full flex-col bg-background transition-all duration-300 ease-in-out",
-        fullscreenClass
+        "@container/card flex h-full flex-col bg-background ring-0 transition-all duration-300 ease-in-out"
       )}
     >
       <CardHeader>
@@ -290,134 +339,54 @@ export function ComparativeAreaChart({
               ))}
             </SelectContent>
           </Select>
-
-          {screen !== "none" && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleFullscreen}
-              aria-label={
-                isFullscreen
-                  ? "Salir de pantalla completa"
-                  : "Pantalla completa"
-              }
-              className="h-8 w-8 shrink-0"
-            >
-              {isFullscreen ? (
-                <Minimize2 className="h-4 w-4" />
-              ) : (
-                <Maximize2 className="h-4 w-4" />
-              )}
-            </Button>
-          )}
         </CardAction>
       </CardHeader>
 
-      <CardContent
-        className={cn(
-          "flex min-h-0 flex-1 flex-col justify-end",
-          isFullscreen ? "px-6 pt-4 pb-8" : "px-2 pt-4 pb-4 sm:px-6 sm:pt-6"
-        )}
-      >
-        <ChartContainer
+      <CardContent className={cn("flex min-h-0 flex-1 flex-col justify-end")}>
+        <ComposedChart
           key={chartKey}
-          config={chartConfig}
-          className={cn(
-            "aspect-auto w-full",
-            isFullscreen ? "h-full min-h-0 flex-1" : "h-[250px]"
-          )}
+          data={mockData[mode]}
+          xDataKey="date"
+          aspectRatio="2 / 1"
+          barGap={0}
+          maxBarSize={32}
         >
-          <AreaChart data={data}>
-            <defs>
-              <linearGradient id="fillA" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-a)"
-                  stopOpacity={0.85}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-a)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id="fillB" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-b)"
-                  stopOpacity={0.45}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-b)"
-                  stopOpacity={0.05}
-                />
-              </linearGradient>
-            </defs>
-
-            <CartesianGrid vertical={false} />
-
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={32}
-              tickFormatter={(v) =>
-                new Date(v).toLocaleDateString("es-ES", {
-                  month: "short",
-                  year: "2-digit",
-                })
-              }
-            />
-
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              width={64}
-              tickFormatter={formatYAxis}
-            />
-
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  labelFormatter={(v) =>
-                    new Date(v).toLocaleDateString("es-ES", {
-                      month: "long",
-                      year: "numeric",
-                    })
-                  }
-                  formatter={(value, name) => [
-                    formatValue(
-                      value as number,
-                      name === "a" ? meta.unitA : meta.unitB
-                    ),
-                    name === "a" ? meta.seriesA : meta.seriesB,
-                  ]}
-                  indicator="dot"
-                />
-              }
-            />
-
-            <Area
-              dataKey="b"
-              type="monotone"
-              fill="url(#fillB)"
-              stroke="var(--color-b)"
-              strokeDasharray="5 3"
-              strokeWidth={1.5}
-            />
-            <Area
-              dataKey="a"
-              type="monotone"
-              fill="url(#fillA)"
-              stroke="var(--color-a)"
-              strokeWidth={2}
-            />
-          </AreaChart>
-        </ChartContainer>
+          <Grid horizontal />
+          <Area
+            dataKey="runRate"
+            curve={smooth}
+            fill="var(--chart-4)"
+            fillOpacity={0.32}
+          />
+          <SeriesBar dataKey="units" fill="var(--chart-3)" radius={4} />
+          <Line
+            dataKey="revenue"
+            curve={smooth}
+            stroke="var(--chart-1)"
+            strokeWidth={2.5}
+          />
+          <ChartTooltip
+            showCrosshair={false}
+            rows={(point) => [
+              {
+                color: "var(--chart-4)",
+                label: meta.seriesB,
+                value: `${(point.runRate as number).toLocaleString("es-ES")} ${meta.unitB}`,
+              },
+              {
+                color: "var(--chart-3)",
+                label: "Volumen",
+                value: (point.units as number).toLocaleString("es-ES"),
+              },
+              {
+                color: "var(--chart-1)",
+                label: meta.seriesA,
+                value: `${(point.revenue as number).toLocaleString("es-ES")} ${meta.unitA}`,
+              },
+            ]}
+          />
+          <XAxis numTicks={8} />
+        </ComposedChart>
       </CardContent>
     </Card>
   )

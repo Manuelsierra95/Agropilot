@@ -1,4 +1,5 @@
-import { useCalendarContext } from "../calendar-context"
+import { ScrollArea, ScrollBar } from "@workspace/ui/components/scroll-area"
+import { useCalendarContext } from "../components/calendar/calendar-context"
 import CalendarBodyDay from "./day/calendar-body-day"
 import CalendarBodyWeek from "./week/calendar-body-week"
 import CalendarBodyMonth from "./month/calendar-body-month"
@@ -7,10 +8,23 @@ export default function CalendarBody() {
   const { mode } = useCalendarContext()
 
   return (
-    <div className="border-t border-r border-l">
-      {mode === "day" && <CalendarBodyDay />}
-      {mode === "week" && <CalendarBodyWeek />}
-      {mode === "month" && <CalendarBodyMonth />}
+    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden border-x border-y border-border/30 text-muted-foreground">
+      {mode === "day" ? (
+        <CalendarBodyDay />
+      ) : (
+        <ScrollArea className="min-h-0 w-full flex-1">
+          {mode === "week" && (
+            <div className="hidden md:block">
+              <CalendarBodyWeek />
+            </div>
+          )}
+          {mode === "month" && <CalendarBodyMonth maxVisibleEvents={4} />}
+          <ScrollBar orientation="vertical" />
+          {mode === "week" && (
+            <ScrollBar orientation="horizontal" className="md:hidden" />
+          )}
+        </ScrollArea>
+      )}
     </div>
   )
 }

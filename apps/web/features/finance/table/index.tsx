@@ -137,7 +137,7 @@ export function TransactionTable({
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <Card className="gap-0">
+        <Card className="gap-0 bg-background ring-0">
           {filtersSection ? (
             <CardHeader>
               <TransactionFiltersSection

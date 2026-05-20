@@ -1,4 +1,4 @@
-import type { ForecastDay } from "@/features/calendar/sidecards/time-weather-card"
+import type { ForecastDay } from "@/features/calendar/components/calendar/sidecards/time-weather-card"
 
 export type CalendarProps = {
   events: CalendarEvent[]
@@ -28,4 +28,5 @@ export type CalendarEvent = {
 }
 
 export const calendarModes = ["day", "week", "month"] as const
+export const calendarMobilesModes = ["day", "month"] as const
 export type Mode = (typeof calendarModes)[number]

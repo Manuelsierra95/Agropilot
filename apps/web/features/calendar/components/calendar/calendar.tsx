@@ -1,7 +1,6 @@
 import type { CalendarProps } from "./calendar-types"
-import type { ForecastDay } from "./sidecards/time-weather-card"
 import CalendarHeader from "./header/calendar-header"
-import CalendarBody from "./body/calendar-body"
+import CalendarBody from "../../body/calendar-body"
 import CalendarHeaderActions from "./header/actions/calendar-header-actions"
 import CalendarHeaderDate from "./header/date/calendar-header-date"
 import CalendarHeaderActionsMode from "./header/actions/calendar-header-actions-mode"
@@ -29,14 +28,16 @@ export default function Calendar({
       calendarIconIsToday={calendarIconIsToday}
       forecast={forecast}
     >
-      <CalendarHeader>
-        <CalendarHeaderDate />
-        <CalendarHeaderActions>
-          <CalendarHeaderActionsMode />
-          <CalendarHeaderActionsAdd />
-        </CalendarHeaderActions>
-      </CalendarHeader>
-      <CalendarBody />
+      <div className="flex h-full min-h-0 flex-col border-border/30">
+        <CalendarHeader>
+          <CalendarHeaderDate />
+          <CalendarHeaderActions>
+            <CalendarHeaderActionsMode />
+            <CalendarHeaderActionsAdd />
+          </CalendarHeaderActions>
+        </CalendarHeader>
+        <CalendarBody />
+      </div>
     </CalendarProvider>
   )
 }

@@ -8,10 +8,10 @@ import {
   ShieldCheck,
   TrendingUp,
 } from "lucide-react"
-import { Label, Pie, PieChart, Sector, type SectorProps } from "recharts"
 
 import type { Transaction } from "@/store/mockTransactions"
 import type { KpiItem } from "./olive-price-card"
+import { Gauge } from "@workspace/ui/components/charts"
 import { Badge } from "@workspace/ui/components/badge"
 import {
   Card,
@@ -20,15 +20,15 @@ import {
   CardHeader,
 } from "@workspace/ui/components/card"
 import {
-  ChartContainer,
-  ChartStyle,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@workspace/ui/components/chart"
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 import Link from "next/link"
 import { Separator } from "@workspace/ui/components/separator"
+import { buttonVariants } from "@workspace/ui/components/button"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -48,16 +48,9 @@ interface Recommendation {
 interface FinanceRecommendationsCardProps {
   transactions: TransactionSnapshot[]
   oils: KpiItem[]
+  redirectButton?: boolean
   className?: string
 }
-
-// ─── Chart config ─────────────────────────────────────────────────────────────
-
-const chartConfig = {
-  amount: { label: "Importe" },
-  ingresos: { label: "Ingresos", color: "var(--chart-2)" },
-  gastos: { label: "Gastos", color: "var(--chart-5)" },
-} satisfies ChartConfig
 
 // ─── Business logic ───────────────────────────────────────────────────────────
 
@@ -178,9 +171,9 @@ const priorityConfig = {
 export function FinanceRecommendationsCard({
   transactions,
   oils,
+  redirectButton = true,
   className,
 }: FinanceRecommendationsCardProps) {
-  const id = "finance-donut"
   const { recs, totalIncome, totalExpenses } = buildRecommendations(
     transactions,
     oils
@@ -189,108 +182,51 @@ export function FinanceRecommendationsCard({
   const balance = totalIncome - totalExpenses
   const isPositive = balance >= 0
 
-  const chartData = [
-    { slice: "ingresos", amount: totalIncome, fill: "var(--primary-income)" },
-    { slice: "gastos", amount: totalExpenses, fill: "var(--primary-expense)" },
-  ]
+  // Gauge fill = income share of total cashflow (0–100).
+  // 50 → break-even, >50 → profitable, <50 → spending more than earning.
+  const total = totalIncome + totalExpenses
+  const gaugeValue = total > 0 ? Math.round((totalIncome / total) * 100) : 50
 
-  const balanceLabel = `${isPositive ? "+" : ""}${balance.toLocaleString("es-ES")} €`
+  // Gradient swaps to red tones when balance is negative
+  const activeGradient: [string, string] = isPositive
+    ? ["#22c55e", "#16a34a"] // green range
+    : ["#ef4444", "#dc2626"] // red range
 
-  const largestIndex = totalIncome >= totalExpenses ? 0 : 1 // 0 = income, 1 = expenses
-
-  const renderActiveShape = React.useCallback(
-    ({ outerRadius = 0, ...props }: SectorProps) => (
-      <g>
-        <Sector {...props} outerRadius={outerRadius + 5} />
-      </g>
-    ),
-    []
-  )
+  const inactiveGradient: [string, string] = isPositive
+    ? ["#166534", "#14532d"] // dark green track
+    : ["#7f1d1d", "#450a0a"] // dark red track
 
   return (
     <Card
-      data-chart={id}
-      className={cn("flex h-full flex-col gap-0 overflow-hidden", className)}
+      className={cn(
+        "flex h-full flex-col gap-0 overflow-hidden bg-background pt-0 ring-0",
+        className
+      )}
     >
-      <CardHeader className="flex flex-col items-center gap-3 pb-4">
-        <ChartStyle id={id} config={chartConfig} />
+      <CardHeader className="flex flex-col items-center gap-0 pb-4">
+        {/* ── Gauge ── */}
+        <div className="mx-auto flex h-full max-w-[220px] justify-center">
+          <Gauge
+            value={gaugeValue}
+            centerValue={balance}
+            useGradient
+            activeGradient={activeGradient}
+            inactiveGradient={inactiveGradient}
+            spacing={0}
+            notchCornerRadius={7}
+            startAngle={140}
+            endAngle={400}
+            inactiveFillOpacity={0.4}
+            defaultLabel="Balance"
+            formatOptions={{
+              style: "currency",
+              currency: "EUR",
+              maximumFractionDigits: 0,
+            }}
+          />
+        </div>
 
-        {/* ── Donut + leyenda ── */}
-        <ChartContainer
-          id={id}
-          config={chartConfig}
-          className="aspect-square w-full max-w-[200px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  hideLabel
-                  formatter={(value, name) => (
-                    <>
-                      <span className="text-muted-foreground">
-                        {chartConfig[name as keyof typeof chartConfig]?.label ??
-                          name}
-                      </span>
-                      <span className="font-mono font-semibold tabular-nums">
-                        {Number(value).toLocaleString("es-ES")}
-                        {"\u00A0"}€
-                      </span>
-                    </>
-                  )}
-                />
-              }
-            />
-            <Pie
-              data={chartData}
-              dataKey="amount"
-              nameKey="slice"
-              innerRadius={64}
-              outerRadius={94}
-              strokeWidth={3}
-              activeIndex={largestIndex}
-              activeShape={renderActiveShape}
-            >
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) - 10}
-                          className="fill-muted-foreground text-sm"
-                        >
-                          Balance
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 10}
-                          style={{
-                            fill: isPositive
-                              ? "var(--primary-income)"
-                              : "var(--primary-expense)",
-                            fontSize: "1.2rem",
-                            fontWeight: 700,
-                          }}
-                        >
-                          {balanceLabel}
-                        </tspan>
-                      </text>
-                    )
-                  }
-                }}
-              />
-            </Pie>
-          </PieChart>
-        </ChartContainer>
-        {/* Leyenda */}
+        {/* ── Leyenda ── */}
         <div className="flex items-center justify-center gap-5">
           <div className="flex items-center gap-2">
             <span className="h-3 w-3 shrink-0 rounded-sm bg-(--primary-income)" />
@@ -325,7 +261,7 @@ export function FinanceRecommendationsCard({
               </div>
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex flex-wrap items-center gap-2">
-                  <span className="text-xs leading-snug font-semibold text-foreground">
+                  <span className="truncate text-xs leading-snug font-semibold text-foreground">
                     {rec.title}
                   </span>
                   <Badge
@@ -335,24 +271,61 @@ export function FinanceRecommendationsCard({
                     {cfg.label}
                   </Badge>
                 </div>
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  {rec.description}
-                </p>
+
+                <ClampedTooltip text={rec.description} />
               </div>
             </div>
           )
         })}
       </CardContent>
 
-      <CardFooter className="flex items-center justify-center border-t border-border/60 px-4 py-2">
-        <Link
-          href="/dashboard/finance"
-          className="flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <span>Ver recomendaciones detalladas</span>
-          <ArrowRight className="size-3.5" />
-        </Link>
-      </CardFooter>
+      {redirectButton && (
+        <CardFooter className="flex items-center justify-center border-0 bg-background px-4 py-2">
+          <Link
+            href="/dashboard/finance"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "w-full gap-2 border-0 bg-muted-foreground/5 text-xs"
+            )}
+          >
+            <span>Ver recomendaciones detalladas</span>
+            <ArrowRight className="size-3.5" />
+          </Link>
+        </CardFooter>
+      )}
     </Card>
+  )
+}
+
+function ClampedTooltip({ text }: { text: string }) {
+  const ref = React.useRef<HTMLParagraphElement>(null)
+  const [isClamped, setIsClamped] = React.useState(false)
+
+  React.useLayoutEffect(() => {
+    const el = ref.current
+    if (el) setIsClamped(el.scrollHeight > el.clientHeight)
+  }, [text])
+
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <p
+            ref={ref}
+            className="line-clamp-1 cursor-default text-xs leading-relaxed text-muted-foreground"
+          >
+            {text}
+          </p>
+        </TooltipTrigger>
+        {isClamped && (
+          <TooltipContent
+            side="bottom"
+            className="max-w-[260px] bg-muted-foreground text-xs leading-relaxed text-background"
+          >
+            {text}
+          </TooltipContent>
+        )}
+      </Tooltip>
+    </TooltipProvider>
   )
 }

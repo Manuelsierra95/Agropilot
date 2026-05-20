@@ -1,4 +1,5 @@
 import { DashboardMap } from "@/features/dashboard/map"
+import { GradientSeparator } from "@/components/gradient-separator"
 import { ComparativeAreaChart } from "@/components/charts/comparative-area-chart"
 import { FinanceOverview } from "./finance"
 import { EventsList } from "./events"
@@ -12,7 +13,7 @@ import { DashboardRiskRadar } from "@/components/cards/risk-summary-radar-card"
 import { mockTransactions } from "@/store/mockTransactions"
 import { ParcelApiResponse } from "../parcel/components/parcel-types"
 
-const dashboardTransactions = mockTransactions.map(
+export const dashboardTransactions = mockTransactions.map(
   ({ type, category, amount, paymentMethod, invoiceNumber, date }) => ({
     type,
     category,
@@ -23,7 +24,7 @@ const dashboardTransactions = mockTransactions.map(
   })
 )
 
-const dashboardRiskSummary = {
+export const dashboardRiskSummary = {
   risks: {
     waterStress: {
       level: "medium",
@@ -60,7 +61,7 @@ export const dashboardPriceKpis = [
     price: 5.42,
     priceMin: 4.8,
     priceMax: 6.1,
-    unit: "kg",
+    unit: "€/kg",
     updatedAt: "09/04/2026",
   },
   {
@@ -68,7 +69,7 @@ export const dashboardPriceKpis = [
     price: 4.85,
     priceMin: 4.1,
     priceMax: 5.5,
-    unit: "kg",
+    unit: "€/kg",
     updatedAt: "09/04/2026",
   },
   {
@@ -76,7 +77,7 @@ export const dashboardPriceKpis = [
     price: 0.78,
     priceMin: 0.55,
     priceMax: 0.95,
-    unit: "kg",
+    unit: "€/kg",
     updatedAt: "09/04/2026",
   },
 ]
@@ -84,39 +85,87 @@ export const dashboardPriceKpis = [
 export default function DashboardOverview() {
   return (
     // TODO: Implementar los skeletons con boneyard-js
-    <DashboardPageContainer className="grid grid-cols-3 grid-rows-[auto] gap-4">
-      <div className="col-span-2 row-span-1 flex flex-col gap-4">
+    <DashboardPageContainer className="grid grid-cols-[1fr_auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto_500px_auto_600px] gap-4">
+      <GradientSeparator
+        orientation="vertical"
+        className="col-start-4 row-span-7 row-start-1"
+      />
+
+      {/* Row 1 */}
+      <div className="col-span-3 col-start-1 row-start-1">
         <OlivePriceCard items={dashboardPriceKpis} />
-        <div className="flex gap-4">
-          <CropSeasonPredictionsCard />
-          <CashFlowSummaryCard transactions={dashboardTransactions} />
-        </div>
       </div>
 
-      <div className="col-span-1 row-span-1">
+      <GradientSeparator
+        orientation="horizontal"
+        className="col-span-3 col-start-1 row-start-2"
+      />
+
+      <div className="col-start-5 row-span-3 row-start-1">
         <FinanceRecommendationsCard
           transactions={dashboardTransactions}
           oils={dashboardPriceKpis}
         />
       </div>
 
-      <div className="col-span-3 row-span-3 flex gap-4">
-        <div className="min-w-0 flex-1">
+      {/* Row 2 */}
+      <div className="col-start-1 row-start-3">
+        <CropSeasonPredictionsCard />
+      </div>
+
+      <GradientSeparator
+        orientation="vertical"
+        className="col-start-2 row-start-3"
+      />
+
+      <div className="col-start-3 row-start-3">
+        <CashFlowSummaryCard transactions={dashboardTransactions} />
+      </div>
+
+      {/* Separador horizontal */}
+      <GradientSeparator
+        orientation="horizontal"
+        className="col-span-3 col-start-1 row-start-4"
+      />
+
+      {/* Row 3 - EventsList | DashboardMap | DashboardRiskRadar */}
+      <div className="col-span-3 col-start-1 row-start-5 flex gap-4">
+        <div className="flex-1">
           <EventsList />
         </div>
-        <div className="min-w-0 flex-[2.5]">
+        <GradientSeparator
+          orientation="vertical"
+          className="col-start-2 row-start-4"
+        />
+        <div className="flex-[2.5]">
           <DashboardMap />
         </div>
-        <div className="min-w-0 flex-[1.5]">
-          <DashboardRiskRadar apiResponse={dashboardRiskSummary} />
-        </div>
       </div>
 
-      <div className="col-span-2">
-        <ComparativeAreaChart screen="full" />
+      <GradientSeparator
+        orientation="horizontal"
+        className="col-start-5 row-start-4"
+      />
+
+      <div className="col-start-5 row-start-5">
+        <DashboardRiskRadar apiResponse={dashboardRiskSummary} />
       </div>
 
-      <div className="col-span-1">
+      <GradientSeparator
+        orientation="horizontal"
+        className="col-span-3 col-start-1 row-start-6"
+      />
+
+      <div className="col-span-3 col-start-1 row-start-7">
+        <ComparativeAreaChart />
+      </div>
+
+      <GradientSeparator
+        orientation="horizontal"
+        className="col-span-2 col-start-5 row-start-6"
+      />
+
+      <div className="col-start-5 row-start-7">
         <FinanceOverview />
       </div>
     </DashboardPageContainer>

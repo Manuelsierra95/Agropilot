@@ -1,7 +1,7 @@
 "use client"
 
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
-import { Badge } from "@workspace/ui/components/badge"
+
 import {
   Card,
   CardContent,
@@ -19,8 +19,8 @@ import {
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { Transaction } from "@/store/mockTransactions"
-import { Separator } from "@workspace/ui/components/separator"
 import { ArrowDown, ArrowUp } from "lucide-react"
+import { GradientSeparator } from "@/components/gradient-separator"
 
 type CashFlowTransaction = Pick<Transaction, "type" | "amount" | "date">
 
@@ -209,7 +209,7 @@ export function CashFlowSummaryCard({
   return (
     <Card
       className={cn(
-        "h-full w-full overflow-hidden border-border/70",
+        "flex h-full w-full flex-col bg-background ring-0",
         className
       )}
     >
@@ -218,8 +218,9 @@ export function CashFlowSummaryCard({
         <CardDescription className="text-xs text-muted-foreground">
           Resumen de ingresos y gastos recientes, con proyección a futuro.
         </CardDescription>
-
-        <CardContent className="flex justify-center gap-20 pt-4">
+      </CardHeader>
+      <CardContent className="flex flex-1 flex-col gap-2">
+        <div className="flex justify-center gap-20">
           <div className="flex flex-col items-center gap-1">
             <span className="text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
               Últimos 7 días
@@ -244,10 +245,7 @@ export function CashFlowSummaryCard({
             </ul>
           </div>
 
-          <Separator
-            orientation="vertical"
-            className="my-auto flex h-14 bg-border/70"
-          />
+          <GradientSeparator />
 
           <div className="flex flex-col items-center gap-1">
             <span className="text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
@@ -272,16 +270,15 @@ export function CashFlowSummaryCard({
               </li>
             </ul>
           </div>
-        </CardContent>
-      </CardHeader>
-      <CardContent className="flex flex-1 flex-col justify-end">
-        <ChartContainer config={chartConfig} className="h-[140px] w-full">
+        </div>
+        <ChartContainer config={chartConfig} className="h-[160px]">
           <LineChart
             accessibilityLayer
             data={chartData}
             margin={{
-              left: 12,
-              right: 12,
+              top: 8,
+              left: 8,
+              right: 8,
             }}
           >
             <CartesianGrid vertical={false} />
@@ -329,15 +326,10 @@ export function CashFlowSummaryCard({
             />
           </LineChart>
         </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex items-center justify-between border-t border-border/60 px-4 py-2">
-        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+        <span className="text-xs text-muted-foreground underline decoration-dashed underline-offset-2">
           Proyección basada en tendencia reciente
-        </div>
-        <span className="font-mono text-[10px] tracking-wide text-muted-foreground uppercase">
-          Act. {new Date().toLocaleDateString("es-ES")}
         </span>
-      </CardFooter>
+      </CardContent>
     </Card>
   )
 }

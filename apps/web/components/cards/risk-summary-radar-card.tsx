@@ -25,9 +25,11 @@ import type { ParcelApiResponse } from "@/features/parcel/components/parcel-type
 import { cn } from "@workspace/ui/lib/utils"
 import { ArrowRight, TrendingUp } from "lucide-react"
 import Link from "next/link"
+import { buttonVariants } from "@workspace/ui/components/button"
 
 type DashboardRiskRadarProps = {
   apiResponse?: Pick<ParcelApiResponse, "risks">
+  redirectButton?: boolean
   className?: string
 }
 
@@ -40,6 +42,7 @@ const chartConfig = {
 
 export function DashboardRiskRadar({
   apiResponse,
+  redirectButton = true,
   className,
 }: DashboardRiskRadarProps) {
   const chartData = apiResponse
@@ -89,7 +92,9 @@ export function DashboardRiskRadar({
     : null
 
   return (
-    <Card className={cn("flex h-full w-full pb-0", className)}>
+    <Card
+      className={cn("flex h-full w-full bg-background pb-0 ring-0", className)}
+    >
       <CardHeader className="items-center">
         <CardTitle>Mapa de Riesgos</CardTitle>
         <CardDescription>
@@ -135,15 +140,20 @@ export function DashboardRiskRadar({
           </div>
         </section>
       </CardContent>
-      <CardFooter className="flex items-center justify-center border-t border-border/60 px-4 py-2">
-        <Link
-          href="/dashboard/finance"
-          className="flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <span>Ver análisis completo</span>
-          <ArrowRight className="size-3.5" />
-        </Link>
-      </CardFooter>
+      {redirectButton && (
+        <CardFooter className="flex items-center justify-center border-0 bg-background px-4 py-0">
+          <Link
+            href="/dashboard/parcel"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "w-full gap-2 border-0 bg-muted-foreground/5 text-xs"
+            )}
+          >
+            <span>Ver análisis completo</span>
+            <ArrowRight className="size-3.5" />
+          </Link>
+        </CardFooter>
+      )}
     </Card>
   )
 }

@@ -1,6 +1,6 @@
 import { format, isSameDay, differenceInDays } from "date-fns"
 import { cn } from "@workspace/ui/lib/utils"
-import { useCalendarContext } from "../calendar-context"
+import { useCalendarContext } from "../components/calendar/calendar-context"
 import { Cloud, CloudRain, CloudSnow, Sun, CloudSun } from "lucide-react"
 
 const weatherIcons = {
@@ -33,7 +33,7 @@ export default function CalendarBodyHeader({
     : null
 
   return (
-    <div className="sticky top-0 z-10 flex w-full items-center justify-center gap-2 border-b bg-background py-2">
+    <div className="sticky top-0 z-10 flex w-full items-center justify-center gap-2 border-b border-border/30 bg-background py-2">
       <span
         className={cn(
           "text-xs font-medium",
@@ -46,7 +46,7 @@ export default function CalendarBodyHeader({
         <span
           className={cn(
             "text-xs font-medium",
-            isToday ? "font-bold text-primary" : "text-foreground"
+            isToday ? "font-bold text-primary" : "text-muted-foreground"
           )}
         >
           {format(date, "dd")}

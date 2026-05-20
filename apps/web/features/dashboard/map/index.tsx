@@ -46,7 +46,7 @@ export function DashboardMap() {
   )
 
   return (
-    <Card className="relative col-span-1 h-full min-h-[28rem] w-full overflow-hidden p-px lg:min-h-[32rem]">
+    <Card className="relative col-span-1 h-full w-full overflow-hidden p-px ring-0">
       <div className="absolute top-3 right-3 z-9">
         <Button
           variant="default"

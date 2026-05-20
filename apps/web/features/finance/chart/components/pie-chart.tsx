@@ -214,7 +214,10 @@ export function FinancePieChart({
   }
 
   return (
-    <Card data-chart={id} className="col-span-1 flex h-full flex-col">
+    <Card
+      data-chart={id}
+      className="col-span-1 flex h-full flex-col bg-background ring-0"
+    >
       <ChartStyle id={id} config={chartConfig} />
 
       <CardHeader className="pb-0">

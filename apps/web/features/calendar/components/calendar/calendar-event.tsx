@@ -1,5 +1,5 @@
-import { CalendarEvent as CalendarEventType } from "@/features/calendar/calendar-types"
-import { useCalendarContext } from "@/features/calendar/calendar-context"
+import { CalendarEvent as CalendarEventType } from "@/features/calendar/components/calendar/calendar-types"
+import { useCalendarContext } from "@/features/calendar/components/calendar/calendar-context"
 import { format, isSameDay, isSameMonth } from "date-fns"
 import { cn } from "@workspace/ui/lib/utils"
 import { motion, MotionConfig, AnimatePresence } from "motion/react"

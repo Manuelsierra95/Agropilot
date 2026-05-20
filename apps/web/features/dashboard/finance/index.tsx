@@ -20,6 +20,7 @@ import {
 import { Badge } from "@workspace/ui/components/badge"
 import { cn } from "@workspace/ui/lib/utils"
 import { ScrollArea, ScrollBar } from "@workspace/ui/components/scroll-area"
+import { buttonVariants } from "@workspace/ui/components/button"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -100,7 +101,7 @@ const transactions: Transaction[] = [
     status: "completed",
   },
   {
-    id: "txn_006",
+    id: "txn_007",
     type: "income",
     description: "Dividendos trimestrales",
     category: "Inversiones",
@@ -110,7 +111,7 @@ const transactions: Transaction[] = [
     status: "completed",
   },
   {
-    id: "txn_006",
+    id: "txn_008",
     type: "income",
     description: "Dividendos trimestrales",
     category: "Inversiones",
@@ -120,7 +121,7 @@ const transactions: Transaction[] = [
     status: "completed",
   },
   {
-    id: "txn_006",
+    id: "txn_009",
     type: "income",
     description: "Dividendos trimestrales",
     category: "Inversiones",
@@ -130,7 +131,7 @@ const transactions: Transaction[] = [
     status: "completed",
   },
   {
-    id: "txn_006",
+    id: "txn_010",
     type: "income",
     description: "Dividendos trimestrales",
     category: "Inversiones",
@@ -140,17 +141,7 @@ const transactions: Transaction[] = [
     status: "completed",
   },
   {
-    id: "txn_006",
-    type: "income",
-    description: "Dividendos trimestrales",
-    category: "Inversiones",
-    amount: 812.5,
-    currency: "EUR",
-    date: "Hace 3 días",
-    status: "completed",
-  },
-  {
-    id: "txn_006",
+    id: "txn_011",
     type: "income",
     description: "Dividendos trimestrales",
     category: "Inversiones",
@@ -213,7 +204,7 @@ function formatAmount(amount: number, currency: string) {
 
 export function FinanceOverview() {
   return (
-    <Card className="col-span-1 flex h-full w-full flex-col gap-0 pb-0">
+    <Card className="col-span-1 flex h-full w-full flex-col gap-0 bg-background pb-0 ring-0">
       <CardHeader className="border-b border-border/60 px-4">
         <div className="flex items-center gap-2">
           <CardTitle className="text-sm font-medium">
@@ -226,7 +217,7 @@ export function FinanceOverview() {
       </CardHeader>
 
       <CardContent className="flex-1 overflow-hidden p-0">
-        <ScrollArea className="h-full max-h-96 w-full">
+        <ScrollArea className="h-full">
           <div className="divide-y divide-border/60">
             {transactions.map((txn) => {
               const { icon: Icon, iconBg, iconColor } = typeConfig[txn.type]
@@ -293,11 +284,13 @@ export function FinanceOverview() {
           <ScrollBar orientation="horizontal" className="sm:hidden" />
         </ScrollArea>
       </CardContent>
-
-      <CardFooter className="flex items-center justify-center border-t border-border/60 px-4 py-2">
+      <CardFooter className="flex items-center justify-center border-0 bg-background px-4 py-2">
         <Link
           href="/dashboard/finance"
-          className="flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "w-full gap-2 border-0 bg-muted-foreground/5 text-xs"
+          )}
         >
           <span>Ver todas las transacciones</span>
           <ArrowRight className="size-3.5" />

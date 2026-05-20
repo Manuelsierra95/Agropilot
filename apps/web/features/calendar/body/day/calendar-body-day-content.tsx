@@ -1,8 +1,8 @@
-import { useCalendarContext } from "../../calendar-context"
+import { useCalendarContext } from "../../components/calendar/calendar-context"
 import { isSameDay } from "date-fns"
 import { hours } from "./calendar-body-margin-day-margin"
 import CalendarBodyHeader from "../calendar-body-header"
-import CalendarEvent from "../../calendar-event"
+import CalendarEvent from "../../components/calendar/calendar-event"
 import { cn } from "@workspace/ui/lib/utils"
 
 export default function CalendarBodyDayContent({
@@ -18,13 +18,19 @@ export default function CalendarBodyDayContent({
 
   return (
     <div
-      className={cn("flex flex-grow flex-col", !hideBorderLeft && "border-l")}
+      className={cn(
+        "flex flex-grow flex-col border-border/30",
+        !hideBorderLeft && "border-l"
+      )}
     >
       <CalendarBodyHeader date={date} />
 
       <div className="relative flex-1">
         {[...hours].map((hour) => (
-          <div key={hour} className="group h-32 border-b border-border/50" />
+          <div
+            key={hour}
+            className="group h-32 border-b border-border/30 last:border-0"
+          />
         ))}
 
         {dayEvents.map((event) => (
