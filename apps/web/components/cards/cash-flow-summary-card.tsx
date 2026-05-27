@@ -20,7 +20,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { Transaction } from "@/store/mockTransactions"
 import { ArrowDown, ArrowUp } from "lucide-react"
-import { GradientSeparator } from "@/components/gradient-separator"
+import { GradientSeparator } from "@/components/ui/gradient-separator"
 
 type CashFlowTransaction = Pick<Transaction, "type" | "amount" | "date">
 
@@ -220,7 +220,7 @@ export function CashFlowSummaryCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2">
-        <div className="flex justify-center gap-20">
+        <div className="flex justify-start gap-8">
           <div className="flex flex-col items-center gap-1">
             <span className="text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
               Últimos 7 días

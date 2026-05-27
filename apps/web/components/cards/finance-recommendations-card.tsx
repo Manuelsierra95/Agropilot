@@ -10,7 +10,7 @@ import {
 } from "lucide-react"
 
 import type { Transaction } from "@/store/mockTransactions"
-import type { KpiItem } from "./olive-price-card"
+import type { KpiItem } from "../../features/dashboard/olive-price"
 import { Gauge } from "@workspace/ui/components/charts"
 import { Badge } from "@workspace/ui/components/badge"
 import {
@@ -307,25 +307,23 @@ function ClampedTooltip({ text }: { text: string }) {
   }, [text])
 
   return (
-    <TooltipProvider delayDuration={100}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <p
-            ref={ref}
-            className="line-clamp-1 cursor-default text-xs leading-relaxed text-muted-foreground"
-          >
-            {text}
-          </p>
-        </TooltipTrigger>
-        {isClamped && (
-          <TooltipContent
-            side="bottom"
-            className="max-w-[260px] bg-muted-foreground text-xs leading-relaxed text-background"
-          >
-            {text}
-          </TooltipContent>
-        )}
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <p
+          ref={ref}
+          className="line-clamp-1 cursor-default text-xs leading-relaxed text-muted-foreground"
+        >
+          {text}
+        </p>
+      </TooltipTrigger>
+      {isClamped && (
+        <TooltipContent
+          side="bottom"
+          className="max-w-[260px] text-xs leading-relaxed"
+        >
+          {text}
+        </TooltipContent>
+      )}
+    </Tooltip>
   )
 }

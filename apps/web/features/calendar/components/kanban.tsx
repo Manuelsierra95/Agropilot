@@ -13,7 +13,12 @@ import type {
   CalendarEventType,
 } from "@/lib/calendar-mock"
 import { useState, useMemo } from "react"
-import { Card, CardContent, CardHeader } from "@workspace/ui/components/card"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@workspace/ui/components/card"
 
 type KanbanColumnId = CalendarEventStatus
 type FilterRange = "day" | "week" | "month"
@@ -157,7 +162,7 @@ export function Kanban({ events }: KanbanProps) {
   const totalCount = filteredCards.length
 
   return (
-    <Card className="flex h-full w-full flex-col overflow-hidden bg-background pt-0 ring-0">
+    <Card className="h-full bg-background pt-0 ring-0">
       <CardHeader className="flex items-center justify-between gap-4 px-4 py-2">
         <div className="flex flex-col gap-0.5">
           <span className="text-sm font-semibold text-foreground capitalize">
@@ -263,6 +268,11 @@ export function Kanban({ events }: KanbanProps) {
           }}
         </KanbanProvider>
       </CardContent>
+      <CardFooter className="border-border/30 bg-background p-2">
+        <span className="text-xs text-muted-foreground">
+          Arrastra y suelta las tareas para actualizar su estado.
+        </span>
+      </CardFooter>
     </Card>
   )
 }

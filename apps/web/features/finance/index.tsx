@@ -1,5 +1,5 @@
-import { DashboardPageContainer } from "@/components/dashboard-page-container"
-import { GradientSeparator } from "@/components/gradient-separator"
+import { DashboardPageContainer } from "@/components/ui/dashboard-page-container"
+import { GradientSeparator } from "@/components/ui/gradient-separator"
 
 import { KpiCard, type KpiItem } from "./top-cards/price-kpi-card"
 import { ExpensesPieChart } from "./chart/expenses-pie-chart"
@@ -10,7 +10,7 @@ import { TransactionTable } from "./table"
 import { mockTransactions as data } from "@/store/mockTransactions"
 import { ComparativeAreaChart } from "@/components/charts/comparative-area-chart"
 import { FinanceRecommendations } from "./top-cards/finance-recommendations"
-import { CropSeasonPredictionsCard } from "@/components/cards/crop-season-predictions-card"
+import { CampaignPredictionsCard } from "@/components/cards/campaign-predictions-card"
 import { FinanceRecommendationsCard } from "@/components/cards/finance-recommendations-card"
 import { dashboardPriceKpis, dashboardTransactions } from "../dashboard"
 import { CashFlowSummaryCard } from "@/components/cards/cash-flow-summary-card"
@@ -58,13 +58,12 @@ export default function Finance() {
         className="col-span-1 row-span-5"
       />
 
-      <div className="col-span-1 col-start-3 row-span-3 row-start-1">
-        <FinanceRecommendationsCard
-          transactions={dashboardTransactions}
-          oils={dashboardPriceKpis}
-          redirectButton={false}
-        />
-      </div>
+      <FinanceRecommendationsCard
+        className="col-span-1 col-start-3 row-span-3 row-start-1"
+        transactions={dashboardTransactions}
+        oils={dashboardPriceKpis}
+        redirectButton={false}
+      />
 
       <GradientSeparator
         orientation="horizontal"

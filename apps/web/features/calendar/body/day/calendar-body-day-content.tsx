@@ -29,7 +29,7 @@ export default function CalendarBodyDayContent({
         {[...hours].map((hour) => (
           <div
             key={hour}
-            className="group h-32 border-b border-border/30 last:border-0"
+            className="group h-32 border-b border-border/30 last:border-none"
           />
         ))}
 

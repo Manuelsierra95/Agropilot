@@ -29,7 +29,7 @@ import {
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
-const CROP_SEASON_DAYS = [
+const CAMPAIGN_DAYS = [
   "Lun 1",
   "Mar 2",
   "Mié 3",
@@ -65,7 +65,7 @@ const CROP_SEASON_DAYS = [
 /**
  * @typedef {"pending" | "in_progress" | "completed"} TaskStatus
  *
- * @typedef {Object} CropTask
+ * @typedef {Object} CampaignTask
  * @property {string}     id
  * @property {string}     name
  * @property {string}     [dependsOn]   - id of another task this one depends on
@@ -75,8 +75,8 @@ const CROP_SEASON_DAYS = [
  * @property {string}     [note]
  */
 
-/** @type {CropTask[]} */
-export const MOCK_CROP_TASKS = [
+/** @type {CampaignTask[]} */
+export const MOCK_CAMPAIGN_TASKS = [
   {
     id: "soil-prep",
     name: "Preparación del suelo",
@@ -255,7 +255,7 @@ function LegendDot({
   )
 }
 
-interface CropTask {
+interface CampaignTask {
   id: string
   name: string
   dependsOn?: string
@@ -270,8 +270,8 @@ function EnhancedTooltipContent({
   taskMap,
   days,
 }: {
-  task: CropTask
-  taskMap: Record<string, CropTask>
+  task: CampaignTask
+  taskMap: Record<string, CampaignTask>
   days: string[]
 }) {
   const cfg = STATUS_CONFIG[task.status]
@@ -346,9 +346,9 @@ function TaskBar({
   days,
   columnWidth,
 }: {
-  task: CropTask
+  task: CampaignTask
   totalDays: number
-  taskMap: Record<string, CropTask>
+  taskMap: Record<string, CampaignTask>
   days: string[]
   columnWidth: number
 }) {
@@ -397,9 +397,9 @@ function TaskRow({
   days,
   columnWidth,
 }: {
-  task: CropTask
+  task: CampaignTask
   totalDays: number
-  taskMap: Record<string, CropTask>
+  taskMap: Record<string, CampaignTask>
   days: string[]
   columnWidth: number
 }) {
@@ -428,15 +428,15 @@ function TaskRow({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 /**
- * CropSeasonTimeline
+ * CampaignTimeline
  */
-export function CropSeasonTimeline({
-  tasks = MOCK_CROP_TASKS,
+export function CampaignTimeline({
+  tasks = MOCK_CAMPAIGN_TASKS,
   todayIndex = TODAY_INDEX,
-  days = CROP_SEASON_DAYS,
+  days = CAMPAIGN_DAYS,
   title = "Temporada de Cultivo",
 }: {
-  tasks?: CropTask[]
+  tasks?: CampaignTask[]
   todayIndex?: number
   days?: string[]
   title?: string
@@ -781,4 +781,4 @@ export function CropSeasonTimeline({
   )
 }
 
-export default CropSeasonTimeline
+export default CampaignTimeline

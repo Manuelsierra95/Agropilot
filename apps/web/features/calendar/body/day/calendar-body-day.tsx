@@ -8,7 +8,7 @@ import { ScrollArea } from "@workspace/ui/components/scroll-area"
 export default function CalendarBodyDay() {
   const { date } = useCalendarContext()
   return (
-    <div className="flex h-full max-h-[calc(100vh-160px)] min-h-0 flex-1 flex-col overflow-hidden">
+    <div className="flex h-full flex-1 flex-col overflow-hidden">
       <ScrollArea className="h-full min-h-0 w-full flex-1">
         <div className="relative flex min-h-0 flex-1">
           <CalendarBodyMarginDayMargin />

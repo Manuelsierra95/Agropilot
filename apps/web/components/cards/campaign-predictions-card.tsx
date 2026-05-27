@@ -46,7 +46,7 @@ const totalMarginTone =
     ? "text-emerald-600 dark:text-emerald-400"
     : "text-red-600 dark:text-red-400"
 
-const cropSeasonPredictions = [
+const campaignPredictions = [
   {
     label: "Produccion estimada",
     value: `${totalProductionKg.toLocaleString("es-ES")} kg`,
@@ -73,13 +73,13 @@ const chartData = rawData.map((d) => ({
   marginLine: d.margin,
 }))
 
-interface CropSeasonPredictionsCardProps {
+interface CampaignPredictionsCardProps {
   className?: string
 }
 
-export function CropSeasonPredictionsCard({
+export function CampaignPredictionsCard({
   className,
-}: CropSeasonPredictionsCardProps) {
+}: CampaignPredictionsCardProps) {
   const lastPoint = rawData[rawData.length - 1]
   const prevPoint = rawData[rawData.length - 2]
   const trendDelta =
@@ -107,7 +107,7 @@ export function CropSeasonPredictionsCard({
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2">
         <div className="grid gap-2">
-          {cropSeasonPredictions.map((item) => (
+          {campaignPredictions.map((item) => (
             <div
               key={item.label}
               className="flex items-center justify-between text-xs"

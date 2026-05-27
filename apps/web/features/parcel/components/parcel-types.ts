@@ -50,10 +50,25 @@ export type ParcelApiMetrics = {
   }
 }
 
+export type RiskAction = {
+  type: "irrigation" | "treatment" | "inspection" | "note"
+  label: string
+  payload?: Record<string, unknown>
+}
+
+export type RiskRecommendation = {
+  title: string
+  description: string
+  urgency: "low" | "medium" | "high"
+  window?: string
+  actions: RiskAction[]
+}
+
 export type ParcelApiRiskDetail = {
-  level: WeatherRiskLevel
+  level: "low" | "medium" | "high"
   score: number
   reasons: string[]
+  recommendation?: RiskRecommendation
 }
 
 export type ParcelApiResponse = {

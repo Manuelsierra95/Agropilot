@@ -294,8 +294,10 @@ const smooth = curveCatmullRom.alpha(0.42)
 
 export function ComparativeAreaChart({
   defaultComparison = "ingresos_gastos",
+  className,
 }: {
   defaultComparison?: ComparisonMode
+  className?: string
 }) {
   const [mode, setMode] = useState<ComparisonMode>(defaultComparison)
   const [chartKey, setChartKey] = useState(0)
@@ -305,7 +307,8 @@ export function ComparativeAreaChart({
   return (
     <Card
       className={cn(
-        "@container/card flex h-full flex-col bg-background ring-0 transition-all duration-300 ease-in-out"
+        "@container/card flex h-full flex-col bg-background ring-0 transition-all duration-300 ease-in-out",
+        className
       )}
     >
       <CardHeader>

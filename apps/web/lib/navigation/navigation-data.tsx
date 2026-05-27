@@ -1,10 +1,9 @@
-import { LucideIcon, TriangleAlert } from "lucide-react"
+import { Euro, LucideIcon, TriangleAlert } from "lucide-react"
 import {
   Cpu,
   BookOpen,
   Home,
   Calendar,
-  DollarSign,
   TreePine,
   CheckCircle,
   Clock,
@@ -74,7 +73,7 @@ export const navigationData: NavigationData = {
   navMain: [
     { title: "Dashboard", url: "/dashboard", icon: Home },
     { title: "Calendar", url: "/dashboard/calendar", icon: Calendar },
-    { title: "Finance", url: "/dashboard/finance", icon: DollarSign },
+    { title: "Finance", url: "/dashboard/finance", icon: Euro },
     { title: "Parcel", url: "/dashboard/parcel", icon: TreePine },
     {
       title: "Notifications",

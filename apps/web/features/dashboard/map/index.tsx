@@ -14,6 +14,7 @@ import { SatelliteLayer } from "./components/satellite-layer"
 import type { Parcel, ParcelLngLat } from "./components/types"
 import { toParcelFeature } from "./components/parcel-utils"
 import { Card } from "@workspace/ui/components/card"
+import { cn } from "@workspace/ui/lib/utils"
 
 const mockParcels = parcelsData as Parcel[]
 
@@ -22,7 +23,7 @@ type PopupInfo = {
   lngLat: ParcelLngLat
 } | null
 
-export function DashboardMap() {
+export function DashboardMap({ className }: { className?: string }) {
   const [isSatellite, setIsSatellite] = useState(false)
   const [popupInfo, setPopupInfo] = useState<PopupInfo>(null)
   const mapRef = useRef<MapRef>(null)
@@ -46,7 +47,12 @@ export function DashboardMap() {
   )
 
   return (
-    <Card className="relative col-span-1 h-full w-full overflow-hidden p-px ring-0">
+    <Card
+      className={cn(
+        "relative h-full w-full overflow-hidden p-px ring-0",
+        className
+      )}
+    >
       <div className="absolute top-3 right-3 z-9">
         <Button
           variant="default"

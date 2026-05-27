@@ -38,314 +38,208 @@ export type ParcelWeatherResult = {
   status?: "ok" | "no-data"
 }
 
+const MS_IN_DAY = 24 * 60 * 60 * 1000
+
+function normalizeUtcDate(date: Date) {
+  return new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  )
+}
+
+// Campaign runs Oct -> Sep. Start at Oct 1 of the current campaign.
+function getCampaignStartUtc(today: Date) {
+  const month = today.getUTCMonth()
+  const year = month >= 9 ? today.getUTCFullYear() : today.getUTCFullYear() - 1
+  return new Date(Date.UTC(year, 9, 1))
+}
+
+function toIsoDate(date: Date) {
+  return date.toISOString().slice(0, 10)
+}
+
+function round(value: number, decimals = 1) {
+  const factor = 10 ** decimals
+  return Math.round(value * factor) / factor
+}
+
+function pseudoRandom(seed: number) {
+  const x = Math.sin(seed) * 10000
+  return x - Math.floor(x)
+}
+
+function buildDailySeries(seed: number, today: Date): WeatherDaily[] {
+  const start = getCampaignStartUtc(today)
+  const startUtc = normalizeUtcDate(start)
+  const endUtc = normalizeUtcDate(today)
+  const totalDays =
+    Math.floor((endUtc.getTime() - startUtc.getTime()) / MS_IN_DAY) + 1
+  const daily: WeatherDaily[] = []
+
+  let previousTempAvg = 0
+  let previousPrecip = 0
+
+  for (let dayIndex = 0; dayIndex < totalDays; dayIndex += 1) {
+    const date = new Date(startUtc.getTime() + dayIndex * MS_IN_DAY)
+    const dayOfYear = Math.floor(
+      (date.getTime() - Date.UTC(date.getUTCFullYear(), 0, 1)) / MS_IN_DAY
+    )
+
+    const seasonal = Math.sin((2 * Math.PI * (dayOfYear - 172)) / 365)
+    const rainSeason = Math.max(
+      0,
+      Math.cos((2 * Math.PI * (dayOfYear - 10)) / 365)
+    )
+    const seedOffset = seed * 1000 + dayIndex
+    const noiseA = (pseudoRandom(seedOffset + 1) - 0.5) * 2
+    const noiseB = (pseudoRandom(seedOffset + 2) - 0.5) * 2
+    const noiseC = (pseudoRandom(seedOffset + 3) - 0.5) * 2
+
+    const tempBase = 17 + (seed % 5) - 2 + seasonal * 8 + noiseA * 0.8
+    const tempSpread = 6 + (1 - seasonal) * 2.5 + Math.abs(noiseB) * 2
+    const tempMin = round(tempBase - tempSpread / 2 - noiseC * 0.4, 1)
+    const tempMax = round(tempBase + tempSpread / 2 + noiseC * 0.4, 1)
+
+    const rainChance = 0.1 + 0.35 * rainSeason
+    const rainRoll = pseudoRandom(seedOffset + 4)
+    const rainIntensity =
+      (0.3 + pseudoRandom(seedOffset + 5) * 1.4) * (0.8 + rainSeason * 6)
+    const precipitation = rainRoll < rainChance ? round(rainIntensity, 1) : 0
+
+    const eto = 2 + 2.8 * ((seasonal + 1) / 2)
+    const waterBalance = round(precipitation - eto + noiseB * 0.4, 1)
+
+    const tempAvg = (tempMax + tempMin) / 2
+    const tempChange = dayIndex === 0 ? 0 : round(tempAvg - previousTempAvg, 1)
+    const precipChange =
+      dayIndex === 0 ? 0 : round(precipitation - previousPrecip, 1)
+
+    daily.push({
+      date: toIsoDate(date),
+      tempMax,
+      tempMin,
+      precipitation,
+      waterBalance,
+      dryDay: precipitation === 0,
+      heatStress: tempMax >= 35,
+      coldStress: tempMin <= 4,
+      tempChange,
+      precipChange,
+    })
+
+    previousTempAvg = tempAvg
+    previousPrecip = precipitation
+  }
+
+  return daily
+}
+
+function sum(values: number[]) {
+  return values.reduce((acc, value) => acc + value, 0)
+}
+
+function average(values: number[]) {
+  return values.length > 0 ? sum(values) / values.length : 0
+}
+
+function stdDev(values: number[]) {
+  if (values.length === 0) return 0
+  const mean = average(values)
+  const variance = average(values.map((value) => (value - mean) ** 2))
+  return Math.sqrt(variance)
+}
+
+function buildMetrics(daily: WeatherDaily[]): WeatherMetrics {
+  const last = (days: number) => daily.slice(-days)
+  const previous = (days: number) => daily.slice(-(days * 2), -days)
+  const sumWaterBalance = (entries: WeatherDaily[]) =>
+    sum(entries.map((entry) => entry.waterBalance ?? 0))
+  const sumRain = (entries: WeatherDaily[]) =>
+    sum(entries.map((entry) => entry.precipitation))
+  const avgTemp = (entries: WeatherDaily[]) =>
+    average(entries.map((entry) => (entry.tempMax + entry.tempMin) / 2))
+
+  const last7 = last(7)
+  const last15 = last(15)
+  const last30 = last(30)
+  const prev7 = previous(7)
+
+  const waterDeficit7d = round(Math.max(0, -sumWaterBalance(last7)), 1)
+  const waterDeficit15d = round(Math.max(0, -sumWaterBalance(last15)), 1)
+  const waterDeficit30d = round(Math.max(0, -sumWaterBalance(last30)), 1)
+
+  const rain7d = round(sumRain(last7), 1)
+  const rain30d = round(sumRain(last30), 1)
+  const tempAvg = round(avgTemp(last30), 1)
+  const tempTrend = round(avgTemp(last7) - avgTemp(prev7), 2)
+  const rainTrend = round(sumRain(last7) - sumRain(prev7), 1)
+
+  const heatStressDays = last30.filter((entry) => entry.tempMax >= 35).length
+  const coldStressDays = last30.filter((entry) => entry.tempMin <= 4).length
+
+  let dryDaysConsecutive = 0
+  for (let index = daily.length - 1; index >= 0; index -= 1) {
+    if (daily[index]?.precipitation !== 0) break
+    dryDaysConsecutive += 1
+  }
+
+  const variabilityIndex = round(
+    stdDev(last30.map((entry) => (entry.tempMax + entry.tempMin) / 2)) / 20,
+    2
+  )
+
+  return {
+    waterDeficit7d,
+    waterDeficit15d,
+    waterDeficit30d,
+    dryDaysConsecutive,
+    tempTrend,
+    rainTrend,
+    heatStressDays,
+    coldStressDays,
+    rain7d,
+    rain30d,
+    tempAvg,
+    variabilityIndex,
+  }
+}
+
+function buildRisks(metrics: WeatherMetrics): WeatherRisks {
+  const waterStress =
+    metrics.waterDeficit30d > 60
+      ? "high"
+      : metrics.waterDeficit30d > 30
+        ? "medium"
+        : "low"
+  const pestRisk =
+    metrics.rain30d > 60 ? "high" : metrics.rain30d > 30 ? "medium" : "low"
+
+  return {
+    waterStress,
+    pestRisk,
+  }
+}
+
+function buildParcelWeatherResult(
+  seed: number,
+  today: Date
+): ParcelWeatherResult {
+  const daily = buildDailySeries(seed, today)
+  const metrics = buildMetrics(daily)
+  const risks = buildRisks(metrics)
+
+  return {
+    status: "ok",
+    daily,
+    metrics,
+    risks,
+  }
+}
+
+const today = new Date()
+
 export const parcelWeatherByParcelId: Record<string, ParcelWeatherResult> = {
-  "1": {
-    status: "ok",
-    daily: [
-      {
-        date: "2026-04-03",
-        tempMax: 22,
-        tempMin: 11,
-        precipitation: 3.2,
-        waterBalance: -0.8,
-        dryDay: false,
-        tempChange: 1.3,
-        precipChange: -1.5,
-      },
-      {
-        date: "2026-04-04",
-        tempMax: 24,
-        tempMin: 10,
-        precipitation: 0,
-        waterBalance: -1.6,
-        dryDay: true,
-        heatStress: false,
-        coldStress: false,
-        tempChange: 2,
-        precipChange: -3.2,
-      },
-      {
-        date: "2026-04-05",
-        tempMax: 26,
-        tempMin: 12,
-        precipitation: 0.4,
-        waterBalance: -1.2,
-        dryDay: false,
-        heatStress: true,
-        tempChange: 2,
-        precipChange: 0.4,
-      },
-      {
-        date: "2026-04-06",
-        tempMax: 27,
-        tempMin: 13,
-        precipitation: 0,
-        waterBalance: -2.2,
-        dryDay: true,
-        heatStress: true,
-        tempChange: 1,
-        precipChange: -0.4,
-      },
-      {
-        date: "2026-04-07",
-        tempMax: 25,
-        tempMin: 12,
-        precipitation: 1.1,
-        waterBalance: -0.9,
-        dryDay: false,
-        heatStress: false,
-        tempChange: -2,
-        precipChange: 1.1,
-      },
-    ],
-    metrics: {
-      waterDeficit7d: 8.1,
-      waterDeficit15d: 17.4,
-      waterDeficit30d: 35.2,
-      dryDaysConsecutive: 2,
-      tempTrend: 1.4,
-      rainTrend: -9.6,
-      heatStressDays: 3,
-      coldStressDays: 0,
-      rain7d: 6.7,
-      rain30d: 22.4,
-      tempAvg: 18.3,
-      variabilityIndex: 0.42,
-    },
-    risks: {
-      waterStress: "medium",
-      pestRisk: "low",
-    },
-  },
-  "2": {
-    status: "ok",
-    daily: [
-      {
-        date: "2026-04-03",
-        tempMax: 20,
-        tempMin: 8,
-        precipitation: 0,
-        waterBalance: -2.1,
-        dryDay: true,
-        tempChange: 0.8,
-        precipChange: -0.6,
-      },
-      {
-        date: "2026-04-04",
-        tempMax: 22,
-        tempMin: 7,
-        precipitation: 0,
-        waterBalance: -2.7,
-        dryDay: true,
-        coldStress: true,
-        tempChange: 2,
-        precipChange: 0,
-      },
-      {
-        date: "2026-04-05",
-        tempMax: 24,
-        tempMin: 9,
-        precipitation: 0,
-        waterBalance: -3,
-        dryDay: true,
-        heatStress: false,
-        tempChange: 2,
-        precipChange: 0,
-      },
-      {
-        date: "2026-04-06",
-        tempMax: 25,
-        tempMin: 10,
-        precipitation: 0.2,
-        waterBalance: -2.4,
-        dryDay: false,
-        heatStress: true,
-        tempChange: 1,
-        precipChange: 0.2,
-      },
-      {
-        date: "2026-04-07",
-        tempMax: 26,
-        tempMin: 11,
-        precipitation: 0,
-        waterBalance: -2.9,
-        dryDay: true,
-        heatStress: true,
-        tempChange: 1,
-        precipChange: -0.2,
-      },
-    ],
-    metrics: {
-      waterDeficit7d: 13.5,
-      waterDeficit15d: 27.8,
-      waterDeficit30d: 52.1,
-      dryDaysConsecutive: 4,
-      tempTrend: 2.3,
-      rainTrend: -13.1,
-      heatStressDays: 4,
-      coldStressDays: 1,
-      rain7d: 1.6,
-      rain30d: 10.3,
-      tempAvg: 16.9,
-      variabilityIndex: 0.56,
-    },
-    risks: {
-      waterStress: "high",
-      pestRisk: "medium",
-    },
-  },
-  "3": {
-    status: "ok",
-    daily: [
-      {
-        date: "2026-04-03",
-        tempMax: 23,
-        tempMin: 11,
-        precipitation: 4.1,
-        waterBalance: 0.6,
-        dryDay: false,
-        tempChange: 0.3,
-        precipChange: 1.5,
-      },
-      {
-        date: "2026-04-04",
-        tempMax: 24,
-        tempMin: 12,
-        precipitation: 3.6,
-        waterBalance: 0.4,
-        dryDay: false,
-        heatStress: false,
-        tempChange: 1,
-        precipChange: -0.5,
-      },
-      {
-        date: "2026-04-05",
-        tempMax: 25,
-        tempMin: 12,
-        precipitation: 2.9,
-        waterBalance: 0.2,
-        dryDay: false,
-        heatStress: false,
-        tempChange: 1,
-        precipChange: -0.7,
-      },
-      {
-        date: "2026-04-06",
-        tempMax: 27,
-        tempMin: 13,
-        precipitation: 1.8,
-        waterBalance: -0.4,
-        dryDay: false,
-        heatStress: true,
-        tempChange: 2,
-        precipChange: -1.1,
-      },
-      {
-        date: "2026-04-07",
-        tempMax: 28,
-        tempMin: 14,
-        precipitation: 0,
-        waterBalance: -1.1,
-        dryDay: true,
-        heatStress: true,
-        tempChange: 1,
-        precipChange: -1.8,
-      },
-    ],
-    metrics: {
-      waterDeficit7d: 4.9,
-      waterDeficit15d: 9.2,
-      waterDeficit30d: 18.7,
-      dryDaysConsecutive: 1,
-      tempTrend: 1.1,
-      rainTrend: -4.2,
-      heatStressDays: 2,
-      coldStressDays: 0,
-      rain7d: 12.4,
-      rain30d: 35.8,
-      tempAvg: 19.7,
-      variabilityIndex: 0.31,
-    },
-    risks: {
-      waterStress: "low",
-      pestRisk: "medium",
-    },
-  },
-  "4": {
-    status: "ok",
-    daily: [
-      {
-        date: "2026-04-03",
-        tempMax: 21,
-        tempMin: 9,
-        precipitation: 1.7,
-        waterBalance: -0.6,
-        dryDay: false,
-        tempChange: -0.3,
-        precipChange: 0.3,
-      },
-      {
-        date: "2026-04-04",
-        tempMax: 22,
-        tempMin: 8,
-        precipitation: 0,
-        waterBalance: -1.4,
-        dryDay: true,
-        coldStress: true,
-        tempChange: 1,
-        precipChange: -1.7,
-      },
-      {
-        date: "2026-04-05",
-        tempMax: 24,
-        tempMin: 10,
-        precipitation: 0.5,
-        waterBalance: -1,
-        dryDay: false,
-        heatStress: false,
-        tempChange: 2,
-        precipChange: 0.5,
-      },
-      {
-        date: "2026-04-06",
-        tempMax: 25,
-        tempMin: 11,
-        precipitation: 0,
-        waterBalance: -1.7,
-        dryDay: true,
-        heatStress: true,
-        tempChange: 1,
-        precipChange: -0.5,
-      },
-      {
-        date: "2026-04-07",
-        tempMax: 24,
-        tempMin: 10,
-        precipitation: 2.4,
-        waterBalance: -0.2,
-        dryDay: false,
-        heatStress: false,
-        tempChange: -1,
-        precipChange: 2.4,
-      },
-    ],
-    metrics: {
-      waterDeficit7d: 6.4,
-      waterDeficit15d: 12.8,
-      waterDeficit30d: 24.5,
-      dryDaysConsecutive: 1,
-      tempTrend: 0.5,
-      rainTrend: -2.1,
-      heatStressDays: 1,
-      coldStressDays: 1,
-      rain7d: 8.9,
-      rain30d: 26.1,
-      tempAvg: 17.8,
-      variabilityIndex: 0.37,
-    },
-    risks: {
-      waterStress: "medium",
-      pestRisk: "low",
-    },
-  },
+  "1": buildParcelWeatherResult(11, today),
+  "2": buildParcelWeatherResult(23, today),
+  "3": buildParcelWeatherResult(37, today),
+  "4": buildParcelWeatherResult(49, today),
 }

@@ -1,17 +1,215 @@
-import { Badge } from "@workspace/ui/components/badge"
+import Link from "next/link"
+import {
+  Leaf,
+  Zap,
+  CircleAlert,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Banknote,
+  ClipboardList,
+  CircleCheck,
+  User,
+  Thermometer,
+  Sprout,
+  Sun,
+  Wheat,
+} from "lucide-react"
+import { Card, CardContent } from "@workspace/ui/components/card"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@workspace/ui/components/tooltip"
+import { GradientSeparator } from "@/components/ui/gradient-separator"
 
 import type { ParcelApiResponse } from "./parcel-types"
 import type { WeatherRisks } from "@/store/parcel-weather.mock"
-import { mockParcels } from "@/store/mockParcels"
-
 import type { AllModeSummary, ParcelItem } from "./parcel-types"
-import {
-  formatDateTime,
-  formatLongDate,
-  formatNumber,
-  riskToBadgeClass,
-  riskToLabel,
-} from "./parcel-utils"
+import { formatDateTime } from "./parcel-utils"
+
+// ─────────────────────────────────────────────
+// Agroclimatic metrics types & mock
+// ─────────────────────────────────────────────
+
+type TempTrend = "up" | "down" | "stable"
+
+type AgroclimateMetrics = {
+  currentTemp: number
+  tempTrendPct: number
+  tempTrend: TempTrend
+  kc: number
+  gdd: number
+  phenoStage: string
+}
+
+const MOCK_AGROCLIMATIC: AgroclimateMetrics = {
+  currentTemp: 22.4,
+  tempTrendPct: 3.2,
+  tempTrend: "up",
+  kc: 0.85,
+  gdd: 312,
+  phenoStage: "Brotación",
+}
+
+// ─────────────────────────────────────────────
+// Yield types
+// ─────────────────────────────────────────────
+
+type YieldData = {
+  /** Número total de árboles en la parcela */
+  trees: number
+  /** Producción total estimada o real en kg */
+  totalKg: number
+}
+
+// ─────────────────────────────────────────────
+// Color tokens mapeados a CSS vars
+//
+// Vars existentes reutilizadas:
+//   --primary-expense   → temperatura subiendo, alertas críticas, salud baja
+//   --primary-income    → salud alta, iconos vegetación
+//   --color-projection  → temperatura bajando
+//   --muted-foreground  → temperatura estable, labels
+//   --task-pending-text → salud media, avisos
+//
+// Vars nuevas a añadir en globals.css:
+//   --color-pheno  oklch(0.72 0.17 142)  → icono etapa fenológica (Sprout)
+//   --color-gdd    oklch(0.73 0.16 55)   → icono GDD/Sol (Sun)
+// ─────────────────────────────────────────────
+
+const TREND_COLORS: Record<TempTrend, string> = {
+  up: "var(--primary-expense)", // calor → rojo-naranja
+  down: "var(--color-projection)", // frío  → azul
+  stable: "var(--muted-foreground)", // sin cambio → gris
+}
+
+const TREND_ICON_MAP = {
+  up: TrendingUp,
+  down: TrendingDown,
+  stable: Minus,
+} as const
+
+// ─────────────────────────────────────────────
+// Score helpers
+// ─────────────────────────────────────────────
+
+type RiskLevel = "low" | "medium" | "high" | "critical" | string
+
+function riskLevelToPenalty(level: RiskLevel): number {
+  switch (level) {
+    case "low":
+      return 0
+    case "medium":
+      return 10
+    case "high":
+      return 20
+    case "critical":
+      return 25
+    default:
+      return 5
+  }
+}
+
+function computeParcelScore(
+  risks?: WeatherRisks,
+  apiResponse?: ParcelApiResponse
+): number {
+  const penalties: number[] = []
+  if (apiResponse) {
+    const r = apiResponse.risks
+    penalties.push(
+      riskLevelToPenalty(r.waterStress.level),
+      riskLevelToPenalty(r.fungalRisk.level),
+      riskLevelToPenalty(r.insectRisk.level),
+      riskLevelToPenalty(r.thermalStress.level)
+    )
+  } else if (risks) {
+    penalties.push(
+      riskLevelToPenalty(risks.waterStress),
+      riskLevelToPenalty(risks.pestRisk)
+    )
+  }
+  if (penalties.length === 0) return 75
+  const totalPenalty = penalties.reduce((a, b) => a + b, 0)
+  const maxPenalty = penalties.length * 25
+  return Math.round(((maxPenalty - totalPenalty) / maxPenalty) * 100)
+}
+
+type ScoreTokens = {
+  color: string
+  tooltip: string
+}
+
+function scoreToTokens(score: number): ScoreTokens {
+  if (score >= 75)
+    return {
+      color: "var(--primary-income)", // verde
+      tooltip: "Parcela en buen estado agronómico",
+    }
+  if (score >= 45)
+    return {
+      color: "var(--task-pending-text)", // ámbar
+      tooltip: "Factores de riesgo moderados — revisa los detalles",
+    }
+  return {
+    color: "var(--primary-expense)", // rojo-naranja
+    tooltip: "Riesgo alto detectado — atención inmediata",
+  }
+}
+
+// ─────────────────────────────────────────────
+// MetricCell
+// ─────────────────────────────────────────────
+
+type MetricCellProps = {
+  value: React.ReactNode
+  label: string
+  tooltip?: string
+  href?: string
+}
+
+function MetricCell({ value, label, tooltip, href }: MetricCellProps) {
+  const inner = (
+    <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 px-4 py-4 transition-colors hover:bg-muted/40">
+      <div className="text-xl leading-none font-semibold tabular-nums">
+        {value}
+      </div>
+      <div className="text-[10px] font-medium tracking-[0.1em] text-muted-foreground uppercase">
+        {label}
+      </div>
+    </div>
+  )
+
+  const wrapped = href ? (
+    <Link href={href} className="flex h-full w-full">
+      {inner}
+    </Link>
+  ) : (
+    inner
+  )
+
+  if (!tooltip) return wrapped
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="flex h-full w-full cursor-default">{wrapped}</div>
+      </TooltipTrigger>
+      <TooltipContent
+        side="bottom"
+        className="max-w-[260px] text-xs leading-relaxed"
+      >
+        {tooltip}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
+// ─────────────────────────────────────────────
+// ParcelHero
+// ─────────────────────────────────────────────
 
 type ParcelHeroProps = {
   isAllSelected: boolean
@@ -19,6 +217,14 @@ type ParcelHeroProps = {
   allModeSummary: AllModeSummary
   risks?: WeatherRisks
   apiResponse?: ParcelApiResponse
+  income?: number
+  trend?: TempTrend
+  employeeCount?: number
+  tasksPending?: number
+  tasksInProgress?: number
+  agroclimate?: AgroclimateMetrics
+  /** Datos de rendimiento: árboles y kg totales para calcular kg/árbol */
+  yieldData?: YieldData
 }
 
 export function ParcelHero({
@@ -27,103 +233,259 @@ export function ParcelHero({
   allModeSummary,
   risks,
   apiResponse,
+  income,
+  trend = "stable",
+  employeeCount = 0,
+  tasksPending = 0,
+  tasksInProgress = 0,
+  agroclimate = MOCK_AGROCLIMATIC,
+  yieldData,
 }: ParcelHeroProps) {
-  const riskBadges = apiResponse
-    ? [
-        ["Riesgo hídrico", apiResponse.risks.waterStress],
-        ["Riesgo fúngico", apiResponse.risks.fungalRisk],
-        ["Riesgo insectos", apiResponse.risks.insectRisk],
-        ["Estrés térmico", apiResponse.risks.thermalStress],
-      ]
-    : []
+  const score = isAllSelected ? null : computeParcelScore(risks, apiResponse)
+  const scoreTokens = score !== null ? scoreToTokens(score) : null
+
+  const { currentTemp, tempTrendPct, tempTrend, kc, gdd, phenoStage } =
+    agroclimate
+  const TrendIcon = TREND_ICON_MAP[tempTrend]
+  const trendColor = TREND_COLORS[tempTrend]
+  const trendSign = tempTrend === "up" ? "+" : tempTrend === "down" ? "−" : ""
+
+  const kgPerTree =
+    yieldData && yieldData.trees > 0
+      ? yieldData.totalKg / yieldData.trees
+      : null
+
+  // ── Tasks display ──
+  const tasksValue =
+    tasksPending === 0 && tasksInProgress === 0 ? (
+      <CircleCheck size={18} className="text-muted-foreground" />
+    ) : (
+      <span className="flex items-baseline gap-1">
+        {tasksPending > 0 && (
+          <span style={{ color: "var(--task-pending-text)" }}>
+            {tasksPending}
+          </span>
+        )}
+      </span>
+    )
+
+  const tasksTooltip =
+    tasksPending === 0 && tasksInProgress === 0
+      ? "Todo al día"
+      : [
+          tasksPending > 0
+            ? `${tasksPending} tareas pendiente${tasksPending > 1 ? "s" : ""}`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(" · ")
+
+  // ── Bottom columns ──
+  type Col = {
+    value: React.ReactNode
+    label: string
+    tooltip?: string
+    href?: string
+  }
+
+  const bottomCols: Col[] = [
+    {
+      value: (
+        <span>
+          {gdd}{" "}
+          <span className="text-sm font-normal text-muted-foreground">
+            °C·día
+          </span>
+        </span>
+      ),
+      label: "GDD",
+      tooltip: "Grados-día acumulados desde inicio de campaña",
+    },
+    {
+      value: (
+        <span>
+          Kc <span>{kc.toFixed(2)}</span>
+        </span>
+      ),
+      label: "Coef. cultivo",
+      tooltip: "Coeficiente de cultivo según etapa fenológica actual",
+    },
+    ...(kgPerTree !== null && yieldData
+      ? [
+          {
+            value: (
+              <span>
+                {kgPerTree.toFixed(2)}{" "}
+                <span className="text-sm font-normal text-muted-foreground">
+                  kg/árbol
+                </span>
+              </span>
+            ),
+            label: "Rendimiento",
+            tooltip: `${yieldData.trees.toLocaleString("es-ES")} árboles · ${yieldData.totalKg.toLocaleString("es-ES")} kg totales`,
+          } satisfies Col,
+        ]
+      : []),
+    ...(scoreTokens !== null && score !== null
+      ? [
+          {
+            value: (
+              <span style={{ color: scoreTokens.color }}>
+                <span
+                  className="mr-1.5 mb-0.5 inline-block h-2 w-2 rounded-full"
+                  style={{ background: scoreTokens.color }}
+                />
+                {score}%
+              </span>
+            ),
+            label: "Balance hídrico",
+            tooltip: scoreTokens.tooltip,
+          } satisfies Col,
+        ]
+      : []),
+    ...(income !== undefined
+      ? [
+          {
+            value: (
+              <span style={{ color: "var(--primary-income)" }}>
+                {income >= 0 ? "+" : ""}
+                {income.toLocaleString("es-ES", {
+                  style: "currency",
+                  currency: "EUR",
+                  maximumFractionDigits: 0,
+                })}
+              </span>
+            ),
+            label: "Rentabilidad",
+            tooltip: "Ingresos netos del período actual",
+            href: "/dashboard/finance",
+          } satisfies Col,
+        ]
+      : []),
+    ...(employeeCount > 0
+      ? [
+          {
+            value: (
+              <span className="flex items-center gap-1.5">
+                <User size={16} className="text-muted-foreground" />
+                {employeeCount}
+              </span>
+            ),
+            label: "Empleados",
+            href: "/dashboard/settings/organization",
+          } satisfies Col,
+        ]
+      : []),
+    {
+      value: tasksValue,
+      label: "Tareas",
+      tooltip: tasksTooltip,
+      href: "/dashboard/calendar",
+    },
+  ]
+
+  const parcelName = isAllSelected
+    ? "Todas las parcelas"
+    : (apiResponse?.request.cropName ?? activeParcel.name)
 
   return (
-    <section className="rounded-xl bg-linear-to-br from-card via-card to-muted/30 p-4 md:p-6">
-      <div className="flex flex-col gap-4">
-        <div className="space-y-2">
-          <p className="text-xs tracking-[0.18em] text-muted-foreground uppercase">
+    <Card className="gap-0 overflow-hidden bg-background pt-0 ring-0">
+      {/* ── Fila superior ── */}
+      <div className="flex items-center justify-between gap-8 px-6 py-5">
+        {/* Identidad */}
+        <div className="flex min-w-0 flex-col gap-2">
+          <p className="text-lg font-extralight tracking-wide text-muted-foreground uppercase">
             Inteligencia de Parcela
           </p>
-          <h1 className="text-2xl leading-tight font-semibold md:text-3xl">
-            {isAllSelected
-              ? "Todas las parcelas"
-              : (apiResponse?.request.cropName ?? activeParcel.name)}
+          <h1 className="text-3xl leading-none font-semibold tracking-tight">
+            {parcelName}
           </h1>
-          <p className="max-w-2xl text-sm text-muted-foreground">
-            {isAllSelected
-              ? "Vista comparativa global: identifica diferencias de lluvia, temperatura, déficit hídrico y estrés entre parcelas."
-              : apiResponse
-                ? `${activeParcel.description}. ${apiResponse.request.cropName} · ${apiResponse.request.days} días · ${formatLongDate(apiResponse.dataRange.start)} a ${formatLongDate(apiResponse.dataRange.end)}.`
-                : `${activeParcel.description}. Monitoriza evolución térmica, precipitación, balance hídrico y riesgo agronómico en una vista única.`}
-          </p>
+          {/* Metadatos con divisores */}
+          {!isAllSelected && apiResponse && (
+            <div className="mt-1 flex items-center gap-4">
+              <span className="font-mono text-sm text-muted-foreground">
+                Coords: {apiResponse.request.coords.lat.toFixed(4)},&nbsp;
+                {apiResponse.request.coords.lng.toFixed(4)}
+              </span>
+              <GradientSeparator orientation="vertical" />
+              <span className="text-sm text-muted-foreground">
+                Estación: {apiResponse.summary.stationId}
+              </span>
+              <GradientSeparator orientation="vertical" />
+              <span className="text-sm text-muted-foreground">
+                {activeParcel.type}
+              </span>
+              <GradientSeparator orientation="vertical" />
+              <span className="text-sm text-muted-foreground">
+                {activeParcel.area} ha
+              </span>
+              <GradientSeparator orientation="vertical" />
+              <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_5px_var(--color-emerald-500)]" />
+                {formatDateTime(apiResponse.summary.lastUpdate)}
+              </span>
+            </div>
+          )}
         </div>
-      </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        {isAllSelected ? (
-          <>
-            <Badge variant="outline">Parcelas: {mockParcels.length}</Badge>
-            <Badge variant="outline">
-              Superficie total: {formatNumber(allModeSummary.totalArea)} ha
-            </Badge>
-            <Badge variant="outline">
-              Riesgo hídrico alto: {allModeSummary.highWaterStressCount}
-            </Badge>
-          </>
-        ) : apiResponse ? (
-          <>
-            <Badge variant="outline">
-              Parcela: {apiResponse.request.parcelId}
-            </Badge>
-            <Badge variant="outline">
-              Coordenadas: {apiResponse.request.coords.lat.toFixed(4)},{" "}
-              {apiResponse.request.coords.lng.toFixed(4)}
-            </Badge>
-            <Badge variant="outline">
-              Estación: {apiResponse.summary.stationId}
-            </Badge>
-            <Badge variant="outline">
-              Última actualización:{" "}
-              {formatDateTime(apiResponse.summary.lastUpdate)}
-            </Badge>
-            <Badge variant="outline">Cultivo: {activeParcel.type}</Badge>
-            <Badge variant="outline">Superficie: {activeParcel.area} ha</Badge>
-            {riskBadges.map(([label, risk]) => (
-              <Badge
-                key={label}
-                className={riskToBadgeClass(risk.level)}
-                variant="outline"
-              >
-                {label}: {riskToLabel(risk.level)}
-              </Badge>
-            ))}
-          </>
-        ) : (
-          <>
-            <Badge variant="outline">Cultivo: {activeParcel.type}</Badge>
-            <Badge variant="outline">
-              Riego: {activeParcel.irrigationType}
-            </Badge>
-            <Badge variant="outline">Superficie: {activeParcel.area} ha</Badge>
-            {risks ? (
-              <>
-                <Badge
-                  className={riskToBadgeClass(risks.waterStress)}
-                  variant="outline"
+        {/* Temperatura + etapa fenológica */}
+        {!isAllSelected && (
+          <div className="flex shrink-0 items-center gap-5">
+            <div className="text-right">
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-light tracking-tight text-foreground tabular-nums">
+                  {currentTemp.toFixed(1)}°C
+                </span>
+                <span
+                  className="flex items-center gap-0.5 text-sm font-medium tabular-nums"
+                  style={{ color: trendColor }}
                 >
-                  Riesgo hídrico: {riskToLabel(risks.waterStress)}
-                </Badge>
-                <Badge
-                  className={riskToBadgeClass(risks.pestRisk)}
-                  variant="outline"
-                >
-                  Riesgo plagas: {riskToLabel(risks.pestRisk)}
-                </Badge>
-              </>
-            ) : null}
-          </>
+                  <TrendIcon size={13} aria-hidden />
+                  {trendSign}
+                  {Math.abs(tempTrendPct).toFixed(1)}%
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">Temperatura</p>
+            </div>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm font-medium text-foreground">
+                    <Sprout
+                      size={14}
+                      style={{ color: "var(--color-pheno)" }}
+                      aria-hidden
+                    />
+                    {phenoStage}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-xs">
+                  {phenoStage} — inicio del crecimiento vegetativo
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         )}
       </div>
-    </section>
+
+      <GradientSeparator orientation="horizontal" className="mx-6" />
+
+      <CardContent className="flex items-stretch">
+        {/* ── Fila inferior: cuadrícula de métricas ── */}
+        {bottomCols.map((col, i) => [
+          <div key={`metric-${col.label}-${i}`} className="flex-1">
+            <MetricCell {...col} />
+          </div>,
+          i < bottomCols.length - 1 ? (
+            <GradientSeparator
+              key={`metric-sep-${col.label}-${i}`}
+              orientation="vertical"
+            />
+          ) : null,
+        ])}
+      </CardContent>
+      <GradientSeparator orientation="horizontal" />
+    </Card>
   )
 }

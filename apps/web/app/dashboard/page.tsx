@@ -1,5 +1,11 @@
+import { Suspense } from "react"
 import DashboardOverview from "@/features/dashboard"
+import { DashboardSkeleton } from "@/features/dashboard/dashboard-skeleton"
 
 export default function DashboardOverviewPage() {
-  return <DashboardOverview />
+  return (
+    <Suspense fallback={<DashboardSkeleton />}>
+      <DashboardOverview />
+    </Suspense>
+  )
 }

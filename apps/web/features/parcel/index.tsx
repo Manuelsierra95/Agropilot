@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { DashboardPageContainer } from "@/components/dashboard-page-container"
+import { DashboardPageContainer } from "@/components/ui/dashboard-page-container"
 import { mockParcels } from "@/store/mockParcels"
 import {
   parcelWeatherByParcelId,
@@ -19,6 +19,31 @@ import type {
   ParcelComparisonItem,
   ParcelItem,
 } from "./components/parcel-types"
+import { ParcelIntelligenceWidget } from "./components/parcel-intelligence-widget"
+
+/**
+ * TODO: Implementar endpoint real de riesgos
+ *
+ * GET /api/parcels/:id/risks
+ *
+ * El backend debe calcular y devolver un objeto con esta estructura
+ * (ver ParcelApiRiskDetail en parcel-types.ts):
+ *
+ * Reglas de negocio:
+ *   - recommendation === null/undefined  →  level === "low"
+ *   - recommendation presente            →  level === "medium" | "high"
+ *   - urgency puede diferir de level:
+ *       ej. level=medium + urgency=high si la ventana de actuación es corta
+ *   - window solo si hay un plazo concreto (omitir si es "vigilar indefinidamente")
+ *   - actions[] mínimo 1 elemento cuando hay recommendation
+ *   - payload en cada action → prefill del formulario en el cliente
+ *       ej. { suggestedAmountMm: 18, reason: "déficit acumulado 7d" }
+ *
+ * Cuando esté listo:
+ *   1. Eliminar buildParcelApiResponse() de page.tsx
+ *   2. Sustituir por fetch(`/api/parcels/${parcelId}/risks`)
+ *   3. El tipo ParcelApiResponse ya encaja — no hay cambios en el frontend
+ */
 
 function buildParcelApiResponse(
   activeParcel: ParcelItem,
@@ -100,27 +125,50 @@ function buildParcelApiResponse(
           "Deficit hidrico ponderado 7d: -3.20 mm/dia",
           "Kc fenologico aplicado: 0.55",
         ],
+        recommendation: {
+          title: "Riego de apoyo recomendado",
+          description:
+            "El déficit acumulado supera el umbral tolerable para la fase de brotación. Sin intervención puede comprometer el cuajado.",
+          urgency: "medium",
+          window: "48-72h",
+          actions: [
+            {
+              type: "irrigation",
+              label: "Programar riego",
+              payload: {
+                suggestedAmountMm: 18,
+                reason: "déficit acumulado 7d",
+              },
+            },
+          ],
+        },
       },
       fungalRisk: {
         level: "low",
-        score: 0.9,
+        score: 0.18,
         reasons: [
           "Temperatura favorable para hongos (16.8 C)",
           "HR media < 55%: techo de riesgo LOW activado",
+          "Precipitacion acumulada 30d: 0.2 mm",
         ],
       },
       insectRisk: {
         level: "low",
-        score: 0,
+        score: 0.22,
         reasons: [
           "Sequedad extrema limita actividad de insectos",
           "HR media < 55%: techo de riesgo LOW activado",
+          "Sin registros de capturas en las ultimas 2 semanas",
         ],
       },
       thermalStress: {
         level: "low",
-        score: 0,
-        reasons: [],
+        score: 0.12,
+        reasons: [
+          "Media 7d dentro del rango optimo (16.8 C)",
+          "Sin dias de estres termico en la ultima semana",
+          "Amplitud termica estable (<= 12 C)",
+        ],
       },
     },
     units: {
@@ -176,6 +224,35 @@ function buildParcelApiResponse(
       },
     ],
   }
+}
+
+// Mock data para el widget de inteligencia de parcela
+const mockIntelligenceData = {
+  name: "Olivar",
+  coordinates: {
+    lat: 37.7656,
+    lng: -3.7743,
+  },
+  stationId: "5270B",
+  cropType: "Olivar",
+  area: 12.5,
+  lastUpdate: new Date("2026-04-09T18:50:00"),
+
+  temperature: 22.4,
+  temperatureChange: 3.2,
+  phenologicalStage: "Brotación",
+
+  gdd: 312,
+  kc: 0.85,
+  waterBalance: 90,
+  estimatedProfitability: 1240,
+  participants: 5,
+  pendingTasks: 4,
+  completedTasks: 1,
+
+  // Rendimiento: 300 olivas producen 300kg = 1 kg/oliva
+  totalTrees: 300,
+  totalYieldKg: 300,
 }
 
 export default function Parcel() {
@@ -253,7 +330,7 @@ export default function Parcel() {
 
   if (!activeParcel) {
     return (
-      <DashboardPageContainer className="mx-4 mt-4 border md:mx-6 md:mt-0">
+      <DashboardPageContainer className="border">
         <div className="flex h-64 items-center justify-center text-muted-foreground">
           No hay datos de parcelas disponibles.
         </div>
@@ -263,7 +340,7 @@ export default function Parcel() {
 
   if (!isAllSelected && !weather) {
     return (
-      <DashboardPageContainer className="mx-4 mt-4 border md:mx-6 md:mt-0">
+      <DashboardPageContainer className="border">
         <div className="flex h-64 items-center justify-center text-muted-foreground">
           No hay datos climáticos para la parcela seleccionada.
         </div>
@@ -276,14 +353,23 @@ export default function Parcel() {
   const daily = weather?.daily
 
   return (
-    <DashboardPageContainer className="">
+    <DashboardPageContainer className="gap-4">
       <ParcelHero
         isAllSelected={isAllSelected}
         activeParcel={activeParcel}
         allModeSummary={allModeSummary}
         risks={risks}
         apiResponse={parcelApiResponse}
+        // Mock
+        income={1240}
+        trend="up"
+        employeeCount={5}
+        tasksPending={2}
+        tasksInProgress={3}
+        yieldData={{ trees: 300, totalKg: 300 }}
       />
+
+      {/* <ParcelIntelligenceWidget data={mockIntelligenceData} /> */}
 
       {!isAllSelected && daily && metrics ? (
         <ParcelSingleView

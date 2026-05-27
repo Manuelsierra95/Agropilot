@@ -129,7 +129,7 @@ export function ActiveAlertsCard({
   const critical = alerts.filter((a) => a.severity === "critical").length
 
   return (
-    <Card className="flex h-full flex-col gap-0 overflow-hidden bg-background pt-0 ring-0">
+    <Card className="flex h-full flex-col gap-0 overflow-hidden bg-background ring-0">
       {/* Header */}
       <CardHeader className="flex shrink-0 flex-row items-center justify-between border-b px-4">
         <div className="flex items-center gap-2">

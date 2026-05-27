@@ -16,7 +16,7 @@ import { Input } from "@workspace/ui/components/input"
 import { useIsMobile } from "@workspace/ui/hooks/use-mobile"
 
 // Mock data — reemplaza con datos reales de tu backend
-export const mockCropSeasons = [
+export const mockCampaigns = [
   {
     id: "2025-26",
     name: "Campaña 2025–26",
@@ -51,7 +51,7 @@ export const mockCropSeasons = [
   },
 ]
 
-export type CropSeason = (typeof mockCropSeasons)[number]
+export type Campaign = (typeof mockCampaigns)[number]
 
 function formatBalance(balance: number | null): string {
   if (balance === null) return "—"
@@ -83,22 +83,22 @@ const statusConfig = {
   },
 }
 
-interface CropSeasonSwitcherProps {
-  cropSeasons?: CropSeason[]
+interface CampaignSwitcherProps {
+  campaigns?: Campaign[]
 }
 
-export function CropSeasonSwitcher({
-  cropSeasons = mockCropSeasons,
-}: CropSeasonSwitcherProps) {
+export function CampaignSwitcher({
+  campaigns = mockCampaigns,
+}: CampaignSwitcherProps) {
   const isMobile = useIsMobile()
 
-  const defaultCropSeason =
-    cropSeasons.find((c) => c.status === "active") ?? cropSeasons[0]
-  const [activeCropSeason, setActiveCropSeason] = React.useState<CropSeason>(
-    defaultCropSeason!
+  const defaultCampaign =
+    campaigns.find((c) => c.status === "active") ?? campaigns[0]
+  const [activeCampaign, setActiveCampaign] = React.useState<Campaign>(
+    defaultCampaign!
   )
 
-  if (!activeCropSeason) return null
+  if (!activeCampaign) return null
 
   return (
     <DropdownMenu>
@@ -110,12 +110,12 @@ export function CropSeasonSwitcher({
         >
           <CircleIcon
             className={cn("size-2 shrink-0 fill-current", {
-              "text-emerald-500": activeCropSeason.status === "active",
-              "text-muted-foreground/50": activeCropSeason.status === "closed",
+              "text-emerald-500": activeCampaign.status === "active",
+              "text-muted-foreground/50": activeCampaign.status === "closed",
             })}
           />
           <span className="max-w-36 truncate text-xs font-medium sm:text-sm">
-            {activeCropSeason.name}
+            {activeCampaign.name}
           </span>
           <ChevronsUpDownIcon className="size-3.5 shrink-0 text-muted-foreground" />
         </Button>
@@ -131,16 +131,16 @@ export function CropSeasonSwitcher({
           Campañas
         </DropdownMenuLabel>
 
-        {cropSeasons.map((cropSeason) => {
-          const cfg = statusConfig[cropSeason.status]
-          const isActive = activeCropSeason.id === cropSeason.id
+        {campaigns.map((campaign) => {
+          const cfg = statusConfig[campaign.status]
+          const isActive = activeCampaign.id === campaign.id
           const balancePositive =
-            cropSeason.balance !== null && cropSeason.balance >= 0
+            campaign.balance !== null && campaign.balance >= 0
 
           return (
             <DropdownMenuItem
-              key={cropSeason.id}
-              onClick={() => setActiveCropSeason(cropSeason)}
+              key={campaign.id}
+              onClick={() => setActiveCampaign(campaign)}
               className={cn("cursor-pointer gap-3 p-2.5", {
                 "bg-accent": isActive,
               })}
@@ -153,10 +153,10 @@ export function CropSeasonSwitcher({
               {/* Info */}
               <div className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate text-sm font-medium">
-                  {cropSeason.name}
+                  {campaign.name}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {formatDateRange(cropSeason.startDate, cropSeason.endDate)}
+                  {formatDateRange(campaign.startDate, campaign.endDate)}
                 </span>
               </div>
 
@@ -166,11 +166,11 @@ export function CropSeasonSwitcher({
                   className={cn("text-xs font-medium", {
                     "text-emerald-600": balancePositive,
                     "text-red-600":
-                      cropSeason.balance !== null && !balancePositive,
-                    "text-muted-foreground": cropSeason.balance === null,
+                      campaign.balance !== null && !balancePositive,
+                    "text-muted-foreground": campaign.balance === null,
                   })}
                 >
-                  {formatBalance(cropSeason.balance)}
+                  {formatBalance(campaign.balance)}
                 </span>
                 <span
                   className={cn(

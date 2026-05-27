@@ -63,8 +63,8 @@ export function ParcelAllView({
   allModeSummary,
 }: ParcelAllViewProps) {
   return (
-    <>
-      <section className="mt-4 grid gap-4 xl:grid-cols-3">
+    <div className="grid gap-4">
+      <section className="grid gap-4 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader>
             <CardTitle>Comparativa entre parcelas</CardTitle>
@@ -129,7 +129,7 @@ export function ParcelAllView({
         </Card>
       </section>
 
-      <section className="mt-4 grid gap-4 xl:grid-cols-2">
+      <section className="grid gap-4 xl:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Temperatura vs déficit hídrico</CardTitle>
@@ -204,6 +204,6 @@ export function ParcelAllView({
           </CardContent>
         </Card>
       </section>
-    </>
+    </div>
   )
 }

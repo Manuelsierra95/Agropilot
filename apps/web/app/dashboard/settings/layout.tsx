@@ -1,4 +1,4 @@
-import { DashboardPageContainer } from "@/components/dashboard-page-container"
+import { DashboardPageContainer } from "@/components/ui/dashboard-page-container"
 
 export default function DashboardSettingsLayout({
   children,

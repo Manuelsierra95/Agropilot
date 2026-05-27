@@ -11,7 +11,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
@@ -23,11 +22,10 @@ import {
 } from "@workspace/ui/components/chart"
 import type { ParcelApiResponse } from "@/features/parcel/components/parcel-types"
 import { cn } from "@workspace/ui/lib/utils"
-import { ArrowRight, TrendingUp } from "lucide-react"
-import Link from "next/link"
-import { buttonVariants } from "@workspace/ui/components/button"
+import { TrendingUp } from "lucide-react"
+import { LinkButton } from "@/components/ui/link-button"
 
-type DashboardRiskRadarProps = {
+type RiskRadarProps = {
   apiResponse?: Pick<ParcelApiResponse, "risks">
   redirectButton?: boolean
   className?: string
@@ -40,11 +38,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function DashboardRiskRadar({
+export function RiskRadar({
   apiResponse,
   redirectButton = true,
   className,
-}: DashboardRiskRadarProps) {
+}: RiskRadarProps) {
   const chartData = apiResponse
     ? [
         {
@@ -92,19 +90,17 @@ export function DashboardRiskRadar({
     : null
 
   return (
-    <Card
-      className={cn("flex h-full w-full bg-background pb-0 ring-0", className)}
-    >
+    <Card className={cn("flex h-full w-full bg-background ring-0", className)}>
       <CardHeader className="items-center">
-        <CardTitle>Mapa de Riesgos</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-balance">Mapa de Riesgos</CardTitle>
+        <CardDescription className="text-pretty">
           Puntuación por categoría de riesgo (0–100)
         </CardDescription>
       </CardHeader>
       <CardContent className="flex h-full flex-col items-center justify-center gap-2 md:gap-6">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[300px] w-full"
+          className="mx-auto aspect-square max-h-[280px] w-full"
         >
           <RadarChart data={chartData}>
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
@@ -141,18 +137,7 @@ export function DashboardRiskRadar({
         </section>
       </CardContent>
       {redirectButton && (
-        <CardFooter className="flex items-center justify-center border-0 bg-background px-4 py-0">
-          <Link
-            href="/dashboard/parcel"
-            className={cn(
-              buttonVariants({ variant: "outline" }),
-              "w-full gap-2 border-0 bg-muted-foreground/5 text-xs"
-            )}
-          >
-            <span>Ver análisis completo</span>
-            <ArrowRight className="size-3.5" />
-          </Link>
-        </CardFooter>
+        <LinkButton text="Ver análisis completo" href="/parcel" />
       )}
     </Card>
   )
