@@ -76,6 +76,12 @@
   --task-completed-bg: #dcfce7;
   --task-completed-text: #166534;
   --task-completed-border: #86efac;
+  --task-overdue-bg: oklch(0.97 0.03 27);
+  --task-overdue-text: var(--primary-expense);
+  --task-overdue-border: oklch(0.8 0.12 27);
+
+  --color-pheno: oklch(0.72 0.17 142);
+  --color-gdd: oklch(0.73 0.16 55);
 
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
@@ -178,6 +184,12 @@
   --task-completed-bg: #052e1b;
   --task-completed-text: #86efac;
   --task-completed-border: #166534;
+  --task-overdue-bg: oklch(0.8 0.12 27);
+  --task-overdue-text: var(--primary-expense);
+  --task-overdue-border: oklch(0.97 0.03 27);
+
+  --color-pheno: oklch(0.62 0.15 142);
+  --color-gdd: oklch(0.68 0.14 55);
 
   --sidebar: oklch(0.141 0 0);
   --sidebar-foreground: oklch(0.985 0 0);

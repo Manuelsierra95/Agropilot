@@ -1,3 +1,6 @@
+// Chart context and hooks
+
+// Re-export visx gradient and pattern components for bar fill styling
 export {
   GradientDarkgreenGreen,
   GradientLightgreenGreen,
@@ -11,27 +14,262 @@ export {
   LinearGradient,
   RadialGradient,
 } from "@visx/gradient"
-export { Area, type AreaProps } from "@workspace/ui/components/charts/area"
+// Area chart components
+export { Area, type AreaProps } from "./area"
+export { AreaChart, type AreaChartProps } from "./area-chart"
+// Bar chart components
 export {
-  ComposedChart,
-  type ComposedChartProps,
-} from "@workspace/ui/components/charts/composed-chart"
-export { Grid, type GridProps } from "@workspace/ui/components/charts/grid"
-export { Line, type LineProps } from "@workspace/ui/components/charts/line"
+  Bar,
+  type BarAnimationType,
+  type BarLineCap,
+  type BarProps,
+} from "./bar"
+export { BarChart, type BarChartProps, type BarOrientation } from "./bar-chart"
+export { BarXAxis, type BarXAxisProps } from "./bar-x-axis"
+export { BarYAxis, type BarYAxisProps } from "./bar-y-axis"
+export { Candlestick, type CandlestickProps } from "./candlestick"
 export {
-  SeriesBar,
-  type SeriesBarProps,
-} from "@workspace/ui/components/charts/series-bar"
-export { XAxis, type XAxisProps } from "@workspace/ui/components/charts/x-axis"
+  CandlestickChart,
+  type CandlestickChartProps,
+  type OHLCDataPoint,
+} from "./candlestick-chart"
+// export {
+//   ChartBrush,
+//   type ChartBrushProps,
+//   type ChartBrushSelection,
+// } from "./chart-brush"
+// export {
+//   chartCenterContainerClassName,
+//   chartCenterLabelClassName,
+//   chartCenterValueClassName,
+// } from "./chart-center-typography"
+// export {
+//   ChartConfigProvider,
+//   type ChartConfigProviderProps,
+//   type ChartConfigValue,
+//   DEFAULT_CHART_CONFIG,
+//   type SpringConfig,
+//   useChartConfig,
+// } from "./chart-config-context"
+export {
+  type ChartContextValue,
+  // type ChartHoverContextValue,
+  ChartProvider,
+  // type ChartStableContextValue,
+  chartCssVars,
+  // defaultScatterColors,
+  type LineConfig,
+  type Margin,
+  type TooltipData,
+  useChart,
+  // useChartHover,
+  // useChartStable,
+} from "./chart-context"
+// export { ChartRevealClip, type ChartRevealClipProps } from "./chart-reveal-clip"
+export {
+  ChartStatFlow,
+  type ChartStatFlowFormat,
+  type ChartStatFlowProps,
+  defaultChartStatFlowFormat,
+} from "./chart-stat-flow"
+// Choropleth chart components
+// export {
+//   ChoroplethChart,
+//   type ChoroplethChartProps,
+//   type ChoroplethContextValue,
+//   type ChoroplethFeature,
+//   ChoroplethFeatureComponent,
+//   type ChoroplethFeatureProperties,
+//   type ChoroplethFeatureProps,
+//   ChoroplethGraticule,
+//   type ChoroplethGraticuleProps,
+//   ChoroplethProvider,
+//   ChoroplethTooltip,
+//   type ChoroplethTooltipData,
+//   type ChoroplethTooltipProps,
+//   choroplethCssVars,
+//   defaultChoroplethColors,
+//   type TransformMatrix,
+//   useChoropleth,
+//   useChoroplethZoom,
+// } from "./choropleth"
+// Composed time-series (line + area + SeriesBar on shared time scale)
+export { ComposedChart, type ComposedChartProps } from "./composed-chart"
+// Funnel chart components
+// export {
+//   FunnelChart,
+//   type FunnelChartProps,
+//   type FunnelGradientStop,
+//   type FunnelStage,
+// } from "./funnel-chart"
+// Gauge chart
+export { Gauge, type GaugeProps } from "./gauge"
+// Shared chart elements
+export { Grid, type GridProps } from "./grid"
+// Composable legend components
+export {
+  Legend,
+  type LegendContextValue,
+  LegendItem as LegendItemComponent,
+  type LegendItemContextValue,
+  type LegendItemData,
+  type LegendItemProps,
+  LegendLabel,
+  type LegendLabelProps,
+  LegendMarker,
+  type LegendMarkerProps,
+  LegendProgress,
+  type LegendProgressProps,
+  type LegendProps,
+  LegendValue,
+  type LegendValueProps,
+  legendCssVars,
+  useLegend,
+  useLegendItem,
+} from "./legend"
+// Line chart components
+export { Line, type LineProps } from "./line"
+export { LineChart, type LineChartProps } from "./line-chart"
+// export {
+//   detectMomentum,
+//   LiveLine,
+//   type LiveLineProps,
+//   type Momentum,
+//   type MomentumColors,
+// } from "./live-line"
+// Live line chart (real-time streaming)
+// export {
+//   LiveLineChart,
+//   type LiveLineChartProps,
+//   type LiveLinePoint,
+// } from "./live-line-chart"
+// export { LiveXAxis, type LiveXAxisProps } from "./live-x-axis"
+// export { LiveYAxis, type LiveYAxisProps } from "./live-y-axis"
+// Marker components
+// export {
+//   type ChartMarker,
+//   ChartMarkers,
+//   type ChartMarkersProps,
+//   MarkerGroup,
+//   type MarkerGroupProps,
+//   MarkerTooltipContent,
+//   type MarkerTooltipContentProps,
+//   useActiveMarkers,
+// } from "./markers"
+// export { PatternArea, type PatternAreaProps } from "./pattern-area"
+// Pie chart components
+export { PieCenter, type PieCenterProps } from "./pie-center"
+export { PieCenterShell, type PieCenterShellProps } from "./pie-center-shell"
+// export { DEFAULT_HOVER_OFFSET, PieChart, type PieChartProps } from "./pie-chart"
+export {
+  defaultPieColors,
+  type PieArcData,
+  type PieContextValue,
+  type PieData,
+  PieProvider,
+  pieCssVars,
+  usePie,
+} from "./pie-context"
+// export {
+//   PieSlice,
+//   type PieSliceHoverEffect,
+//   type PieSliceProps,
+// } from "./pie-slice"
+// Radar chart components
+// export { RadarArea, type RadarAreaProps } from "./radar-area"
+// export { RadarAxis, type RadarAxisProps } from "./radar-axis"
+// export { RadarChart, type RadarChartProps } from "./radar-chart"
+// export {
+//   defaultRadarColors,
+//   type RadarContextValue,
+//   type RadarData,
+//   type RadarMetric,
+//   RadarProvider,
+//   radarCssVars,
+//   useRadar,
+// } from "./radar-context"
+// export { RadarGrid, type RadarGridProps } from "./radar-grid"
+// export { RadarLabels, type RadarLabelsProps } from "./radar-labels"
+// Ring chart components
+export { Ring, type RingLineCap, type RingProps } from "./ring"
+export { RingCenter, type RingCenterProps } from "./ring-center"
+export { RingChart, type RingChartProps } from "./ring-chart"
+export {
+  defaultRingColors,
+  type RingContextValue,
+  type RingData,
+  RingProvider,
+  ringCssVars,
+  useRing,
+} from "./ring-context"
+// Sankey chart components
+// export {
+//   SankeyChart,
+//   type SankeyChartProps,
+//   type SankeyContextValue,
+//   type SankeyData,
+//   SankeyLink,
+//   type SankeyLinkDatum,
+//   type SankeyLinkProps,
+//   SankeyNode,
+//   type SankeyNodeDatum,
+//   type SankeyNodeProps,
+//   SankeyProvider,
+//   SankeyTooltip,
+//   type SankeyTooltipData,
+//   type SankeyTooltipProps,
+//   sankeyCssVars,
+//   useSankey,
+// } from "./sankey"
+// Scatter chart components
+// export { Scatter, type ScatterProps } from "./scatter"
+// export { ScatterChart, type ScatterChartProps } from "./scatter-chart"
+// Segment selection components
+export {
+  SegmentBackground,
+  type SegmentBackgroundProps,
+  SegmentLineFrom,
+  type SegmentLineProps,
+  SegmentLineTo,
+  type SegmentLineVariant,
+} from "./segment"
+// Series bar (time-based columns for ComposedChart)
+export { SeriesBar, type SeriesBarProps } from "./series-bar"
+// export { SeriesMarkers, type SeriesMarkersProps } from "./series-markers"
+// export {
+//   getSeriesMarkerVisualExtent,
+//   SeriesPointMarker,
+//   type SeriesPointMarkerProps,
+//   type SeriesPointMarkerStyle,
+// } from "./series-point-marker"
+// Tooltip components
 export {
   ChartTooltip,
   type ChartTooltipProps,
-} from "@workspace/ui/components/charts/tooltip/chart-tooltip"
-export { curveCatmullRom, curveLinear } from "@visx/curve"
-export { LineChart } from "@workspace/ui/components/charts/line-chart"
-export { CandlestickChart } from "@workspace/ui/components/charts/candlestick-chart"
-export { Candlestick } from "@workspace/ui/components/charts/candlestick"
-export { Gauge } from "@workspace/ui/components/charts/gauge"
-export { RingChart } from "@workspace/ui/components/charts/ring-chart"
-export { RingCenter } from "@workspace/ui/components/charts/ring-center"
-export { Ring, type RingProps } from "@workspace/ui/components/charts/ring"
+  DateTicker,
+  type DateTickerProps,
+  type IndicatorWidth,
+  TooltipBox,
+  type TooltipBoxProps,
+  TooltipContent,
+  type TooltipContentProps,
+  TooltipDot,
+  type TooltipDotProps,
+  TooltipIndicator,
+  type TooltipIndicatorProps,
+  type TooltipRow,
+} from "./tooltip"
+// Chart interaction hook
+export {
+  type ChartSelection,
+  useChartInteraction,
+} from "./use-chart-interaction"
+// export {
+//   PatternCircles,
+//   PatternHexagons,
+//   PatternLines,
+//   PatternWaves,
+// } from "./visx-pattern"
+export { XAxis, type XAxisProps } from "./x-axis"
+export { YAxis, type YAxisProps } from "./y-axis"
+export { curveLinear, curveMonotoneX, curveCatmullRom } from "@visx/curve"
