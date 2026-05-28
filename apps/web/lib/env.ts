@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 const envSchema = z.object({
-  PUBLIC_API_URL: z.string().url().default("http://localhost:8787"),
+  PUBLIC_API_URL: z.string().url().default("http://localhost:3001"),
   PUBLIC_API_VERSION: z.string().default("v1"),
   PUBLIC_REDIRECT_URL: z
     .string()

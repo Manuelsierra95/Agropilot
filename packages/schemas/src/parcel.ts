@@ -9,9 +9,32 @@ export const parcelSelectSchema = createSelectSchema(parcels)
 export const parcelInsertSchema = createInsertSchema(parcels)
 export const parcelUpdateSchema = createUpdateSchema(parcels)
 
+export const parcelCreateSchema = createInsertSchema(parcels).pick({
+  name: true,
+  cropType: true,
+  irrigationType: true,
+  centroid: true,
+  polygon: true,
+})
+
+export const parcelUpdateInputSchema = createUpdateSchema(parcels)
+  .pick({
+    name: true,
+    cropType: true,
+    irrigationType: true,
+    centroid: true,
+    polygon: true,
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+  })
+
 export type ParcelSelect = typeof parcelSelectSchema.type
 export type ParcelInsert = typeof parcelInsertSchema.type
 export type ParcelUpdate = typeof parcelUpdateSchema.type
+
+export type ParcelCreateInput = ReturnType<typeof parcelCreateSchema.parse>
+export type ParcelUpdateInput = ReturnType<typeof parcelUpdateInputSchema.parse>
 
 export const parseParcelSelect = (value: unknown): ParcelSelect | null => {
   const parsed = parcelSelectSchema.safeParse(value)

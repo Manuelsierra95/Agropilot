@@ -1,6 +1,6 @@
 import { defineConfig } from "drizzle-kit"
 
-const databaseUrl = process.env.DATABASE_URL
+const databaseUrl = "postgresql://myuser:mypassword@localhost:5432/mydb"
 
 if (!databaseUrl) {
   throw new Error("Missing database URL. Set DATABASE_URL.")

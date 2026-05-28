@@ -33,6 +33,7 @@ export const users = pgTable("users", {
 export const organizations = pgTable("organizations", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
+  slug: text("slug").unique(),
   logo: text("logo"),
   metadata: text("metadata"),
   status: text("status", {

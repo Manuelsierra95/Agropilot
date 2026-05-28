@@ -5,7 +5,7 @@ import type { ApiVariables } from "@/types/variables"
 import { errorHandler } from "@/middlewares/error-handler"
 import { corsMiddleware } from "@/middlewares/cors"
 import { csrfMiddleware } from "@/middlewares/csrf"
-import { rateLimitMiddleware } from "@/middlewares/rateLimit"
+// import { rateLimitMiddleware } from "@/middlewares/rateLimit"
 import { parcelRoutes } from "./routes/parcel"
 import { organizationRoutes } from "./routes/organization"
 import { userRoutes } from "./routes/user"
@@ -27,5 +27,10 @@ const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .route("/parcel", parcelRoutes)
   .route("/organization", organizationRoutes)
 
+const PORT = process.env.PORT || 3001
+
 export type AppType = typeof app
-export default app
+export default {
+  port: PORT,
+  fetch: app.fetch,
+}

@@ -1,5 +1,6 @@
 import * as schema from "./schemas"
-import { createNeonDatabase as createDatabase } from "./client/neon"
+// import { createNeonDatabase as createDatabase } from "./client/neon"
+import { createLocalDatabase as createDatabase } from "./client/node"
 
 type DatabaseInstance = ReturnType<typeof createDatabase>
 

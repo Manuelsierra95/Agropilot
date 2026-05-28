@@ -1,8 +1,5 @@
-import type { RateLimit } from "@cloudflare/workers-types"
-
 export type Env = {
   NODE_ENV: "development" | "production" | "test"
-  RATE_LIMITER: RateLimit
   CACHE_MAX_AGE: number
   CACHE_STALE_WHILE_REVALIDATE: number
   ORIGINS: string

@@ -47,7 +47,7 @@ const auth = betterAuth({
     user: {
       create: {
         after: async (user) => {
-          await createOrganizationForUser(user, auth.api)
+          await createOrganizationForUser(user)
         },
       },
     },
