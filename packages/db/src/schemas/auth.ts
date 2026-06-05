@@ -8,11 +8,12 @@ import {
   integer,
 } from "drizzle-orm/pg-core"
 import { parcels } from "./parcel"
+import { primaryKeyField } from "../helper"
 
 // Tables
 
 export const users = pgTable("users", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
@@ -31,7 +32,7 @@ export const users = pgTable("users", {
 })
 
 export const organizations = pgTable("organizations", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   name: text("name").notNull(),
   slug: text("slug").unique(),
   logo: text("logo"),
@@ -52,7 +53,7 @@ export const organizations = pgTable("organizations", {
 export const members = pgTable(
   "members",
   {
-    id: text("id").primaryKey(),
+    id: primaryKeyField(),
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
@@ -71,7 +72,7 @@ export const members = pgTable(
 export const invitations = pgTable(
   "invitations",
   {
-    id: text("id").primaryKey(),
+    id: primaryKeyField(),
     email: text("email").notNull(),
     inviterId: text("inviter_id")
       .notNull()
@@ -93,7 +94,7 @@ export const invitations = pgTable(
 export const organizationRoles = pgTable(
   "organization_roles",
   {
-    id: text("id").primaryKey(),
+    id: primaryKeyField(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),
@@ -112,7 +113,7 @@ export const organizationRoles = pgTable(
 export const sessions = pgTable(
   "sessions",
   {
-    id: text("id").primaryKey(),
+    id: primaryKeyField(),
     expiresAt: timestamp("expires_at").notNull(),
     token: text("token").notNull().unique(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -135,7 +136,7 @@ export const sessions = pgTable(
 export const accounts = pgTable(
   "accounts",
   {
-    id: text("id").primaryKey(),
+    id: primaryKeyField(),
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
     userId: text("user_id")
@@ -159,7 +160,7 @@ export const accounts = pgTable(
 export const verifications = pgTable(
   "verifications",
   {
-    id: text("id").primaryKey(),
+    id: primaryKeyField(),
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
     expiresAt: timestamp("expires_at").notNull(),

@@ -7,11 +7,12 @@ import { numeric } from "drizzle-orm/pg-core"
 import { index } from "drizzle-orm/pg-core"
 import { campaigns } from "./finance"
 import { unique } from "drizzle-orm/pg-core"
+import { primaryKeyField } from "../helper"
 
 // Tables
 
 export const parcels = pgTable("parcels", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organizations.id, { onDelete: "cascade" }),
@@ -30,7 +31,7 @@ export const parcels = pgTable("parcels", {
 })
 
 export const parcelLocation = pgTable("parcel_location", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   parcelId: text("parcel_id")
     .notNull()
     .unique()
@@ -41,6 +42,7 @@ export const parcelLocation = pgTable("parcel_location", {
   streetType: text("street_type"),
   streetName: text("street_name"),
   streetNumber: text("street_number"),
+  postalCode: text("postal_code"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -62,7 +64,7 @@ export const parcelStation = pgTable("parcel_station", {
 })
 
 export const parcelWeather = pgTable("parcel_weather", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   parcelId: text("parcel_id")
     .notNull()
     .references(() => parcels.id, { onDelete: "cascade" })
@@ -83,7 +85,7 @@ export const parcelWeather = pgTable("parcel_weather", {
 export const parcelFinancialSummaries = pgTable(
   "parcel_financial_summaries",
   {
-    id: text("id").primaryKey(),
+    id: primaryKeyField(),
     parcelId: text("parcel_id")
       .notNull()
       .references(() => parcels.id, { onDelete: "cascade" }),
@@ -149,7 +151,7 @@ export const parcelFinancialSummaries = pgTable(
 )
 
 export const parcelCashflowDaily = pgTable("parcel_cashflow_daily", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   parcelId: text("parcel_id")
     .notNull()
     .references(() => parcels.id, { onDelete: "cascade" }),

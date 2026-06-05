@@ -2,9 +2,10 @@ import { relations } from "drizzle-orm"
 import { pgTable, text, timestamp, integer } from "drizzle-orm/pg-core"
 import { geometry } from "../utils/post-gis"
 import { parcelStation } from "./parcel"
+import { primaryKeyField } from "../helper"
 
 export const weatherStation = pgTable("weather_station", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   stationId: text("station_id").notNull().unique(),
   name: text("name").notNull(),
   location: geometry("location").notNull(),

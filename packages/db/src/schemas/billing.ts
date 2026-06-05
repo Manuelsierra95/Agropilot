@@ -8,11 +8,12 @@ import {
 } from "drizzle-orm/pg-core"
 import { relations } from "drizzle-orm"
 import { organizations } from "./auth"
+import { primaryKeyField } from "../helper"
 
 // Tables
 
 export const subscriptions = pgTable("subscriptions", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   organizationId: text("organization_id")
     .notNull()
     .unique()
@@ -42,7 +43,7 @@ export const subscriptions = pgTable("subscriptions", {
 })
 
 export const planLimits = pgTable("plan_limits", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   plan: text("plan", {
     enum: ["free", "pro", "enterprise"],
   })
@@ -62,7 +63,7 @@ export const planLimits = pgTable("plan_limits", {
 
 // Premium modules available for purchase
 export const modules = pgTable("modules", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   slug: text("slug", {
     enum: ["ai-analysis", "field-notebook", "automations"],
   })
@@ -87,7 +88,7 @@ export const modules = pgTable("modules", {
 export const organizationModules = pgTable(
   "organization_modules",
   {
-    id: text("id").primaryKey(),
+    id: primaryKeyField(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),

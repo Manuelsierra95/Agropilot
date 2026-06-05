@@ -12,11 +12,12 @@ import { parcels } from "./parcel"
 import { users } from "./auth"
 import { jsonb } from "drizzle-orm/pg-core"
 import { boolean } from "drizzle-orm/pg-core"
+import { primaryKeyField } from "../helper"
 
 // Tables
 
 export const transactions = pgTable("transactions", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organizations.id, { onDelete: "cascade" }),
@@ -63,7 +64,7 @@ export const transactions = pgTable("transactions", {
 })
 
 export const campaigns = pgTable("campaigns", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   name: text("name").notNull().unique(), // "2025/2026"
   startDate: date("start_date").notNull(),
   endDate: date("end_date").notNull(),
@@ -74,7 +75,7 @@ export const campaigns = pgTable("campaigns", {
 export const marketPrices = pgTable(
   "market_prices",
   {
-    id: text("id").primaryKey(),
+    id: primaryKeyField(),
 
     // For now we will only track olive oil prices, but this can be extended in the future
     product: text("product", {

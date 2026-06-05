@@ -2,9 +2,10 @@ import { pgTable, text, timestamp, integer, jsonb } from "drizzle-orm/pg-core"
 import { organizations } from "./auth"
 import { parcels } from "./parcel"
 import { relations } from "drizzle-orm"
+import { primaryKeyField } from "../helper"
 
 export const tasks = pgTable("tasks", {
-  id: text("id").primaryKey(),
+  id: primaryKeyField(),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organizations.id, { onDelete: "cascade" }),
