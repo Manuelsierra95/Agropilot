@@ -1,0 +1,44 @@
+import { parser, POLYGON_WFS_URL } from "./client"
+
+function parsePolygon(json: any): [number, number][][] {
+  const posListRaw =
+    json?.FeatureCollection?.member?.["cp:CadastralParcel"]?.["cp:geometry"]?.[
+      "gml:MultiSurface"
+    ]?.["gml:surfaceMember"]?.["gml:Surface"]?.["gml:patches"]?.[
+      "gml:PolygonPatch"
+    ]?.["gml:exterior"]?.["gml:LinearRing"]?.["gml:posList"]?.["#text"]
+
+  if (!posListRaw) {
+    throw new Error("No se encontró geometría para esa referencia catastral")
+  }
+
+  const values = String(posListRaw).trim().split(/\s+/).map(Number)
+
+  const polygon: [number, number][] = []
+  for (let i = 0; i < values.length - 1; i += 2) {
+    polygon.push([values[i + 1], values[i]])
+  }
+
+  return [polygon]
+}
+
+export async function fetchPolygon(
+  refcat: string
+): Promise<[number, number][][]> {
+  const url = new URL(POLYGON_WFS_URL)
+  url.searchParams.set("service", "wfs")
+  url.searchParams.set("version", "2")
+  url.searchParams.set("request", "getfeature")
+  url.searchParams.set("STOREDQUERIE_ID", "GetParcel")
+  url.searchParams.set("refcat", refcat)
+  url.searchParams.set("srsname", "EPSG:4326")
+
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error("No se pudo obtener la geometria de la parcela")
+  }
+
+  const json = parser.parse(await response.text())
+  return parsePolygon(json)
+}

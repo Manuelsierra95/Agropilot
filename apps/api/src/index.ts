@@ -10,6 +10,7 @@ import { parcelRoutes } from "./routes/parcel"
 import { organizationRoutes } from "./routes/organization"
 import { userRoutes } from "./routes/user"
 import { billingRoutes } from "./routes/billing"
+import { searchRoutes } from "./routes/search"
 
 const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .basePath("/api/v1")
@@ -22,10 +23,11 @@ const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
 
   .on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw))
 
-  .route("/user", userRoutes)
-  .route("/billing", billingRoutes)
-  .route("/parcel", parcelRoutes)
   .route("/organization", organizationRoutes)
+  .route("/user", userRoutes)
+  .route("/search", searchRoutes)
+  .route("/parcel", parcelRoutes)
+  .route("/billing", billingRoutes)
 
 const PORT = process.env.PORT || 3001
 
