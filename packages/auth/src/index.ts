@@ -43,6 +43,22 @@ const auth = betterAuth({
       clientSecret: env.GOOGLE_CLIENT_SECRET!,
     },
   },
+  user: {
+    additionalFields: {
+      onboardingStatus: {
+        type: "string",
+        required: true,
+        defaultValue: "not_started",
+        input: false,
+      },
+      onboardingStep: {
+        type: "number",
+        required: false,
+        defaultValue: null,
+        input: false,
+      },
+    },
+  },
   databaseHooks: {
     user: {
       create: {
@@ -87,6 +103,8 @@ export { auth }
 export type AuthInstance = typeof auth
 export type User = BetterAuthUser & {
   activeOrganizationId: string | null
+  onboardingStatus: "not_started" | "in_progress" | "completed"
+  onboardingStep: number | null
 }
 export type { Auth, Session }
 export { ac, organizationRoles }
