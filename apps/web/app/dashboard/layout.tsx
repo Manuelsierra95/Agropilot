@@ -1,7 +1,3 @@
-import { auth } from "@workspace/auth"
-import { headers } from "next/headers"
-import { redirect } from "next/navigation"
-
 import { Providers } from "@/providers/providers"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import NextTopLoader from "nextjs-toploader"
@@ -12,14 +8,6 @@ export default async function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-
-  if (!session) {
-    redirect("/auth/sign-in")
-  }
-
   return (
     <Providers>
       <NuqsAdapter>

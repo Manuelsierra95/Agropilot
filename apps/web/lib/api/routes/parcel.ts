@@ -1,20 +1,64 @@
-import type { InferResponseType } from "hono/client"
 import { client } from "@/lib/api/client"
+import {
+  ParcelSelect,
+  ParcelCreateInput,
+  ParcelUpdateInput,
+} from "@workspace/schemas"
+import { cache } from "react"
 
-// export const parcelApi = {
-//   // Queries
-//   getAll:   async (): Promise<ParcelApi[]> => { ... },
-//   getById:  async (id: string): Promise<ParcelApi> => { ... },
+const getListParcels = cache(
+  (): Promise<ParcelSelect[]> =>
+    client.api.v1.parcel
+      .$get()
+      .then((res) => res.json())
+      .then((res) => res.parcels)
+)
 
-//   // Mutations
-//   create: async (data: ParcelCreate): Promise<ParcelApi> => { ... },
-//   update: async (id: string, data: ParcelUpdate): Promise<ParcelApi> => { ... },
-//   delete: async (id: string): Promise<void> => { ... },
-// }
+const getParcelById = cache(
+  (id: string): Promise<ParcelSelect> =>
+    client.api.v1.parcel[":id"]
+      .$get({
+        param: {
+          id,
+        },
+      })
+      .then((res) => res.json())
+      .then((res) => res.parcel)
+)
 
-// Usage:
-// const parcels = await parcelApi.getAll()
-// const parcel  = await parcelApi.getById(id)
-// await parcelApi.create(data)
-// await parcelApi.update(id, data)
-// await parcelApi.delete(id)
+const createParcel = (data: ParcelCreateInput) =>
+  client.api.v1.parcel
+    .$post({
+      json: data,
+    })
+    .then((res) => res.json())
+    .then((res) => res.parcel)
+
+const updateParcel = (id: string, data: ParcelUpdateInput) =>
+  client.api.v1.parcel[":id"]
+    .$put({
+      param: {
+        id,
+      },
+      json: data,
+    })
+    .then((res) => res.json())
+    .then((res) => res.parcel)
+
+const deleteParcel = (id: string) =>
+  client.api.v1.parcel[":id"]
+    .$delete({
+      param: {
+        id,
+      },
+    })
+    .then((res) => res.json())
+    .then((res) => res.id)
+
+export const parcelApi = {
+  getListParcels: getListParcels,
+  getParcelById: getParcelById,
+  createParcel: createParcel,
+  updateParcel: updateParcel,
+  deleteParcel: deleteParcel,
+}

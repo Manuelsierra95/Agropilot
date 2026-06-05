@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "Onboarding flow for new Agropilot users.",
 }
 
-export default function Page() {
+export default async function Page() {
   return <ParcelOnboarding />
 }
