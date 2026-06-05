@@ -10,6 +10,7 @@ import {
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod"
+import z from "zod"
 
 export const userSelectSchema = createSelectSchema(users)
 export const userInsertSchema = createInsertSchema(users)
@@ -82,16 +83,19 @@ export type VerificationUpdate = ReturnType<
   typeof verificationUpdateSchema.parse
 >
 
-export type UserMeResponse = {
-  id: string
-  name: string
-  email: string
-  image: string | null
-  role: string
-  organizationId: string
+export type UserMeResponse = Omit<UserSelect, "emailVerified" | "updatedAt"> & {
+  role: MemberSelect["role"]
+  organizationId: MemberSelect["organizationId"]
   provider: AccountSelect["providerId"]
-  createdAt: Date
 }
+
+export const userOnboardingUpdateSchema = z.object({
+  onboardingStep: z.number().int().min(1),
+})
+
+export type UserOnboardingUpdate = ReturnType<
+  typeof userOnboardingUpdateSchema.parse
+>
 
 export const parseAuthUser = (value: unknown): AuthUser | null => {
   const parsed = authUserSchema.safeParse(value)

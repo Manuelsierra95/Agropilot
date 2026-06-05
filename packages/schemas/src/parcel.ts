@@ -4,6 +4,7 @@ import {
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod"
+import z from "zod"
 
 export const parcelSelectSchema = createSelectSchema(parcels)
 export const parcelInsertSchema = createInsertSchema(parcels)
@@ -29,9 +30,9 @@ export const parcelUpdateInputSchema = createUpdateSchema(parcels)
     message: "At least one field must be provided",
   })
 
-export type ParcelSelect = typeof parcelSelectSchema.type
-export type ParcelInsert = typeof parcelInsertSchema.type
-export type ParcelUpdate = typeof parcelUpdateSchema.type
+export type ParcelSelect = ReturnType<typeof parcelSelectSchema.parse>
+export type ParcelInsert = ReturnType<typeof parcelInsertSchema.parse>
+export type ParcelUpdate = ReturnType<typeof parcelUpdateSchema.parse>
 
 export type ParcelCreateInput = ReturnType<typeof parcelCreateSchema.parse>
 export type ParcelUpdateInput = ReturnType<typeof parcelUpdateInputSchema.parse>
@@ -50,3 +51,7 @@ export const parseParcelUpdate = (value: unknown): ParcelUpdate | null => {
   const parsed = parcelUpdateSchema.safeParse(value)
   return parsed.success ? (parsed.data as unknown as ParcelUpdate) : null
 }
+
+export const parcelSearchQuerySchema = z.object({
+  q: z.string().min(1, "Query parameter 'q' is required"),
+})
