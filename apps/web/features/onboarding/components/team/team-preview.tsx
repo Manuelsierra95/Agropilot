@@ -23,25 +23,25 @@ interface TeamInvitesSendBarProps {
   onSend: () => void
 }
 
-function TeamInvitesSendBar({
+export function TeamInvitesSendBar({
   sentMock,
   sendLabel,
   validInviteCount,
   onSend,
 }: TeamInvitesSendBarProps) {
   return (
-    <div className="shrink-0 border-t border-sidebar-border bg-sidebar-accent/60 px-4 py-4">
+    <div className="flex flex-col gap-2">
       <p className="text-sm text-muted-foreground">
         {sentMock
           ? "Listo en modo demo. Al conectar la API, se enviarán por correo."
-          : "Revisa la lista y envía las solicitudes de acceso."}
+          : "Revisa la lista en la vista previa y envía las solicitudes de acceso."}
       </p>
       <Button
         type="button"
         size="lg"
         variant={sentMock ? "outline" : "default"}
         className={cn(
-          "mt-3 h-11 w-full gap-2 shadow-sm",
+          "h-11 w-full gap-2 shadow-sm",
           sentMock &&
             "border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary"
         )}
@@ -67,19 +67,13 @@ function TeamInvitesSendBar({
 interface TeamInvitesPreviewProps {
   invites: TeamInviteDraft[]
   sentMock: boolean
-  sendLabel: string
-  validInviteCount: number
   onRemove: (id: string) => void
-  onSend: () => void
 }
 
 export function TeamInvitesPreview({
   invites,
   sentMock,
-  sendLabel,
-  validInviteCount,
   onRemove,
-  onSend,
 }: TeamInvitesPreviewProps) {
   const listedInvites = invites.filter((invite) => invite.email.trim().length > 0)
 
@@ -137,12 +131,6 @@ export function TeamInvitesPreview({
           </ul>
         )}
       </div>
-      <TeamInvitesSendBar
-        sentMock={sentMock}
-        sendLabel={sendLabel}
-        validInviteCount={validInviteCount}
-        onSend={onSend}
-      />
     </div>
   )
 }

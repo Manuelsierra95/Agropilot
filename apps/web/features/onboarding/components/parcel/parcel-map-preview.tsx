@@ -14,23 +14,19 @@ interface ParcelMapProps {
 }
 
 export function ParcelMap({ parcels, activeParcelId }: ParcelMapProps) {
-  const mapParcels = useMemo(
-    () => fieldFormDraftsToMapParcels(parcels, activeParcelId),
-    [parcels, activeParcelId]
-  )
-
   const activeDraft = parcels.find((parcel) => parcel.id === activeParcelId)
-  const activeName = activeDraft?.name.trim() || "Parcela sin nombre"
-  const hasAnyPolygon = mapParcels.length > 0
 
-  const hint =
-    parcels.length > 1
-      ? hasAnyPolygon
-        ? "Parcela activa resaltada en verde. Pantalla completa para ver todas."
-        : "Usa el buscador para localizar la parcela activa."
-      : hasAnyPolygon
-        ? "Haz clic en una parcela para ver detalles"
-        : "Usa el buscador para localizar la parcela en el mapa"
+  const mapParcels = useMemo(() => {
+    if (!activeDraft) return []
+    return fieldFormDraftsToMapParcels([activeDraft], activeParcelId)
+  }, [activeDraft, activeParcelId])
+
+  const activeName = activeDraft?.name.trim() || "Parcela sin nombre"
+  const hasActivePolygon = mapParcels.length > 0
+
+  const hint = hasActivePolygon
+    ? "Haz clic en la parcela para ver detalles"
+    : "Usa el buscador para localizar la parcela en el mapa"
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col">
@@ -44,13 +40,14 @@ export function ParcelMap({ parcels, activeParcelId }: ParcelMapProps) {
           resizeWithContainer
           parcels={mapParcels.length > 0 ? mapParcels : undefined}
           focusedParcelId={activeParcelId}
+          geometryRefitKey={activeDraft?.polygon ?? null}
           fitOnMount
           hint={hint}
           showControls
           showLocate={false}
           showPopup={mapParcels.length > 0} // TODO: Mostrar solo info de la parcela, no mostrar el boton de ver detalle (dejar solo el boton de cerrar)
         />
-        {!hasAnyPolygon && activeDraft ? (
+        {!hasActivePolygon && activeDraft ? (
           <p className="sr-only">Vista previa de {activeName}</p>
         ) : null}
       </div>

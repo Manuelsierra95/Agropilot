@@ -215,7 +215,7 @@ export function CoordinatesSearch({
         <DialogTrigger asChild>
           <Button
             type="button"
-            className="w-full"
+            className="w-full bg-primary/10 text-primary hover:bg-primary/20"
             disabled={disabled || isLoading}
           >
             <MapPin className="mr-2 h-4 w-4" />
@@ -223,7 +223,7 @@ export function CoordinatesSearch({
           </Button>
         </DialogTrigger>
         <DialogContent
-          className="inset-0 flex h-[100dvh] w-screen max-h-none max-w-none translate-x-0 translate-y-0 flex-col gap-3 rounded-none border-0 p-3 sm:max-w-none sm:p-4"
+          className="inset-0 flex h-[100dvh] max-h-none w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-3 rounded-none border-0 p-3 sm:max-w-none sm:p-4"
           showCloseButton
         >
           <DialogHeader className="shrink-0 space-y-1 pb-0">

@@ -9,7 +9,10 @@ import {
 } from "./components/onboarding-step"
 import { CreateParcel, type FieldFormData } from "./components/parcel"
 import { createParcelDraft } from "./components/parcel/parcel-draft-utils"
-import { toParcelCreateInput } from "./components/parcel/parcel-form"
+import {
+  toParcelCreateInput,
+  toParcelUpdateInput,
+} from "./components/parcel/parcel-form"
 import { BulkFinance } from "./components/finance/bulk-finance"
 import { TeamInvites } from "./components/team"
 import { OnboardingSummary } from "./components/onboarding-summary"
@@ -70,17 +73,27 @@ export default function OnboardingFlow() {
     }))
   }, [])
 
-  const handleRemoveParcel = useCallback((id: string) => {
-    setParcelState((state) => {
-      if (state.parcels.length <= 1) return state
-      const nextParcels = state.parcels.filter((parcel) => parcel.id !== id)
-      const nextActiveId =
-        state.activeParcelId === id
-          ? (nextParcels[0]?.id ?? state.activeParcelId)
-          : state.activeParcelId
-      return { parcels: nextParcels, activeParcelId: nextActiveId }
-    })
-  }, [])
+  const handleRemoveParcel = useCallback(
+    async (id: string) => {
+      const parcel = parcels.find((item) => item.id === id)
+      if (!parcel) return
+
+      if (parcel.serverId) {
+        await parcelApi.deleteParcel(parcel.serverId)
+      }
+
+      setParcelState((state) => {
+        if (state.parcels.length <= 1) return state
+        const nextParcels = state.parcels.filter((item) => item.id !== id)
+        const nextActiveId =
+          state.activeParcelId === id
+            ? (nextParcels[0]?.id ?? state.activeParcelId)
+            : state.activeParcelId
+        return { parcels: nextParcels, activeParcelId: nextActiveId }
+      })
+    },
+    [parcels]
+  )
 
   const handlePolygonChange = useCallback(
     (parcelId: string, polygon: string | null) => {
@@ -90,7 +103,7 @@ export default function OnboardingFlow() {
         )
       )
     },
-    []
+    [setParcels]
   )
 
   const handleCentroidChange = useCallback(
@@ -101,41 +114,43 @@ export default function OnboardingFlow() {
         )
       )
     },
-    []
+    [setParcels]
   )
 
-  const handlePersistParcelsAndContinue = useCallback(async () => {
-    try {
-      const pending = parcels.filter((parcel) => !parcel.serverId)
-      const created = await Promise.all(
-        pending.map((parcel) =>
-          parcelApi.createParcel(toParcelCreateInput(parcel))
-        )
-      )
-
-      if (created.length > 0) {
-        setParcelState((state) => {
-          let createdIndex = 0
-          return {
-            ...state,
-            parcels: state.parcels.map((parcel) => {
-              if (parcel.serverId) return parcel
-              const serverParcel = created[createdIndex]
-              createdIndex += 1
-              return serverParcel
-                ? { ...parcel, serverId: serverParcel.id }
-                : parcel
-            }),
-          }
-        })
+  const handleSaveParcel = useCallback(
+    async (parcelId: string) => {
+      const parcel = parcels.find((item) => item.id === parcelId)
+      if (!parcel) {
+        throw new Error("Parcel not found")
       }
 
-      await userApi.updateOnboarding(ONBOARDING_STEP_AFTER_PARCELS)
-      goNext()
-    } catch {
-      throw new Error("Failed to persist parcels")
-    }
-  }, [parcels, goNext])
+      if (parcel.serverId) {
+        await parcelApi.updateParcel(
+          parcel.serverId,
+          toParcelUpdateInput(parcel)
+        )
+        return
+      }
+
+      const created = await parcelApi.createParcel(toParcelCreateInput(parcel))
+
+      setParcelState((state) => ({
+        ...state,
+        parcels: state.parcels.map((item) =>
+          item.id === parcelId ? { ...item, serverId: created.id } : item
+        ),
+      }))
+    },
+    [parcels]
+  )
+
+  const handleContinueFromParcels = useCallback(async () => {
+    await userApi
+      .updateOnboarding(ONBOARDING_STEP_AFTER_PARCELS)
+      .catch(() => undefined)
+
+    goNext()
+  }, [goNext])
 
   const steps = useMemo<OnboardingStepRenderer[]>(
     () => [
@@ -149,7 +164,8 @@ export default function OnboardingFlow() {
           onRemoveParcel={handleRemoveParcel}
           onPolygonChange={handlePolygonChange}
           onCentroidChange={handleCentroidChange}
-          onPersistAndContinue={handlePersistParcelsAndContinue}
+          onSaveParcel={handleSaveParcel}
+          onContinue={handleContinueFromParcels}
         />
       ),
       ({ onContinue, onSkip }) => (
@@ -186,8 +202,11 @@ export default function OnboardingFlow() {
       handleRemoveParcel,
       handlePolygonChange,
       handleCentroidChange,
-      handlePersistParcelsAndContinue,
+      handleSaveParcel,
+      handleContinueFromParcels,
       goToStep,
+      setParcels,
+      setActiveParcelId,
     ]
   )
 

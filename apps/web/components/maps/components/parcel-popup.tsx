@@ -1,10 +1,7 @@
 "use client"
 
 import { MapPopup } from "@workspace/ui/components/map"
-
 import type { Parcel, ParcelLngLat } from "./types"
-import { GridIcon, SunIcon } from "lucide-react"
-import { Button } from "@workspace/ui/components/button"
 
 type ParcelPopupProps = {
   parcel: Parcel
@@ -12,15 +9,14 @@ type ParcelPopupProps = {
   onClose: () => void
 }
 
-const cropEmoji: Record<string, string> = {
-  Trigo: "🌾",
-  Olivos: "🫒",
-  Girasol: "🌻",
+function formatAreaHa(area: number): string {
+  return area.toLocaleString("es-ES", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  })
 }
 
 export function ParcelPopup({ parcel, lngLat, onClose }: ParcelPopupProps) {
-  const emoji = cropEmoji[parcel.type] ?? "🌿"
-
   return (
     <MapPopup
       longitude={lngLat[0]}
@@ -32,92 +28,66 @@ export function ParcelPopup({ parcel, lngLat, onClose }: ParcelPopupProps) {
       offset={12}
       className="rounded-none! border-none! bg-transparent! p-0! shadow-none!"
     >
-      <div className="w-56 overflow-hidden rounded-[14px] border border-border/40 bg-background shadow-lg">
-        {/* Accent bar */}
-        <div className="h-[3px]" style={{ background: parcel.color }} />
+      <div className="w-[216px] overflow-hidden rounded-lg border border-border bg-background shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.03)]">
+        {/* ── Header ─────────────────────────────── */}
+        <div className="flex items-center gap-2 px-3 pt-3 pb-2.5">
+          <span
+            className="h-2 w-2 shrink-0 rounded-full"
+            style={{ backgroundColor: parcel.color }}
+          />
+          <p className="truncate text-[13px] leading-none font-semibold text-foreground">
+            {parcel.name}
+          </p>
+        </div>
 
-        {/* Header */}
-        <div className="relative px-3.5 pt-3 pb-2.5">
-          <div className="flex items-start gap-2.5">
-            <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] text-[17px]"
-              style={{ backgroundColor: `${parcel.color}22` }}
-            >
-              {emoji}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-serif text-sm leading-snug font-semibold text-foreground">
-                {parcel.name}
-              </p>
-              <span
-                className="mt-1 inline-flex items-center rounded-full px-1.5 py-0.5 text-[10.5px] font-medium tracking-wide uppercase"
-                style={{
-                  backgroundColor: `${parcel.color}18`,
-                  color: parcel.color,
-                }}
-              >
-                {parcel.type}
+        {/* ── Sub-header: type + area ──────────────── */}
+        <div className="flex items-center gap-1.5 px-3 pb-3">
+          <span className="text-[11.5px] text-muted-foreground">
+            {parcel.type}
+          </span>
+          {parcel.area != null ? (
+            <>
+              <span className="text-[11px] text-border select-none">·</span>
+              <span className="text-[11.5px] text-muted-foreground tabular-nums">
+                {formatAreaHa(parcel.area)} ha
               </span>
-              <div className="mt-1 flex gap-1.5">
-                <span className="text-[10px] text-muted-foreground/60 tabular-nums">
-                  {lngLat[1].toFixed(4)}°N
-                </span>
-                <span className="text-[10px] text-muted-foreground/60 tabular-nums">
-                  {Math.abs(lngLat[0]).toFixed(4)}°O
-                </span>
-              </div>
-            </div>
-          </div>
+            </>
+          ) : null}
         </div>
 
-        <div className="mx-3.5 h-px bg-border/50" />
+        <div className="h-px bg-border" />
 
-        {/* Body */}
-        <div className="flex flex-col gap-1.5 px-3.5 py-2.5">
+        {/* ── Data rows ──────────────────────────── */}
+        <div className="space-y-2.5 px-3 py-3">
           <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-[11.5px] text-muted-foreground">
-              <GridIcon />
-              Superficie
+            <span className="text-[10.5px] font-medium tracking-[0.07em] text-muted-foreground/55 uppercase">
+              Régimen hídrico
             </span>
-            <span className="text-xs font-medium text-foreground tabular-nums">
-              {parcel.area} ha
+            <span className="font-mono text-[10.5px] text-muted-foreground">
+              {parcel.irrigationType ?? "Sin dato"}
             </span>
           </div>
+
           <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-[11.5px] text-muted-foreground">
-              <SunIcon />
-              Estado
+            <span className="text-[10.5px] font-medium tracking-[0.07em] text-muted-foreground/55 uppercase">
+              Coords
             </span>
-            <span
-              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium"
-              style={{
-                backgroundColor: `${parcel.color}18`,
-                color: parcel.color,
-              }}
-            >
-              <span
-                className="h-1.5 w-1.5 rounded-full"
-                style={{ backgroundColor: parcel.color }}
-              />
-              Activa
+            <span className="font-mono text-[10.5px] text-muted-foreground tabular-nums">
+              {lngLat[1].toFixed(4)}N&nbsp;{Math.abs(lngLat[0]).toFixed(4)}O
             </span>
           </div>
         </div>
 
-        {/* Footer CTA */}
-        <div className="grid grid-cols-3 gap-2 px-3.5 pb-3">
-          <Button
-            size="sm"
-            variant="outline"
-            className="col-span-1 w-full"
-            onClick={() => onClose()}
-          >
-            Cerrar
-          </Button>
-          <Button size="sm" variant="outline" className="col-span-2 w-full">
-            Ver detalle →
-          </Button>
-        </div>
+        <div className="h-px bg-border" />
+
+        {/* ── Footer ──────────────────────────────── */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="w-full cursor-pointer px-3 py-2.5 text-center text-[11.5px] text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+        >
+          Cerrar
+        </button>
       </div>
     </MapPopup>
   )

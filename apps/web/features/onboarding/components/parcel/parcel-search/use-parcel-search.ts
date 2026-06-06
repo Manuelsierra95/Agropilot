@@ -1,7 +1,11 @@
 "use client"
 
 import { useCallback, useState } from "react"
-import type { ParcelSearchResult, SearchParcelFn, SearchParcelInput } from "./types"
+import type {
+  ParcelSearchResult,
+  SearchParcelFn,
+  SearchParcelInput,
+} from "./types"
 
 export function useParcelSearch(searchParcel: SearchParcelFn) {
   const [isLoading, setIsLoading] = useState(false)
@@ -13,7 +17,9 @@ export function useParcelSearch(searchParcel: SearchParcelFn) {
       setError(null)
 
       try {
+        console.log("Searching parcel with input:", input)
         const result = await searchParcel(input)
+        console.log("Search result:", result)
         return result
       } catch (err) {
         const message =

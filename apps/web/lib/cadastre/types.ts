@@ -1,6 +1,8 @@
 export type ParcelAddress = {
   province?: string | null
   municipality?: string | null
+  /** Full cadastre location description (ldt). */
+  ldt?: string | null
   streetType?: string | null
   streetName?: string | null
   streetNumber?: string | null
@@ -10,6 +12,8 @@ export type ParcelAddress = {
 export type ParcelSearchResult = {
   refcat?: string
   geometryCoordinates: number[][][]
+  /** Centroid [lng, lat] from API when available. */
+  centroid?: [number, number]
   address?: ParcelAddress | null
 }
 

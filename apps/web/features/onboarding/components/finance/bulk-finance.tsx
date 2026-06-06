@@ -1,10 +1,12 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { CheckCircle2, Send } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
 import { Badge } from "@workspace/ui/components/badge"
+import { cn } from "@workspace/ui/lib/utils"
 import {
   Table,
   TableBody,
@@ -122,6 +124,56 @@ const EXAMPLE_PASTE = `concepto\timporte\tfecha\tcategoria\ttipo
 Fertilizante NPK\t1240,50\t2025-01-15\tfertilization\tgasto
 Venta aceite\t4800\t2025-02-02\tsale\tingreso`
 
+interface FinanceBulkImportBarProps {
+  imported: boolean
+  importLabel: string
+  canImport: boolean
+  onImport: () => void
+}
+
+function FinanceBulkImportBar({
+  imported,
+  importLabel,
+  canImport,
+  onImport,
+}: FinanceBulkImportBarProps) {
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-sm text-muted-foreground">
+        {imported
+          ? "Listo en modo demo. Al conectar la API, se importarán en finanzas."
+          : canImport
+            ? "Revisa los movimientos en la vista previa e impórtalos antes de continuar."
+            : "Los datos de ejemplo no se pueden importar. Pega y procesa tus propios movimientos."}
+      </p>
+      <Button
+        type="button"
+        size="lg"
+        variant={imported ? "outline" : "default"}
+        className={cn(
+          "h-11 w-full gap-2 shadow-sm",
+          imported &&
+            "border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary"
+        )}
+        onClick={onImport}
+        disabled={!canImport || imported}
+      >
+        {imported ? (
+          <>
+            <CheckCircle2 className="h-4 w-4" />
+            Movimientos importados
+          </>
+        ) : (
+          <>
+            <Send className="h-4 w-4" />
+            {importLabel}
+          </>
+        )}
+      </Button>
+    </div>
+  )
+}
+
 interface BulkFinanceProps {
   rows: FinanceBulkRow[]
   onRowsChange: (rows: FinanceBulkRow[]) => void
@@ -137,9 +189,13 @@ export function BulkFinance({
 }: BulkFinanceProps) {
   const [pasteValue, setPasteValue] = useState("")
   const [parseError, setParseError] = useState<string | null>(null)
+  const [rowsAreExample, setRowsAreExample] = useState(false)
+  const [imported, setImported] = useState(() => rows.length > 0)
 
   const displayRows = rows.length > 0 ? rows : MOCK_FINANCE_ROWS
   const isUsingMock = rows.length === 0
+  const isExamplePreview = isUsingMock || rowsAreExample
+  const canImport = rows.length > 0 && !rowsAreExample
 
   const totals = useMemo(() => {
     const income = displayRows
@@ -166,29 +222,69 @@ export function BulkFinance({
     }
 
     setParseError(null)
+    setImported(false)
+    setRowsAreExample(false)
     onRowsChange(parsed)
   }
 
   const handleLoadExample = () => {
     setPasteValue(EXAMPLE_PASTE)
     setParseError(null)
+    setImported(false)
+    setRowsAreExample(true)
     onRowsChange(parsePastedFinance(EXAMPLE_PASTE))
   }
 
   const handleClear = () => {
     setPasteValue("")
     setParseError(null)
+    setImported(false)
+    setRowsAreExample(false)
     onRowsChange([])
   }
 
+  const handleImport = () => {
+    if (!canImport) return
+    setImported(true)
+  }
+
+  const handleFinish = () => {
+    if (!imported && canImport) {
+      handleImport()
+    }
+    onContinue?.()
+  }
+
+  const importLabel = !canImport
+    ? isExamplePreview
+      ? "Los datos de ejemplo no se importan"
+      : "Procesa datos antes de importar"
+    : totals.count === 1
+      ? "Importar 1 movimiento"
+      : `Importar ${totals.count} movimientos`
+
   return (
     <OnboardingSplitLayout
+      actions={
+        <FinanceBulkImportBar
+          imported={imported}
+          importLabel={importLabel}
+          canImport={canImport}
+          onImport={handleImport}
+        />
+      }
       footer={
         <div className="flex flex-col gap-1">
-          <Button type="button" size="lg" onClick={onContinue}>
+          <Button type="button" size="lg" className="w-full" onClick={handleFinish}>
             Continuar
           </Button>
-          <Button type="button" size="lg" variant="ghost" onClick={onSkip}>
+          <Button
+            type="button"
+            size="lg"
+            variant="ghost"
+            className="w-full"
+            onClick={onSkip}
+          >
             Omitir este paso
           </Button>
         </div>
@@ -202,11 +298,12 @@ export function BulkFinance({
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            {isUsingMock ? (
+            {isExamplePreview ? (
               <Badge variant="secondary">Datos de ejemplo</Badge>
             ) : (
               <Badge>Pegado desde Excel</Badge>
             )}
+            {imported ? <Badge>Movimientos importados</Badge> : null}
             <Badge variant="outline">
               Ingresos: {totals.income.toLocaleString("es-ES")} €
             </Badge>
@@ -262,8 +359,8 @@ export function BulkFinance({
             Importar finanzas
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Copia una o varias columnas desde Excel y pégalas aquí. Detectamos
-            tabulaciones entre columnas y saltos de línea entre filas.
+            Copia una o varias columnas desde Excel y pégalas aquí. Procesa los
+            datos, revisa la vista previa e impórtalos antes de continuar.
           </p>
         </div>
 

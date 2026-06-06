@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type FormEvent } from "react"
+import { useCallback, useState } from "react"
 import { Search } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
@@ -11,7 +11,6 @@ import {
   FieldGroup,
 } from "@workspace/ui/components/field"
 import { Loader2 } from "lucide-react"
-
 interface RefcatSearchProps {
   onSearch: (refcat: string) => void
   isLoading: boolean
@@ -30,8 +29,7 @@ export function RefcatSearch({
 
   const error = externalError ?? localError
 
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault()
+  const handleSearch = useCallback(() => {
     const value = refcat.trim().toUpperCase()
     if (!value) {
       setLocalError("Introduce una referencia catastral.")
@@ -39,10 +37,10 @@ export function RefcatSearch({
     }
     setLocalError(null)
     onSearch(value)
-  }
+  }, [onSearch, refcat])
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-4">
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="refcat">Referencia catastral</FieldLabel>
@@ -54,6 +52,12 @@ export function RefcatSearch({
               setRefcat(e.target.value.toUpperCase())
               setLocalError(null)
             }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                handleSearch()
+              }
+            }}
             disabled={isLoading || disabled}
             className="font-mono uppercase"
           />
@@ -62,9 +66,10 @@ export function RefcatSearch({
       </FieldGroup>
 
       <Button
-        type="submit"
+        type="button"
         disabled={isLoading || disabled}
-        className="w-full"
+        className="w-full bg-primary/10 text-primary hover:bg-primary/20"
+        onClick={handleSearch}
       >
         {isLoading ? (
           <>
@@ -78,6 +83,6 @@ export function RefcatSearch({
           </>
         )}
       </Button>
-    </form>
+    </div>
   )
 }

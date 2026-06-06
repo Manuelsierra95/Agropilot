@@ -1,8 +1,9 @@
 export type Parcel = {
   id: string
   name: string
-  area: number
+  area?: number
   type: string
+  irrigationType?: string
   color: string
   geometryType: "Polygon"
   geometryCoordinates: number[][][]

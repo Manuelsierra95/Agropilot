@@ -7,13 +7,15 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@workspace/ui/components/field"
+import { ScrollArea } from "@workspace/ui/components/scroll-area"
 import { CropTypeSelector } from "./crop-type-selector"
 import { IrrigationToggle } from "./irrigation-toggle"
 import { ParcelSearch } from "./parcel-search/parcel-search"
 import type { ParcelAddress } from "@/lib/cadastre/types"
 import type { ParcelSearchResult } from "./parcel-search/types"
 import type { SearchParcelFn } from "@/lib/cadastre/types"
-import type { ParcelCreateInput } from "@workspace/schemas"
+import type { ParcelCreateInput, ParcelUpdateInput } from "@workspace/schemas"
+import { hectaresToSquareMeters } from "@/lib/area"
 import { parsePolygonCoordinates } from "./parcel-draft-utils"
 import {
   draftCentroidFromCoordinates,
@@ -27,6 +29,7 @@ export interface FieldFormData {
   name: string
   cropType: string
   irrigationType?: IrrigationType
+  areaHa?: number | null
   polygon?: string | null
   centroid?: string | null
   refcat?: string | null
@@ -38,6 +41,8 @@ export type ParcelFormErrors = {
   irrigationType?: string
   geometry?: string
 }
+
+export type ParcelSaveStatus = "idle" | "saving" | "saved" | "error"
 
 export function hasParcelGeometry(data: FieldFormData): boolean {
   const coordinates = parsePolygonCoordinates(data.polygon)
@@ -137,7 +142,21 @@ export function validateParcelForm(data: FieldFormData): ParcelFormErrors {
   return errors
 }
 
-export function toParcelCreateInput(data: FieldFormData): ParcelCreateInput {
+function toParcelLocationFields(data: FieldFormData) {
+  const address = data.address
+
+  return {
+    refcat: data.refcat ?? null,
+    province: address?.province ?? null,
+    municipality: address?.municipality ?? null,
+    streetType: address?.streetType ?? null,
+    streetName: address?.streetName ?? null,
+    streetNumber: address?.streetNumber ?? null,
+    postalCode: address?.postalCode ?? null,
+  }
+}
+
+function toParcelCoreFields(data: FieldFormData) {
   const coordinates = parsePolygonCoordinates(data.polygon)
   const polygon =
     coordinates && coordinates.length > 0
@@ -151,9 +170,34 @@ export function toParcelCreateInput(data: FieldFormData): ParcelCreateInput {
     name: data.name.trim(),
     cropType: data.cropType || DEFAULT_CROP_TYPE,
     irrigationType: data.irrigationType,
+    ...(data.areaHa != null
+      ? { areaHa: data.areaHa, areaM2: hectaresToSquareMeters(data.areaHa) }
+      : {}),
     ...(centroid ? { centroid } : {}),
     ...(polygon ? { polygon } : {}),
   }
+}
+
+export function toParcelCreateInput(data: FieldFormData): ParcelCreateInput {
+  return {
+    ...toParcelCoreFields(data),
+    ...toParcelLocationFields(data),
+  }
+}
+
+export function toParcelUpdateInput(data: FieldFormData): ParcelUpdateInput {
+  return {
+    ...toParcelCoreFields(data),
+    ...toParcelLocationFields(data),
+  }
+}
+
+export function hasUnsavedParcelData(data: FieldFormData): boolean {
+  if (data.serverId) return false
+
+  return Boolean(
+    data.name.trim() || data.irrigationType || hasParcelGeometry(data)
+  )
 }
 
 interface ParcelFormProps {
@@ -177,75 +221,101 @@ export function ParcelForm({
   const located = hasParcelGeometry(value)
 
   return (
-    <>
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-          Crea tu parcela
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          Empieza agregando la información básica de tu parcela. Siempre puedes
-          editar estos detalles más tarde.
-        </p>
+    <ScrollArea className="h-full min-h-0 w-full flex-1">
+      <div className="pb-4 pr-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            Crea tu parcela
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            Empieza agregando la información básica de tu parcela. Siempre
+            puedes editar estos detalles más tarde.
+          </p>
+        </div>
+
+        <FieldGroup className="mt-2">
+          <Field data-invalid={Boolean(errors.name) || undefined}>
+            <FieldLabel htmlFor="parcel-name">
+              Nombre de la parcela
+              <span className="text-destructive">*</span>
+            </FieldLabel>
+            <Input
+              id="parcel-name"
+              name="name"
+              placeholder="Parcela olivos"
+              value={name}
+              aria-invalid={Boolean(errors.name) || undefined}
+              onChange={(e) => onChange({ ...value, name: e.target.value })}
+            />
+            {errors.name ? (
+              <FieldDescription className="text-destructive">
+                {errors.name}
+              </FieldDescription>
+            ) : null}
+          </Field>
+
+          <ParcelSearch
+            hasGeometry={located}
+            geometryError={errors.geometry}
+            disabled={searchDisabled}
+            searchParcel={searchParcel}
+            onFound={onGeometryFound}
+          />
+
+          <Field>
+            <FieldLabel htmlFor="parcel-area-ha">Superficie (ha)</FieldLabel>
+            <Input
+              id="parcel-area-ha"
+              name="areaHa"
+              type="number"
+              inputMode="decimal"
+              min={0}
+              step="0.0001"
+              placeholder="Ej: 2,45"
+              value={value.areaHa ?? ""}
+              onChange={(e) => {
+                const raw = e.target.value.trim()
+                onChange({
+                  ...value,
+                  areaHa: raw === "" ? null : Number(raw),
+                })
+              }}
+            />
+            <FieldDescription>
+              Opcional. Introduce las hectáreas de la parcela.
+            </FieldDescription>
+          </Field>
+
+          <Field>
+            <FieldLabel>Tipo de cultivo</FieldLabel>
+            <CropTypeSelector
+              value={cropType || DEFAULT_CROP_TYPE}
+              onChange={(nextCropType) =>
+                onChange({ ...value, cropType: nextCropType })
+              }
+            />
+          </Field>
+
+          <Field data-invalid={Boolean(errors.irrigationType) || undefined}>
+            <FieldLabel htmlFor="parcel-irrigation">
+              Régimen hídrico
+              <span className="text-destructive">*</span>
+            </FieldLabel>
+            <IrrigationToggle
+              value={irrigationType}
+              invalid={Boolean(errors.irrigationType)}
+              onChange={(nextIrrigation) =>
+                onChange({ ...value, irrigationType: nextIrrigation })
+              }
+            />
+            {errors.irrigationType ? (
+              <FieldDescription className="text-destructive">
+                {errors.irrigationType}
+              </FieldDescription>
+            ) : null}
+          </Field>
+        </FieldGroup>
       </div>
-
-      <FieldGroup className="mt-2">
-        <Field data-invalid={Boolean(errors.name) || undefined}>
-          <FieldLabel htmlFor="parcel-name">
-            Nombre de la parcela
-            <span className="text-destructive">*</span>
-          </FieldLabel>
-          <Input
-            id="parcel-name"
-            name="name"
-            placeholder="Parcela olivos"
-            value={name}
-            aria-invalid={Boolean(errors.name) || undefined}
-            onChange={(e) => onChange({ ...value, name: e.target.value })}
-          />
-          {errors.name ? (
-            <FieldDescription className="text-destructive">
-              {errors.name}
-            </FieldDescription>
-          ) : null}
-        </Field>
-
-        <ParcelSearch
-          hasGeometry={located}
-          geometryError={errors.geometry}
-          disabled={searchDisabled}
-          searchParcel={searchParcel}
-          onFound={onGeometryFound}
-        />
-
-        <Field>
-          <FieldLabel>Tipo de cultivo</FieldLabel>
-          <CropTypeSelector
-            value={cropType || DEFAULT_CROP_TYPE}
-            onChange={(nextCropType) =>
-              onChange({ ...value, cropType: nextCropType })
-            }
-          />
-        </Field>
-
-        <Field data-invalid={Boolean(errors.irrigationType) || undefined}>
-          <FieldLabel htmlFor="parcel-irrigation">
-            Régimen hídrico
-            <span className="text-destructive">*</span>
-          </FieldLabel>
-          <IrrigationToggle
-            value={irrigationType}
-            invalid={Boolean(errors.irrigationType)}
-            onChange={(nextIrrigation) =>
-              onChange({ ...value, irrigationType: nextIrrigation })
-            }
-          />
-          {errors.irrigationType ? (
-            <FieldDescription className="text-destructive">
-              {errors.irrigationType}
-            </FieldDescription>
-          ) : null}
-        </Field>
-      </FieldGroup>
-    </>
+    </ScrollArea>
   )
 }

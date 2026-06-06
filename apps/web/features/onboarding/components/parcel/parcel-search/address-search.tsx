@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, type FormEvent } from "react"
 import { Loader2, Search } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
@@ -21,6 +20,7 @@ import type { AddressQuery } from "./types"
 import { useAddressSearchForm } from "./use-address-search-form"
 
 interface AddressSearchProps {
+  isActive?: boolean
   onSearch: (address: AddressQuery & { tipoViaSigla: string }) => void
   isLoading: boolean
   disabled?: boolean
@@ -28,6 +28,7 @@ interface AddressSearchProps {
 }
 
 export function AddressSearch({
+  isActive = false,
   onSearch,
   isLoading,
   disabled = false,
@@ -41,20 +42,14 @@ export function AddressSearch({
     loadingProvincias,
     loadingVias,
     municipios,
-    prefetchProvincias,
     provincias,
     tiposVia,
     updateField,
     validateAndGetData,
     viasFiltradas,
-  } = useAddressSearchForm()
+  } = useAddressSearchForm(isActive)
 
-  useEffect(() => {
-    prefetchProvincias()
-  }, [prefetchProvincias])
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
+  const handleSearch = () => {
     const data = validateAndGetData()
     if (!data) return
     onSearch(data)
@@ -63,7 +58,7 @@ export function AddressSearch({
   const displayError = externalError ?? apiError
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-4">
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="provincia">Provincia</FieldLabel>
@@ -92,7 +87,9 @@ export function AddressSearch({
               ))}
             </SelectContent>
           </Select>
-          {errors.provincia ? <FieldError>{errors.provincia}</FieldError> : null}
+          {errors.provincia ? (
+            <FieldError>{errors.provincia}</FieldError>
+          ) : null}
         </Field>
 
         <Field>
@@ -126,7 +123,9 @@ export function AddressSearch({
               ))}
             </SelectContent>
           </Select>
-          {errors.municipio ? <FieldError>{errors.municipio}</FieldError> : null}
+          {errors.municipio ? (
+            <FieldError>{errors.municipio}</FieldError>
+          ) : null}
         </Field>
 
         <Field>
@@ -134,7 +133,9 @@ export function AddressSearch({
           <Select
             value={formData.tipoVia || ""}
             onValueChange={(value) => updateField("tipoVia", value)}
-            disabled={isLoading || loadingVias || !formData.municipio || disabled}
+            disabled={
+              isLoading || loadingVias || !formData.municipio || disabled
+            }
           >
             <SelectTrigger id="tipoVia">
               <SelectValue
@@ -176,7 +177,7 @@ export function AddressSearch({
             </SelectTrigger>
             <SelectContent className="p-2">
               {viasFiltradas.map((via) => (
-                <SelectItem key={via.Codigo} value={via.Denominacion}>
+                <SelectItem key={via.Codigo} value={String(via.Codigo)}>
                   {via.Denominacion}
                 </SelectItem>
               ))}
@@ -202,7 +203,12 @@ export function AddressSearch({
         {displayError ? <FieldError>{displayError}</FieldError> : null}
       </FieldGroup>
 
-      <Button type="submit" disabled={isLoading || disabled} className="w-full">
+      <Button
+        type="button"
+        disabled={isLoading || disabled}
+        className="w-full bg-primary/10 text-primary hover:bg-primary/20"
+        onClick={handleSearch}
+      >
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -215,6 +221,6 @@ export function AddressSearch({
           </>
         )}
       </Button>
-    </form>
+    </div>
   )
 }

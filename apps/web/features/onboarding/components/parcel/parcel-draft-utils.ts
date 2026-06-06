@@ -1,6 +1,11 @@
 import type { Parcel } from "@/components/maps/components/types"
 import { parseWktPolygon } from "@/lib/cadastre/geometry"
-import { CROP_TYPE_LABELS, DEFAULT_CROP_TYPE, type CropTypeValue } from "./parcel-constants"
+import {
+  CROP_TYPE_LABELS,
+  DEFAULT_CROP_TYPE,
+  IRRIGATION_TYPE_LABELS,
+  type CropTypeValue,
+} from "./parcel-constants"
 import type { FieldFormData } from "./parcel-form"
 
 const PARCEL_MAP_COLORS = [
@@ -23,6 +28,21 @@ export function createParcelDraft(): FieldFormData {
     irrigationType: undefined,
     polygon: null,
     centroid: null,
+  }
+}
+
+export function clearParcelDraftData(parcel: FieldFormData): FieldFormData {
+  return {
+    id: parcel.id,
+    serverId: parcel.serverId,
+    name: "",
+    cropType: DEFAULT_CROP_TYPE,
+    irrigationType: undefined,
+    areaHa: null,
+    polygon: null,
+    centroid: null,
+    refcat: null,
+    address: null,
   }
 }
 
@@ -82,8 +102,11 @@ export function fieldFormDraftsToMapParcels(
       {
         id: draft.id,
         name: draft.name.trim() || "Parcela sin nombre",
-        area: 0,
+        area: draft.areaHa ?? undefined,
         type: cropLabel,
+        irrigationType: draft.irrigationType
+          ? IRRIGATION_TYPE_LABELS[draft.irrigationType]
+          : undefined,
         color: isActive
           ? ACTIVE_PARCEL_COLOR
           : (PARCEL_MAP_COLORS[index % PARCEL_MAP_COLORS.length] ??

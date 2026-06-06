@@ -98,7 +98,10 @@ export function OnboardingSummary({
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-muted-foreground" aria-hidden />
+                  <MapPin
+                    className="h-5 w-5 text-muted-foreground"
+                    aria-hidden
+                  />
                   <CardTitle className="text-base">Parcelas</CardTitle>
                 </div>
                 <Badge>{parcelCountLabel}</Badge>
@@ -130,7 +133,9 @@ export function OnboardingSummary({
                         <span className="font-medium text-foreground">
                           {parcelName}
                         </span>
-                        <span className="text-muted-foreground">{cropLabel}</span>
+                        <span className="text-muted-foreground">
+                          {cropLabel}
+                        </span>
                       </div>
                       {irrigationLabel ? (
                         <div className="flex justify-between gap-4">
@@ -170,7 +175,9 @@ export function OnboardingSummary({
                   <Euro className="h-5 w-5 text-muted-foreground" aria-hidden />
                   <CardTitle className="text-base">Finanzas</CardTitle>
                 </div>
-                <Badge variant={financeTotals.count > 0 ? "default" : "secondary"}>
+                <Badge
+                  variant={financeTotals.count > 0 ? "default" : "secondary"}
+                >
                   {financeTotals.count > 0
                     ? `${financeTotals.count} movimientos`
                     : "Omitido"}
@@ -183,13 +190,13 @@ export function OnboardingSummary({
                 <>
                   <div className="flex justify-between gap-4">
                     <span className="text-muted-foreground">Ingresos</span>
-                    <span className="font-medium tabular-nums text-foreground">
+                    <span className="font-medium text-foreground tabular-nums">
                       {formatCurrency(financeTotals.income)}
                     </span>
                   </div>
                   <div className="flex justify-between gap-4">
                     <span className="text-muted-foreground">Gastos</span>
-                    <span className="font-medium tabular-nums text-foreground">
+                    <span className="font-medium text-foreground tabular-nums">
                       {formatCurrency(financeTotals.expense)}
                     </span>
                   </div>
@@ -212,10 +219,15 @@ export function OnboardingSummary({
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-muted-foreground" aria-hidden />
+                  <Users
+                    className="h-5 w-5 text-muted-foreground"
+                    aria-hidden
+                  />
                   <CardTitle className="text-base">Equipo</CardTitle>
                 </div>
-                <Badge variant={validInvites.length > 0 ? "default" : "secondary"}>
+                <Badge
+                  variant={validInvites.length > 0 ? "default" : "secondary"}
+                >
                   {validInvites.length > 0
                     ? validInvites.length === 1
                       ? "1 invitación"

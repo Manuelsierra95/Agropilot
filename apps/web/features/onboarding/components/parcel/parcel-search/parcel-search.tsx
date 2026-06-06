@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { Badge } from "@workspace/ui/components/badge"
 import {
   Tabs,
@@ -7,7 +9,12 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs"
-import { mockSearchParcel } from "@/lib/cadastre/search-parcel"
+import { searchParcel } from "@/lib/cadastre/search-parcel"
+import {
+  searchApi,
+  searchQueryKeys,
+  searchQueryOptions,
+} from "@/lib/api/routes/search"
 import type { ParcelSearchResult, SearchParcelFn } from "./types"
 import { useParcelSearch } from "./use-parcel-search"
 import { CoordinatesSearch } from "./coordinates-search"
@@ -24,12 +31,17 @@ interface ParcelSearchProps {
 
 export function ParcelSearch({
   onFound,
-  searchParcel = mockSearchParcel,
+  searchParcel: searchParcelProp = searchParcel,
   disabled = false,
   hasGeometry = false,
   geometryError,
 }: ParcelSearchProps) {
-  const { isLoading, error, search, clearError } = useParcelSearch(searchParcel)
+  const { isLoading, error, search, clearError } =
+    useParcelSearch(searchParcelProp)
+  const queryClient = useQueryClient()
+  const [activeTab, setActiveTab] = useState<"coords" | "refcat" | "address">(
+    "coords"
+  )
 
   const handleFound = async (
     input: Parameters<SearchParcelFn>[0]
@@ -64,9 +76,19 @@ export function ParcelSearch({
       ) : null}
 
       <Tabs
-        defaultValue="coords"
+        value={activeTab}
         className="w-full"
-        onValueChange={() => clearError()}
+        onValueChange={(value) => {
+          clearError()
+          if (value === "address") {
+            void queryClient.prefetchQuery({
+              queryKey: searchQueryKeys.provinces(),
+              queryFn: () => searchApi.getProvinces(),
+              ...searchQueryOptions,
+            })
+          }
+          setActiveTab(value as "coords" | "refcat" | "address")
+        }}
       >
         <TabsList className="w-full">
           <TabsTrigger value="coords" className="flex-1">
@@ -103,6 +125,7 @@ export function ParcelSearch({
 
         <TabsContent value="address" className="mt-4">
           <AddressSearch
+            isActive={activeTab === "address"}
             isLoading={isLoading}
             disabled={disabled}
             error={error}

@@ -66,9 +66,16 @@ export function ParcelLocationSummary({
         ) : null}
 
         {streetLine ? (
-          <div>
+          <div className="sm:col-span-2">
             <dt className="text-xs text-muted-foreground">Dirección</dt>
             <dd className="mt-0.5 font-medium text-foreground">{streetLine}</dd>
+          </div>
+        ) : address?.ldt?.trim() ? (
+          <div className="sm:col-span-2">
+            <dt className="text-xs text-muted-foreground">Ubicación</dt>
+            <dd className="mt-0.5 font-medium text-foreground">
+              {formatValue(address.ldt)}
+            </dd>
           </div>
         ) : null}
 

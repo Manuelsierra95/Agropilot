@@ -138,6 +138,12 @@ export type MapComponentProps = {
    * Other parcels in `parcels` remain visible.
    */
   focusedParcelId?: string | null
+
+  /**
+   * When this value changes (e.g. after a cadastre search), refits the viewport
+   * to the focused parcel or all parcels.
+   */
+  geometryRefitKey?: string | null
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -156,6 +162,7 @@ export function MapComponent({
   showPopup = true,
   resizeWithContainer = false,
   focusedParcelId = null,
+  geometryRefitKey = null,
 }: MapComponentProps) {
   const [isSatellite, setIsSatellite] = useState(false)
   const [popupInfo, setPopupInfo] = useState<PopupInfo>(null)
@@ -231,6 +238,12 @@ export function MapComponent({
   }, [focusedParcelId, flyToFocusedParcel])
 
   useEffect(() => {
+    if (!geometryRefitKey) return
+    if (flyToFocusedParcel()) return
+    fitToParcels()
+  }, [geometryRefitKey, flyToFocusedParcel, fitToParcels])
+
+  useEffect(() => {
     if (!resizeWithContainer) return
     const root = containerRef.current
     if (!root) return
@@ -269,6 +282,7 @@ export function MapComponent({
       {/* Satellite toggle */}
       <div className="absolute top-3 right-3 z-9">
         <Button
+          type="button"
           variant="default"
           size="sm"
           className="border-border bg-card/90 text-foreground backdrop-blur-sm hover:bg-accent"

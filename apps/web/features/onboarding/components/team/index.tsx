@@ -15,7 +15,7 @@ import {
 } from "@workspace/ui/components/select"
 import { Mail, Plus } from "lucide-react"
 import { OnboardingSplitLayout } from "../onboarding-split-layout"
-import { TeamInvitesPreview } from "./team-preview"
+import { TeamInvitesPreview, TeamInvitesSendBar } from "./team-preview"
 import {
   MOCK_TEAM_INVITES,
   TEAM_ROLE_LABELS,
@@ -129,6 +129,14 @@ export function TeamInvites({
   return (
     <OnboardingSplitLayout
       previewOnMobile="stack"
+      actions={
+        <TeamInvitesSendBar
+          sentMock={sentMock}
+          sendLabel={sendLabel}
+          validInviteCount={validInviteCount}
+          onSend={handleSendMock}
+        />
+      }
       footer={
         <div className="flex flex-col gap-1">
           <Button type="button" size="lg" className="w-full" onClick={handleFinish}>
@@ -163,10 +171,7 @@ export function TeamInvites({
         <TeamInvitesPreview
           invites={displayInvites}
           sentMock={sentMock}
-          sendLabel={sendLabel}
-          validInviteCount={validInviteCount}
           onRemove={removeInvite}
-          onSend={handleSendMock}
         />
       }
     >
@@ -176,8 +181,8 @@ export function TeamInvites({
             Invita a tu equipo
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Añade correos y roles de tus compañeros. La lista y el envío están
-            en el panel de la derecha.
+            Añade correos y roles de tus compañeros. Revisa la lista en la vista
+            previa y envía las invitaciones antes de continuar.
           </p>
         </div>
 

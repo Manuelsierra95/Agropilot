@@ -1,11 +1,12 @@
 "use client"
 
 import { useCallback, useMemo, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import {
-  MOCK_CATASTRO_MUNICIPALITIES,
-  MOCK_CATASTRO_PROVINCES,
-  MOCK_CATASTRO_STREETS,
-} from "@/features/onboarding/mocks/onboarding-mocks"
+  searchApi,
+  searchQueryKeys,
+  searchQueryOptions,
+} from "@/lib/api/routes/search"
 import type { AddressQuery } from "./types"
 
 type AddressFormData = Partial<AddressQuery>
@@ -14,37 +15,76 @@ type AddressFormErrors = Partial<Record<keyof AddressQuery, string>>
 
 const EMPTY_FORM: AddressFormData = {}
 
-export function useAddressSearchForm() {
+export function useAddressSearchForm(isActive: boolean) {
   const [formData, setFormData] = useState<AddressFormData>(EMPTY_FORM)
   const [errors, setErrors] = useState<AddressFormErrors>({})
   const [apiError, setApiError] = useState<string | null>(null)
 
-  const provincias = MOCK_CATASTRO_PROVINCES
+  const provincesQuery = useQuery({
+    queryKey: searchQueryKeys.provinces(),
+    queryFn: () => searchApi.getProvinces(),
+    enabled: isActive,
+    ...searchQueryOptions,
+  })
 
-  const municipios = useMemo(() => {
-    if (!formData.provincia) return []
-    return MOCK_CATASTRO_MUNICIPALITIES[formData.provincia] ?? []
-  }, [formData.provincia])
+  const provincias = provincesQuery.data ?? []
 
-  const streetsForMunicipality = useMemo(() => {
-    if (!formData.provincia || !formData.municipio) return []
-    const key = `${formData.provincia}-${formData.municipio}`
-    return MOCK_CATASTRO_STREETS[key] ?? []
-  }, [formData.provincia, formData.municipio])
+  const provinceCode = useMemo(
+    () =>
+      provincias.find((item) => item.Denominacion === formData.provincia)?.Codigo,
+    [provincias, formData.provincia]
+  )
+
+  const municipalitiesQuery = useQuery({
+    queryKey: searchQueryKeys.municipalities(provinceCode ?? 0),
+    queryFn: () => searchApi.getMunicipalities(provinceCode!),
+    enabled: isActive && provinceCode != null,
+    ...searchQueryOptions,
+  })
+
+  const municipios = municipalitiesQuery.data ?? []
+
+  const municipalityCode = useMemo(
+    () =>
+      municipios.find((item) => item.Denominacion === formData.municipio)?.Codigo,
+    [municipios, formData.municipio]
+  )
+
+  const streetsQuery = useQuery({
+    queryKey: searchQueryKeys.streets(provinceCode ?? 0, municipalityCode ?? 0),
+    queryFn: () =>
+      searchApi.getStreets({
+        province: provinceCode!,
+        municipality: municipalityCode!,
+      }),
+    enabled: isActive && provinceCode != null && municipalityCode != null,
+    ...searchQueryOptions,
+  })
+
+  const streets = streetsQuery.data ?? []
 
   const tiposVia = useMemo(() => {
-    const types = new Set(streetsForMunicipality.map((via) => via.TipoVia))
+    const types = new Set(streets.map((via) => via.TipoVia))
     return [...types].sort()
-  }, [streetsForMunicipality])
+  }, [streets])
 
   const viasFiltradas = useMemo(() => {
     if (!formData.tipoVia) return []
-    return streetsForMunicipality.filter((via) => via.TipoVia === formData.tipoVia)
-  }, [streetsForMunicipality, formData.tipoVia])
+    return streets.filter((via) => via.TipoVia === formData.tipoVia)
+  }, [streets, formData.tipoVia])
 
-  const prefetchProvincias = useCallback(() => {
-    // Provincias are static mocks; no async prefetch needed.
-  }, [])
+  const queryApiError = useMemo(() => {
+    if (provincesQuery.isError) return "No se pudieron cargar las provincias."
+    if (municipalitiesQuery.isError) return "No se pudieron cargar los municipios."
+    if (streetsQuery.isError) return "No se pudieron cargar las vías."
+    return null
+  }, [provincesQuery.isError, municipalitiesQuery.isError, streetsQuery.isError])
+
+  const displayApiError = apiError ?? queryApiError
+
+  const loadingProvincias = provincesQuery.isPending
+  const loadingMunicipios = municipalitiesQuery.isFetching
+  const loadingVias = streetsQuery.isFetching
 
   const updateField = useCallback(
     <K extends keyof AddressQuery>(field: K, value: AddressQuery[K]) => {
@@ -106,7 +146,7 @@ export function useAddressSearchForm() {
     }
 
     const selectedStreet = viasFiltradas.find(
-      (via) => via.Denominacion === formData.nombreVia
+      (via) => String(via.Codigo) === formData.nombreVia
     )
 
     if (!selectedStreet) {
@@ -118,21 +158,20 @@ export function useAddressSearchForm() {
       provincia: formData.provincia!,
       municipio: formData.municipio!,
       tipoVia: formData.tipoVia!,
-      nombreVia: formData.nombreVia!,
+      nombreVia: selectedStreet.Denominacion,
       numero: formData.numero!,
       tipoViaSigla: selectedStreet.Sigla,
     }
   }, [formData, viasFiltradas])
 
   return {
-    apiError,
+    apiError: displayApiError,
     errors,
     formData,
-    loadingMunicipios: false,
-    loadingProvincias: false,
-    loadingVias: false,
+    loadingMunicipios,
+    loadingProvincias,
+    loadingVias,
     municipios,
-    prefetchProvincias,
     provincias,
     tiposVia,
     updateField,

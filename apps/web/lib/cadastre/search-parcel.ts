@@ -1,62 +1,52 @@
+import { searchApi } from "@/lib/api/routes/search"
+import { applyParcelSearchResponse } from "./apply-search-response"
 import type { ParcelSearchResult, SearchParcelFn, SearchParcelInput } from "./types"
 
-/** Sample parcel near Cazorla (Jaén) for UI development until catastro proxy exists. */
-const MOCK_PARCEL_GEOMETRY: number[][][] = [
-  [
-    [-3.0012, 37.911],
-    [-2.9991, 37.911],
-    [-2.9991, 37.9098],
-    [-3.0012, 37.9098],
-    [-3.0012, 37.911],
-  ],
-]
+function toParcelSearchResult(
+  data: Awaited<ReturnType<typeof searchApi.searchByAddress>>,
+  input?: Extract<SearchParcelInput, { type: "address" }>
+): ParcelSearchResult {
+  const draft = applyParcelSearchResponse(data, {
+    streetType: input?.tipoViaSigla ?? null,
+    streetName: input?.nombreVia ?? null,
+    streetNumber: input?.numero ?? null,
+  })
 
-const MOCK_RESULT: ParcelSearchResult = {
-  refcat: "0060304WG0906S0001YO",
-  geometryCoordinates: MOCK_PARCEL_GEOMETRY,
-  address: {
-    province: "JAÉN",
-    municipality: "CAZORLA",
-    streetType: "CL",
-    streetName: "TORRE BAJA",
-    streetNumber: "8",
-    postalCode: "23470",
-  },
-}
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-/**
- * Temporary stub. Replace with real catastro client or API proxy without changing UI components.
- */
-export const mockSearchParcel: SearchParcelFn = async (input) => {
-  await delay(600)
-
-  if (input.type === "refcat" && input.refcat.length < 14) {
-    throw new Error("Introduce una referencia catastral válida (mínimo 14 caracteres).")
+  return {
+    refcat: draft.refcat,
+    geometryCoordinates: data.geometry.polygon.coordinates,
+    centroid: data.geometry.centroid.coordinates,
+    address: draft.address,
   }
+}
 
-  if (input.type === "coords") {
-    const delta = 0.0008
-    const { lat, lng } = input
-    return {
-      refcat: MOCK_RESULT.refcat,
-      geometryCoordinates: [
-        [
-          [lng - delta, lat + delta],
-          [lng + delta, lat + delta],
-          [lng + delta, lat - delta],
-          [lng - delta, lat - delta],
-          [lng - delta, lat + delta],
-        ],
-      ],
-      address: MOCK_RESULT.address,
+export const searchParcel: SearchParcelFn = async (input) => {
+  switch (input.type) {
+    case "address": {
+      const data = await searchApi.searchByAddress({
+        province: input.provincia,
+        municipality: input.municipio,
+        streetSigla: input.tipoViaSigla,
+        streetName: input.nombreVia,
+        number: input.numero,
+      })
+      return toParcelSearchResult(data, input)
+    }
+    case "coords": {
+      const data = await searchApi.searchByCoords(input.lat, input.lng)
+      return toParcelSearchResult(data)
+    }
+    case "refcat": {
+      const normalized = input.refcat.replace(/\s+/g, "")
+      if (normalized.length < 14) {
+        throw new Error(
+          "Introduce una referencia catastral válida (mínimo 14 caracteres)."
+        )
+      }
+      const data = await searchApi.searchByRefcat(normalized)
+      return toParcelSearchResult(data)
     }
   }
-
-  return { ...MOCK_RESULT }
 }
 
 export type { SearchParcelInput, ParcelSearchResult }

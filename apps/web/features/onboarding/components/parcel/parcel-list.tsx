@@ -2,8 +2,8 @@
 
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
-import { Plus, X } from "lucide-react"
-import type { FieldFormData } from "./parcel-form"
+import { Check, Plus, X } from "lucide-react"
+import type { FieldFormData, ParcelSaveStatus } from "./parcel-form"
 
 interface ParcelListProps {
   parcels: FieldFormData[]
@@ -12,12 +12,21 @@ interface ParcelListProps {
   onAdd: () => void
   onRemove: (id: string) => void
   invalidParcelIds?: Set<string>
+  saveStatusByParcelId?: Record<string, ParcelSaveStatus>
 }
 
 function getParcelLabel(parcel: FieldFormData, index: number, total: number) {
   const trimmed = parcel.name.trim()
   if (trimmed) return trimmed
   return total > 1 ? `Parcela ${index + 1}` : "Nueva parcela"
+}
+
+function isParcelSaved(
+  parcel: FieldFormData,
+  saveStatusByParcelId?: Record<string, ParcelSaveStatus>
+) {
+  if (saveStatusByParcelId?.[parcel.id] === "saved") return true
+  return Boolean(parcel.serverId)
 }
 
 export function ParcelList({
@@ -27,6 +36,7 @@ export function ParcelList({
   onAdd,
   onRemove,
   invalidParcelIds,
+  saveStatusByParcelId,
 }: ParcelListProps) {
   return (
     <div className="shrink-0 -mx-6 flex flex-col gap-2 border-b border-sidebar-border bg-sidebar px-6 pb-3">
@@ -34,6 +44,7 @@ export function ParcelList({
         {parcels.map((parcel, index) => {
           const isActive = parcel.id === activeParcelId
           const isInvalid = invalidParcelIds?.has(parcel.id)
+          const isSaved = isParcelSaved(parcel, saveStatusByParcelId)
           const label = getParcelLabel(parcel, index, parcels.length)
 
           return (
@@ -44,14 +55,21 @@ export function ParcelList({
                 isActive
                   ? "border-primary bg-primary/10"
                   : "border-sidebar-border bg-sidebar-accent hover:bg-sidebar-accent/80",
-                isInvalid && "border-destructive/50"
+                isInvalid && "border-destructive/50",
+                isSaved && !isActive && "border-emerald-600/30"
               )}
             >
               <button
                 type="button"
                 onClick={() => onSelect(parcel.id)}
-                className="cursor-pointer truncate px-2.5 py-1.5 text-left text-sm font-medium text-foreground"
+                className="inline-flex cursor-pointer items-center gap-1 truncate px-2.5 py-1.5 text-left text-sm font-medium text-foreground"
               >
+                {isSaved ? (
+                  <Check
+                    className="h-3.5 w-3.5 shrink-0 text-emerald-600"
+                    aria-hidden
+                  />
+                ) : null}
                 {label}
               </button>
               {parcels.length > 1 ? (
