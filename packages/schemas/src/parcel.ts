@@ -10,21 +10,37 @@ export const parcelSelectSchema = createSelectSchema(parcels)
 export const parcelInsertSchema = createInsertSchema(parcels)
 export const parcelUpdateSchema = createUpdateSchema(parcels)
 
-export const parcelCreateSchema = createInsertSchema(parcels).pick({
-  name: true,
-  cropType: true,
-  irrigationType: true,
-  centroid: true,
-  polygon: true,
+const parcelLocationFieldShape = {
+  refcat: z.string().nullish(),
+  province: z.string().nullish(),
+  municipality: z.string().nullish(),
+  streetType: z.string().nullish(),
+  streetName: z.string().nullish(),
+  streetNumber: z.string().nullish(),
+  postalCode: z.string().nullish(),
+}
+
+export const parcelCreateSchema = z.object({
+  name: z.string().trim().min(1),
+  cropType: z.string().min(1),
+  irrigationType: z.enum(["dryland", "irrigated"]).nullish(),
+  areaHa: z.coerce.number().positive().optional(),
+  areaM2: z.coerce.number().int().positive().optional(),
+  centroid: z.string().nullish(),
+  polygon: z.string().nullish(),
+  ...parcelLocationFieldShape,
 })
 
-export const parcelUpdateInputSchema = createUpdateSchema(parcels)
-  .pick({
-    name: true,
-    cropType: true,
-    irrigationType: true,
-    centroid: true,
-    polygon: true,
+export const parcelUpdateInputSchema = z
+  .object({
+    name: z.string().trim().min(1).optional(),
+    cropType: z.string().min(1).optional(),
+    irrigationType: z.enum(["dryland", "irrigated"]).nullish(),
+    areaHa: z.coerce.number().positive().optional(),
+    areaM2: z.coerce.number().int().positive().optional(),
+    centroid: z.string().nullish(),
+    polygon: z.string().nullish(),
+    ...parcelLocationFieldShape,
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: "At least one field must be provided",
@@ -34,8 +50,8 @@ export type ParcelSelect = ReturnType<typeof parcelSelectSchema.parse>
 export type ParcelInsert = ReturnType<typeof parcelInsertSchema.parse>
 export type ParcelUpdate = ReturnType<typeof parcelUpdateSchema.parse>
 
-export type ParcelCreateInput = ReturnType<typeof parcelCreateSchema.parse>
-export type ParcelUpdateInput = ReturnType<typeof parcelUpdateInputSchema.parse>
+export type ParcelCreateInput = z.infer<typeof parcelCreateSchema>
+export type ParcelUpdateInput = z.infer<typeof parcelUpdateInputSchema>
 
 export const parseParcelSelect = (value: unknown): ParcelSelect | null => {
   const parsed = parcelSelectSchema.safeParse(value)
@@ -51,7 +67,3 @@ export const parseParcelUpdate = (value: unknown): ParcelUpdate | null => {
   const parsed = parcelUpdateSchema.safeParse(value)
   return parsed.success ? (parsed.data as unknown as ParcelUpdate) : null
 }
-
-export const parcelSearchQuerySchema = z.object({
-  q: z.string().min(1, "Query parameter 'q' is required"),
-})
