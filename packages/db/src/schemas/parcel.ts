@@ -1,12 +1,19 @@
 import { relations } from "drizzle-orm"
-import { pgTable, text, timestamp, date, jsonb } from "drizzle-orm/pg-core"
+import {
+  pgTable,
+  text,
+  timestamp,
+  date,
+  jsonb,
+  numeric,
+  index,
+  unique,
+  integer,
+} from "drizzle-orm/pg-core"
 import { organizations } from "./auth"
 import { geometry, geometryPolygon } from "../utils/post-gis"
 import { weatherStation } from "./weatherStation"
-import { numeric } from "drizzle-orm/pg-core"
-import { index } from "drizzle-orm/pg-core"
 import { campaigns } from "./finance"
-import { unique } from "drizzle-orm/pg-core"
 import { primaryKeyField } from "../helper"
 
 // Tables
@@ -21,6 +28,8 @@ export const parcels = pgTable("parcels", {
   irrigationType: text("irrigation_type", {
     enum: ["dryland", "irrigated"],
   }),
+  areaHa: numeric("area_ha", { precision: 10, scale: 4 }), // Optional user-entered area in hectares
+  areaM2: integer("area_m2"), // Reserved; not computed from geometry
   centroid: geometry("centroid"), // Centroid point of the parcel (lat/lng fast querys)
   polygon: geometryPolygon("polygon"), // Full polygon geometry
   createdAt: timestamp("created_at").defaultNow().notNull(),
