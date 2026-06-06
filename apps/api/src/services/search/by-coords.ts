@@ -1,14 +1,18 @@
+import type { ParcelSearchResponse } from "@workspace/schemas"
 import { COORDS_URL, parser } from "./client"
-import { formatRefcatSegment, getByRefcat } from "./refcat"
+import {
+  buildParcelRefcat,
+  formatRefcatSegment,
+  getParcelMetadataByRefcat,
+} from "./refcat"
+import { toParcelSearchResponse } from "./parcel-search-result"
 
-function parseRefcat(
+function parseRefcatFromCoords(
   pc1: string | number | undefined,
   pc2: string | number | undefined
 ): string | null {
   if (pc1 == null || pc2 == null) return null
-  return (
-    formatRefcatSegment(pc1, 7) + formatRefcatSegment(pc2, 7)
-  ).toUpperCase()
+  return buildParcelRefcat({ pc1, pc2 })
 }
 
 export async function searchByCoords({
@@ -17,7 +21,7 @@ export async function searchByCoords({
 }: {
   lat: number
   lng: number
-}) {
+}): Promise<ParcelSearchResponse> {
   const params = new URLSearchParams({
     SRS: "EPSG:4326",
     Coordenada_X: String(lng),
@@ -31,14 +35,14 @@ export async function searchByCoords({
   }
 
   const xml = await response.text()
-
   const parsed = parser.parse(xml)
   const coord = parsed?.consulta_coordenadas?.coordenadas?.coord
-  const refcat = parseRefcat(coord?.pc?.pc1, coord?.pc?.pc2)
+  const parcelRefcat = parseRefcatFromCoords(coord?.pc?.pc1, coord?.pc?.pc2)
 
-  if (!refcat) {
+  if (!parcelRefcat) {
     throw new Error("No se encontró ninguna parcela para esas coordenadas")
   }
 
-  return getByRefcat(refcat)
+  const metadata = await getParcelMetadataByRefcat(parcelRefcat)
+  return toParcelSearchResponse(metadata)
 }

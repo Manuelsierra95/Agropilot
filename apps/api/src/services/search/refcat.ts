@@ -1,4 +1,8 @@
 import { fetchCatastroXml, parser, REFCAT_URL } from "./client"
+import { parseCatastroStructuredAddress } from "./catastro-address"
+import type { ParcelSearchMetadata } from "./parcel-search-result"
+import { toParcelSearchResponse } from "./parcel-search-result"
+import type { ParcelSearchResponse } from "@workspace/schemas"
 
 function mapRefCatBody(refcat: string) {
   return {
@@ -17,53 +21,67 @@ export function formatRefcatSegment(
   return str.length >= length ? str : str.padStart(length, "0")
 }
 
-function buildRefcat(rc: {
+export function buildParcelRefcat(rc: {
   pc1?: string | number
   pc2?: string | number
-  car?: string | number
-  cc1?: string | number
-  cc2?: string | number
 }): string {
-  return [
-    formatRefcatSegment(rc.pc1, 7),
-    formatRefcatSegment(rc.pc2, 7),
-    formatRefcatSegment(rc.car, 4),
-    formatRefcatSegment(rc.cc1, 1),
-    formatRefcatSegment(rc.cc2, 1),
-  ].join("")
+  return (
+    formatRefcatSegment(rc.pc1, 7) + formatRefcatSegment(rc.pc2, 7)
+  ).toUpperCase()
 }
 
-function normalizeCatastro(parsed: any) {
-  const consulta = parsed?.consulta_dnp
-  const bi = consulta?.bico?.bi
+export function normalizeRefcatInput(refcat: string): string {
+  return refcat.trim().toUpperCase().replace(/\s+/g, "")
+}
 
-  const rc = bi?.idbi?.rc
+/** Parcel-level refcat (14 chars) used for polygon WFS queries. */
+export function toParcelRefcat(refcat: string): string {
+  const normalized = normalizeRefcatInput(refcat)
+  return normalized.length >= 14 ? normalized.slice(0, 14) : normalized
+}
 
-  const refcat = rc ? buildRefcat(rc) : null
+function parseCatastroMetadata(
+  parsed: unknown,
+  inputRefcat: string
+): ParcelSearchMetadata {
+  const consulta = (parsed as { consulta_dnp?: unknown })?.consulta_dnp
+  const bi = (consulta as { bico?: { bi?: unknown } })?.bico?.bi
 
-  const dt = bi?.dt
-  const loc = dt?.locs?.lous?.lourb
+  if (!bi || typeof bi !== "object") {
+    throw new Error("No se encontró la parcela para esa referencia catastral.")
+  }
+
+  const rc = (bi as { idbi?: { rc?: { pc1?: string; pc2?: string } } }).idbi?.rc
+  const parcelRefcat = rc ? buildParcelRefcat(rc) : toParcelRefcat(inputRefcat)
+
+  const dt = (bi as { dt?: { np?: string; nm?: string } }).dt
+  const ldt = (bi as { ldt?: string }).ldt ?? ""
+  const structured = parseCatastroStructuredAddress(bi)
 
   return {
-    refcat,
-    address: {
-      province: dt?.np ?? null,
-      municipality: dt?.nm ?? null,
-      streetType: loc?.dir?.tv ?? null,
-      streetName: loc?.dir?.nv ?? null,
-      streetNumber: loc?.dir?.pnp ?? null,
-      postalCode: loc?.dp ?? null,
-    },
+    refcat: parcelRefcat,
+    provincia: dt?.np ?? "",
+    municipio: dt?.nm ?? "",
+    ldt,
+    streetType: structured.streetType,
+    streetName: structured.streetName,
+    streetNumber: structured.streetNumber,
+    postalCode: structured.postalCode,
   }
 }
 
-export async function getByRefcat(refcat: string) {
-  const xml = await fetchCatastroXml(REFCAT_URL, mapRefCatBody(refcat))
+export async function getParcelMetadataByRefcat(
+  refcat: string
+): Promise<ParcelSearchMetadata> {
+  const normalized = normalizeRefcatInput(refcat)
+  const xml = await fetchCatastroXml(REFCAT_URL, mapRefCatBody(normalized))
   const parsed = parser.parse(xml)
-  const result = normalizeCatastro(parsed)
+  return parseCatastroMetadata(parsed, normalized)
+}
 
-  return {
-    ...result,
-    refcat: result.refcat ?? refcat.trim().toUpperCase(),
-  }
+export async function searchByRefcat(
+  refcat: string
+): Promise<ParcelSearchResponse> {
+  const metadata = await getParcelMetadataByRefcat(refcat)
+  return toParcelSearchResponse(metadata)
 }

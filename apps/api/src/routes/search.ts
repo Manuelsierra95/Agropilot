@@ -4,6 +4,7 @@ import type { AuthVariables } from "@/types/variables"
 import { zValidator } from "@hono/zod-validator"
 import { requireAuth } from "@/middlewares/require-auth"
 import {
+  addressSearchQuerySchema,
   municipalitiesQuerySchema,
   streetsQuerySchema,
   coordsQuerySchema,
@@ -11,11 +12,12 @@ import {
 } from "@workspace/schemas"
 import {
   fetchPolygon,
-  getByRefcat,
   getMunicipalities,
   getProvinces,
   getStreets,
+  searchByAddress,
   searchByCoords,
+  searchByRefcat,
 } from "@/services/search"
 
 export const searchRoutes = new Hono<{
@@ -36,24 +38,59 @@ export const searchRoutes = new Hono<{
       return c.json({ data })
     }
   )
-  // De aqui obtenemos el objeto para renderizar primero streets.TipoVia y para los nombres de las calles streets.Denominacion
   .get("/streets", zValidator("query", streetsQuerySchema), async (c) => {
     const { province, municipality } = c.req.valid("query")
     const data = await getStreets({ province, municipality })
     return c.json({ data })
   })
+  .get("/address", zValidator("query", addressSearchQuerySchema), async (c) => {
+    const query = c.req.valid("query")
+
+    try {
+      const data = await searchByAddress(query)
+      return c.json({ data })
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo localizar la parcela por dirección."
+      return c.json({ error: message }, 400)
+    }
+  })
   .get("/coords", zValidator("query", coordsQuerySchema), async (c) => {
     const { lat, lng } = c.req.valid("query")
-    const data = await searchByCoords({ lat, lng })
-    return c.json({ data })
+
+    try {
+      const data = await searchByCoords({ lat, lng })
+      return c.json({ data })
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo localizar la parcela por coordenadas."
+      return c.json({ error: message }, 400)
+    }
   })
   .get(
     "/refcat/:refcat",
     zValidator("param", refcatParamsSchema),
     async (c) => {
       const { refcat } = c.req.valid("param")
-      const data = await getByRefcat(refcat)
-      return c.json({ data })
+
+      console.log("Searching by refcat:", refcat)
+
+      try {
+        const data = await searchByRefcat(refcat)
+        console.log("Search result:", data)
+        return c.json({ data })
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "No se pudo localizar la parcela por referencia catastral."
+        console.error("Error searching by refcat:", error)
+        return c.json({ error: message }, 400)
+      }
     }
   )
   .get(

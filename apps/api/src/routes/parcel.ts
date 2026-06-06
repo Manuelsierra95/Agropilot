@@ -10,7 +10,10 @@ import {
   listParcels,
   updateParcel,
 } from "@/services/parcel"
-import { parcelCreateSchema, parcelUpdateInputSchema } from "@workspace/schemas"
+import {
+  parcelCreateSchema,
+  parcelUpdateInputSchema,
+} from "@workspace/schemas"
 
 export const parcelRoutes = new Hono<{
   Bindings: Env

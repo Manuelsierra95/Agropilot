@@ -1,4 +1,5 @@
 export { getProvinces, getMunicipalities, getStreets } from "./callejero"
-export { getByRefcat } from "./refcat"
+export { searchByRefcat } from "./refcat"
 export { searchByCoords } from "./by-coords"
+export { searchByAddress } from "./by-address"
 export { fetchPolygon } from "./geometry"

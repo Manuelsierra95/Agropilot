@@ -42,3 +42,24 @@ export async function fetchPolygon(
   const json = parser.parse(await response.text())
   return parsePolygon(json)
 }
+
+/** Centroid of the exterior ring (mean of vertices), EPSG:4326 [lng, lat]. */
+export function getPolygonCentroid(
+  coordinates: [number, number][][]
+): [number, number] {
+  const ring = coordinates[0]
+
+  if (!ring?.length) {
+    throw new Error("Polygon ring is empty")
+  }
+
+  let lngSum = 0
+  let latSum = 0
+
+  for (const [lng, lat] of ring) {
+    lngSum += lng
+    latSum += lat
+  }
+
+  return [lngSum / ring.length, latSum / ring.length]
+}

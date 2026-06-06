@@ -50,8 +50,6 @@ export async function postCatastro<T>(
     body: JSON.stringify(mapToCatastroBody(body)),
   })
 
-  console.log("Request to Catastro:", { url, body, status: response.status })
-
   if (!response.ok) {
     throw new Error(
       `Error en la petición: ${response.status} ${response.statusText}`
