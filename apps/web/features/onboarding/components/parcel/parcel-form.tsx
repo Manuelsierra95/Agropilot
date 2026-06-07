@@ -14,8 +14,11 @@ import { ParcelSearch } from "./parcel-search/parcel-search"
 import type { ParcelAddress } from "@/lib/cadastre/types"
 import type { ParcelSearchResult } from "./parcel-search/types"
 import type { SearchParcelFn } from "@/lib/cadastre/types"
-import type { ParcelCreateInput, ParcelUpdateInput } from "@workspace/schemas"
-import { hectaresToSquareMeters } from "@/lib/area"
+import {
+  hectaresToSquareMeters,
+  type ParcelCreateInput,
+  type ParcelUpdateInput,
+} from "@workspace/schemas"
 import { parsePolygonCoordinates } from "./parcel-draft-utils"
 import {
   draftCentroidFromCoordinates,
@@ -222,7 +225,7 @@ export function ParcelForm({
 
   return (
     <ScrollArea className="h-full min-h-0 w-full flex-1">
-      <div className="pb-4 pr-3">
+      <div className="pr-3 pb-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             Crea tu parcela

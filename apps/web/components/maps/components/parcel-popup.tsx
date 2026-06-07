@@ -2,18 +2,12 @@
 
 import { MapPopup } from "@workspace/ui/components/map"
 import type { Parcel, ParcelLngLat } from "./types"
+import { formatAreaHa } from "@workspace/schemas"
 
 type ParcelPopupProps = {
   parcel: Parcel
   lngLat: ParcelLngLat
   onClose: () => void
-}
-
-function formatAreaHa(area: number): string {
-  return area.toLocaleString("es-ES", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 4,
-  })
 }
 
 export function ParcelPopup({ parcel, lngLat, onClose }: ParcelPopupProps) {
