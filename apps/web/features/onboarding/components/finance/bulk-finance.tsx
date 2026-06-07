@@ -1,12 +1,19 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import { CheckCircle2, Send } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import { CheckCircle2, Loader2, Send } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
 import { Badge } from "@workspace/ui/components/badge"
 import { cn } from "@workspace/ui/lib/utils"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select"
 import {
   Table,
   TableBody,
@@ -15,119 +22,24 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table"
-import {
-  MOCK_FINANCE_ROWS,
-  type FinanceBulkRow,
-} from "../../mocks/onboarding-mocks"
+import type { TransactionBulkRow } from "@workspace/schemas"
+import { financeApi } from "@/lib/api/routes/finance"
+import { MOCK_FINANCE_ROWS } from "../../mocks/onboarding-mocks"
+import type { FieldFormData } from "../parcel/parcel-form"
 import { OnboardingSplitLayout } from "../onboarding-split-layout"
-
-const COLUMN_ALIASES: Record<string, keyof Omit<FinanceBulkRow, "id">> = {
-  concepto: "concept",
-  concept: "concept",
-  descripcion: "concept",
-  importe: "amount",
-  amount: "amount",
-  cantidad: "amount",
-  monto: "amount",
-  fecha: "date",
-  date: "date",
-  categoria: "category",
-  category: "category",
-  tipo: "flow",
-  flow: "flow",
-  movimiento: "flow",
-}
-
-const FLOW_ALIASES: Record<string, FinanceBulkRow["flow"]> = {
-  ingreso: "income",
-  income: "income",
-  gasto: "expense",
-  expense: "expense",
-  egreso: "expense",
-}
-
-function normalizeHeader(
-  cell: string
-): keyof Omit<FinanceBulkRow, "id"> | null {
-  const key = cell.trim().toLowerCase()
-  return COLUMN_ALIASES[key] ?? null
-}
-
-function parseAmount(raw: string): number | null {
-  const normalized = raw.trim().replace(/\./g, "").replace(",", ".")
-  const value = Number.parseFloat(normalized)
-  return Number.isFinite(value) ? value : null
-}
-
-function parseFlow(raw: string): FinanceBulkRow["flow"] {
-  const key = raw.trim().toLowerCase()
-  return FLOW_ALIASES[key] ?? (key.includes("ing") ? "income" : "expense")
-}
-
-function parsePastedFinance(text: string): FinanceBulkRow[] {
-  const lines = text
-    .trim()
-    .split(/\r?\n/)
-    .map((line) => line.split("\t").map((cell) => cell.trim()))
-    .filter((cells) => cells.some((cell) => cell.length > 0))
-
-  if (lines.length === 0) return []
-
-  const firstRow = lines[0] ?? []
-  const headerKeys = firstRow.map(normalizeHeader)
-  const hasHeader = headerKeys.filter(Boolean).length >= 2
-  const dataLines = hasHeader ? lines.slice(1) : lines
-
-  return dataLines.map((cells, index) => {
-    const row: Omit<FinanceBulkRow, "id"> = {
-      concept: "",
-      amount: 0,
-      date: new Date().toISOString().slice(0, 10),
-      category: "other",
-      flow: "expense",
-    }
-
-    if (hasHeader) {
-      firstRow.forEach((_, colIndex) => {
-        const field = headerKeys[colIndex]
-        const value = cells[colIndex] ?? ""
-        if (!field || !value) return
-        if (field === "amount") {
-          const amount = parseAmount(value)
-          if (amount !== null) row.amount = amount
-        } else if (field === "flow") {
-          row.flow = parseFlow(value)
-        } else {
-          row[field] = value as never
-        }
-      })
-    } else if (cells.length === 1) {
-      row.concept = cells[0] ?? ""
-      row.amount = 0
-    } else {
-      row.concept = cells[0] ?? ""
-      const amount = parseAmount(cells[1] ?? "")
-      if (amount !== null) row.amount = amount
-      if (cells[2]) row.date = cells[2]
-      if (cells[3]) row.category = cells[3]
-      if (cells[4]) row.flow = parseFlow(cells[4])
-    }
-
-    return {
-      id: `paste-${index}-${Date.now()}`,
-      ...row,
-    }
-  })
-}
-
-const EXAMPLE_PASTE = `concepto\timporte\tfecha\tcategoria\ttipo
-Fertilizante NPK\t1240,50\t2025-01-15\tfertilization\tgasto
-Venta aceite\t4800\t2025-02-02\tsale\tingreso`
+import {
+  assignIncrementalInvoiceNumbers,
+  EXAMPLE_PASTE,
+  parsePastedFinance,
+  PAYMENT_METHOD_LABELS,
+} from "./bulk-finance-utils"
 
 interface FinanceBulkImportBarProps {
   imported: boolean
   importLabel: string
   canImport: boolean
+  isImporting: boolean
+  importError: string | null
   onImport: () => void
 }
 
@@ -135,17 +47,22 @@ function FinanceBulkImportBar({
   imported,
   importLabel,
   canImport,
+  isImporting,
+  importError,
   onImport,
 }: FinanceBulkImportBarProps) {
   return (
     <div className="flex flex-col gap-2">
       <p className="text-sm text-muted-foreground">
         {imported
-          ? "Listo en modo demo. Al conectar la API, se importarán en finanzas."
+          ? "Los movimientos se han guardado en finanzas."
           : canImport
             ? "Revisa los movimientos en la vista previa e impórtalos antes de continuar."
             : "Los datos de ejemplo no se pueden importar. Pega y procesa tus propios movimientos."}
       </p>
+      {importError ? (
+        <p className="text-sm text-destructive">{importError}</p>
+      ) : null}
       <Button
         type="button"
         size="lg"
@@ -156,9 +73,14 @@ function FinanceBulkImportBar({
             "border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary"
         )}
         onClick={onImport}
-        disabled={!canImport || imported}
+        disabled={!canImport || imported || isImporting}
       >
-        {imported ? (
+        {isImporting ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Importando...
+          </>
+        ) : imported ? (
           <>
             <CheckCircle2 className="h-4 w-4" />
             Movimientos importados
@@ -175,13 +97,15 @@ function FinanceBulkImportBar({
 }
 
 interface BulkFinanceProps {
-  rows: FinanceBulkRow[]
-  onRowsChange: (rows: FinanceBulkRow[]) => void
+  parcels: FieldFormData[]
+  rows: TransactionBulkRow[]
+  onRowsChange: (rows: TransactionBulkRow[]) => void
   onContinue?: () => void
   onSkip?: () => void
 }
 
 export function BulkFinance({
+  parcels,
   rows,
   onRowsChange,
   onContinue,
@@ -190,12 +114,43 @@ export function BulkFinance({
   const [pasteValue, setPasteValue] = useState("")
   const [parseError, setParseError] = useState<string | null>(null)
   const [rowsAreExample, setRowsAreExample] = useState(false)
-  const [imported, setImported] = useState(() => rows.length > 0)
+  const [imported, setImported] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
+  const [importError, setImportError] = useState<string | null>(null)
+  const [selectedParcelId, setSelectedParcelId] = useState<string | null>(null)
+
+  const savedParcels = useMemo(
+    () => parcels.filter((parcel) => Boolean(parcel.serverId)),
+    [parcels]
+  )
+
+  useEffect(() => {
+    if (savedParcels.length === 1) {
+      setSelectedParcelId(savedParcels[0]?.serverId ?? null)
+      return
+    }
+
+    setSelectedParcelId((current) => {
+      if (current && savedParcels.some((parcel) => parcel.serverId === current)) {
+        return current
+      }
+      return null
+    })
+  }, [savedParcels])
+
+  const selectedParcel = savedParcels.find(
+    (parcel) => parcel.serverId === selectedParcelId
+  )
 
   const displayRows = rows.length > 0 ? rows : MOCK_FINANCE_ROWS
   const isUsingMock = rows.length === 0
   const isExamplePreview = isUsingMock || rowsAreExample
-  const canImport = rows.length > 0 && !rowsAreExample
+  const hasSavedParcels = savedParcels.length > 0
+  const canImport =
+    rows.length > 0 &&
+    !rowsAreExample &&
+    hasSavedParcels &&
+    selectedParcelId !== null
 
   const totals = useMemo(() => {
     const income = displayRows
@@ -222,6 +177,7 @@ export function BulkFinance({
     }
 
     setParseError(null)
+    setImportError(null)
     setImported(false)
     setRowsAreExample(false)
     onRowsChange(parsed)
@@ -230,6 +186,7 @@ export function BulkFinance({
   const handleLoadExample = () => {
     setPasteValue(EXAMPLE_PASTE)
     setParseError(null)
+    setImportError(null)
     setImported(false)
     setRowsAreExample(true)
     onRowsChange(parsePastedFinance(EXAMPLE_PASTE))
@@ -238,30 +195,77 @@ export function BulkFinance({
   const handleClear = () => {
     setPasteValue("")
     setParseError(null)
+    setImportError(null)
     setImported(false)
     setRowsAreExample(false)
     onRowsChange([])
   }
 
-  const handleImport = () => {
-    if (!canImport) return
-    setImported(true)
+  const handleImport = async (): Promise<boolean> => {
+    if (!canImport || imported || isImporting || !selectedParcelId) {
+      return imported
+    }
+
+    setIsImporting(true)
+    setImportError(null)
+
+    try {
+      const rowsWithInvoices = assignIncrementalInvoiceNumbers(rows)
+      const payload = rowsWithInvoices.map(
+        ({
+          concept,
+          description,
+          amount,
+          date,
+          category,
+          flow,
+          paymentMethod,
+          invoiceNumber,
+        }) => ({
+          concept,
+          description,
+          amount,
+          date,
+          category,
+          flow,
+          paymentMethod,
+          invoiceNumber,
+          parcelId: selectedParcelId,
+        })
+      )
+      await financeApi.bulkCreateTransactions({ transactions: payload })
+      onRowsChange(rowsWithInvoices)
+      setImported(true)
+      return true
+    } catch {
+      setImportError(
+        "No se pudieron importar los movimientos. Inténtalo de nuevo."
+      )
+      return false
+    } finally {
+      setIsImporting(false)
+    }
   }
 
-  const handleFinish = () => {
-    if (!imported && canImport) {
-      handleImport()
+  const handleFinish = async () => {
+    if (canImport && !imported) {
+      const success = await handleImport()
+      if (!success) return
     }
     onContinue?.()
   }
 
-  const importLabel = !canImport
-    ? isExamplePreview
-      ? "Los datos de ejemplo no se importan"
-      : "Procesa datos antes de importar"
-    : totals.count === 1
-      ? "Importar 1 movimiento"
-      : `Importar ${totals.count} movimientos`
+  const importLabel = !hasSavedParcels
+    ? "Guarda una parcela antes de importar"
+    : !selectedParcelId
+      ? "Selecciona una parcela"
+      : !canImport
+        ? isExamplePreview
+          ? "Los datos de ejemplo no se importan"
+          : "Procesa datos antes de importar"
+        : totals.count === 1
+          ? "Importar 1 movimiento"
+          : `Importar ${totals.count} movimientos`
 
   return (
     <OnboardingSplitLayout
@@ -270,12 +274,20 @@ export function BulkFinance({
           imported={imported}
           importLabel={importLabel}
           canImport={canImport}
-          onImport={handleImport}
+          isImporting={isImporting}
+          importError={importError}
+          onImport={() => void handleImport()}
         />
       }
       footer={
         <div className="flex flex-col gap-1">
-          <Button type="button" size="lg" className="w-full" onClick={handleFinish}>
+          <Button
+            type="button"
+            size="lg"
+            className="w-full"
+            onClick={() => void handleFinish()}
+            disabled={isImporting}
+          >
             Continuar
           </Button>
           <Button
@@ -284,6 +296,7 @@ export function BulkFinance({
             variant="ghost"
             className="w-full"
             onClick={onSkip}
+            disabled={isImporting}
           >
             Omitir este paso
           </Button>
@@ -298,6 +311,11 @@ export function BulkFinance({
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            {selectedParcel ? (
+              <Badge variant="outline">
+                Parcela: {selectedParcel.name.trim() || "Sin nombre"}
+              </Badge>
+            ) : null}
             {isExamplePreview ? (
               <Badge variant="secondary">Datos de ejemplo</Badge>
             ) : (
@@ -314,22 +332,28 @@ export function BulkFinance({
         </div>
       }
       preview={
-        <div className="h-full min-h-0 overflow-y-auto p-4">
+        <div className="h-full min-h-0 overflow-x-auto overflow-y-auto p-4">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Concepto</TableHead>
+                <TableHead>Descripción</TableHead>
                 <TableHead className="text-right">Importe</TableHead>
                 <TableHead>Fecha</TableHead>
                 <TableHead>Categoría</TableHead>
                 <TableHead>Tipo</TableHead>
+                <TableHead>Método pago</TableHead>
+                <TableHead>Nº factura</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {displayRows.map((row) => (
                 <TableRow key={row.id}>
-                  <TableCell className="max-w-[200px] truncate font-medium">
+                  <TableCell className="max-w-[160px] truncate font-medium">
                     {row.concept}
+                  </TableCell>
+                  <TableCell className="max-w-[160px] truncate text-muted-foreground">
+                    {row.description ?? "—"}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
                     {row.amount.toLocaleString("es-ES", {
@@ -346,6 +370,14 @@ export function BulkFinance({
                       {row.flow === "income" ? "Ingreso" : "Gasto"}
                     </Badge>
                   </TableCell>
+                  <TableCell>
+                    {row.paymentMethod
+                      ? PAYMENT_METHOD_LABELS[row.paymentMethod]
+                      : "—"}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">
+                    {row.invoiceNumber ?? "—"}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -360,8 +392,43 @@ export function BulkFinance({
           </h1>
           <p className="mt-2 text-muted-foreground">
             Copia una o varias columnas desde Excel y pégalas aquí. Procesa los
-            datos, revisa la vista previa e impórtalos antes de continuar.
+            datos, asigna una parcela, revisa la vista previa e impórtalos antes
+            de continuar.
           </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="finance-parcel">Parcela</Label>
+          {!hasSavedParcels ? (
+            <p className="text-sm text-destructive">
+              Guarda al menos una parcela en el paso anterior para poder importar
+              movimientos.
+            </p>
+          ) : savedParcels.length === 1 ? (
+            <p className="text-sm text-muted-foreground">
+              Los movimientos se asignarán a{" "}
+              <span className="font-medium text-foreground">
+                {savedParcels[0]?.name.trim() || "tu parcela"}
+              </span>
+              .
+            </p>
+          ) : (
+            <Select
+              value={selectedParcelId ?? undefined}
+              onValueChange={setSelectedParcelId}
+            >
+              <SelectTrigger id="finance-parcel" className="w-full">
+                <SelectValue placeholder="Selecciona la parcela para este importe" />
+              </SelectTrigger>
+              <SelectContent>
+                {savedParcels.map((parcel) => (
+                  <SelectItem key={parcel.id} value={parcel.serverId!}>
+                    {parcel.name.trim() || "Parcela sin nombre"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -369,7 +436,7 @@ export function BulkFinance({
           <Textarea
             id="finance-paste"
             placeholder={
-              "Pega aquí (Ctrl+V). Ejemplo de columnas:\nconcepto | importe | fecha | categoria | tipo"
+              "Pega aquí (Ctrl+V). Ejemplo de columnas:\nconcepto | descripcion | importe | fecha | categoria | tipo | metodo_pago | factura"
             }
             value={pasteValue}
             onChange={(e) => setPasteValue(e.target.value)}
@@ -379,20 +446,30 @@ export function BulkFinance({
             <p className="text-sm text-destructive">{parseError}</p>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Tip: selecciona las celdas en Excel, copia y pega. Una sola
-              columna también funciona (se usará como concepto).
+              Tip: selecciona las celdas en Excel, copia y pega. Si no indicas
+              número de factura, se generará uno incremental automáticamente.
             </p>
           )}
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Button type="button" onClick={handleParse}>
+          <Button type="button" onClick={handleParse} disabled={isImporting}>
             Procesar datos
           </Button>
-          <Button type="button" variant="outline" onClick={handleLoadExample}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleLoadExample}
+            disabled={isImporting}
+          >
             Cargar ejemplo
           </Button>
-          <Button type="button" variant="ghost" onClick={handleClear}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={handleClear}
+            disabled={isImporting}
+          >
             Limpiar
           </Button>
         </div>
@@ -401,4 +478,4 @@ export function BulkFinance({
   )
 }
 
-export type { FinanceBulkRow }
+export type { TransactionBulkRow as FinanceBulkRow }

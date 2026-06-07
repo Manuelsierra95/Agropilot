@@ -3,6 +3,7 @@ import { organizationApi } from "./routes/organization"
 import { userApi } from "./routes/user"
 import { billingApi } from "./routes/billing"
 import { searchApi } from "./routes/search"
+import { financeApi } from "./routes/finance"
 
 export const api = {
   example: exampleApi,
@@ -10,4 +11,5 @@ export const api = {
   organization: organizationApi,
   billing: billingApi,
   search: searchApi,
+  finance: financeApi,
 }

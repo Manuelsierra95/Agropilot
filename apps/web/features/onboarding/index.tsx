@@ -170,6 +170,7 @@ export default function OnboardingFlow() {
       ),
       ({ onContinue, onSkip }) => (
         <BulkFinance
+          parcels={parcels}
           rows={financeRows}
           onRowsChange={setFinanceRows}
           onContinue={onContinue}
