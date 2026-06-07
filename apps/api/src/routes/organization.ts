@@ -9,7 +9,17 @@ import {
   getOrganizationMembers,
   getOrganizationMe,
 } from "@/services/organization"
-import { updateOrganizationSchema } from "@workspace/schemas"
+import {
+  bulkCreateInvitations,
+  cancelInvitation,
+  createInvitation,
+  listInvitations,
+} from "@/services/invitations"
+import {
+  invitationBulkCreateSchema,
+  invitationCreateSchema,
+  updateOrganizationSchema,
+} from "@workspace/schemas"
 import { requireRole } from "@/middlewares/require-role"
 
 export const organizationRoutes = new Hono<{
@@ -40,4 +50,45 @@ export const organizationRoutes = new Hono<{
     const data = c.req.valid("json")
     const organization = await updateOrganization(organizationId, data)
     return c.json({ organization }, 200)
+  })
+  .get("/invitations", async (c) => {
+    const invitations = await listInvitations(
+      c.get("organizationId"),
+      c.req.raw.headers
+    )
+    return c.json({ invitations }, 200)
+  })
+  .post(
+    "/invitations/bulk",
+    zValidator("json", invitationBulkCreateSchema),
+    async (c) => {
+      const { invitations: items } = c.req.valid("json")
+      const result = await bulkCreateInvitations(
+        c.get("organizationId"),
+        items,
+        c.req.raw.headers
+      )
+      return c.json(result, 201)
+    }
+  )
+  .post(
+    "/invitations",
+    zValidator("json", invitationCreateSchema),
+    async (c) => {
+      const data = c.req.valid("json")
+      const invitation = await createInvitation(
+        c.get("organizationId"),
+        data,
+        c.req.raw.headers
+      )
+      return c.json({ invitation }, 201)
+    }
+  )
+  .delete("/invitations/:id", async (c) => {
+    await cancelInvitation(
+      c.req.param("id"),
+      c.get("organizationId"),
+      c.req.raw.headers
+    )
+    return c.json({ id: c.req.param("id") }, 200)
   })
