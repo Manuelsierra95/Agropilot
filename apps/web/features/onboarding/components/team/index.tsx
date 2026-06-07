@@ -14,10 +14,10 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { Mail, Plus } from "lucide-react"
+import { organizationApi } from "@/lib/api/routes/organization"
 import { OnboardingSplitLayout } from "../onboarding-split-layout"
 import { TeamInvitesPreview, TeamInvitesSendBar } from "./team-preview"
 import {
-  MOCK_TEAM_INVITES,
   TEAM_ROLE_LABELS,
   type TeamInviteDraft,
   type TeamInviteRole,
@@ -48,19 +48,21 @@ export function TeamInvites({
   onContinue,
   onSkip,
 }: TeamInvitesProps) {
-  const [sentMock, setSentMock] = useState(false)
+  const [sent, setSent] = useState(false)
+  const [isSending, setIsSending] = useState(false)
+  const [sendError, setSendError] = useState<string | null>(null)
   const [draftEmail, setDraftEmail] = useState("")
   const [draftRole, setDraftRole] = useState<TeamInviteRole>(DEFAULT_DRAFT_ROLE)
   const [draftError, setDraftError] = useState<string | null>(null)
 
-  const displayInvites =
-    invites.length > 0 ? invites : MOCK_TEAM_INVITES
-  const isUsingMock = invites.length === 0
+  const resetSendState = () => {
+    setSent(false)
+    setSendError(null)
+  }
 
   const removeInvite = (id: string) => {
-    const base = isUsingMock ? [...MOCK_TEAM_INVITES] : [...invites]
-    onInvitesChange(base.filter((invite) => invite.id !== id))
-    setSentMock(false)
+    onInvitesChange(invites.filter((invite) => invite.id !== id))
+    resetSendState()
   }
 
   const handleAddToList = () => {
@@ -71,44 +73,82 @@ export function TeamInvites({
     }
 
     const email = parsed.data
-    const base = isUsingMock ? [...MOCK_TEAM_INVITES] : [...invites]
     const normalized = email.toLowerCase()
     if (
-      base.some((invite) => invite.email.trim().toLowerCase() === normalized)
+      invites.some((invite) => invite.email.trim().toLowerCase() === normalized)
     ) {
       setDraftError("Ese correo ya está en la lista.")
       return
     }
 
     onInvitesChange([
-      ...base,
+      ...invites,
       { id: createInviteId(), email, role: draftRole },
     ])
     setDraftEmail("")
     setDraftRole(DEFAULT_DRAFT_ROLE)
     setDraftError(null)
-    setSentMock(false)
+    resetSendState()
   }
 
-  const handleSendMock = () => {
-    const valid = displayInvites.filter(
-      (invite) => invite.email.trim().length > 0
-    )
-    if (valid.length === 0) return
-    if (isUsingMock) {
-      onInvitesChange(valid)
+  const handleSend = async (): Promise<boolean> => {
+    if (sent || isSending) {
+      return sent
     }
-    setSentMock(true)
+
+    const valid = invites.filter((invite) => invite.email.trim().length > 0)
+    if (valid.length === 0) return false
+
+    setIsSending(true)
+    setSendError(null)
+
+    try {
+      const result = await organizationApi.bulkCreateInvitations({
+        invitations: valid.map(({ email, role }) => ({ email, role })),
+      })
+
+      const sentByEmail = new Map(
+        result.invitations.map((invitation) => [
+          invitation.email.trim().toLowerCase(),
+          invitation.id,
+        ])
+      )
+
+      onInvitesChange(
+        valid.map((invite) => ({
+          ...invite,
+          id: sentByEmail.get(invite.email.trim().toLowerCase()) ?? invite.id,
+        }))
+      )
+
+      if (result.failed.length > 0) {
+        const failedEmails = result.failed.map((item) => item.email).join(", ")
+        setSendError(
+          `Se enviaron ${result.count} invitación(es), pero fallaron: ${failedEmails}.`
+        )
+      }
+
+      setSent(true)
+      return true
+    } catch {
+      setSendError(
+        "No se pudieron enviar las invitaciones. Inténtalo de nuevo."
+      )
+      return false
+    } finally {
+      setIsSending(false)
+    }
   }
 
-  const handleFinish = () => {
-    if (!sentMock && displayInvites.some((i) => i.email.trim())) {
-      handleSendMock()
+  const handleFinish = async () => {
+    if (!sent && invites.some((invite) => invite.email.trim())) {
+      const success = await handleSend()
+      if (!success) return
     }
     onContinue?.()
   }
 
-  const validInviteCount = displayInvites.filter(
+  const validInviteCount = invites.filter(
     (invite) => invite.email.trim().length > 0
   ).length
 
@@ -131,15 +171,22 @@ export function TeamInvites({
       previewOnMobile="stack"
       actions={
         <TeamInvitesSendBar
-          sentMock={sentMock}
+          sent={sent}
           sendLabel={sendLabel}
           validInviteCount={validInviteCount}
-          onSend={handleSendMock}
+          isSending={isSending}
+          sendError={sendError}
+          onSend={() => void handleSend()}
         />
       }
       footer={
         <div className="flex flex-col gap-1">
-          <Button type="button" size="lg" className="w-full" onClick={handleFinish}>
+          <Button
+            type="button"
+            size="lg"
+            className="w-full"
+            onClick={() => void handleFinish()}
+          >
             Continuar
           </Button>
           <Button
@@ -160,17 +207,14 @@ export function TeamInvites({
             <p className="text-sm text-muted-foreground">{inviteCountLabel}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            {isUsingMock ? (
-              <Badge variant="secondary">Datos de ejemplo</Badge>
-            ) : null}
-            {sentMock ? <Badge>Invitaciones preparadas</Badge> : null}
+            {sent ? <Badge>Invitaciones enviadas</Badge> : null}
           </div>
         </div>
       }
       preview={
         <TeamInvitesPreview
-          invites={displayInvites}
-          sentMock={sentMock}
+          invites={invites}
+          sent={sent}
           onRemove={removeInvite}
         />
       }
@@ -185,12 +229,6 @@ export function TeamInvites({
             previa y envía las invitaciones antes de continuar.
           </p>
         </div>
-
-        {isUsingMock && (
-          <Badge variant="secondary" className="w-fit">
-            Invitaciones de ejemplo en la lista — añade las tuyas o elimínalas
-          </Badge>
-        )}
 
         <div className="space-y-4 rounded-xl border bg-card p-4">
           <p className="text-sm font-medium text-foreground">

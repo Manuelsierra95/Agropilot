@@ -3,7 +3,7 @@
 import { Button } from "@workspace/ui/components/button"
 import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar"
 import { Badge } from "@workspace/ui/components/badge"
-import { CheckCircle2, Send, Trash2 } from "lucide-react"
+import { CheckCircle2, Loader2, Send, Trash2 } from "lucide-react"
 import { cn } from "@workspace/ui/lib/utils"
 import {
   TEAM_ROLE_LABELS,
@@ -17,41 +17,53 @@ function emailInitial(email: string) {
 }
 
 interface TeamInvitesSendBarProps {
-  sentMock: boolean
+  sent: boolean
   sendLabel: string
   validInviteCount: number
+  isSending: boolean
+  sendError: string | null
   onSend: () => void
 }
 
 export function TeamInvitesSendBar({
-  sentMock,
+  sent,
   sendLabel,
   validInviteCount,
+  isSending,
+  sendError,
   onSend,
 }: TeamInvitesSendBarProps) {
   return (
     <div className="flex flex-col gap-2">
       <p className="text-sm text-muted-foreground">
-        {sentMock
-          ? "Listo en modo demo. Al conectar la API, se enviarán por correo."
+        {sent
+          ? "Las invitaciones se han creado en tu organización."
           : "Revisa la lista en la vista previa y envía las solicitudes de acceso."}
       </p>
+      {sendError ? (
+        <p className="text-sm text-destructive">{sendError}</p>
+      ) : null}
       <Button
         type="button"
         size="lg"
-        variant={sentMock ? "outline" : "default"}
+        variant={sent ? "outline" : "default"}
         className={cn(
           "h-11 w-full gap-2 shadow-sm",
-          sentMock &&
+          sent &&
             "border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary"
         )}
         onClick={onSend}
-        disabled={validInviteCount === 0 || sentMock}
+        disabled={validInviteCount === 0 || sent || isSending}
       >
-        {sentMock ? (
+        {isSending ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Enviando...
+          </>
+        ) : sent ? (
           <>
             <CheckCircle2 className="h-4 w-4" />
-            Invitaciones preparadas
+            Invitaciones enviadas
           </>
         ) : (
           <>
@@ -66,13 +78,13 @@ export function TeamInvitesSendBar({
 
 interface TeamInvitesPreviewProps {
   invites: TeamInviteDraft[]
-  sentMock: boolean
+  sent: boolean
   onRemove: (id: string) => void
 }
 
 export function TeamInvitesPreview({
   invites,
-  sentMock,
+  sent,
   onRemove,
 }: TeamInvitesPreviewProps) {
   const listedInvites = invites.filter((invite) => invite.email.trim().length > 0)
@@ -105,15 +117,9 @@ export function TeamInvitesPreview({
                     <Badge variant="secondary" className="text-xs">
                       {TEAM_ROLE_LABELS[invite.role]}
                     </Badge>
-                    {sentMock ? (
-                      <Badge variant="outline" className="text-xs">
-                        Preparada
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="text-xs">
-                        Pendiente
-                      </Badge>
-                    )}
+                    <Badge variant="outline" className="text-xs">
+                      {sent ? "Enviada" : "Pendiente"}
+                    </Badge>
                   </div>
                 </div>
                 <Button
@@ -122,6 +128,7 @@ export function TeamInvitesPreview({
                   size="icon"
                   className="shrink-0 text-muted-foreground hover:text-destructive"
                   onClick={() => onRemove(invite.id)}
+                  disabled={sent}
                   aria-label={`Eliminar invitación a ${invite.email.trim()}`}
                 >
                   <Trash2 className="h-4 w-4" />
