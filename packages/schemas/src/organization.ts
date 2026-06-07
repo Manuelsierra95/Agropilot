@@ -1,6 +1,43 @@
 import { createSelectSchema, createUpdateSchema } from "drizzle-zod"
-import { organizations, members } from "@workspace/db/schemas"
+import { organizations, members, invitations } from "@workspace/db/schemas"
+import z from "zod"
 import { AuthUser } from "./auth"
+
+export const invitationRoleSchema = z.enum(["admin", "member", "viewer"])
+
+export const invitationCreateSchema = z.object({
+  email: z.string().trim().email(),
+  role: invitationRoleSchema,
+})
+
+export const invitationBulkCreateSchema = z.object({
+  invitations: z.array(invitationCreateSchema).min(1).max(50),
+})
+
+export const invitationSelectSchema = createSelectSchema(invitations)
+
+export type InvitationRole = z.infer<typeof invitationRoleSchema>
+export type InvitationCreateInput = z.infer<typeof invitationCreateSchema>
+export type InvitationBulkCreateInput = z.infer<typeof invitationBulkCreateSchema>
+
+type InvitationSelectFromSchema = ReturnType<
+  typeof invitationSelectSchema.parse
+>
+
+export type InvitationSelect = InvitationSelectFromSchema
+
+export type InvitationBulkCreateResult = {
+  invitations: InvitationSelect[]
+  failed: { email: string; message: string }[]
+  count: number
+}
+
+export const parseInvitationSelect = (
+  value: unknown
+): InvitationSelect | null => {
+  const parsed = invitationSelectSchema.safeParse(value)
+  return parsed.success ? (parsed.data as unknown as InvitationSelect) : null
+}
 
 export const organizationSchema = createSelectSchema(organizations)
 export const memberSchema = createSelectSchema(members)
