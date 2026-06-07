@@ -11,6 +11,7 @@ import { organizationRoutes } from "./routes/organization"
 import { userRoutes } from "./routes/user"
 import { billingRoutes } from "./routes/billing"
 import { searchRoutes } from "./routes/search"
+import { financeRoutes } from "./routes/finance"
 
 const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .basePath("/api/v1")
@@ -28,6 +29,7 @@ const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .route("/search", searchRoutes)
   .route("/parcel", parcelRoutes)
   .route("/billing", billingRoutes)
+  .route("/finance", financeRoutes)
 
 const PORT = process.env.PORT || 3001
 
