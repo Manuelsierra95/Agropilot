@@ -4,7 +4,7 @@ import {
   sessions,
   users,
   verifications,
-} from "@workspace/db"
+} from "@workspace/db/schemas"
 import {
   createInsertSchema,
   createSelectSchema,

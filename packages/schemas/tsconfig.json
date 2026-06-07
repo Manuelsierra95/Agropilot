@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@workspace/db": ["../../packages/db/src/index.ts"]
+      "@workspace/db": ["../../packages/db/src/index.ts"],
+      "@workspace/db/schemas": ["../../packages/db/src/schemas/index.ts"]
     }
   },
   "include": ["."],

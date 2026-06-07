@@ -1,4 +1,4 @@
-import { parcels } from "@workspace/db"
+import { parcels } from "@workspace/db/schemas"
 import {
   createInsertSchema,
   createSelectSchema,

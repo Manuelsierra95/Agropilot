@@ -1,5 +1,5 @@
 import { createSelectSchema, createUpdateSchema } from "drizzle-zod"
-import { organizations, members } from "@workspace/db"
+import { organizations, members } from "@workspace/db/schemas"
 import { AuthUser } from "./auth"
 
 export const organizationSchema = createSelectSchema(organizations)

@@ -4,7 +4,7 @@ import {
   planLimits,
   modules,
   organizationModules,
-} from "@workspace/db"
+} from "@workspace/db/schemas"
 import z from "zod"
 
 export const subscriptionSchema = createSelectSchema(subscriptions)
