@@ -1,0 +1,26 @@
+{
+  "name": "@workspace/copilot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test:presentation": "pnpm dlx tsx src/pipeline/resolve-presentation-channel.test.ts",
+    "test:dashboard-cells": "pnpm dlx tsx src/pipeline/dashboard-cells.test.ts",
+    "test:copilot-scope": "pnpm dlx tsx src/pipeline/copilot-scope.test.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^3.0.68",
+    "ai": "^6.0.197",
+    "ai-sdk-ollama": "^3.8.5",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^25.1.0",
+    "@workspace/typescript-config": "workspace:*",
+    "typescript": "^5.9.3"
+  }
+}
