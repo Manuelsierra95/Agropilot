@@ -82,6 +82,10 @@ export const marketPrices = pgTable(
       enum: ["olive_oil"],
     }).notNull(),
 
+    grade: text("grade", {
+      enum: ["virgen_extra", "virgen", "lampante"],
+    }).notNull(),
+
     market: text("market"),
     price: numeric("price", { precision: 12, scale: 4 }).notNull(),
     unit: text("unit").notNull(),
@@ -91,8 +95,9 @@ export const marketPrices = pgTable(
     createdAt: timestamp("created_at").defaultNow(),
   },
   (table) => ({
-    productDateIdx: index("market_prices_product_date_idx").on(
+    productGradeDateIdx: index("market_prices_product_grade_date_idx").on(
       table.product,
+      table.grade,
       table.date
     ),
   })
