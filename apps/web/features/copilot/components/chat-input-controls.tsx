@@ -8,7 +8,7 @@ import { Textarea } from "@workspace/ui/components/textarea"
 import { useCopilotChat } from "@/features/copilot/copilot-chat-provider"
 
 export function ChatInputControls({
-  placeholder = "Pregunta sobre precios, finanzas o ventana de venta…",
+  placeholder = "Pregunta lo que quieras",
 }: {
   placeholder?: string
 }) {
