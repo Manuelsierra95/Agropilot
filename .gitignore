@@ -5,6 +5,7 @@ TODO.md
 
 # Dependencies
 node_modules
+.pnpm-store
 .pnp
 .pnp.js
 
