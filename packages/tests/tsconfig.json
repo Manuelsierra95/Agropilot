@@ -1,0 +1,13 @@
+{
+  "extends": "@workspace/typescript-config/base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../../apps/api/src/*"],
+      "@env": ["../../apps/api/env.d.ts"],
+      "api/app": ["../../apps/api/src/app.ts"]
+    }
+  },
+  "include": ["src", "vitest.config.ts"]
+}
