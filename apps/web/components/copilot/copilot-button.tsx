@@ -15,23 +15,25 @@ import { useSidebar } from "@workspace/ui/components/sidebar"
 export function CopilotButton({ className }: { className?: string }) {
   const { open, toggleSidebar } = useSidebar()
 
+  if (open) return null
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
           type="button"
-          variant={open ? "secondary" : "outline"}
-          size="icon"
-          className={cn("size-8", className)}
+          variant="ghost"
+          size="icon-sm"
+          className="-ml-1"
           onClick={toggleSidebar}
-          aria-label={open ? "Ocultar copilot" : "Mostrar copilot"}
-          aria-pressed={open}
+          aria-label="Mostrar copilot"
+          aria-pressed={false}
         >
           <Bot className="size-4" />
         </Button>
       </TooltipTrigger>
       <TooltipContent side="bottom">
-        {open ? "Ocultar copilot" : "Mostrar copilot"}
+        Mostrar copilot
         <span className="ml-1.5 opacity-60">(⌘I)</span>
       </TooltipContent>
     </Tooltip>

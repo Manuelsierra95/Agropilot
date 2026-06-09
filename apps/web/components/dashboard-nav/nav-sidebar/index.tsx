@@ -1,5 +1,6 @@
 import { AppSidebar } from "@/components/dashboard-nav/components/app-sidebar"
 import { CopilotLayout } from "@/components/copilot/copilot-layout"
+import { LeftSidebarBridge } from "@/components/dashboard-nav/nav-sidebar/left-sidebar-context"
 import { DashboardContentScroll } from "@/components/dashboard-nav/nav-sidebar/dashboard-content-scroll"
 import { NavSidebarHeader } from "@/components/dashboard-nav/nav-sidebar/nav-sidebar-header"
 import {
@@ -20,17 +21,22 @@ export default async function NavSidebar({
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen} className="h-svh overflow-hidden">
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      className="h-svh overflow-hidden"
+    >
       <Sidebar collapsible="offcanvas">
         <AppSidebar />
         <SidebarRail />
       </Sidebar>
-      <CopilotLayout className="min-w-0 flex-1">
-        <SidebarInset className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <NavSidebarHeader />
-          <DashboardContentScroll>{children}</DashboardContentScroll>
-        </SidebarInset>
-      </CopilotLayout>
+      <LeftSidebarBridge>
+        <CopilotLayout className="min-w-0 flex-1">
+          <SidebarInset className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+            <NavSidebarHeader />
+            <DashboardContentScroll>{children}</DashboardContentScroll>
+          </SidebarInset>
+        </CopilotLayout>
+      </LeftSidebarBridge>
     </SidebarProvider>
   )
 }
