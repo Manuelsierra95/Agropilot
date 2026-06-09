@@ -2,9 +2,11 @@ import { db, schema, eq, and, asc, gte, lte } from "@workspace/db"
 import { z } from "zod"
 import { HTTPException } from "hono/http-exception"
 import {
+  parcelWeatherDataSchema,
   type ParcelCreateInput,
   type ParcelSelect,
   type ParcelUpdateInput,
+  type ParcelWeatherMetric,
 } from "@workspace/schemas"
 
 const HECTARES_TO_SQUARE_METERS = 10_000
@@ -139,17 +141,6 @@ async function upsertParcelLocation(
   })
 }
 
-const parcelWeatherDataSchema = z.object({
-  daily: z.array(
-    z.object({
-      date: z.string(),
-      soilMoisture: z.number(),
-      rainfall: z.number(),
-      temperature: z.number(),
-    })
-  ),
-})
-
 export type ParcelCashflowQueryFilters = {
   parcelId?: string
   from: string
@@ -162,8 +153,6 @@ export type ParcelCashflowRow = {
   expense: string | null
   parcelId: string
 }
-
-export type ParcelWeatherMetric = "soil_moisture" | "rainfall" | "temperature"
 
 export type ParcelWeatherQueryFilters = {
   parcelId?: string
