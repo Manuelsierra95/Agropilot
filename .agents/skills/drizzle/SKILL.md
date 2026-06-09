@@ -18,6 +18,10 @@ progressive_disclosure:
 
 Modern TypeScript-first ORM with zero dependencies, compile-time type safety, and SQL-like syntax. Optimized for edge runtimes and serverless environments.
 
+## Agropilot (este repo)
+
+Schemas en `packages/db/src/schemas/`. **Obligatorio:** cada tabla nueva o modificada debe tener seed en `packages/seeds` (salvo tablas de auth gestionadas por Better Auth). Ver skill `agropilot` → `AGENTS.md` y `packages/seeds/README.md`.
+
 ## Quick Start
 
 ### Installation

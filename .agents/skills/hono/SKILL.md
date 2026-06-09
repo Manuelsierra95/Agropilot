@@ -7,6 +7,10 @@ description: Use when building Hono web applications or when the user asks about
 
 Build Hono web applications. This skill provides inline API knowledge for AI. Use `npx hono request` to test endpoints. If the `hono-docs` MCP server is configured, prefer its tools for the latest documentation over the inline reference.
 
+## Agropilot (este repo)
+
+**Obligatorio:** cada endpoint nuevo o modificado en `apps/api` debe tener tests unitarios en `packages/tests`. Ver skill `agropilot` → `AGENTS.md`.
+
 ## Hono CLI Usage
 
 ### Request Testing
@@ -444,6 +448,8 @@ app.get('/sse', (c) => {
 ---
 
 ## Testing with app.request()
+
+En Agropilot, los tests viven en `packages/tests` (Vitest), importan `api/app` y mockean servicios. Ejecutar con `pnpm test`.
 
 Test endpoints without starting an HTTP server:
 
