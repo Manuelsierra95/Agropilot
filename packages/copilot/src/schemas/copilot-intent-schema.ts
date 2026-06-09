@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 import { actionIntentSchema } from "./action-schema"
-import { querySpecSchema, renderChartInputSchema } from "./chart-action-schema"
+import { querySpecSchema } from "./chart-action-schema"
 import { dashboardCellsSchema } from "./dashboard-grid-schema"
 import { widgetSpecSchema } from "./widget-schema"
 
@@ -79,16 +79,6 @@ export type CopilotResolveReason = "invalid_intent" | "llm_error"
 export type CopilotIntentResult =
   | { ok: true; intent: CopilotIntent }
   | { ok: false; reason: CopilotResolveReason }
-
-export function chartInputToIntent(
-  input: z.infer<typeof renderChartInputSchema>
-): ChartIntent {
-  return {
-    intent: "chart",
-    title: input.title,
-    queries: input.queries,
-  }
-}
 
 export function normalizeAnswerFocus(
   focus: AnswerFocus | undefined

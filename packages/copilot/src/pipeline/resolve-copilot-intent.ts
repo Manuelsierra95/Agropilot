@@ -1,14 +1,13 @@
 import { convertToModelMessages, generateObject, generateText, type UIMessage } from "ai"
 
 import {
-  chartInputToIntent,
   type CopilotIntent,
   type CopilotIntentResult,
   copilotIntentSchema,
   COPILOT_REFERENCE_DATE,
   normalizeAnswerFocus,
 } from "../schemas/copilot-intent-schema"
-import { renderChartInputSchema, type QuerySpec } from "../schemas/chart-action-schema"
+import type { QuerySpec } from "../schemas/chart-action-schema"
 import { COPILOT_INTENT_SYSTEM_PROMPT } from "../prompts/dashboard-system-prompt"
 import { getLastUserText } from "./get-last-user-text"
 import { getChatModel } from "../model/get-model"
@@ -41,12 +40,6 @@ function parseCopilotIntent(input: unknown): CopilotIntentResult {
     }
     console.log(`${LOG_PREFIX} success`, intent)
     return { ok: true, intent }
-  }
-
-  const chartOnly = renderChartInputSchema.safeParse(normalized)
-  if (chartOnly.success) {
-    console.log(`${LOG_PREFIX} mapped legacy chart JSON to intent`)
-    return { ok: true, intent: chartInputToIntent(chartOnly.data) }
   }
 
   console.error(

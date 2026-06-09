@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.68",
+    "@workspace/schemas": "workspace:*",
     "ai": "^6.0.197",
     "ai-sdk-ollama": "^3.8.5",
     "zod": "^3.25.76"

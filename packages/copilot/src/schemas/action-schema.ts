@@ -1,21 +1,17 @@
 import { z } from "zod"
 
-export const taskCategorySchema = z.enum([
-  "irrigation",
-  "fertilization",
-  "treatment",
-  "harvest",
-  "inspection",
-])
+import {
+  copilotCreateTaskPayloadSchema,
+  TASK_CATEGORY_LABELS,
+  taskCategorySchema,
+  type CopilotCreateTaskPayload,
+  type TaskCategory,
+} from "@workspace/schemas"
 
-export const createTaskPayloadSchema = z.object({
-  title: z.string().min(1),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  description: z.string().optional(),
-  parcelId: z.string().optional(),
-  category: taskCategorySchema.optional(),
-  priority: z.number().int().min(1).max(5).optional(),
-})
+export { TASK_CATEGORY_LABELS, taskCategorySchema }
+export type { TaskCategory }
+
+export const createTaskPayloadSchema = copilotCreateTaskPayloadSchema
 
 export const copilotActionSchema = z.discriminatedUnion("action", [
   z.object({
@@ -33,20 +29,11 @@ export const actionIntentSchema = z.discriminatedUnion("action", [
   }),
 ])
 
-export type TaskCategory = z.infer<typeof taskCategorySchema>
-export type CreateTaskPayload = z.infer<typeof createTaskPayloadSchema>
+export type CreateTaskPayload = CopilotCreateTaskPayload
 export type CopilotAction = z.infer<typeof copilotActionSchema>
 export type ActionIntent = z.infer<typeof actionIntentSchema>
 export type CopilotActionType = CopilotAction["action"]
 export type CopilotActionPayload = CopilotAction["data"]
-
-export const TASK_CATEGORY_LABELS: Record<TaskCategory, string> = {
-  irrigation: "Riego",
-  fertilization: "Fertilización",
-  treatment: "Tratamiento",
-  harvest: "Cosecha",
-  inspection: "Inspección",
-}
 
 export const ACTION_UI_CONFIG = {
   create_task: {

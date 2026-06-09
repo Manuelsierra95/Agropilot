@@ -9,7 +9,7 @@ import type {
 } from "../schemas/dashboard-grid-schema"
 import { createEmptyDashboardCells } from "../schemas/dashboard-grid-schema"
 import { processChartView } from "./process-chart-view"
-import type { RenderChartInput } from "../schemas/chart-action-schema"
+import type { ChartQueryInput } from "../schemas/chart-action-schema"
 import { inferDashboardCells } from "./infer-dashboard-cells"
 import { validateDashboardCells } from "./validate-dashboard-cells"
 
@@ -123,7 +123,7 @@ function buildChartCell(
     return { kind: "empty" }
   }
 
-  const action: RenderChartInput = {
+  const action: ChartQueryInput = {
     title: spec.title,
     queries: selected.map((r) => r.query),
   }

@@ -3,7 +3,7 @@ import type { AnswerFocus } from "../schemas/copilot-intent-schema"
 import { COPILOT_REFERENCE_DATE } from "../schemas/copilot-intent-schema"
 import { formatDataAnswer } from "./format-data-answer"
 import { processChartView } from "./process-chart-view"
-import type { RenderChartInput } from "../schemas/chart-action-schema"
+import type { ChartQueryInput } from "../schemas/chart-action-schema"
 import type {
   DataPresentation,
   Widget,
@@ -126,7 +126,7 @@ function buildChartWidget(
     .map((i) => results[i])
     .filter((r): r is QueryResult => r !== undefined)
 
-  const action: RenderChartInput = {
+  const action: ChartQueryInput = {
     title: spec.title,
     queries: selected.map((r) => r.query),
   }

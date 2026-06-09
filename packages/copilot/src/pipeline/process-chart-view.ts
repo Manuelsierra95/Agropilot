@@ -3,7 +3,7 @@ import {
   type ChartSeriesKind,
   type ChartView,
   type QueryResult,
-  type RenderChartInput,
+  type ChartQueryInput,
 } from "../schemas/chart-action-schema"
 
 function defaultSeriesKind(query: QueryResult["query"]): ChartSeriesKind {
@@ -17,7 +17,7 @@ function defaultSeriesKind(query: QueryResult["query"]): ChartSeriesKind {
 }
 
 export function processChartView(
-  action: RenderChartInput,
+  action: ChartQueryInput,
   results: QueryResult[]
 ): ChartView {
   const seriesMap = new Map<
