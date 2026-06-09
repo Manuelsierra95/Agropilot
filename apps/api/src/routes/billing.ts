@@ -7,7 +7,8 @@ import { getActiveOrganization } from "@/services/organization"
 import { getBillingMe, toggleModule } from "@/services/billing"
 import { HTTPException } from "hono/http-exception"
 import { zValidator } from "@hono/zod-validator"
-import { slugSchema, toggleModuleSchema } from "@workspace/schemas"
+import { toggleModuleSchema } from "@workspace/schemas"
+import z from "zod"
 
 export const billingRoutes = new Hono<{
   Bindings: Env
@@ -40,7 +41,12 @@ export const billingRoutes = new Hono<{
   // Activar / desactivar módulo
   .patch(
     "/modules/:slug",
-    zValidator("param", slugSchema),
+    zValidator(
+      "param",
+      z.object({
+        slug: z.enum(["ai-analysis", "field-notebook", "automations"]),
+      })
+    ),
     zValidator("json", toggleModuleSchema),
     async (c) => {
       const member = c.get("member")

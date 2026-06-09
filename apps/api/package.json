@@ -1,13 +1,21 @@
 {
   "name": "api",
+  "exports": {
+    ".": "./src/index.ts",
+    "./app": "./src/app.ts"
+  },
   "scripts": {
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.68",
     "@hono/zod-validator": "^0.7.6",
     "@workspace/auth": "workspace:*",
+    "@workspace/copilot": "workspace:*",
     "@workspace/db": "workspace:*",
     "@workspace/schemas": "workspace:*",
+    "ai": "^6.0.197",
+    "ai-sdk-ollama": "^3.8.5",
     "fast-xml-parser": "^5.8.0",
     "hono": "^4.12.23",
     "zod": "^3.25.76"

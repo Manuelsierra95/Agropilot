@@ -1,4 +1,5 @@
-import { db, schema, eq, and } from "@workspace/db"
+import { db, schema, eq, and, asc, gte, lte } from "@workspace/db"
+import { z } from "zod"
 import { HTTPException } from "hono/http-exception"
 import {
   type ParcelCreateInput,
@@ -136,6 +137,182 @@ async function upsertParcelLocation(
     parcelId,
     ...location,
   })
+}
+
+const parcelWeatherDataSchema = z.object({
+  daily: z.array(
+    z.object({
+      date: z.string(),
+      soilMoisture: z.number(),
+      rainfall: z.number(),
+      temperature: z.number(),
+    })
+  ),
+})
+
+export type ParcelCashflowQueryFilters = {
+  parcelId?: string
+  from: string
+  to: string
+}
+
+export type ParcelCashflowRow = {
+  date: string
+  income: string | null
+  expense: string | null
+  parcelId: string
+}
+
+export type ParcelWeatherMetric = "soil_moisture" | "rainfall" | "temperature"
+
+export type ParcelWeatherQueryFilters = {
+  parcelId?: string
+  metric: ParcelWeatherMetric
+  from: string
+  to: string
+}
+
+export type ParcelWeatherDailyRow = {
+  date: string
+  value: number
+  parcelId: string
+  parcelName: string
+}
+
+export async function resolveParcelIdForOrg(
+  organizationId: string,
+  parcelId?: string,
+  defaultParcelId?: string
+): Promise<string | null> {
+  if (parcelId) {
+    const parcel = await db.query.parcels.findFirst({
+      where: and(
+        eq(schema.parcels.organizationId, organizationId),
+        eq(schema.parcels.id, parcelId)
+      ),
+      columns: { id: true },
+    })
+
+    return parcel?.id ?? null
+  }
+
+  if (defaultParcelId) {
+    const parcel = await db.query.parcels.findFirst({
+      where: and(
+        eq(schema.parcels.organizationId, organizationId),
+        eq(schema.parcels.id, defaultParcelId)
+      ),
+      columns: { id: true },
+    })
+
+    if (parcel) {
+      return parcel.id
+    }
+  }
+
+  const first = await db.query.parcels.findFirst({
+    where: eq(schema.parcels.organizationId, organizationId),
+    columns: { id: true },
+    orderBy: [asc(schema.parcels.name)],
+  })
+
+  return first?.id ?? null
+}
+
+export async function queryParcelCashflow(
+  organizationId: string,
+  filters: ParcelCashflowQueryFilters,
+  defaultParcelId?: string
+): Promise<ParcelCashflowRow[]> {
+  const parcelId = await resolveParcelIdForOrg(
+    organizationId,
+    filters.parcelId,
+    defaultParcelId
+  )
+
+  if (!parcelId) {
+    return []
+  }
+
+  return db.query.parcelCashflowDaily.findMany({
+    where: and(
+      eq(schema.parcelCashflowDaily.parcelId, parcelId),
+      gte(schema.parcelCashflowDaily.date, filters.from),
+      lte(schema.parcelCashflowDaily.date, filters.to)
+    ),
+    orderBy: [asc(schema.parcelCashflowDaily.date)],
+    columns: {
+      date: true,
+      income: true,
+      expense: true,
+      parcelId: true,
+    },
+  })
+}
+
+function weatherMetricValue(
+  entry: z.infer<typeof parcelWeatherDataSchema>["daily"][number],
+  metric: ParcelWeatherMetric
+): number {
+  switch (metric) {
+    case "soil_moisture":
+      return entry.soilMoisture
+    case "rainfall":
+      return entry.rainfall
+    case "temperature":
+      return entry.temperature
+  }
+}
+
+export async function queryParcelWeather(
+  organizationId: string,
+  filters: ParcelWeatherQueryFilters,
+  defaultParcelId?: string
+): Promise<ParcelWeatherDailyRow[]> {
+  const parcelId = await resolveParcelIdForOrg(
+    organizationId,
+    filters.parcelId,
+    defaultParcelId
+  )
+
+  if (!parcelId) {
+    return []
+  }
+
+  const parcel = await db.query.parcels.findFirst({
+    where: and(
+      eq(schema.parcels.organizationId, organizationId),
+      eq(schema.parcels.id, parcelId)
+    ),
+    columns: { id: true, name: true },
+  })
+
+  if (!parcel) {
+    return []
+  }
+
+  const weather = await db.query.parcelWeather.findFirst({
+    where: eq(schema.parcelWeather.parcelId, parcelId),
+    columns: { status: true, data: true },
+  })
+
+  if (!weather || weather.status !== "ok") {
+    return []
+  }
+
+  const parsed = parcelWeatherDataSchema.safeParse(weather.data)
+  if (!parsed.success) {
+    return []
+  }
+
+  return parsed.data.daily
+    .filter((entry) => entry.date >= filters.from && entry.date <= filters.to)
+    .map((entry) => ({
+      date: entry.date,
+      value: weatherMetricValue(entry, filters.metric),
+      parcelId: parcel.id,
+      parcelName: parcel.name,
+    }))
 }
 
 export async function listParcels(

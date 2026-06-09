@@ -1,6 +1,7 @@
-import { db, schema, eq, and, desc, isNotNull } from "@workspace/db"
+import { db, schema, eq, and, asc, desc, isNotNull, gte, lte } from "@workspace/db"
 import { HTTPException } from "hono/http-exception"
 import type {
+  TransactionCategory,
   TransactionCreateInput,
   TransactionSelect,
   TransactionUpdateInput,
@@ -234,6 +235,68 @@ export async function listTransactions(
   return db.query.transactions.findMany({
     where: eq(schema.transactions.organizationId, organizationId),
     orderBy: [desc(schema.transactions.date)],
+  })
+}
+
+export type TransactionQueryFilters = {
+  from: string
+  to: string
+  flow?: "income" | "expense"
+  category?: TransactionCategory
+}
+
+export type OilGrade = "virgen_extra" | "virgen" | "lampante"
+
+export type MarketPricesQueryFilters = {
+  grade: OilGrade
+  from: string
+  to: string
+}
+
+export type MarketPriceRow = {
+  date: string
+  price: string
+}
+
+export async function queryTransactions(
+  organizationId: string,
+  filters: TransactionQueryFilters
+): Promise<TransactionSelect[]> {
+  const conditions = [
+    eq(schema.transactions.organizationId, organizationId),
+    gte(schema.transactions.date, filters.from),
+    lte(schema.transactions.date, filters.to),
+  ]
+
+  if (filters.flow) {
+    conditions.push(eq(schema.transactions.flow, filters.flow))
+  }
+
+  if (filters.category) {
+    conditions.push(eq(schema.transactions.category, filters.category))
+  }
+
+  return db.query.transactions.findMany({
+    where: and(...conditions),
+    orderBy: [desc(schema.transactions.date)],
+  })
+}
+
+export async function queryMarketPrices(
+  filters: MarketPricesQueryFilters
+): Promise<MarketPriceRow[]> {
+  return db.query.marketPrices.findMany({
+    where: and(
+      eq(schema.marketPrices.product, "olive_oil"),
+      eq(schema.marketPrices.grade, filters.grade),
+      gte(schema.marketPrices.date, filters.from),
+      lte(schema.marketPrices.date, filters.to)
+    ),
+    orderBy: [asc(schema.marketPrices.date)],
+    columns: {
+      date: true,
+      price: true,
+    },
   })
 }
 
