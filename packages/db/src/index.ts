@@ -33,7 +33,22 @@ const db = new Proxy({} as DatabaseInstance, {
 export type Schema = typeof schema
 export type Database = typeof db
 
-// Export drizzle-orm utilities
+// Explicit re-exports so Node ESM consumers (e.g. tsx in @workspace/seeds) can
+// use named imports; `export *` alone does not surface these at runtime.
+export {
+  and,
+  asc,
+  desc,
+  eq,
+  gte,
+  isNotNull,
+  isNull,
+  lte,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm"
+
 export * from "drizzle-orm"
 
 export * from "./schemas"
