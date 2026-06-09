@@ -1,9 +1,9 @@
-import { DashboardPageContainer } from "@/components/ui/dashboard-page-container"
+import { PageContainer } from "@/components/ui/page-container"
 
 export default function Notifications() {
   return (
-    <DashboardPageContainer className="flex flex-col gap-4 md:gap-6">
+    <PageContainer className="flex flex-col gap-4 md:gap-6">
       <h1>Notificaciones</h1>
-    </DashboardPageContainer>
+    </PageContainer>
   )
 }

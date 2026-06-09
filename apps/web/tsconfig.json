@@ -7,20 +7,21 @@
       "@workspace/ui/*": ["../../packages/ui/src/*"],
       "@workspace/api": ["../api/src/index.ts"],
       "@workspace/auth": ["../../packages/auth/src/index.ts"],
-      "@workspace/schemas": ["../../packages/schemas/src/index.ts"]
+      "@workspace/schemas": ["../../packages/schemas/src/index.ts"],
+      "@workspace/copilot": ["../../packages/copilot/src/index.ts"],
     },
     "plugins": [
       {
-        "name": "next"
-      }
-    ]
+        "name": "next",
+      },
+    ],
   },
   "include": [
     "next-env.d.ts",
     "next.config.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
 }

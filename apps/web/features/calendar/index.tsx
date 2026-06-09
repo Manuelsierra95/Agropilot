@@ -1,4 +1,4 @@
-import { DashboardPageContainer } from "@/components/ui/dashboard-page-container"
+import { PageContainer } from "@/components/ui/page-container"
 import { calendarMockData } from "@/lib/calendar-mock"
 import { CalendarClient } from "@/features/calendar/components/calendar/calendar-client"
 import { GradientSeparator } from "@/components/ui/gradient-separator"
@@ -15,7 +15,7 @@ import { Kanban } from "./components/kanban"
 
 export default function Calendar() {
   return (
-    <DashboardPageContainer className="grid grid-cols-[1fr_auto_1fr_auto_1fr] grid-rows-[minmax(0,300px)_auto_minmax(0,1120px)_auto_auto] gap-4">
+    <PageContainer className="grid grid-cols-[1fr_auto_1fr_auto_1fr] grid-rows-[minmax(0,300px)_auto_minmax(0,1120px)_auto_auto] gap-4">
       {/* 🔴 TOP: DECISION LAYER */}
       <div className="col-start-1 row-start-1">
         <ActiveAlertsCard />
@@ -70,6 +70,6 @@ export default function Calendar() {
       <div className="col-span-5 col-start-1 row-start-5">
         <CampaignTimeline />
       </div>
-    </DashboardPageContainer>
+    </PageContainer>
   )
 }

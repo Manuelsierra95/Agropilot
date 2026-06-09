@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { DashboardPageContainer } from "@/components/ui/dashboard-page-container"
+import { PageContainer } from "@/components/ui/page-container"
 import { mockParcels } from "@/store/mockParcels"
 import {
   parcelWeatherByParcelId,
@@ -330,21 +330,21 @@ export default function Parcel() {
 
   if (!activeParcel) {
     return (
-      <DashboardPageContainer className="border">
+      <PageContainer className="border">
         <div className="flex h-64 items-center justify-center text-muted-foreground">
           No hay datos de parcelas disponibles.
         </div>
-      </DashboardPageContainer>
+      </PageContainer>
     )
   }
 
   if (!isAllSelected && !weather) {
     return (
-      <DashboardPageContainer className="border">
+      <PageContainer className="border">
         <div className="flex h-64 items-center justify-center text-muted-foreground">
           No hay datos climáticos para la parcela seleccionada.
         </div>
-      </DashboardPageContainer>
+      </PageContainer>
     )
   }
 
@@ -353,7 +353,7 @@ export default function Parcel() {
   const daily = weather?.daily
 
   return (
-    <DashboardPageContainer className="gap-4">
+    <PageContainer className="gap-4">
       <ParcelHero
         isAllSelected={isAllSelected}
         activeParcel={activeParcel}
@@ -384,6 +384,6 @@ export default function Parcel() {
           allModeSummary={allModeSummary}
         />
       )}
-    </DashboardPageContainer>
+    </PageContainer>
   )
 }

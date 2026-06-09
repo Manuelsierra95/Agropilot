@@ -1,14 +1,21 @@
-import NavSidebar from "@/components/dashboard-nav/nav-sidebar"
+import { CopilotLayout } from "@/components/copilot/copilot-layout"
 import NavDock from "@/components/dashboard-nav/nav-dock"
+import NavSidebar from "@/components/dashboard-nav/nav-sidebar"
 import { NavDockHeader } from "./nav-dock/nav-dock-header"
 
-export function NavigationWrapper({ children }: { children: React.ReactNode }) {
+export async function NavigationWrapper({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <nav>
       {/* Mobile: Navbar Dock */}
-      <div className="min-h-screen lg:hidden">
-        <NavDockHeader />
-        {children}
+      <div className="flex min-h-screen flex-col lg:hidden">
+        <CopilotLayout className="flex min-h-0 flex-1 flex-col">
+          <NavDockHeader />
+          <div className="min-h-0 flex-1 overflow-auto">{children}</div>
+        </CopilotLayout>
         <NavDock />
       </div>
 

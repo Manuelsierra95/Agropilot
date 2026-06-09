@@ -1,4 +1,4 @@
-import { DashboardPageContainer } from "@/components/ui/dashboard-page-container"
+import { PageContainer } from "@/components/ui/page-container"
 import { GradientSeparator } from "@/components/ui/gradient-separator"
 
 import { KpiCard, type KpiItem } from "./top-cards/price-kpi-card"
@@ -12,7 +12,7 @@ import { ComparativeAreaChart } from "@/components/charts/comparative-area-chart
 import { FinanceRecommendations } from "./top-cards/finance-recommendations"
 import { CampaignPredictionsCard } from "@/components/cards/campaign-predictions-card"
 import { FinanceRecommendationsCard } from "@/components/cards/finance-recommendations-card"
-import { dashboardPriceKpis, dashboardTransactions } from "../dashboard"
+import { dashboardPriceKpis, dashboardTransactions } from "../dashboard/mocks"
 import { CashFlowSummaryCard } from "@/components/cards/cash-flow-summary-card"
 
 // Aceites
@@ -45,8 +45,7 @@ const oils: KpiItem[] = [
 
 export default function Finance() {
   return (
-    <DashboardPageContainer className="grid grid-cols-[1fr_auto_1fr] grid-rows-[auto] gap-4">
-      {/* <DashboardPageContainer className="flex flex-col gap-4 md:gap-6"> */}
+    <PageContainer className="grid grid-cols-[1fr_auto_1fr] grid-rows-[auto] gap-4">
 
       {/* Row 1 */}
       <div className="col-span-1 row-span-2">
@@ -93,6 +92,6 @@ export default function Finance() {
       <div className="col-span-3 row-start-7">
         <TransactionTable data={data} />
       </div>
-    </DashboardPageContainer>
+    </PageContainer>
   )
 }
