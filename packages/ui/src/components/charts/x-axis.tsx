@@ -154,11 +154,11 @@ export function XAxis({
 
   return createPortal(
     <div className="pointer-events-none absolute inset-0">
-      {labelsToShow.map((item) => (
+      {labelsToShow.map((item, index) => (
         <XAxisLabel
           crosshairX={crosshairX}
           isHovering={isHovering}
-          key={`${item.date.getTime()}-${item.x}`}
+          key={`${item.date.getTime()}-${item.x}-${index}`}
           label={item.label}
           tickerHalfWidth={tickerHalfWidth}
           x={item.x}

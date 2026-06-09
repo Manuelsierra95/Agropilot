@@ -179,10 +179,10 @@ export function ChartTooltip({
           width="100%"
         >
           <g transform={`translate(${margin.left},${margin.top})`}>
-            {lines.map((line) => (
+            {lines.map((line, index) => (
               <TooltipDot
                 color={line.stroke}
-                key={line.dataKey}
+                key={`${line.dataKey}-${index}`}
                 strokeColor={chartCssVars.background}
                 visible={visible}
                 x={tooltipData?.xPositions?.[line.dataKey] ?? x}

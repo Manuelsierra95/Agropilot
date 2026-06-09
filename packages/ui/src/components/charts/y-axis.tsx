@@ -59,10 +59,10 @@ export function YAxis({
       className="pointer-events-none absolute top-0 bottom-0"
       style={{ left: 0, width: margin.left }}
     >
-      {ticks.map((tick) => (
+      {ticks.map((tick, index) => (
         <div
           className="absolute right-0 flex items-center justify-end pr-2"
-          key={tick.value}
+          key={`${tick.value}-${tick.y}-${index}`}
           style={{ top: tick.y, transform: "translateY(-50%)" }}
         >
           <span className="text-chart-label text-xs">{tick.label}</span>
