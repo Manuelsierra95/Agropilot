@@ -8,8 +8,7 @@ export function getAiProvider(): string {
 
 export function getChatModel(): LanguageModel {
   const provider = getAiProvider()
-  const model =
-    process.env.OLLAMA_MODEL ?? "phi3:3.8b-mini-128k-instruct-q5_K_M"
+  const model = process.env.OLLAMA_MODEL ?? "llama3.1:8b-instruct-q4_K_M"
 
   if (provider === "openai") {
     return openai(process.env.OPENAI_MODEL ?? "gpt-4o-mini")
