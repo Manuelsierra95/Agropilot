@@ -73,7 +73,7 @@ export function OlivePrice({ items, className }: OlivePriceCardProps) {
     >
       {/* ── Fila de items ── */}
       <div
-        className="grid w-full grid-cols-1 gap-px md:grid-cols-[repeat(var(--cols),minmax(0,1fr))]"
+        className="grid w-full grid-cols-[repeat(var(--cols),minmax(0,1fr))] gap-px"
         style={{ "--cols": items.length } as React.CSSProperties}
       >
         {items.map((item, index) => {

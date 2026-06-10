@@ -22,47 +22,20 @@ import {
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
 
-function addDays(base: Date, days: number) {
-  const d = new Date(base)
-  d.setDate(d.getDate() + days)
-  return d
-}
-
-const CAMPAIGN_START = new Date("2026-01-15")
-
-// Mock: 30 puntos cada 4 días. Costes crecen linealmente desde el principio;
-// el valor crece lento al inicio y se acelera cerca de la cosecha.
-const rawPoints = Array.from({ length: 30 }, (_, i) => {
-  const day = i * 4
-  const costIncrement = 2_800 + (i % 3) * 320
-  const valueIncrement =
-    800 + Math.round(18_000 * Math.pow(i / 29, 1.9)) / 29 + (i % 4) * 200
-  return { day, costIncrement, valueIncrement }
-})
-
-// Acumulados
 type ChartPoint = { date: Date; cost: number; value: number }
 
-const chartData: ChartPoint[] = rawPoints.reduce(
-  (
-    acc: ChartPoint[],
-    {
-      day,
-      costIncrement,
-      valueIncrement,
-    }: { day: number; costIncrement: number; valueIncrement: number },
-    i: number
-  ) => {
-    const prev = acc[i - 1] ?? { cost: 0, value: 0 }
-    acc.push({
-      date: addDays(CAMPAIGN_START, day),
-      cost: Math.round(prev.cost + costIncrement),
-      value: Math.round(prev.value + valueIncrement),
-    })
-    return acc
-  },
-  [] as ChartPoint[]
-)
+export type CampaignMarginData = {
+  campaignStart: string
+  points: { date: string; cost: number; value: number }[]
+}
+
+function toChartData(data: CampaignMarginData): ChartPoint[] {
+  return data.points.map((point) => ({
+    date: new Date(`${point.date}T12:00:00`),
+    cost: point.cost,
+    value: point.value,
+  }))
+}
 
 function formatCurrency(v: number) {
   if (Math.abs(v) >= 1_000) {
@@ -76,10 +49,13 @@ function formatCurrency(v: number) {
 
 export function CampaignAccumulatedMargin({
   className,
+  data,
 }: {
   className?: string
+  data: CampaignMarginData
 }) {
-  const last = chartData[chartData.length - 1]
+  const chartData = toChartData(data)
+  const last = chartData.at(-1) ?? { cost: 0, value: 0, date: new Date() }
 
   const gap = last.value - last.cost
   const isProfit = gap >= 0
@@ -96,7 +72,7 @@ export function CampaignAccumulatedMargin({
       : null
 
   return (
-    <Card className={cn("w-200 bg-background ring-0", className)}>
+    <Card className={cn("w-full min-w-0 bg-background ring-0", className)}>
       <CardHeader className="pb-2">
         {/* Cifra principal: gap actual */}
         <div

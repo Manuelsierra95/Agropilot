@@ -13,7 +13,7 @@ import {
 
 import { useDashboardState } from "@/features/copilot/dashboard-state"
 
-import { DashboardSkeleton } from "@/features/dashboard/dashboard-skeleton"
+import { CopilotDashboardSkeleton } from "@/features/dashboard/copilot-dashboard-skeleton"
 
 import { AlertWidget } from "./widgets/alert-widget"
 import { ChartWidget } from "./widgets/chart-widget"
@@ -84,7 +84,7 @@ export function DashboardGridHost() {
   }
 
   if (status === "loading") {
-    return <DashboardSkeleton />
+    return <CopilotDashboardSkeleton />
   }
 
   return (

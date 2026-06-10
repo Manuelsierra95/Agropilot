@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import type { Transaction } from "@/store/mockTransactions"
-import type { KpiItem } from "./olive-price"
+import type { Item } from "./olive-price"
 import { Gauge } from "@workspace/ui/components/charts"
 import { Card, CardHeader } from "@workspace/ui/components/card"
 import { cn } from "@workspace/ui/lib/utils"
@@ -18,7 +18,7 @@ type TransactionSnapshot = Pick<
 
 interface FinanceRecommendationsProps {
   transactions: TransactionSnapshot[]
-  oils: KpiItem[]
+  oils: Item[]
   previousCampaign?: {
     totalIncome: number
     totalExpenses: number
@@ -32,7 +32,6 @@ interface FinanceRecommendationsProps {
 export function FinanceResume({
   className,
   transactions,
-  oils,
   previousCampaign,
 }: FinanceRecommendationsProps) {
   const expensesByCategory = transactions
@@ -90,13 +89,13 @@ export function FinanceResume({
   return (
     <Card
       className={cn(
-        "flex h-full max-w-md min-w-sm flex-col gap-0 overflow-hidden bg-background pt-0 ring-0",
+        "flex h-full w-full max-w-xs min-w-0 flex-col gap-0 overflow-hidden bg-background pt-0 ring-0",
         className
       )}
     >
       <CardHeader className="flex flex-col items-center">
         {/* ── Gauge ── */}
-        <div className="mx-auto flex h-full w-full max-w-md justify-center">
+        <div className="mx-auto flex h-full w-full max-w-xs justify-center">
           <Gauge
             value={gaugeValue}
             centerValue={balance}
