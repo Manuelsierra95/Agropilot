@@ -8,7 +8,7 @@ import {
   parcelWeatherByParcelId,
   type ParcelWeatherResult,
 } from "@/store/parcel-weather.mock"
-import { useParcelStore } from "@/store/useParcelStore"
+import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
 
 import { ParcelAllView } from "./components/parcel-all-view"
 import { ParcelHero } from "./components/parcel-hero"
@@ -256,8 +256,8 @@ const mockIntelligenceData = {
 }
 
 export default function Parcel() {
-  const parcelId = useParcelStore((state) => state.parcelId)
-  const isAllSelected = parcelId === "all"
+  const [{ parcelId }] = useDashboardScopeParams()
+  const isAllSelected = !parcelId
 
   const selectedParcel = React.useMemo<ParcelItem | undefined>(() => {
     if (isAllSelected) return undefined

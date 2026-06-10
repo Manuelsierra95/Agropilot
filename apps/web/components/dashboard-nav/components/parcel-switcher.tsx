@@ -11,25 +11,36 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
 import { ChevronsUpDownIcon, PlusIcon } from "lucide-react"
-import type { NavigationParcel } from "@/lib/navigation/navigation-data"
-import { getIcon } from "@/lib/icons"
 import { Button } from "@workspace/ui/components/button"
 import { useIsMobile } from "@workspace/ui/hooks/use-mobile"
+import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
+import { useDashboardScopeActions } from "@/hooks/use-dashboard-scope-actions"
+import { useDashboardListsStore } from "@/store/useDashboardListsStore"
+import { ParcelSwitcherPlaceholder } from "@/components/dashboard-nav/components/switcher-placeholders"
+import { getParcelIcon } from "@/lib/navigation/parcel-icon"
 
 interface ParcelSwitcherProps {
-  parcels: NavigationParcel[]
   variant?: "sidebar" | "dock"
 }
 
-export function ParcelSwitcher({
-  parcels,
-  variant = "sidebar",
-}: ParcelSwitcherProps) {
+export function ParcelSwitcher({ variant = "sidebar" }: ParcelSwitcherProps) {
   const isMobile = useIsMobile()
-  const [activeParcel, setActiveParcel] = React.useState(parcels[0])
-  if (!activeParcel) return null
+  const [{ parcelId }] = useDashboardScopeParams()
+  const { selectParcel } = useDashboardScopeActions()
+  const parcels = useDashboardListsStore((state) => state.parcels)
+  const isLoading = useDashboardListsStore((state) => state.isLoadingParcels)
 
-  const ActiveIcon = getIcon(activeParcel.icon)
+  const activeParcel =
+    parcels.find((parcel) => parcel.id === parcelId) ?? parcels[0]
+
+  if (!activeParcel) {
+    if (isLoading) {
+      return <ParcelSwitcherPlaceholder variant={variant} />
+    }
+    return null
+  }
+
+  const ActiveIcon = getParcelIcon(activeParcel.cropType)
   const isDock = variant === "dock"
 
   return (
@@ -38,9 +49,10 @@ export function ParcelSwitcher({
         <Button
           variant="ghost"
           size="sm"
+          disabled={isLoading}
           className={
             isDock
-              ? "flex w-fit items-center gap-2 rounded-lg p-1.5 hover:bg-accent"
+              ? "flex items-center gap-2 rounded-lg p-1.5 hover:bg-accent"
               : "p-0 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           }
         >
@@ -75,11 +87,11 @@ export function ParcelSwitcher({
           Parcels
         </DropdownMenuLabel>
         {parcels.map((parcel, index) => {
-          const ParcelIcon = getIcon(parcel.icon)
+          const ParcelIcon = getParcelIcon(parcel.cropType)
           return (
             <DropdownMenuItem
-              key={parcel.name}
-              onClick={() => setActiveParcel(parcel)}
+              key={parcel.id}
+              onClick={() => void selectParcel(parcel.id)}
               className="gap-2 p-2"
             >
               <div className="flex size-6 items-center justify-center rounded-md border">

@@ -6,13 +6,11 @@ import {
 } from "@workspace/schemas"
 import { cache } from "react"
 
-const getListParcels = cache(
-  (): Promise<ParcelSelect[]> =>
-    client.api.v1.parcel
-      .$get()
-      .then((res) => res.json())
-      .then((res) => res.parcels)
-)
+const getListParcels = (): Promise<ParcelSelect[]> =>
+  client.api.v1.parcel
+    .$get()
+    .then((res) => res.json())
+    .then((res) => res.parcels)
 
 const getParcelById = cache(
   (id: string): Promise<ParcelSelect> =>

@@ -19,6 +19,18 @@ import {
   dashboardMainClassName,
 } from "@/features/dashboard/dashboard-grid-layout"
 
+type DashboardOverviewProps = {
+  searchParams: Record<string, string | string[] | undefined>
+}
+
+function readParam(
+  searchParams: Record<string, string | string[] | undefined>,
+  key: string
+): string | undefined {
+  const value = searchParams[key]
+  return typeof value === "string" ? value : undefined
+}
+
 function toCalendarEvents(
   events: DashboardCalendarEvent[]
 ): import("@/lib/calendar-mock").CalendarEvent[] {
@@ -29,8 +41,15 @@ function toCalendarEvents(
   }))
 }
 
-export default async function DashboardOverview() {
-  const overview = await api.dashboard.getOverview()
+export default async function DashboardOverview({
+  searchParams,
+}: DashboardOverviewProps) {
+  const overview = await api.dashboard.getOverview({
+    parcelId: readParam(searchParams, "parcelId"),
+    campaignId: readParam(searchParams, "campaignId"),
+    from: readParam(searchParams, "from"),
+    to: readParam(searchParams, "to"),
+  })
 
   return (
     <div className={dashboardContainerClassName}>

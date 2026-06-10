@@ -4,14 +4,14 @@
 export const dashboardContainerClassName = "@container/main min-w-0 w-full"
 
 export const dashboardMainClassName =
-  "grid min-w-0 w-full grid-cols-1 gap-0 p-4 @min-[1100px]/main:grid-cols-3"
+  "grid min-w-0 w-full grid-cols-1 gap-0 p-4 @min-[1100px]/main:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,20rem)]"
 
 const fullRow = "col-span-full min-w-0"
 
 export const dashboardGridSlot = {
   topRow: `${fullRow} flex flex-col gap-0 @min-[1100px]/main:col-span-2 @min-[1100px]/main:col-start-1 @min-[1100px]/main:row-start-1`,
   resumeCropWrapper: `${fullRow} order-first flex min-w-0 items-stretch gap-4 @min-[1100px]/main:order-none @min-[1100px]/main:row-span-2 @min-[1100px]/main:col-start-3 @min-[1100px]/main:row-start-1`,
-  resumeCrop: "min-w-0 flex-1",
+  resumeCrop: "min-w-0 w-full",
   financeRow: `${fullRow} flex flex-col gap-0 @min-[1100px]/main:col-span-2 @min-[1100px]/main:row-start-2`,
   recoMapRow: `${fullRow} flex flex-col gap-0 @min-[1100px]/main:col-span-3 @min-[1100px]/main:row-start-3`,
   tablesRow: `${fullRow} flex flex-col gap-0 @min-[1100px]/main:col-span-3 @min-[1100px]/main:row-start-4`,

@@ -14,44 +14,16 @@ import { cn } from "@workspace/ui/lib/utils"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { useIsMobile } from "@workspace/ui/hooks/use-mobile"
-
-// Mock data — reemplaza con datos reales de tu backend
-export const mockCampaigns = [
-  {
-    id: "2025-26",
-    name: "Campaña 2025–26",
-    startDate: "2025-10-01",
-    endDate: "2026-09-30",
-    status: "active" as const,
-    balance: null,
-  },
-  {
-    id: "2024-25",
-    name: "Campaña 2024–25",
-    startDate: "2024-10-01",
-    endDate: "2025-09-30",
-    status: "closed" as const,
-    balance: 29540,
-  },
-  {
-    id: "2023-24",
-    name: "Campaña 2023–24",
-    startDate: "2023-10-01",
-    endDate: "2024-09-30",
-    status: "closed" as const,
-    balance: 24900,
-  },
-  {
-    id: "2022-23",
-    name: "Campaña 2022–23",
-    startDate: "2022-10-01",
-    endDate: "2023-09-30",
-    status: "closed" as const,
-    balance: -3100,
-  },
-]
-
-export type Campaign = (typeof mockCampaigns)[number]
+import type { CampaignListItem } from "@workspace/schemas"
+import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
+import { useDashboardScopeActions } from "@/hooks/use-dashboard-scope-actions"
+import { CampaignSwitcherPlaceholder } from "@/components/dashboard-nav/components/switcher-placeholders"
+import {
+  selectCampaignsForParcel,
+  selectHasLoadedCampaignsForParcel,
+  selectIsLoadingCampaigns,
+  useDashboardListsStore,
+} from "@/store/useDashboardListsStore"
 
 function formatBalance(balance: number | null): string {
   if (balance === null) return "—"
@@ -60,8 +32,8 @@ function formatBalance(balance: number | null): string {
 }
 
 function formatDateRange(startDate: string, endDate: string): string {
-  const fmt = (d: string) =>
-    new Date(d).toLocaleDateString("es-ES", {
+  const fmt = (date: string) =>
+    new Date(date).toLocaleDateString("es-ES", {
       month: "short",
       year: "numeric",
     })
@@ -83,22 +55,50 @@ const statusConfig = {
   },
 }
 
-interface CampaignSwitcherProps {
-  campaigns?: Campaign[]
-}
-
-export function CampaignSwitcher({
-  campaigns = mockCampaigns,
-}: CampaignSwitcherProps) {
+export function CampaignSwitcher() {
   const isMobile = useIsMobile()
-
-  const defaultCampaign =
-    campaigns.find((c) => c.status === "active") ?? campaigns[0]
-  const [activeCampaign, setActiveCampaign] = React.useState<Campaign>(
-    defaultCampaign!
+  const [{ parcelId, campaignId, from, to }] = useDashboardScopeParams()
+  const { selectCampaign, selectDateRange } = useDashboardScopeActions()
+  const campaigns = useDashboardListsStore((state) =>
+    selectCampaignsForParcel(state, parcelId)
   )
+  const isLoading = useDashboardListsStore((state) =>
+    selectIsLoadingCampaigns(state, parcelId)
+  )
+  const hasLoadedCampaigns = useDashboardListsStore((state) =>
+    selectHasLoadedCampaignsForParcel(state, parcelId)
+  )
+  const isPendingCampaigns =
+    Boolean(parcelId) && !hasLoadedCampaigns && !from && !to
 
-  if (!activeCampaign) return null
+  const [customFrom, setCustomFrom] = React.useState(from ?? "")
+  const [customTo, setCustomTo] = React.useState(to ?? "")
+
+  React.useEffect(() => {
+    setCustomFrom(from ?? "")
+    setCustomTo(to ?? "")
+  }, [from, to])
+
+  const activeCampaign =
+    from && to
+      ? ({
+          id: "custom-range",
+          name: "Rango personalizado",
+          startDate: from,
+          endDate: to,
+          status: "active",
+          balance: null,
+        } satisfies CampaignListItem)
+      : (campaigns.find((campaign) => campaign.id === campaignId) ??
+        campaigns.find((campaign) => campaign.status === "active") ??
+        campaigns[0])
+
+  if (!activeCampaign) {
+    if (isLoading || isPendingCampaigns) {
+      return <CampaignSwitcherPlaceholder />
+    }
+    return null
+  }
 
   return (
     <DropdownMenu>
@@ -106,7 +106,8 @@ export function CampaignSwitcher({
         <Button
           variant="ghost"
           size="sm"
-          className="w-fit p-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          disabled={isLoading}
+          className="p-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
         >
           <CircleIcon
             className={cn("size-2 shrink-0 fill-current", {
@@ -133,24 +134,23 @@ export function CampaignSwitcher({
 
         {campaigns.map((campaign) => {
           const cfg = statusConfig[campaign.status]
-          const isActive = activeCampaign.id === campaign.id
+          const isActive =
+            !from && !to && activeCampaign.id === campaign.id
           const balancePositive =
             campaign.balance !== null && campaign.balance >= 0
 
           return (
             <DropdownMenuItem
               key={campaign.id}
-              onClick={() => setActiveCampaign(campaign)}
+              onClick={() => void selectCampaign(campaign.id)}
               className={cn("cursor-pointer gap-3 p-2.5", {
                 "bg-accent": isActive,
               })}
             >
-              {/* Dot de estado */}
               <div className="flex size-6 shrink-0 items-center justify-center">
                 <div className={cn("size-2 rounded-full", cfg.color)} />
               </div>
 
-              {/* Info */}
               <div className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate text-sm font-medium">
                   {campaign.name}
@@ -160,7 +160,6 @@ export function CampaignSwitcher({
                 </span>
               </div>
 
-              {/* Balance + badge */}
               <div className="flex shrink-0 flex-col items-end gap-1">
                 <span
                   className={cn("text-xs font-medium", {
@@ -188,7 +187,6 @@ export function CampaignSwitcher({
 
         <DropdownMenuSeparator />
 
-        {/* Rango personalizado */}
         <div className="p-2.5">
           <p className="mb-2 flex items-center gap-1.5 text-xs text-muted-foreground">
             <CalendarIcon className="size-3" />
@@ -197,21 +195,28 @@ export function CampaignSwitcher({
           <div className="flex items-center gap-2">
             <Input
               type="date"
-              defaultValue="2024-01-01"
+              value={customFrom}
+              onChange={(event) => setCustomFrom(event.target.value)}
               className="flex-1 text-xs"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
             />
             <span className="shrink-0 text-xs text-muted-foreground">→</span>
             <Input
               type="date"
-              defaultValue="2024-12-31"
+              value={customTo}
+              onChange={(event) => setCustomTo(event.target.value)}
               className="flex-1 text-xs"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
             />
           </div>
           <Button
             className="mt-2 w-full rounded-md border border-border bg-muted py-1.5 text-xs text-foreground transition-colors hover:bg-accent"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation()
+              if (customFrom && customTo) {
+                void selectDateRange(customFrom, customTo)
+              }
+            }}
           >
             Aplicar rango
           </Button>

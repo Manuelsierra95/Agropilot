@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ChevronsUpDown, Settings2Icon, ChevronsUpDownIcon } from "lucide-react"
+import { ChevronsUpDownIcon, Settings2Icon } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,36 +15,38 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@workspace/ui/components/sidebar"
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@workspace/ui/components/avatar"
+import { useSession } from "@/lib/auth-client"
+import { parseAuthSession } from "@workspace/schemas"
+import { useDashboardScopeActions } from "@/hooks/use-dashboard-scope-actions"
+import { OrgSwitcherPlaceholder } from "@/components/dashboard-nav/components/switcher-placeholders"
+import { useDashboardListsStore } from "@/store/useDashboardListsStore"
 
-type Organization = {
-  id: string
-  name: string
-  logo?: string
-  plan: string
-}
+export function OrgSwitcher() {
+  const { data: session } = useSession()
+  const organizations = useDashboardListsStore((state) => state.organizations)
+  const isLoading = useDashboardListsStore(
+    (state) => state.isLoadingOrganizations
+  )
+  const { selectOrganization } = useDashboardScopeActions()
 
-export function OrgSwitcher({
-  organizations,
-}: {
-  organizations: Organization[]
-}) {
-  const [activeOrg, setActiveOrg] = React.useState(organizations[0])
+  const activeOrganizationId =
+    parseAuthSession(session?.session)?.activeOrganizationId ?? null
+  const activeOrg =
+    organizations.find((org) => org.id === activeOrganizationId) ??
+    organizations[0]
 
   if (!activeOrg) {
+    if (isLoading) {
+      return <OrgSwitcherPlaceholder />
+    }
     return null
   }
 
   const initials = activeOrg.name
     .split(" ")
     .slice(0, 2)
-    .map((n) => n[0])
+    .map((namePart) => namePart[0])
     .join("")
     .toUpperCase()
 
@@ -55,6 +57,7 @@ export function OrgSwitcher({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="sm"
+              disabled={isLoading}
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="flex size-6 items-center justify-center rounded-md border">
@@ -71,7 +74,9 @@ export function OrgSwitcher({
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
                   {activeOrg.name}{" "}
-                  <span className="text-foreground/40">({activeOrg.plan})</span>
+                  <span className="text-foreground/40">
+                    ({activeOrg.plan})
+                  </span>
                 </span>
               </div>
               <ChevronsUpDownIcon className="ml-auto" />
@@ -80,7 +85,7 @@ export function OrgSwitcher({
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
             align="start"
-            side={"bottom"}
+            side="bottom"
             sideOffset={6}
           >
             <DropdownMenuLabel className="text-xs text-muted-foreground">
@@ -89,7 +94,7 @@ export function OrgSwitcher({
             {organizations.map((org, index) => (
               <DropdownMenuItem
                 key={org.id}
-                onClick={() => setActiveOrg(org)}
+                onClick={() => void selectOrganization(org.id)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
