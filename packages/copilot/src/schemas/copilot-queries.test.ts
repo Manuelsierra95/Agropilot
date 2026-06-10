@@ -1,9 +1,10 @@
+import { transactionCategorySchema } from "@workspace/schemas"
+
 import {
   COPILOT_DATA_SOURCES,
   querySpecSchema,
   transactionsQuerySchema,
 } from "./copilot-queries"
-import { transactionCategorySchema } from "./finance"
 
 function assert(condition: boolean, message: string) {
   if (!condition) {

@@ -1,15 +1,13 @@
 export { streamCopilotResponse } from "./pipeline/stream-copilot-response"
 export type { StreamCopilotDeps } from "./pipeline/stream-copilot-response"
 export { resolveCopilotIntent } from "./pipeline/resolve-copilot-intent"
-export {
-  querySpecSchema,
-  type ChartView,
-  type QuerySpec,
-  type QueryResult,
-  type QueryResultError,
-  gradeLabel,
-  metricLabel,
+export { querySpecSchema } from "./schemas/copilot-queries"
+export type {
+  ChartView,
+  QueryResult,
+  QueryResultError,
 } from "./schemas/chart-action-schema"
+export type { QuerySpec } from "./schemas/copilot-queries"
 export type {
   ActionConfirmationData,
   ActionConfirmationStatus,
@@ -61,12 +59,10 @@ export type {
   CopilotActionPayload,
   CopilotActionType,
   CreateTaskPayload,
-  TaskCategory,
 } from "./schemas/action-schema"
 export {
   formatActionDate,
   getActionUiConfig,
-  TASK_CATEGORY_LABELS,
 } from "./schemas/action-schema"
 export { createPendingTaskProgress } from "./pipeline/task-progress-steps"
 export type { CopilotContext, ExecuteQueryFn } from "./types/execute-query"

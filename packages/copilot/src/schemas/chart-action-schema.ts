@@ -1,36 +1,4 @@
-import {
-  chartQueryInputSchema,
-  gradeLabel,
-  marketPricesQuerySchema,
-  metricLabel,
-  oilGradeSchema,
-  parcelCashflowQuerySchema,
-  parcelWeatherQuerySchema,
-  querySpecSchema,
-  tasksQuerySchema,
-  transactionsQuerySchema,
-  type ChartQueryInput,
-  type OilGrade,
-  type ParcelWeatherMetric,
-  type QuerySpec,
-} from "@workspace/schemas"
-
-export {
-  chartQueryInputSchema,
-  gradeLabel,
-  marketPricesQuerySchema,
-  metricLabel,
-  oilGradeSchema,
-  parcelCashflowQuerySchema,
-  parcelWeatherQuerySchema,
-  querySpecSchema,
-  tasksQuerySchema,
-  transactionsQuerySchema,
-  type ChartQueryInput,
-  type OilGrade,
-  type ParcelWeatherMetric,
-  type QuerySpec,
-}
+import type { QuerySpec } from "./copilot-queries"
 
 export type ChartSeriesKind = "line" | "area" | "bar"
 

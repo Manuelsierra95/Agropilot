@@ -1,8 +1,8 @@
 import z from "zod"
 
-import { taskCategorySchema } from "./tasks"
+import { taskCategorySchema } from "@workspace/schemas"
 
-export const copilotCreateTaskPayloadSchema = z.object({
+export const createTaskPayloadSchema = z.object({
   title: z.string().min(1).describe("Título de la tarea"),
   date: z
     .string()
@@ -22,6 +22,4 @@ export const copilotCreateTaskPayloadSchema = z.object({
     .describe("Prioridad de 0 (baja) a 3 (alta)"),
 })
 
-export type CopilotCreateTaskPayload = z.infer<
-  typeof copilotCreateTaskPayloadSchema
->
+export type CreateTaskPayload = z.infer<typeof createTaskPayloadSchema>

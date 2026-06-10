@@ -1,17 +1,8 @@
 import { z } from "zod"
 
-import {
-  copilotCreateTaskPayloadSchema,
-  TASK_CATEGORY_LABELS,
-  taskCategorySchema,
-  type CopilotCreateTaskPayload,
-  type TaskCategory,
-} from "@workspace/schemas"
+import { createTaskPayloadSchema, type CreateTaskPayload } from "./copilot-actions"
 
-export { TASK_CATEGORY_LABELS, taskCategorySchema }
-export type { TaskCategory }
-
-export const createTaskPayloadSchema = copilotCreateTaskPayloadSchema
+export type { CreateTaskPayload }
 
 export const copilotActionSchema = z.discriminatedUnion("action", [
   z.object({
@@ -29,7 +20,6 @@ export const actionIntentSchema = z.discriminatedUnion("action", [
   }),
 ])
 
-export type CreateTaskPayload = CopilotCreateTaskPayload
 export type CopilotAction = z.infer<typeof copilotActionSchema>
 export type ActionIntent = z.infer<typeof actionIntentSchema>
 export type CopilotActionType = CopilotAction["action"]
