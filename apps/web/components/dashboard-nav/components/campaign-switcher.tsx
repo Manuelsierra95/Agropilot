@@ -106,7 +106,7 @@ export function CampaignSwitcher({
         <Button
           variant="ghost"
           size="sm"
-          className="p-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          className="w-fit p-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
         >
           <CircleIcon
             className={cn("size-2 shrink-0 fill-current", {

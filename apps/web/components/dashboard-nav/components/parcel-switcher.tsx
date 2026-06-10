@@ -40,7 +40,7 @@ export function ParcelSwitcher({
           size="sm"
           className={
             isDock
-              ? "flex items-center gap-2 rounded-lg p-1.5 hover:bg-accent"
+              ? "flex w-fit items-center gap-2 rounded-lg p-1.5 hover:bg-accent"
               : "p-0 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           }
         >
