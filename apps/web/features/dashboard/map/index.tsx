@@ -6,8 +6,7 @@ import { Button } from "@workspace/ui/components/button"
 import { Layers } from "lucide-react"
 import { useTheme } from "next-themes"
 
-import parcelsData from "./data.json"
-import { mapCenter } from "./components/parcel-utils"
+import { getPolygonCenter, mapCenter } from "./components/parcel-utils"
 import { ParcelPopup } from "./components/parcel-popup"
 import { ParcelsLayer } from "./components/parcels-layer"
 import { SatelliteLayer } from "./components/satellite-layer"
@@ -16,14 +15,18 @@ import { toParcelFeature } from "./components/parcel-utils"
 import { Card } from "@workspace/ui/components/card"
 import { cn } from "@workspace/ui/lib/utils"
 
-const mockParcels = parcelsData as Parcel[]
-
 type PopupInfo = {
   parcel: Parcel
   lngLat: ParcelLngLat
 } | null
 
-export function DashboardMap({ className }: { className?: string }) {
+export function DashboardMap({
+  className,
+  parcels = [],
+}: {
+  className?: string
+  parcels?: Parcel[]
+}) {
   const [isSatellite, setIsSatellite] = useState(false)
   const [popupInfo, setPopupInfo] = useState<PopupInfo>(null)
   const mapRef = useRef<MapRef>(null)
@@ -31,12 +34,18 @@ export function DashboardMap({ className }: { className?: string }) {
 
   const mapTheme = resolvedTheme === "dark" ? "dark" : "light"
 
+  const center = useMemo<ParcelLngLat>(() => {
+    const first = parcels[0]
+    if (!first?.geometryCoordinates?.length) return mapCenter
+    return getPolygonCenter(first.geometryCoordinates)
+  }, [parcels])
+
   const geojsonData = useMemo<GeoJSON.FeatureCollection>(
     () => ({
       type: "FeatureCollection",
-      features: mockParcels.map(toParcelFeature),
+      features: parcels.map(toParcelFeature),
     }),
-    []
+    [parcels]
   )
 
   const handleParcelClick = useCallback(
@@ -48,12 +57,9 @@ export function DashboardMap({ className }: { className?: string }) {
 
   return (
     <Card
-      className={cn(
-        "relative h-full w-full overflow-hidden p-px ring-0",
-        className
-      )}
+      className={cn("relative h-full w-full overflow-hidden ring-0", className)}
     >
-      <div className="absolute top-3 right-3 z-9">
+      <div className="absolute top-6 right-3 z-9">
         <Button
           variant="default"
           size="sm"
@@ -71,7 +77,7 @@ export function DashboardMap({ className }: { className?: string }) {
       {/* Map */}
       <Map
         ref={mapRef}
-        center={mapCenter}
+        center={center}
         zoom={14}
         className="h-full w-full"
         theme={mapTheme}
@@ -84,7 +90,7 @@ export function DashboardMap({ className }: { className?: string }) {
         />
         <ParcelsLayer
           geojsonData={geojsonData}
-          parcels={mockParcels}
+          parcels={parcels}
           isSatellite={isSatellite}
           onParcelClick={handleParcelClick}
         />
@@ -97,12 +103,6 @@ export function DashboardMap({ className }: { className?: string }) {
           />
         )}
       </Map>
-
-      <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-9 bg-linear-to-t from-black/20 to-transparent px-4 py-3">
-        <span className="text-[11px] text-muted-foreground drop-shadow">
-          Haz clic en una parcela para ver detalles
-        </span>
-      </footer>
     </Card>
   )
 }

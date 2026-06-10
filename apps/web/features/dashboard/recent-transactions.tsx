@@ -21,10 +21,19 @@ import { ArrowRightIcon } from "lucide-react"
 import type { Transaction } from "@/store/mockTransactions"
 import Link from "next/link"
 
-type TransactionSnapshot = Pick<
-  Transaction,
-  "type" | "category" | "amount" | "paymentMethod" | "invoiceNumber" | "date"
->
+type TransactionSnapshot = Omit<
+  Pick<
+    Transaction,
+    "type" | "category" | "amount" | "paymentMethod" | "invoiceNumber" | "date"
+  >,
+  "date"
+> & {
+  date: string | Date
+}
+
+function toDate(value: string | Date): Date {
+  return value instanceof Date ? value : new Date(value)
+}
 
 const currencyFormatter = new Intl.NumberFormat("es-ES", {
   style: "currency",
@@ -64,7 +73,7 @@ function toneClass(type: Transaction["type"]) {
 
 function getVisibleTransactions(data: TransactionSnapshot[]) {
   return [...data]
-    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .sort((a, b) => toDate(b.date).getTime() - toDate(a.date).getTime())
     .slice(0, 6)
 }
 
@@ -120,7 +129,7 @@ export function RecentTransactions({
               visible.map((tx) => (
                 <TableRow
                   className="hover:bg-transparent"
-                  key={tx.invoiceNumber ?? tx.date.toISOString()}
+                  key={tx.invoiceNumber ?? toDate(tx.date).toISOString()}
                 >
                   <TableCell className="max-w-[260px] truncate pl-6">
                     <div className="flex items-center gap-2">
@@ -146,7 +155,7 @@ export function RecentTransactions({
                     {formatSignedAmount(tx.type, tx.amount)}
                   </TableCell>
                   <TableCell className="pr-6 text-end text-xs text-muted-foreground">
-                    {shortDateFormatter.format(tx.date)}
+                    {shortDateFormatter.format(toDate(tx.date))}
                   </TableCell>
                 </TableRow>
               ))

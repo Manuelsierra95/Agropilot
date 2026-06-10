@@ -21,8 +21,6 @@ import {
 } from "@workspace/ui/components/card"
 import { cn } from "@workspace/ui/lib/utils"
 import { ArrowDown, ArrowUp } from "lucide-react"
-import { GradientSeparator } from "@/components/ui/gradient-separator"
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -231,9 +229,14 @@ function ProductionValueKPIs({
   prevEurPorOlivo: number
 }) {
   return (
-    <div className={cn("flex w-full gap-2 overflow-hidden", className)}>
+    <div
+      className={cn(
+        "flex w-full min-w-0 flex-wrap items-start justify-start gap-x-8 gap-y-3",
+        className
+      )}
+    >
       {/* KPI 1 — Producción total */}
-      <div className="flex min-w-0 bg-background">
+      <div className="min-w-0 bg-background">
         <KpiItem
           label="Producción total"
           value={totalKg.toLocaleString("es-ES")}
@@ -248,10 +251,8 @@ function ProductionValueKPIs({
         />
       </div>
 
-      <GradientSeparator orientation="vertical" className="" />
-
       {/* KPI 2 — Valor estimado */}
-      <div className="flex min-w-0 bg-background">
+      <div className="min-w-0 bg-background">
         <KpiItem
           label="Valor estimado"
           value={totalEur.toLocaleString("es-ES")}
@@ -266,10 +267,8 @@ function ProductionValueKPIs({
         />
       </div>
 
-      <GradientSeparator orientation="vertical" className="" />
-
       {/* KPI 3 — kg por olivo */}
-      <div className="flex min-w-0 bg-background">
+      <div className="min-w-0 bg-background">
         <KpiItem
           label="Producción por olivo"
           value={kgPorOlivo.toLocaleString("es-ES")}
@@ -285,10 +284,8 @@ function ProductionValueKPIs({
         />
       </div>
 
-      <GradientSeparator orientation="vertical" className="" />
-
       {/* KPI 4 — € por olivo */}
-      <div className="flex min-w-0 bg-background">
+      <div className="min-w-0 bg-background">
         <KpiItem
           label="Valor por olivo"
           value={eurPorOlivo.toLocaleString("es-ES")}
@@ -314,7 +311,7 @@ function ProductionValueAreaChart({
   areaData: CampaignMonthPoint[]
 }) {
   return (
-    <div className={cn("flex flex-col gap-2", className)}>
+    <div className={cn("flex min-w-0 w-full flex-col gap-2", className)}>
       <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span
@@ -337,10 +334,11 @@ function ProductionValueAreaChart({
       </div>
 
       <AreaChart
+        className="min-w-0 max-w-full"
         aspectRatio="4 / 2"
         data={areaData}
         xDataKey="date"
-        margin={{ top: 12, right: 24, bottom: 36, left: 52 }}
+        margin={{ top: 12, right: 16, bottom: 36, left: 44 }}
       >
         <Grid horizontal />
         <YAxis
@@ -402,7 +400,7 @@ function ProductionValueBarChart({
   prevCampaignLabel: string
 }) {
   return (
-    <div className={cn("flex flex-col gap-2 pl-3", className)}>
+    <div className={cn("flex min-w-0 w-full flex-col gap-2", className)}>
       <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span
@@ -422,12 +420,13 @@ function ProductionValueBarChart({
       </div>
 
       <BarChart
+        className="min-w-0 max-w-full"
         data={barData}
         xDataKey="month"
         orientation="horizontal"
         barGap={0.2}
         aspectRatio="4 / 3"
-        margin={{ top: 8, right: 16, bottom: 8, left: 40 }}
+        margin={{ top: 8, right: 12, bottom: 8, left: 36 }}
       >
         <Grid horizontal={false} vertical fadeVertical />
         <Bar dataKey="currentKg" fill={COLOR_CURRENT} lineCap={3} />
@@ -552,7 +551,9 @@ export function ProductionValue({
   const barData = buildBarData(monthlyProductionKg, prevMonthlyProductionKg)
 
   return (
-    <Card className={cn("bg-background ring-0", className)}>
+    <Card
+      className={cn("@container/production min-w-0 bg-background ring-0", className)}
+    >
       <CardHeader className="pb-2">
         <CardTitle>Producción y valor estimado</CardTitle>
         <CardDescription>
@@ -561,11 +562,10 @@ export function ProductionValue({
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="pb-4">
-        <div className="grid grid-cols-[1fr_1.4fr] gap-x-6 gap-y-4">
-          {/* ── Fila 1: KPIs en 2 columnas, alineados al start ── */}
+      <CardContent className="min-w-0 pb-4">
+        <div className="grid min-w-0 grid-cols-1 gap-4 @min-[720px]/production:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] @min-[720px]/production:gap-x-6">
           <ProductionValueKPIs
-            className="col-span-2 justify-start"
+            className="col-span-full"
             totalKg={totalKg}
             totalEur={totalEur}
             kgPorOlivo={kgPorOlivo}
@@ -576,17 +576,15 @@ export function ProductionValue({
             prevEurPorOlivo={prevEurPorOlivo}
           />
 
-          {/* ── Fila 2: BarChart izquierda ── */}
           <ProductionValueBarChart
-            className="col-start-1 row-start-2"
+            className="@min-[720px]/production:col-start-1 @min-[720px]/production:row-start-2"
             barData={barData}
             campaignLabel={campaignLabel}
             prevCampaignLabel={prevCampaignLabel}
           />
 
-          {/* ── Fila 2: AreaChart derecha ── */}
           <ProductionValueAreaChart
-            className="col-start-2 row-start-2"
+            className="@min-[720px]/production:col-start-2 @min-[720px]/production:row-start-2"
             areaData={areaData}
           />
         </div>
