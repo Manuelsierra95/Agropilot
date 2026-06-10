@@ -156,6 +156,15 @@ export const dashboardProductionValueSchema = z.object({
   campaignStartYear: z.number().int(),
 })
 
+export const dashboardOverviewQuerySchema = z.object({
+  parcelId: z.string().uuid().optional(),
+  campaignId: z.string().uuid().optional(),
+  from: z.string().date().optional(),
+  to: z.string().date().optional(),
+})
+
+export type DashboardOverviewQuery = z.infer<typeof dashboardOverviewQuerySchema>
+
 export const dashboardOverviewSchema = z.object({
   olivePrices: z.array(dashboardOlivePriceItemSchema),
   sellingWindow: dashboardSellingWindowSchema,
