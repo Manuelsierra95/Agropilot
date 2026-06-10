@@ -57,6 +57,41 @@ describe("dashboard routes", () => {
     const body = await res.json()
     expect(body.overview.olivePrices).toHaveLength(1)
     expect(body.overview.finance.transactions).toEqual([])
-    expect(dashboardMocks.getDashboardOverview).toHaveBeenCalledOnce()
+    expect(dashboardMocks.getDashboardOverview).toHaveBeenCalledWith(
+      expect.any(String),
+      {}
+    )
+  })
+
+  it("GET /dashboard/overview forwards query filters to service", async () => {
+    mockAuthenticatedSession()
+    dashboardMocks.getDashboardOverview.mockResolvedValue(mockOverview)
+
+    const parcelId = "22222222-2222-4222-8222-222222222222"
+    const campaignId = "11111111-1111-4111-8111-111111111111"
+    const res = await apiRequest(
+      app,
+      `/api/v1/dashboard/overview?parcelId=${parcelId}&campaignId=${campaignId}&from=2025-01-01&to=2025-12-31`
+    )
+    expect(res.status).toBe(200)
+    expect(dashboardMocks.getDashboardOverview).toHaveBeenCalledWith(
+      expect.any(String),
+      {
+        parcelId,
+        campaignId,
+        from: "2025-01-01",
+        to: "2025-12-31",
+      }
+    )
+  })
+
+  it("GET /dashboard/overview returns 400 for invalid query", async () => {
+    mockAuthenticatedSession()
+
+    const res = await apiRequest(
+      app,
+      "/api/v1/dashboard/overview?parcelId=invalid"
+    )
+    expect(res.status).toBe(400)
   })
 })

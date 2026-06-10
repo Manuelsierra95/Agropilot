@@ -9,14 +9,18 @@ import {
   lte,
   sql,
 } from "@workspace/db"
-import type { DashboardOverview, OilGrade } from "@workspace/schemas"
+import type {
+  DashboardOverview,
+  DashboardOverviewQuery,
+  OilGrade,
+} from "@workspace/schemas"
 import { DASHBOARD_OIL_GRADES } from "@workspace/schemas"
 import {
   getCampaignPeriodForDate,
-  listTransactions,
   queryMarketPrices,
   type MarketPriceRow,
 } from "@/services/finance"
+import { resolveCampaignById } from "@/services/campaign"
 import { listParcels, resolveParcelIdForOrg } from "@/services/parcel"
 import {
   buildCampaignMarginSeries,
@@ -34,8 +38,6 @@ import {
 const TREES_PER_HECTARE = 200
 const MARKET_HISTORY_DAYS = 90
 const RECENT_TRANSACTION_LIMIT = 50
-const UPCOMING_TASK_DAYS = 14
-
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)
 }
@@ -43,12 +45,6 @@ function todayIso(): string {
 function daysAgoIso(days: number): string {
   const date = new Date()
   date.setDate(date.getDate() - days)
-  return date.toISOString().slice(0, 10)
-}
-
-function addDaysIso(isoDate: string, days: number): string {
-  const date = new Date(`${isoDate}T12:00:00.000Z`)
-  date.setUTCDate(date.getUTCDate() + days)
   return date.toISOString().slice(0, 10)
 }
 
@@ -116,31 +112,78 @@ function emptyOlivarOverview(
   }
 }
 
+type ResolvedDateRange = {
+  from: string
+  to: string
+}
+
+function resolveOverviewDateRange(
+  campaign: { startDate: string; endDate: string } | null | undefined,
+  filters: DashboardOverviewQuery
+): ResolvedDateRange {
+  if (filters.from && filters.to) {
+    return { from: filters.from, to: filters.to }
+  }
+
+  if (campaign) {
+    return { from: campaign.startDate, to: campaign.endDate }
+  }
+
+  const period = getCampaignPeriodForDate(todayIso())
+  return { from: period.startDate, to: period.endDate }
+}
+
+async function listTransactionsForOverview(
+  organizationId: string,
+  dateRange: ResolvedDateRange,
+  parcelId?: string | null
+) {
+  const conditions = [
+    eq(schema.transactions.organizationId, organizationId),
+    gte(schema.transactions.date, dateRange.from),
+    lte(schema.transactions.date, dateRange.to),
+  ]
+
+  if (parcelId) {
+    conditions.push(eq(schema.transactions.parcelId, parcelId))
+  }
+
+  return db.query.transactions.findMany({
+    where: and(...conditions),
+    orderBy: [desc(schema.transactions.date)],
+  })
+}
+
 export async function getDashboardOverview(
-  organizationId: string
+  organizationId: string,
+  filters: DashboardOverviewQuery = {}
 ): Promise<DashboardOverview> {
   const today = todayIso()
   const marketFrom = daysAgoIso(MARKET_HISTORY_DAYS)
-  const taskTo = addDaysIso(today, UPCOMING_TASK_DAYS)
 
-  const [
-    campaign,
-    parcels,
-    transactions,
-    pricesByGrade,
-    parcelId,
-  ] = await Promise.all([
-    resolveActiveCampaign(),
+  const [parcels, pricesByGrade, resolvedParcelId] = await Promise.all([
     listParcels(organizationId),
-    listTransactions(organizationId),
     fetchMarketPricesByGrade(marketFrom, today),
-    resolveParcelIdForOrg(organizationId),
+    resolveParcelIdForOrg(organizationId, filters.parcelId),
   ])
 
   const primaryParcel =
-    parcels.find((p) => p.id === parcelId) ?? parcels[0] ?? null
+    parcels.find((p) => p.id === resolvedParcelId) ?? parcels[0] ?? null
 
+  const campaign = filters.campaignId
+    ? await resolveCampaignById(filters.campaignId)
+    : filters.from && filters.to
+      ? null
+      : await resolveActiveCampaign()
+
+  const dateRange = resolveOverviewDateRange(campaign, filters)
   const campaignId = campaign?.id
+
+  const transactions = await listTransactionsForOverview(
+    organizationId,
+    dateRange,
+    primaryParcel?.id
+  )
   const previousCampaignName = campaign
     ? getPreviousCampaignName(campaign.name)
     : null
@@ -183,12 +226,19 @@ export async function getDashboardOverview(
               : []
           )
       : Promise.resolve([]),
-    campaignId
-      ? db.query.parcelCashflowDaily.findMany({
-          where: eq(schema.parcelCashflowDaily.campaignId, campaignId),
-          orderBy: [asc(schema.parcelCashflowDaily.date)],
-        })
-      : Promise.resolve([]),
+    db.query.parcelCashflowDaily.findMany({
+      where: and(
+        ...(primaryParcel
+          ? [eq(schema.parcelCashflowDaily.parcelId, primaryParcel.id)]
+          : []),
+        ...(campaignId
+          ? [eq(schema.parcelCashflowDaily.campaignId, campaignId)]
+          : []),
+        gte(schema.parcelCashflowDaily.date, dateRange.from),
+        lte(schema.parcelCashflowDaily.date, dateRange.to)
+      ),
+      orderBy: [asc(schema.parcelCashflowDaily.date)],
+    }),
     previousCampaignName
       ? db.query.campaigns
           .findFirst({
@@ -219,8 +269,11 @@ export async function getDashboardOverview(
     db.query.tasks.findMany({
       where: and(
         eq(schema.tasks.organizationId, organizationId),
-        gte(schema.tasks.startDate, new Date(`${today}T00:00:00.000Z`)),
-        lte(schema.tasks.startDate, new Date(`${taskTo}T23:59:59.999Z`))
+        gte(schema.tasks.startDate, new Date(`${dateRange.from}T00:00:00.000Z`)),
+        lte(schema.tasks.startDate, new Date(`${dateRange.to}T23:59:59.999Z`)),
+        ...(primaryParcel
+          ? [eq(schema.tasks.parcelId, primaryParcel.id)]
+          : [])
       ),
       orderBy: [asc(schema.tasks.startDate)],
       limit: 20,
@@ -335,7 +388,7 @@ export async function getDashboardOverview(
   }
 
   const aggregatedCashflow = aggregateCashflowByDate(cashflowDaily)
-  const campaignStart = campaign?.startDate ?? getCampaignPeriodForDate(today).startDate
+  const campaignStart = dateRange.from
 
   const campaignMargin = buildCampaignMarginSeries(
     campaignStart,
