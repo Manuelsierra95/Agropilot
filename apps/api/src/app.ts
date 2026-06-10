@@ -11,6 +11,7 @@ import { billingRoutes } from "./routes/billing"
 import { searchRoutes } from "./routes/search"
 import { financeRoutes } from "./routes/finance"
 import { copilotRoutes } from "./routes/copilot"
+import { dashboardRoutes } from "./routes/dashboard"
 
 export const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .basePath("/api/v1")
@@ -28,5 +29,6 @@ export const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .route("/billing", billingRoutes)
   .route("/finance", financeRoutes)
   .route("/copilot", copilotRoutes)
+  .route("/dashboard", dashboardRoutes)
 
 export type AppType = typeof app
