@@ -1,5 +1,6 @@
+import { gradeLabel, metricLabel } from "@workspace/schemas"
+
 import type { QueryResult } from "../schemas/chart-action-schema"
-import { gradeLabel, metricLabel } from "../schemas/chart-action-schema"
 import type { AnswerFocus } from "../schemas/copilot-intent-schema"
 import { COPILOT_REFERENCE_DATE } from "../schemas/copilot-intent-schema"
 import type { WidgetSpec } from "../schemas/widget-schema"

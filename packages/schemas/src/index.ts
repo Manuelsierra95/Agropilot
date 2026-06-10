@@ -28,27 +28,3 @@ export * from "./market"
 export * from "./campaign"
 export * from "./parcel-weather"
 export * from "./parcel-cashflow"
-export {
-  chartQueryInputSchema,
-  COPILOT_DATA_SOURCE_RESPONSE_SCHEMAS,
-  COPILOT_DATA_SOURCES,
-  COPILOT_QUERY_RESULT_ROW_FIELDS,
-  gradeLabel,
-  marketPricesQuerySchema,
-  metricLabel,
-  oilGradeSchema,
-  parcelCashflowQuerySchema,
-  parcelWeatherMetricSchema,
-  parcelWeatherQuerySchema,
-  querySpecSchema,
-  tasksQuerySchema,
-  transactionsQuerySchema,
-  type ChartQueryInput,
-  type OilGrade,
-  type ParcelWeatherMetric,
-  type QuerySpec,
-} from "./copilot-queries"
-export {
-  copilotCreateTaskPayloadSchema,
-  type CopilotCreateTaskPayload,
-} from "./copilot-actions"

@@ -8,6 +8,7 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "test:copilot-queries": "pnpm dlx tsx src/schemas/copilot-queries.test.ts",
     "test:presentation": "pnpm dlx tsx src/pipeline/resolve-presentation-channel.test.ts",
     "test:dashboard-cells": "pnpm dlx tsx src/pipeline/dashboard-cells.test.ts",
     "test:copilot-scope": "pnpm dlx tsx src/pipeline/copilot-scope.test.ts"

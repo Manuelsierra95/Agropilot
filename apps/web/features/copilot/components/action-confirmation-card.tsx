@@ -8,13 +8,15 @@ import type {
   CopilotActionPayload,
   CopilotActionType,
   CreateTaskPayload,
-  TaskCategory,
 } from "@workspace/copilot"
 import {
   formatActionDate,
   getActionUiConfig,
-  TASK_CATEGORY_LABELS,
 } from "@workspace/copilot"
+import {
+  TASK_CATEGORY_LABELS,
+  type TaskCategory,
+} from "@workspace/schemas"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
 import {

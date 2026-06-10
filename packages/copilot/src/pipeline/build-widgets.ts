@@ -3,7 +3,7 @@ import type { AnswerFocus } from "../schemas/copilot-intent-schema"
 import { COPILOT_REFERENCE_DATE } from "../schemas/copilot-intent-schema"
 import { formatDataAnswer } from "./format-data-answer"
 import { processChartView } from "./process-chart-view"
-import type { ChartQueryInput } from "../schemas/chart-action-schema"
+import type { ChartQueryInput } from "../schemas/copilot-queries"
 import type {
   DataPresentation,
   Widget,

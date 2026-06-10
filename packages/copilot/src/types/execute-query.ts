@@ -1,4 +1,5 @@
-import type { QueryResult, QuerySpec } from "../schemas/chart-action-schema"
+import type { QueryResult } from "../schemas/chart-action-schema"
+import type { QuerySpec } from "../schemas/copilot-queries"
 
 export type CopilotContext = {
   organizationId: string

@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "generate": "dlx auth@latest generate",
-    "test:copilot-queries": "pnpm dlx tsx src/copilot-queries.test.ts"
+    "generate": "dlx auth@latest generate"
   },
   "dependencies": {
     "@workspace/db": "workspace:^",

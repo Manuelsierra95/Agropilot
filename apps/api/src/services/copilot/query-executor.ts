@@ -1,6 +1,8 @@
 import {
   gradeLabel,
   metricLabel,
+} from "@workspace/schemas"
+import {
   type CopilotContext,
   type ExecuteQueryFn,
   type QueryResult,

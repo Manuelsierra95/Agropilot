@@ -9,7 +9,7 @@ import type {
 } from "../schemas/dashboard-grid-schema"
 import { createEmptyDashboardCells } from "../schemas/dashboard-grid-schema"
 import { processChartView } from "./process-chart-view"
-import type { ChartQueryInput } from "../schemas/chart-action-schema"
+import type { ChartQueryInput } from "../schemas/copilot-queries"
 import { inferDashboardCells } from "./infer-dashboard-cells"
 import { validateDashboardCells } from "./validate-dashboard-cells"
 

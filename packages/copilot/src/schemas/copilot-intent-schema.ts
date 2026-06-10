@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 import { actionIntentSchema } from "./action-schema"
-import { querySpecSchema } from "./chart-action-schema"
+import { querySpecSchema } from "./copilot-queries"
 import { dashboardCellsSchema } from "./dashboard-grid-schema"
 import { widgetSpecSchema } from "./widget-schema"
 

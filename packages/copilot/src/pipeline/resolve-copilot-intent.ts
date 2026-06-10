@@ -7,7 +7,7 @@ import {
   COPILOT_REFERENCE_DATE,
   normalizeAnswerFocus,
 } from "../schemas/copilot-intent-schema"
-import type { QuerySpec } from "../schemas/chart-action-schema"
+import type { QuerySpec } from "../schemas/copilot-queries"
 import { COPILOT_INTENT_SYSTEM_PROMPT } from "../prompts/dashboard-system-prompt"
 import { getLastUserText } from "./get-last-user-text"
 import { getChatModel } from "../model/get-model"

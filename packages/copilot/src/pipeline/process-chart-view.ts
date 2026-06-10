@@ -3,8 +3,8 @@ import {
   type ChartSeriesKind,
   type ChartView,
   type QueryResult,
-  type ChartQueryInput,
 } from "../schemas/chart-action-schema"
+import type { ChartQueryInput } from "../schemas/copilot-queries"
 
 function defaultSeriesKind(query: QueryResult["query"]): ChartSeriesKind {
   if (query.source === "marketPrices" || query.source === "parcelWeather") {
