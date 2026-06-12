@@ -1,10 +1,12 @@
 "use client"
 
+import { useQueryClient } from "@tanstack/react-query"
 import { useCallback } from "react"
 import { useRouter } from "next/navigation"
 
 import { api } from "@/lib/api"
 import { authClient } from "@/lib/auth-client"
+import { invalidateDashboard } from "@/lib/dashboard/invalidate-dashboard"
 import { pickDefaultCampaignId } from "@/lib/dashboard/pick-default-campaign"
 import { buildDashboardScopeKey } from "@/lib/dashboard/scope-key"
 import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
@@ -34,12 +36,38 @@ async function resolveCampaignsForParcel(parcelId: string) {
   }
 }
 
+const ALL_DASHBOARD_FAMILIES = [
+  "finance",
+  "events",
+  "parcels",
+  "production",
+  "daily",
+] as const
+
 export function useDashboardScopeActions() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [scopeParams, setScopeParams] = useDashboardScopeParams()
   const { navigateScope, updatePendingScopeKey } = useDashboardScopeTransition()
   const invalidateOnOrgChange = useDashboardListsStore(
     (state) => state.invalidateOnOrgChange
+  )
+
+  const invalidateDashboardScope = useCallback(
+    (previousScope?: {
+      parcelId?: string | null
+      campaignId?: string | null
+      from?: string | null
+      to?: string | null
+    }) => {
+      invalidateDashboard(queryClient, [...ALL_DASHBOARD_FAMILIES], {
+        parcelId: previousScope?.parcelId ?? scopeParams.parcelId,
+        campaignId: previousScope?.campaignId ?? scopeParams.campaignId,
+        from: previousScope?.from ?? scopeParams.from,
+        to: previousScope?.to ?? scopeParams.to,
+      })
+    },
+    [queryClient, scopeParams]
   )
 
   const selectOrganization = useCallback(
@@ -53,6 +81,7 @@ export function useDashboardScopeActions() {
         }
 
         invalidateOnOrgChange()
+        invalidateDashboardScope()
 
         const parcels = await api.parcel.getListParcels()
         if (parcels.length === 0) {
@@ -83,6 +112,7 @@ export function useDashboardScopeActions() {
       })
     },
     [
+      invalidateDashboardScope,
       invalidateOnOrgChange,
       navigateScope,
       router,
@@ -117,13 +147,13 @@ export function useDashboardScopeActions() {
         campaignId,
       })
 
-      navigateScope(expectedKey, () =>
-        setScopeParams({
+      navigateScope(expectedKey, () => {
+        void setScopeParams({
           campaignId,
           from: null,
           to: null,
         })
-      )
+      })
     },
     [navigateScope, scopeParams.parcelId, setScopeParams]
   )
@@ -136,13 +166,13 @@ export function useDashboardScopeActions() {
         to,
       })
 
-      navigateScope(expectedKey, () =>
-        setScopeParams({
+      navigateScope(expectedKey, () => {
+        void setScopeParams({
           from,
           to,
           campaignId: null,
         })
-      )
+      })
     },
     [navigateScope, scopeParams.parcelId, setScopeParams]
   )

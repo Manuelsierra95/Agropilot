@@ -1,3 +1,6 @@
+import Link from "next/link"
+import { ChevronRightIcon, Lock } from "lucide-react"
+
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -8,7 +11,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@workspace/ui/components/sidebar"
-import { ChevronRightIcon, Lock } from "lucide-react"
 import type {
   NavigationNavModulesItem,
   NavigationNavSubItem,
@@ -76,9 +78,9 @@ export function NavModules({ items }: { items: NavigationNavModulesItem[] }) {
                     {item.items?.map((subItem: NavigationNavSubItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <a href={subItem.url}>
+                          <Link href={subItem.url}>
                             <span>{subItem.title}</span>
-                          </a>
+                          </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}

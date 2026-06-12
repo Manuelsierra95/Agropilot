@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 import {
   SidebarGroup,
   SidebarMenu,
@@ -13,10 +15,10 @@ export function NavMain({ items }: { items: NavigationNavItem[] }) {
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <Link href={item.url}>
                 <item.icon className="size-4" />
                 <span>{item.title}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

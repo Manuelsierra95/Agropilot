@@ -11,7 +11,8 @@ export const dashboardScopeParsers = {
 
 export function useDashboardScopeParams() {
   return useQueryStates(dashboardScopeParsers, {
-    shallow: false,
+    // Evita re-ejecutar el RSC del dashboard en cada cambio de parcela/campaña.
+    shallow: true,
     history: "push",
   })
 }

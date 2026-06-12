@@ -3,7 +3,7 @@
 import { useRef, useState } from "react"
 import { Pencil, Send, X } from "lucide-react"
 
-import type { AgroCopilotUIMessage } from "@workspace/copilot"
+import type { UIMessage } from "ai"
 import { Button } from "@workspace/ui/components/button"
 import { Textarea } from "@workspace/ui/components/textarea"
 import { cn } from "@workspace/ui/lib/utils"
@@ -11,7 +11,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import { getMessageText } from "./turn-utils"
 
 interface EditableUserQuestionProps {
-  message: AgroCopilotUIMessage
+  message: UIMessage
   isDisabled: boolean
   onEditSubmit: (correctedText: string) => void
 }

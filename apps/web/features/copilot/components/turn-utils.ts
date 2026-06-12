@@ -1,16 +1,11 @@
-import type {
-  ActionConfirmationData,
-  ActionLocalState,
-  AgroCopilotUIMessage,
-  CopilotActionPayload,
-} from "@workspace/copilot"
+import type { UIMessage } from "ai"
 
 export type ChatTurn = {
-  user: AgroCopilotUIMessage
-  assistant?: AgroCopilotUIMessage
+  user: UIMessage
+  assistant?: UIMessage
 }
 
-export function groupTurns(messages: AgroCopilotUIMessage[]): ChatTurn[] {
+export function groupTurns(messages: UIMessage[]): ChatTurn[] {
   const turns: ChatTurn[] = []
 
   for (let index = 0; index < messages.length; index++) {
@@ -26,22 +21,9 @@ export function groupTurns(messages: AgroCopilotUIMessage[]): ChatTurn[] {
   return turns
 }
 
-export function getMessageText(message: AgroCopilotUIMessage): string {
+export function getMessageText(message: UIMessage): string {
   return message.parts
     .filter((part) => part.type === "text")
     .map((part) => part.text)
     .join("")
-}
-
-export function resolveActionState(
-  confirmation: ActionConfirmationData,
-  actionStates: Record<string, ActionLocalState>
-): ActionLocalState {
-  return (
-    actionStates[confirmation.id] ?? {
-      action: confirmation.action,
-      data: confirmation.data as CopilotActionPayload,
-      status: confirmation.status,
-    }
-  )
 }

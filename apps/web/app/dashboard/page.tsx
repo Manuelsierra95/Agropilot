@@ -1,8 +1,6 @@
-import { Suspense } from "react"
 import { redirect } from "next/navigation"
 
 import DashboardOverview from "@/features/dashboard/default-view"
-import { DashboardSkeleton } from "@/features/dashboard/dashboard-skeleton"
 import { ensureDashboardScopeSearchParams } from "@/lib/dashboard/ensure-dashboard-scope"
 
 type DashboardPageProps = {
@@ -19,9 +17,5 @@ export default async function DashboardOverviewPage({
     redirect(redirectTo)
   }
 
-  return (
-    <Suspense fallback={<DashboardSkeleton />}>
-      <DashboardOverview searchParams={params} />
-    </Suspense>
-  )
+  return <DashboardOverview />
 }

@@ -1,9 +1,18 @@
 import { client } from "@/lib/api/client"
+import { notifyDashboardMutation } from "@/lib/dashboard/notify-dashboard-mutation"
+import type { DashboardScopeParams } from "@/lib/dashboard/scope-key"
+import { toScopeQuery } from "@/lib/dashboard/scope-query"
 import {
   TransactionBulkCreateInput,
   TransactionCreateInput,
   TransactionSelect,
   TransactionUpdateInput,
+  type DashboardCampaignMargin,
+  type DashboardFinanceResume,
+  type DashboardOlivePriceItem,
+  type DashboardProductionValue,
+  type DashboardSellingWindow,
+  type DashboardTransactionSnapshot,
 } from "@workspace/schemas"
 import { cache } from "react"
 
@@ -31,7 +40,10 @@ const createTransaction = (data: TransactionCreateInput) =>
       json: data,
     })
     .then((res) => res.json())
-    .then((res) => res.transaction)
+    .then((res) => {
+      notifyDashboardMutation(["finance", "production"])
+      return res.transaction
+    })
 
 const bulkCreateTransactions = (data: TransactionBulkCreateInput) =>
   client.api.v1.finance.bulk
@@ -39,7 +51,10 @@ const bulkCreateTransactions = (data: TransactionBulkCreateInput) =>
       json: data,
     })
     .then((res) => res.json())
-    .then((res) => res.transactions)
+    .then((res) => {
+      notifyDashboardMutation(["finance", "production"])
+      return res.transactions
+    })
 
 const updateTransaction = (id: string, data: TransactionUpdateInput) =>
   client.api.v1.finance[":id"]
@@ -48,7 +63,10 @@ const updateTransaction = (id: string, data: TransactionUpdateInput) =>
       json: data,
     })
     .then((res) => res.json())
-    .then((res) => res.transaction)
+    .then((res) => {
+      notifyDashboardMutation(["finance", "production"])
+      return res.transaction
+    })
 
 const deleteTransaction = (id: string) =>
   client.api.v1.finance[":id"]
@@ -56,7 +74,56 @@ const deleteTransaction = (id: string) =>
       param: { id },
     })
     .then((res) => res.json())
-    .then((res) => res.id)
+    .then((res) => {
+      notifyDashboardMutation(["finance", "production"])
+      return res.id
+    })
+
+const getOlivePrices = (): Promise<DashboardOlivePriceItem[]> =>
+  client.api.v1.finance["olive-prices"]
+    .$get()
+    .then((res) => res.json())
+    .then((res) => res.olivePrices)
+
+const getSellingWindow = (
+  scope: DashboardScopeParams
+): Promise<DashboardSellingWindow> =>
+  client.api.v1.finance["selling-window"]
+    .$get({ query: toScopeQuery(scope) })
+    .then((res) => res.json())
+    .then((res) => res.sellingWindow)
+
+const getFinanceResume = (
+  scope: DashboardScopeParams
+): Promise<DashboardFinanceResume> =>
+  client.api.v1.finance.resume
+    .$get({ query: toScopeQuery(scope) })
+    .then((res) => res.json())
+    .then((res) => res.finance)
+
+const getCampaignMargin = (
+  scope: DashboardScopeParams
+): Promise<DashboardCampaignMargin> =>
+  client.api.v1.finance["campaign-margin"]
+    .$get({ query: toScopeQuery(scope) })
+    .then((res) => res.json())
+    .then((res) => res.campaignMargin)
+
+const getRecentTransactions = (
+  scope: DashboardScopeParams
+): Promise<DashboardTransactionSnapshot[]> =>
+  client.api.v1.finance["recent-transactions"]
+    .$get({ query: toScopeQuery(scope) })
+    .then((res) => res.json())
+    .then((res) => res.transactions)
+
+const getProductionValue = (
+  scope: DashboardScopeParams
+): Promise<DashboardProductionValue> =>
+  client.api.v1.finance["production-value"]
+    .$get({ query: toScopeQuery(scope) })
+    .then((res) => res.json())
+    .then((res) => res.productionValue)
 
 export const financeApi = {
   listTransactions,
@@ -65,4 +132,10 @@ export const financeApi = {
   bulkCreateTransactions,
   updateTransaction,
   deleteTransaction,
+  getOlivePrices,
+  getSellingWindow,
+  getFinanceResume,
+  getCampaignMargin,
+  getRecentTransactions,
+  getProductionValue,
 }

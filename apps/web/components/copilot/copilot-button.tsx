@@ -12,6 +12,8 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { useSidebar } from "@workspace/ui/components/sidebar"
 
+import { preloadCopilotPanel } from "@/components/copilot/copilot-panel-shell"
+
 export function CopilotButton({ className }: { className?: string }) {
   const { open, toggleSidebar } = useSidebar()
 
@@ -24,8 +26,10 @@ export function CopilotButton({ className }: { className?: string }) {
           type="button"
           variant="ghost"
           size="icon-sm"
-          className="-ml-1"
+          className={cn("-ml-1", className)}
           onClick={toggleSidebar}
+          onMouseEnter={preloadCopilotPanel}
+          onFocus={preloadCopilotPanel}
           aria-label="Mostrar copilot"
           aria-pressed={false}
         >

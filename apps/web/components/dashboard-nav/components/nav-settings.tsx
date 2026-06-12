@@ -1,3 +1,6 @@
+import Link from "next/link"
+import type { LucideIcon } from "lucide-react"
+
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -5,7 +8,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar"
-import type { LucideIcon } from "lucide-react"
 
 interface NavSettingsItem {
   title: string
@@ -21,10 +23,10 @@ export function NavSettings({ items }: { items: NavSettingsItem[] }) {
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild tooltip={item.title}>
-              <a href={item.url}>
+              <Link href={item.url}>
                 <item.icon className="size-4" />
                 <span>{item.title}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

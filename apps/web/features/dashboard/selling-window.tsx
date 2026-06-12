@@ -9,10 +9,14 @@ import {
   CardFooter,
   CardHeader,
 } from "@workspace/ui/components/card"
+import { Input } from "@workspace/ui/components/input"
 import { TrendingUp, TrendingDown, Minus } from "lucide-react"
+
+import { useSellingWindowOverridesStore } from "@/store/useSellingWindowOverridesStore"
 
 interface SellingWindowProps {
   className?: string
+  scopeKey?: string
   lonjaPrice: number
   costPerKg: number
   lastSalePrice?: number
@@ -54,12 +58,20 @@ const SIGNAL_CONFIG = {
 
 export function SellingWindow({
   className,
+  scopeKey,
   lonjaPrice,
   costPerKg,
   lastSalePrice,
   estimatedKg,
   campaignTarget,
 }: SellingWindowProps) {
+  const setEstimatedKg = useSellingWindowOverridesStore(
+    (state) => state.setEstimatedKg
+  )
+  const setCampaignTarget = useSellingWindowOverridesStore(
+    (state) => state.setCampaignTarget
+  )
+  const editable = Boolean(scopeKey)
   const margin = lonjaPrice - costPerKg
   const marginPct = costPerKg > 0 ? (margin / costPerKg) * 100 : 0
   const signal = getSignal(margin)
@@ -119,14 +131,32 @@ export function SellingWindow({
 
         {/* Potential Revenue */}
         <div className="rounded-lg bg-muted/50 px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
               <p className="text-xs font-medium text-muted-foreground">
                 Ingreso potencial
               </p>
-              <p className="text-xs text-muted-foreground/70">
-                {estimatedKg.toLocaleString("es-ES")} kg disponibles
-              </p>
+              {editable ? (
+                <div className="mt-1 flex items-center gap-2">
+                  <Input
+                    type="number"
+                    min={0}
+                    className="h-8 w-28 text-sm tabular-nums"
+                    value={estimatedKg}
+                    onChange={(event) => {
+                      const value = Number(event.target.value)
+                      if (scopeKey && Number.isFinite(value)) {
+                        setEstimatedKg(scopeKey, value)
+                      }
+                    }}
+                  />
+                  <span className="text-xs text-muted-foreground/70">kg</span>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground/70">
+                  {estimatedKg.toLocaleString("es-ES")} kg disponibles
+                </p>
+              )}
             </div>
             <p className="text-xl font-semibold tracking-tight tabular-nums">
               {potentialRevenue.toLocaleString("es-ES", {
@@ -158,23 +188,41 @@ export function SellingWindow({
               </div>
             )}
 
-            {campaignTarget && (
-              <div className="flex items-center justify-between text-sm">
+            {(campaignTarget !== undefined || editable) && (
+              <div className="flex items-center justify-between gap-3 text-sm">
                 <span className="text-muted-foreground">
-                  vs. objetivo ({campaignTarget.toFixed(2)} €/kg)
+                  vs. objetivo
+                  {editable ? null : ` (${campaignTarget?.toFixed(2)} €/kg)`}
                 </span>
-                <span
-                  className={cn(
-                    "font-medium",
-                    lonjaPrice >= campaignTarget
-                      ? "text-emerald-500"
-                      : "text-red-500"
-                  )}
-                >
-                  {lonjaPrice >= campaignTarget
-                    ? "Superado"
-                    : `-${(campaignTarget - lonjaPrice).toFixed(2)} €/kg`}
-                </span>
+                {editable ? (
+                  <Input
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    className="h-8 w-24 text-sm tabular-nums"
+                    value={campaignTarget ?? ""}
+                    placeholder="€/kg"
+                    onChange={(event) => {
+                      const value = Number(event.target.value)
+                      if (scopeKey && Number.isFinite(value)) {
+                        setCampaignTarget(scopeKey, value)
+                      }
+                    }}
+                  />
+                ) : campaignTarget ? (
+                  <span
+                    className={cn(
+                      "font-medium",
+                      lonjaPrice >= campaignTarget
+                        ? "text-emerald-500"
+                        : "text-red-500"
+                    )}
+                  >
+                    {lonjaPrice >= campaignTarget
+                      ? "Superado"
+                      : `-${(campaignTarget - lonjaPrice).toFixed(2)} €/kg`}
+                  </span>
+                ) : null}
               </div>
             )}
           </div>

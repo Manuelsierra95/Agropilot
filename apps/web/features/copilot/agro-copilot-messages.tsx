@@ -10,16 +10,7 @@ import { MessageHistory } from "./components/message-history"
 import { groupTurns } from "./components/turn-utils"
 
 export function AgroCopilotMessages() {
-  const {
-    messages,
-    isLoading,
-    actionStates,
-    handleActionDataChange,
-    handleActionConfirm,
-    handleActionCancel,
-    handleEditSubmit,
-    hasMessages,
-  } = useCopilotChat()
+  const { messages, isLoading, handleEditSubmit, hasMessages } = useCopilotChat()
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const activeTurnRef = useRef<HTMLDivElement>(null)
@@ -55,13 +46,7 @@ export function AgroCopilotMessages() {
       ref={scrollRef}
       className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain"
     >
-      <MessageHistory
-        turns={historyTurns}
-        actionStates={actionStates}
-        onActionDataChange={handleActionDataChange}
-        onActionConfirm={handleActionConfirm}
-        onActionCancel={handleActionCancel}
-      />
+      <MessageHistory turns={historyTurns} />
 
       <div
         ref={activeTurnRef}
@@ -75,14 +60,7 @@ export function AgroCopilotMessages() {
           />
         ) : null}
         {activeTurn ? (
-          <ActiveTurnPanel
-            turn={activeTurn}
-            isStreaming={isLoading}
-            actionStates={actionStates}
-            onActionDataChange={handleActionDataChange}
-            onActionConfirm={handleActionConfirm}
-            onActionCancel={handleActionCancel}
-          />
+          <ActiveTurnPanel turn={activeTurn} isStreaming={isLoading} />
         ) : null}
       </div>
     </div>

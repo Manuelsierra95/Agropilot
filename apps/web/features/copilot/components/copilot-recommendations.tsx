@@ -1,3 +1,8 @@
+"use client"
+
+import { useQuery } from "@tanstack/react-query"
+import { Loader2 } from "lucide-react"
+
 import { cn } from "@workspace/ui/lib/utils"
 
 import { api } from "@/lib/api"
@@ -6,12 +11,15 @@ import { CopilotEmptyState } from "./copilot-empty-state"
 import { CopilotRecommendationsHeader } from "./copilot-recommendations-header"
 import { CopilotSuggestionButtons } from "./copilot-suggestion-buttons"
 
-export async function CopilotRecommendations({
+export function CopilotRecommendations({
   className,
 }: {
   className?: string
 }) {
-  const suggestions = await api.copilot.getSuggestions()
+  const { data: suggestions, isLoading } = useQuery({
+    queryKey: ["copilot", "suggestions"],
+    queryFn: () => api.copilot.fetchSuggestions(),
+  })
 
   return (
     <CopilotEmptyState>
@@ -22,7 +30,11 @@ export async function CopilotRecommendations({
         )}
       >
         <CopilotRecommendationsHeader />
-        <CopilotSuggestionButtons suggestions={suggestions} />
+        {isLoading ? (
+          <Loader2 className="size-5 animate-spin text-muted-foreground" />
+        ) : (
+          <CopilotSuggestionButtons suggestions={suggestions ?? []} />
+        )}
       </div>
     </CopilotEmptyState>
   )

@@ -14,7 +14,7 @@ function SkeletonBlock({ className }: { className?: string }) {
   return <div className={cn(skeletonBlockClassName, className)} aria-hidden />
 }
 
-function WidgetSkeleton({
+export function WidgetSkeleton({
   className,
   headerWidth = "w-32",
   contentHeight = "h-[120px]",
@@ -35,7 +35,7 @@ function WidgetSkeleton({
   )
 }
 
-function ResumeCropSkeleton({ className }: { className?: string }) {
+export function ResumeCropSkeleton({ className }: { className?: string }) {
   return (
     <Card
       className={cn(
@@ -85,7 +85,7 @@ function ResumeCropSkeleton({ className }: { className?: string }) {
   )
 }
 
-function MapSkeleton({ className }: { className?: string }) {
+export function MapSkeleton({ className }: { className?: string }) {
   return (
     <Card className={cn("min-w-0 overflow-hidden bg-background ring-0", className)}>
       <CardHeader className="pb-3">
@@ -101,7 +101,7 @@ function MapSkeleton({ className }: { className?: string }) {
   )
 }
 
-function ProductionValueSkeleton({ className }: { className?: string }) {
+export function ProductionValueSkeleton({ className }: { className?: string }) {
   return (
     <Card className={cn("min-w-0 bg-background ring-0", className)}>
       <CardHeader>

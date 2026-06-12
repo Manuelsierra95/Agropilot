@@ -5,9 +5,9 @@ import { billingApi } from "./routes/billing"
 import { searchApi } from "./routes/search"
 import { financeApi } from "./routes/finance"
 import { copilotApi } from "./routes/copilot"
-import { dashboardApi } from "./routes/dashboard"
 import { parcelApi } from "./routes/parcel"
 import { campaignApi } from "./routes/campaign"
+import { tasksApi } from "./routes/tasks"
 
 export const api = {
   example: exampleApi,
@@ -17,7 +17,7 @@ export const api = {
   search: searchApi,
   finance: financeApi,
   copilot: copilotApi,
-  dashboard: dashboardApi,
   parcel: parcelApi,
   campaign: campaignApi,
+  tasks: tasksApi,
 }
