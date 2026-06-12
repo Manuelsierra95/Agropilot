@@ -6,6 +6,10 @@ const parcelMocks = vi.hoisted(() => ({
   createParcel: vi.fn(),
   updateParcel: vi.fn(),
   deleteParcel: vi.fn(),
+  getParcelsForMap: vi.fn(),
+  getParcelRecommendations: vi.fn(),
+  getParcelRisks: vi.fn(),
+  getParcelCropOverview: vi.fn(),
 }))
 
 vi.mock("@/services/parcel", () => parcelMocks)
@@ -86,5 +90,55 @@ describe("parcel routes", () => {
 
     const res = await apiRequest(app, "/api/v1/parcel/p-1", { method: "DELETE" })
     expect(res.status).toBe(200)
+  })
+
+  it("GET /parcel/map returns 401 without auth", async () => {
+    const res = await apiRequest(app, "/api/v1/parcel/map")
+    expect(res.status).toBe(401)
+  })
+
+  it("GET /parcel/map returns map parcels", async () => {
+    mockAuthenticatedSession()
+    parcelMocks.getParcelsForMap.mockResolvedValue([{ id: "p-1", name: "La Mata" }])
+
+    const res = await apiRequest(app, "/api/v1/parcel/map")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.mapParcels).toHaveLength(1)
+  })
+
+  it("GET /parcel/:id/recommendations returns recommendations", async () => {
+    mockAuthenticatedSession()
+    parcelMocks.getParcelRecommendations.mockResolvedValue([])
+
+    const res = await apiRequest(app, "/api/v1/parcel/p-1/recommendations")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.recommendations).toEqual([])
+  })
+
+  it("GET /parcel/:id/risks returns risks", async () => {
+    mockAuthenticatedSession()
+    parcelMocks.getParcelRisks.mockResolvedValue({
+      waterStress: { level: "low", score: 0.25, reasons: [] },
+      fungalRisk: { level: "low", score: 0.25, reasons: [] },
+      insectRisk: { level: "low", score: 0.25, reasons: [] },
+      thermalStress: { level: "low", score: 0.25, reasons: [] },
+    })
+
+    const res = await apiRequest(app, "/api/v1/parcel/p-1/risks")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.risks.waterStress.level).toBe("low")
+  })
+
+  it("GET /parcel/:id/crop-overview returns olivar data", async () => {
+    mockAuthenticatedSession()
+    parcelMocks.getParcelCropOverview.mockResolvedValue({ name: "La Mata" })
+
+    const res = await apiRequest(app, "/api/v1/parcel/p-1/crop-overview")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.olivar.name).toBe("La Mata")
   })
 })

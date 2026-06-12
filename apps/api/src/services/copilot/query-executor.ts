@@ -99,7 +99,7 @@ async function executeParcelCashflowQuery(
       from: query.from,
       to: query.to,
     },
-    ctx.defaultParcelId
+    ctx.activeParcelId
   )
 
   const baseDataKey = queryDataKey(query, index)
@@ -148,7 +148,7 @@ async function executeParcelWeatherQuery(
       from: query.from,
       to: query.to,
     },
-    ctx.defaultParcelId
+    ctx.activeParcelId
   )
 
   const dataKey = queryDataKey(query, index)

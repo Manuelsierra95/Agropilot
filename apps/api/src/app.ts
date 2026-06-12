@@ -11,18 +11,21 @@ import { billingRoutes } from "./routes/billing"
 import { searchRoutes } from "./routes/search"
 import { financeRoutes } from "./routes/finance"
 import { copilotRoutes } from "./routes/copilot"
-import { dashboardRoutes } from "./routes/dashboard"
 import { campaignRoutes } from "./routes/campaign"
+import { taskRoutes } from "./routes/tasks"
+import { logger } from "hono/logger"
 
 export const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .basePath("/api/v1")
   .onError(errorHandler)
   .use(corsMiddleware)
 
+  .use(logger())
+
   .get("/healthz", (c) => c.text("OK"))
 
   .on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw))
-
+  // routa para ver las peticiones entrantes y salientes
   .route("/organization", organizationRoutes)
   .route("/user", userRoutes)
   .route("/search", searchRoutes)
@@ -30,7 +33,7 @@ export const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .route("/billing", billingRoutes)
   .route("/finance", financeRoutes)
   .route("/copilot", copilotRoutes)
-  .route("/dashboard", dashboardRoutes)
   .route("/campaign", campaignRoutes)
+  .route("/tasks", taskRoutes)
 
 export type AppType = typeof app

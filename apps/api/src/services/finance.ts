@@ -467,3 +467,12 @@ export async function bulkCreateTransactions(
     return created
   })
 }
+
+export {
+  getOlivePricesForDashboard,
+  getSellingWindowForDashboard,
+  getFinanceResumeForDashboard,
+  getCampaignMarginForDashboard,
+  getRecentTransactionsForDashboard,
+  getProductionValueForDashboard,
+} from "@/services/finance-dashboard"

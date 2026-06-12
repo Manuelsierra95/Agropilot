@@ -168,6 +168,21 @@ export type ParcelWeatherDailyRow = {
   parcelName: string
 }
 
+export async function getParcelNameForOrg(
+  organizationId: string,
+  parcelId: string
+): Promise<string | null> {
+  const parcel = await db.query.parcels.findFirst({
+    where: and(
+      eq(schema.parcels.organizationId, organizationId),
+      eq(schema.parcels.id, parcelId)
+    ),
+    columns: { name: true },
+  })
+
+  return parcel?.name ?? null
+}
+
 export async function resolveParcelIdForOrg(
   organizationId: string,
   parcelId?: string,
@@ -419,3 +434,11 @@ export async function deleteParcel(
     throw new HTTPException(404, { message: "Parcel not found" })
   }
 }
+
+export {
+  getParcelsForMap,
+  getParcelRecommendations,
+  getParcelRisks,
+  getParcelCropOverview,
+  resolvePrimaryParcelId,
+} from "@/services/parcel-dashboard"

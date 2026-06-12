@@ -7,12 +7,17 @@ import {
   createParcel,
   deleteParcel,
   getParcelById,
+  getParcelCropOverview,
+  getParcelRecommendations,
+  getParcelRisks,
+  getParcelsForMap,
   listParcels,
   updateParcel,
 } from "@/services/parcel"
 import {
   parcelCreateSchema,
   parcelUpdateInputSchema,
+  dashboardScopeQuerySchema,
 } from "@workspace/schemas"
 
 export const parcelRoutes = new Hono<{
@@ -24,6 +29,37 @@ export const parcelRoutes = new Hono<{
     const parcels = await listParcels(c.get("organizationId"))
     return c.json({ parcels }, 200)
   })
+  .get("/map", async (c) => {
+    const mapParcels = await getParcelsForMap(c.get("organizationId"))
+    return c.json({ mapParcels }, 200)
+  })
+  .get("/:id/recommendations", async (c) => {
+    const recommendations = await getParcelRecommendations(
+      c.get("organizationId"),
+      c.req.param("id")
+    )
+    return c.json({ recommendations }, 200)
+  })
+  .get("/:id/risks", async (c) => {
+    const risks = await getParcelRisks(
+      c.get("organizationId"),
+      c.req.param("id")
+    )
+    return c.json({ risks }, 200)
+  })
+  .get(
+    "/:id/crop-overview",
+    zValidator("query", dashboardScopeQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const olivar = await getParcelCropOverview(
+        c.get("organizationId"),
+        c.req.param("id"),
+        filters
+      )
+      return c.json({ olivar }, 200)
+    }
+  )
   .get("/:id", async (c) => {
     const parcel = await getParcelById(
       c.get("organizationId"),

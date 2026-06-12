@@ -1,5 +1,6 @@
 import { db, schema, eq, desc } from "@workspace/db"
-import type { CampaignListItem } from "@workspace/schemas"
+import type { CampaignListItem, DashboardScopeQuery } from "@workspace/schemas"
+import { getCampaignPeriodForDate } from "@/services/finance"
 
 export function formatCampaignDisplayName(name: string): string {
   const [startYear, endYear] = name.split("/").map(Number)
@@ -54,4 +55,49 @@ export function pickDefaultCampaignId(
     campaigns.find((campaign) => campaign.status === "active")?.id ??
     campaigns[0]?.id
   )
+}
+
+function todayIso(): string {
+  return new Date().toISOString().slice(0, 10)
+}
+
+export async function resolveActiveCampaign() {
+  const active = await db.query.campaigns.findFirst({
+    where: eq(schema.campaigns.isActive, true),
+    orderBy: [desc(schema.campaigns.startDate)],
+  })
+
+  if (active) return active
+
+  const period = getCampaignPeriodForDate(todayIso())
+  return db.query.campaigns.findFirst({
+    where: eq(schema.campaigns.name, period.name),
+  })
+}
+
+export type ResolvedDateRange = {
+  from: string
+  to: string
+}
+
+export function resolveScopeDateRange(
+  campaign: { startDate: string; endDate: string } | null | undefined,
+  filters: DashboardScopeQuery
+): ResolvedDateRange {
+  if (filters.from && filters.to) {
+    return { from: filters.from, to: filters.to }
+  }
+
+  if (campaign) {
+    return { from: campaign.startDate, to: campaign.endDate }
+  }
+
+  const period = getCampaignPeriodForDate(todayIso())
+  return { from: period.startDate, to: period.endDate }
+}
+
+export function getPreviousCampaignName(name: string): string {
+  const [startYear] = name.split("/").map(Number)
+  if (!Number.isFinite(startYear)) return name
+  return `${startYear - 1}/${startYear}`
 }

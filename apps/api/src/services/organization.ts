@@ -10,6 +10,17 @@ import type {
 } from "@workspace/schemas"
 import { HTTPException } from "hono/http-exception"
 
+export async function getOrganizationName(
+  organizationId: string
+): Promise<string | null> {
+  const organization = await db.query.organizations.findFirst({
+    where: eq(schema.organizations.id, organizationId),
+    columns: { name: true },
+  })
+
+  return organization?.name ?? null
+}
+
 export const getActiveOrganization = async (
   organizationId: string,
   member: AuthMember

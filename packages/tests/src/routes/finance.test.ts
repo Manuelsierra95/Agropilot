@@ -7,6 +7,12 @@ const financeMocks = vi.hoisted(() => ({
   updateTransaction: vi.fn(),
   deleteTransaction: vi.fn(),
   bulkCreateTransactions: vi.fn(),
+  getOlivePricesForDashboard: vi.fn(),
+  getSellingWindowForDashboard: vi.fn(),
+  getFinanceResumeForDashboard: vi.fn(),
+  getCampaignMarginForDashboard: vi.fn(),
+  getRecentTransactionsForDashboard: vi.fn(),
+  getProductionValueForDashboard: vi.fn(),
 }))
 
 vi.mock("@/services/finance", () => financeMocks)
@@ -119,5 +125,95 @@ describe("finance routes", () => {
     expect(res.status).toBe(201)
     const body = await res.json()
     expect(body.count).toBe(2)
+  })
+
+  it("GET /finance/olive-prices returns 401 without auth", async () => {
+    const res = await apiRequest(app, "/api/v1/finance/olive-prices")
+    expect(res.status).toBe(401)
+  })
+
+  it("GET /finance/olive-prices returns olive prices", async () => {
+    mockAuthenticatedSession()
+    financeMocks.getOlivePricesForDashboard.mockResolvedValue([
+      { name: "Virgen Extra", price: 5.42 },
+    ])
+
+    const res = await apiRequest(app, "/api/v1/finance/olive-prices")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.olivePrices).toHaveLength(1)
+  })
+
+  it("GET /finance/selling-window returns selling window", async () => {
+    mockAuthenticatedSession()
+    financeMocks.getSellingWindowForDashboard.mockResolvedValue({
+      lonjaPrice: 5.42,
+      costPerKg: 3.8,
+      estimatedKg: 1000,
+    })
+
+    const res = await apiRequest(app, "/api/v1/finance/selling-window")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.sellingWindow.lonjaPrice).toBe(5.42)
+  })
+
+  it("GET /finance/selling-window returns 400 for invalid parcelId", async () => {
+    mockAuthenticatedSession()
+
+    const res = await apiRequest(
+      app,
+      "/api/v1/finance/selling-window?parcelId=not-a-uuid"
+    )
+    expect(res.status).toBe(400)
+  })
+
+  it("GET /finance/resume returns finance resume", async () => {
+    mockAuthenticatedSession()
+    financeMocks.getFinanceResumeForDashboard.mockResolvedValue({
+      transactions: [],
+    })
+
+    const res = await apiRequest(app, "/api/v1/finance/resume")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.finance.transactions).toEqual([])
+  })
+
+  it("GET /finance/campaign-margin returns margin series", async () => {
+    mockAuthenticatedSession()
+    financeMocks.getCampaignMarginForDashboard.mockResolvedValue({
+      campaignStart: "2025-10-01",
+      points: [],
+    })
+
+    const res = await apiRequest(app, "/api/v1/finance/campaign-margin")
+    expect(res.status).toBe(200)
+  })
+
+  it("GET /finance/recent-transactions returns transactions", async () => {
+    mockAuthenticatedSession()
+    financeMocks.getRecentTransactionsForDashboard.mockResolvedValue([])
+
+    const res = await apiRequest(app, "/api/v1/finance/recent-transactions")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.transactions).toEqual([])
+  })
+
+  it("GET /finance/production-value returns production value", async () => {
+    mockAuthenticatedSession()
+    financeMocks.getProductionValueForDashboard.mockResolvedValue({
+      monthlyProductionKg: Array(12).fill(0),
+      prevMonthlyProductionKg: Array(12).fill(0),
+      lonjaPrice: 5.42,
+      numOlivos: 100,
+      campaignStartYear: 2025,
+    })
+
+    const res = await apiRequest(app, "/api/v1/finance/production-value")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.productionValue.numOlivos).toBe(100)
   })
 })

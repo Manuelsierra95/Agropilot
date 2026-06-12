@@ -10,4 +10,13 @@ export type Env = {
   GOOGLE_CLIENT_ID: string
   GOOGLE_CLIENT_SECRET: string
   DATABASE_URL: string
+  AI_PROVIDER?: string
+  OLLAMA_MODEL?: string
+  OLLAMA_BASE_URL?: string
+  OPENAI_API_KEY?: string
+  OPENAI_MODEL?: string
+  GROQ_API_KEY?: string
+  GROQ_MODEL?: string
+  GOOGLE_GENERATIVE_AI_API_KEY?: string
+  GOOGLE_MODEL?: string
 }

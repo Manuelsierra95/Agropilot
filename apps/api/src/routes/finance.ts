@@ -7,6 +7,12 @@ import {
   bulkCreateTransactions,
   createTransaction,
   deleteTransaction,
+  getCampaignMarginForDashboard,
+  getFinanceResumeForDashboard,
+  getOlivePricesForDashboard,
+  getProductionValueForDashboard,
+  getRecentTransactionsForDashboard,
+  getSellingWindowForDashboard,
   getTransactionById,
   listTransactions,
   updateTransaction,
@@ -15,6 +21,8 @@ import {
   transactionBulkCreateSchema,
   transactionCreateSchema,
   transactionUpdateInputSchema,
+  dashboardScopeQuerySchema,
+  dashboardRecentTransactionsQuerySchema,
 } from "@workspace/schemas"
 
 export const financeRoutes = new Hono<{
@@ -26,6 +34,70 @@ export const financeRoutes = new Hono<{
     const transactions = await listTransactions(c.get("organizationId"))
     return c.json({ transactions }, 200)
   })
+  .get("/olive-prices", async (c) => {
+    const olivePrices = await getOlivePricesForDashboard()
+    return c.json({ olivePrices }, 200)
+  })
+  .get(
+    "/selling-window",
+    zValidator("query", dashboardScopeQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const sellingWindow = await getSellingWindowForDashboard(
+        c.get("organizationId"),
+        filters
+      )
+      return c.json({ sellingWindow }, 200)
+    }
+  )
+  .get(
+    "/resume",
+    zValidator("query", dashboardScopeQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const finance = await getFinanceResumeForDashboard(
+        c.get("organizationId"),
+        filters
+      )
+      return c.json({ finance }, 200)
+    }
+  )
+  .get(
+    "/campaign-margin",
+    zValidator("query", dashboardScopeQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const campaignMargin = await getCampaignMarginForDashboard(
+        c.get("organizationId"),
+        filters
+      )
+      return c.json({ campaignMargin }, 200)
+    }
+  )
+  .get(
+    "/recent-transactions",
+    zValidator("query", dashboardRecentTransactionsQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const transactions = await getRecentTransactionsForDashboard(
+        c.get("organizationId"),
+        filters
+      )
+      return c.json({ transactions }, 200)
+    }
+  )
+  .get(
+    "/production-value",
+    zValidator("query", dashboardScopeQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const productionValue = await getProductionValueForDashboard(
+        c.get("organizationId"),
+        filters
+      )
+      return c.json({ productionValue }, 200)
+    }
+  )
   .post("/bulk", zValidator("json", transactionBulkCreateSchema), async (c) => {
     const { transactions } = c.req.valid("json")
     const created = await bulkCreateTransactions(
