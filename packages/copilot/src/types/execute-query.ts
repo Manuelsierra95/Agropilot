@@ -1,10 +1,12 @@
-import type { QueryResult } from "../schemas/chart-action-schema"
+import type { QueryResult } from "../schemas/query-result"
 import type { QuerySpec } from "../schemas/copilot-queries"
 
 export type CopilotContext = {
   organizationId: string
   userId: string
-  defaultParcelId?: string
+  organizationName?: string
+  activeParcelId?: string
+  activeParcelName?: string
 }
 
 export type ExecuteQueryFn = (

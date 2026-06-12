@@ -9,11 +9,11 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test:copilot-queries": "pnpm dlx tsx src/schemas/copilot-queries.test.ts",
-    "test:presentation": "pnpm dlx tsx src/pipeline/resolve-presentation-channel.test.ts",
-    "test:dashboard-cells": "pnpm dlx tsx src/pipeline/dashboard-cells.test.ts",
-    "test:copilot-scope": "pnpm dlx tsx src/pipeline/copilot-scope.test.ts"
+    "test:get-model": "pnpm dlx tsx src/model/get-model.test.ts"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.80",
+    "@ai-sdk/groq": "^3.0.39",
     "@ai-sdk/openai": "^3.0.68",
     "@workspace/schemas": "workspace:*",
     "ai": "^6.0.197",
