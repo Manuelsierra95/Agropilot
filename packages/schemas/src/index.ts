@@ -10,6 +10,7 @@ export {
   TASK_CATEGORY_LABELS,
   TASK_STATUS_LABELS,
   taskCategorySchema,
+  taskCreateInputSchema,
   taskInsertSchema,
   taskSelectSchema,
   taskSourceSchema,
@@ -17,6 +18,7 @@ export {
   taskTypeSchema,
   taskUpdateSchema,
   type TaskCategory,
+  type TaskCreateInput,
   type TaskInsert,
   type TaskSelect,
   type TaskSource,
@@ -29,3 +31,8 @@ export * from "./campaign"
 export * from "./parcel-weather"
 export * from "./parcel-cashflow"
 export * from "./dashboard"
+export * from "./dashboard-scope"
+export * from "./finance-dashboard"
+export * from "./parcel-dashboard"
+export * from "./tasks-dashboard"
+export * from "./copilot"

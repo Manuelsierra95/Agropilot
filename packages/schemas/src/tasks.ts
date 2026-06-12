@@ -35,6 +35,20 @@ export const taskSelectSchema = createSelectSchema(tasks)
 export const taskInsertSchema = createInsertSchema(tasks)
 export const taskUpdateSchema = createUpdateSchema(tasks)
 
+export const taskCreateInputSchema = z.object({
+  title: z.string().min(1),
+  category: taskCategorySchema,
+  startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .describe("Fecha de inicio ISO YYYY-MM-DD"),
+  description: z.string().optional(),
+  parcelId: z.string().optional(),
+  priority: z.number().int().min(0).max(3).optional(),
+})
+
+export type TaskCreateInput = z.infer<typeof taskCreateInputSchema>
+
 export type TaskType = z.infer<typeof taskTypeSchema>
 export type TaskCategory = z.infer<typeof taskCategorySchema>
 export type TaskStatus = z.infer<typeof taskStatusSchema>
