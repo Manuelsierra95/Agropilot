@@ -10,6 +10,9 @@ const parcelMocks = vi.hoisted(() => ({
   getParcelRecommendations: vi.fn(),
   getParcelRisks: vi.fn(),
   getParcelCropOverview: vi.fn(),
+  getParcelsCropOverviewsForDashboard: vi.fn(),
+  getParcelsRecommendationsForDashboard: vi.fn(),
+  getParcelsRisksForDashboard: vi.fn(),
 }))
 
 vi.mock("@/services/parcel", () => parcelMocks)
@@ -140,5 +143,81 @@ describe("parcel routes", () => {
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.olivar.name).toBe("La Mata")
+  })
+
+  it("GET /parcel/crop-overviews returns 401 without auth", async () => {
+    const res = await apiRequest(app, "/api/v1/parcel/crop-overviews")
+    expect(res.status).toBe(401)
+  })
+
+  it("GET /parcel/crop-overviews returns bulk crop overviews", async () => {
+    mockAuthenticatedSession()
+    parcelMocks.getParcelsCropOverviewsForDashboard.mockResolvedValue({
+      parcels: [
+        {
+          parcelId: "p-1",
+          name: "La Mata",
+          coordinates: { lat: 38, lng: -3.37 },
+          stationId: "—",
+          cropType: "olivo",
+          area: 10,
+          lastUpdate: "2026-01-01T00:00:00.000Z",
+          temperature: 20,
+          temperatureChange: 0,
+          phenologicalStage: "Vegetativo",
+          gdd: 100,
+          gddTarget: 3000,
+          kc: 0.5,
+          waterBalance: 0,
+          estimatedProfitability: 0,
+          participants: 1,
+          pendingTasks: 0,
+          completedTasks: 0,
+          totalTrees: 2000,
+          totalYieldKg: 0,
+          aiInsight: "",
+        },
+      ],
+    })
+
+    const res = await apiRequest(app, "/api/v1/parcel/crop-overviews")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.cropOverviews.parcels).toHaveLength(1)
+  })
+
+  it("GET /parcel/parcels-recommendations returns bulk recommendations", async () => {
+    mockAuthenticatedSession()
+    parcelMocks.getParcelsRecommendationsForDashboard.mockResolvedValue({
+      parcels: [{ parcelId: "p-1", name: "La Mata", recommendations: [] }],
+    })
+
+    const res = await apiRequest(app, "/api/v1/parcel/parcels-recommendations")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.parcelsRecommendations.parcels).toHaveLength(1)
+  })
+
+  it("GET /parcel/parcels-risks returns bulk risks", async () => {
+    mockAuthenticatedSession()
+    parcelMocks.getParcelsRisksForDashboard.mockResolvedValue({
+      parcels: [
+        {
+          parcelId: "p-1",
+          name: "La Mata",
+          risks: {
+            waterStress: { level: "low", score: 0.25, reasons: [] },
+            fungalRisk: { level: "low", score: 0.25, reasons: [] },
+            insectRisk: { level: "low", score: 0.25, reasons: [] },
+            thermalStress: { level: "low", score: 0.25, reasons: [] },
+          },
+        },
+      ],
+    })
+
+    const res = await apiRequest(app, "/api/v1/parcel/parcels-risks")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.parcelsRisks.parcels).toHaveLength(1)
   })
 })

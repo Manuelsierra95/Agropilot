@@ -440,5 +440,8 @@ export {
   getParcelRecommendations,
   getParcelRisks,
   getParcelCropOverview,
+  getParcelsCropOverviewsForDashboard,
+  getParcelsRecommendationsForDashboard,
+  getParcelsRisksForDashboard,
   resolvePrimaryParcelId,
 } from "@/services/parcel-dashboard"

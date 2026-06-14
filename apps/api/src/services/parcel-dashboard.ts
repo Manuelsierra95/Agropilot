@@ -1,8 +1,11 @@
-import { db, schema, eq, and, sql } from "@workspace/db"
+import { db, schema, eq, and, sql, inArray } from "@workspace/db"
 import { HTTPException } from "hono/http-exception"
 import type {
   DashboardMapParcel,
   DashboardOlivar,
+  DashboardParcelsCropOverviews,
+  DashboardParcelsRecommendations,
+  DashboardParcelsRisks,
   DashboardRecommendation,
   DashboardRisks,
   DashboardScopeQuery,
@@ -248,6 +251,106 @@ async function loadParcelWeather(parcelId: string) {
   })
 }
 
+async function loadParcelWeatherBatch(parcelIds: string[]) {
+  if (parcelIds.length === 0) return []
+
+  return db.query.parcelWeather.findMany({
+    where: inArray(schema.parcelWeather.parcelId, parcelIds),
+  })
+}
+
+type ParcelRow = Awaited<ReturnType<typeof listParcels>>[number]
+
+type TaskCountRow = {
+  parcelId: string | null
+  status: string
+  count: number
+}
+
+function groupTaskCountsByParcel(rows: TaskCountRow[]) {
+  const byParcel = new Map<string, { pending: number; done: number }>()
+
+  for (const row of rows) {
+    if (!row.parcelId) continue
+    const current = byParcel.get(row.parcelId) ?? { pending: 0, done: 0 }
+    if (row.status === "pending") current.pending = row.count
+    if (row.status === "done") current.done = row.count
+    byParcel.set(row.parcelId, current)
+  }
+
+  return byParcel
+}
+
+function buildCropOverview(
+  parcel: ParcelRow,
+  weather: Awaited<ReturnType<typeof loadParcelWeather>>,
+  station: { primaryStationId: string | null } | null | undefined,
+  primarySummary:
+    | {
+        profit: string | null
+        totalKg: string | null
+      }
+    | undefined,
+  taskCounts: { pending: number; done: number }
+): DashboardOlivar {
+  const coords = parseWktPoint(parcel.centroid ?? null) ?? {
+    lat: 38,
+    lng: -3.37,
+  }
+
+  const metrics = (weather?.metrics ?? {}) as Record<string, unknown>
+  const cropMetrics = (metrics.crop ?? {}) as Record<string, number | string>
+  const tempMetrics = (metrics.temperature ?? {}) as Record<
+    number | string,
+    number
+  >
+  const dailyData = (weather?.data ?? {}) as {
+    daily?: { temperature?: number }[]
+  }
+  const latestDailyTemp = dailyData.daily?.at(-1)?.temperature
+  const recommendationsList = mapDbRecommendationsToDashboard(
+    weather?.recommendations
+  )
+
+  return {
+    ...emptyOlivarOverview(parcel, coords),
+    stationId: station?.primaryStationId ?? "—",
+    lastUpdate: weather?.computedAt?.toISOString() ?? new Date().toISOString(),
+    temperature:
+      latestDailyTemp ??
+      Number(tempMetrics.avg7d ?? tempMetrics.avg30d ?? 0),
+    temperatureChange: Number(tempMetrics.trend ?? 0),
+    phenologicalStage: String(cropMetrics.stage ?? "Vegetativo"),
+    gdd: Number(cropMetrics.gdd ?? 0),
+    gddTarget: 3000,
+    kc: Number(cropMetrics.kc ?? 0.5),
+    waterBalance: Number(
+      (metrics.water as { deficit7d?: number })?.deficit7d ?? 0
+    ),
+    estimatedProfitability: primarySummary?.profit
+      ? Number(primarySummary.profit)
+      : 0,
+    pendingTasks: taskCounts.pending,
+    completedTasks: taskCounts.done,
+    totalYieldKg: primarySummary?.totalKg
+      ? Number(primarySummary.totalKg)
+      : 0,
+    aiInsight: recommendationsList[0]?.message ?? "",
+  }
+}
+
+async function resolveCampaignIdForFilters(
+  filters: DashboardScopeQuery
+): Promise<string | undefined> {
+  const campaign = filters.campaignId
+    ? await resolveCampaignById(filters.campaignId)
+    : filters.from && filters.to
+      ? null
+      : await resolveActiveCampaign()
+
+  return campaign?.id
+}
+
 export async function getParcelsForMap(
   organizationId: string
 ): Promise<DashboardMapParcel[]> {
@@ -279,91 +382,149 @@ export async function getParcelCropOverview(
   filters: DashboardScopeQuery = {}
 ): Promise<DashboardOlivar> {
   const parcel = await getParcelById(organizationId, parcelId)
-  const coords = parseWktPoint(parcel.centroid ?? null) ?? {
-    lat: 38,
-    lng: -3.37,
+  const campaignId = await resolveCampaignIdForFilters(filters)
+
+  const [weather, station, financialSummaries, taskCountRows] =
+    await Promise.all([
+      loadParcelWeather(parcelId),
+      db.query.parcelStation.findFirst({
+        where: eq(schema.parcelStation.parcelId, parcelId),
+      }),
+      campaignId
+        ? db.query.parcelFinancialSummaries.findMany({
+            where: and(
+              eq(schema.parcelFinancialSummaries.campaignId, campaignId),
+              eq(schema.parcelFinancialSummaries.parcelId, parcelId)
+            ),
+          })
+        : Promise.resolve([]),
+      db
+        .select({
+          parcelId: schema.tasks.parcelId,
+          status: schema.tasks.status,
+          count: sql<number>`count(*)::int`,
+        })
+        .from(schema.tasks)
+        .where(
+          and(
+            eq(schema.tasks.organizationId, organizationId),
+            eq(schema.tasks.parcelId, parcelId)
+          )
+        )
+        .groupBy(schema.tasks.parcelId, schema.tasks.status),
+    ])
+
+  const taskCounts = groupTaskCountsByParcel(taskCountRows).get(parcelId) ?? {
+    pending: 0,
+    done: 0,
   }
 
-  const campaign = filters.campaignId
-    ? await resolveCampaignById(filters.campaignId)
-    : filters.from && filters.to
-      ? null
-      : await resolveActiveCampaign()
+  return buildCropOverview(
+    parcel,
+    weather,
+    station,
+    financialSummaries[0],
+    taskCounts
+  )
+}
 
-  const campaignId = campaign?.id
-
-  const [weather, station, financialSummaries, taskCounts] = await Promise.all([
-    loadParcelWeather(parcelId),
-    db.query.parcelStation.findFirst({
-      where: eq(schema.parcelStation.parcelId, parcelId),
-    }),
-    campaignId
-      ? db.query.parcelFinancialSummaries.findMany({
-          where: and(
-            eq(schema.parcelFinancialSummaries.campaignId, campaignId),
-            eq(schema.parcelFinancialSummaries.parcelId, parcelId)
-          ),
-        })
-      : Promise.resolve([]),
-    db
-      .select({
-        status: schema.tasks.status,
-        count: sql<number>`count(*)::int`,
-      })
-      .from(schema.tasks)
-      .where(
-        and(
-          eq(schema.tasks.organizationId, organizationId),
-          eq(schema.tasks.parcelId, parcelId)
-        )
-      )
-      .groupBy(schema.tasks.status),
+export async function getParcelsCropOverviewsForDashboard(
+  organizationId: string,
+  filters: DashboardScopeQuery = {}
+): Promise<DashboardParcelsCropOverviews> {
+  const [parcels, campaignId] = await Promise.all([
+    listParcels(organizationId),
+    resolveCampaignIdForFilters(filters),
   ])
 
-  const primarySummary = financialSummaries[0]
-  const metrics = (weather?.metrics ?? {}) as Record<string, unknown>
-  const cropMetrics = (metrics.crop ?? {}) as Record<string, number | string>
-  const tempMetrics = (metrics.temperature ?? {}) as Record<
-    number | string,
-    number
-  >
-  const dailyData = (weather?.data ?? {}) as {
-    daily?: { temperature?: number }[]
-  }
-  const latestDailyTemp = dailyData.daily?.at(-1)?.temperature
-  const recommendationsList = mapDbRecommendationsToDashboard(
-    weather?.recommendations
-  )
+  const parcelIds = parcels.map((parcel) => parcel.id)
 
-  const pendingTasks =
-    taskCounts.find((row) => row.status === "pending")?.count ?? 0
-  const completedTasks =
-    taskCounts.find((row) => row.status === "done")?.count ?? 0
+  const [weatherRows, stationRows, financialSummaries, taskCountRows] =
+    await Promise.all([
+      loadParcelWeatherBatch(parcelIds),
+      parcelIds.length > 0
+        ? db.query.parcelStation.findMany({
+            where: inArray(schema.parcelStation.parcelId, parcelIds),
+          })
+        : Promise.resolve([]),
+      campaignId
+        ? db.query.parcelFinancialSummaries.findMany({
+            where: eq(schema.parcelFinancialSummaries.campaignId, campaignId),
+          })
+        : Promise.resolve([]),
+      db
+        .select({
+          parcelId: schema.tasks.parcelId,
+          status: schema.tasks.status,
+          count: sql<number>`count(*)::int`,
+        })
+        .from(schema.tasks)
+        .where(eq(schema.tasks.organizationId, organizationId))
+        .groupBy(schema.tasks.parcelId, schema.tasks.status),
+    ])
+
+  const weatherByParcelId = new Map(
+    weatherRows.map((row) => [row.parcelId, row])
+  )
+  const stationByParcelId = new Map(
+    stationRows.map((row) => [row.parcelId, row])
+  )
+  const summaryByParcelId = new Map(
+    financialSummaries.map((row) => [row.parcelId, row])
+  )
+  const taskCountsByParcelId = groupTaskCountsByParcel(taskCountRows)
 
   return {
-    ...emptyOlivarOverview(parcel, coords),
-    stationId: station?.primaryStationId ?? "—",
-    lastUpdate: weather?.computedAt?.toISOString() ?? new Date().toISOString(),
-    temperature:
-      latestDailyTemp ??
-      Number(tempMetrics.avg7d ?? tempMetrics.avg30d ?? 0),
-    temperatureChange: Number(tempMetrics.trend ?? 0),
-    phenologicalStage: String(cropMetrics.stage ?? "Vegetativo"),
-    gdd: Number(cropMetrics.gdd ?? 0),
-    gddTarget: 3000,
-    kc: Number(cropMetrics.kc ?? 0.5),
-    waterBalance: Number(
-      (metrics.water as { deficit7d?: number })?.deficit7d ?? 0
-    ),
-    estimatedProfitability: primarySummary?.profit
-      ? Number(primarySummary.profit)
-      : 0,
-    pendingTasks,
-    completedTasks,
-    totalYieldKg: primarySummary?.totalKg
-      ? Number(primarySummary.totalKg)
-      : 0,
-    aiInsight: recommendationsList[0]?.message ?? "",
+    parcels: parcels.map((parcel) => ({
+      parcelId: parcel.id,
+      ...buildCropOverview(
+        parcel,
+        weatherByParcelId.get(parcel.id),
+        stationByParcelId.get(parcel.id),
+        summaryByParcelId.get(parcel.id),
+        taskCountsByParcelId.get(parcel.id) ?? { pending: 0, done: 0 }
+      ),
+    })),
+  }
+}
+
+export async function getParcelsRecommendationsForDashboard(
+  organizationId: string
+): Promise<DashboardParcelsRecommendations> {
+  const parcels = await listParcels(organizationId)
+  const parcelIds = parcels.map((parcel) => parcel.id)
+  const weatherRows = await loadParcelWeatherBatch(parcelIds)
+  const weatherByParcelId = new Map(
+    weatherRows.map((row) => [row.parcelId, row])
+  )
+
+  return {
+    parcels: parcels.map((parcel) => ({
+      parcelId: parcel.id,
+      name: parcel.name,
+      recommendations: mapDbRecommendationsToDashboard(
+        weatherByParcelId.get(parcel.id)?.recommendations
+      ),
+    })),
+  }
+}
+
+export async function getParcelsRisksForDashboard(
+  organizationId: string
+): Promise<DashboardParcelsRisks> {
+  const parcels = await listParcels(organizationId)
+  const parcelIds = parcels.map((parcel) => parcel.id)
+  const weatherRows = await loadParcelWeatherBatch(parcelIds)
+  const weatherByParcelId = new Map(
+    weatherRows.map((row) => [row.parcelId, row])
+  )
+
+  return {
+    parcels: parcels.map((parcel) => ({
+      parcelId: parcel.id,
+      name: parcel.name,
+      risks: mapDbRisksToDashboard(weatherByParcelId.get(parcel.id)?.risks),
+    })),
   }
 }
 

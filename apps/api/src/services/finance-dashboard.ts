@@ -3,6 +3,8 @@ import type {
   DashboardCampaignMargin,
   DashboardFinanceResume,
   DashboardOlivePriceItem,
+  DashboardParcelsFinanceComparison,
+  DashboardParcelsSellingWindows,
   DashboardProductionValue,
   DashboardScopeQuery,
   DashboardSellingWindow,
@@ -22,7 +24,7 @@ import {
   resolveCampaignById,
   resolveScopeDateRange,
 } from "@/services/campaign"
-import { queryMarketPrices, type MarketPriceRow } from "@/services/finance"
+import { getCachedMarketPricesByGrade } from "@/services/market-prices-cache"
 import { listParcels, resolveParcelIdForOrg } from "@/services/parcel"
 
 const MARKET_HISTORY_DAYS = 90
@@ -43,20 +45,6 @@ function daysAgoIso(days: number): string {
   const date = new Date()
   date.setDate(date.getDate() - days)
   return date.toISOString().slice(0, 10)
-}
-
-async function fetchMarketPricesByGrade(
-  from: string,
-  to: string
-): Promise<Record<OilGrade, MarketPriceRow[]>> {
-  const entries = await Promise.all(
-    DASHBOARD_OIL_GRADES.map(async (grade) => {
-      const rows = await queryMarketPrices({ grade, from, to })
-      return [grade, rows] as const
-    })
-  )
-
-  return Object.fromEntries(entries) as Record<OilGrade, MarketPriceRow[]>
 }
 
 function buildOlivePriceItems(
@@ -83,7 +71,8 @@ function buildOlivePriceItems(
 }
 
 function mapTransactionToSnapshot(
-  tx: TransactionSelect
+  tx: TransactionSelect,
+  parcelName?: string
 ): DashboardTransactionSnapshot {
   const paymentMethod = (tx.paymentMethod ?? "otro") as PaymentMethod
 
@@ -96,6 +85,7 @@ function mapTransactionToSnapshot(
     paymentMethod,
     invoiceNumber: tx.invoiceNumber ?? undefined,
     date: tx.date,
+    ...(parcelName ? { parcelName } : {}),
   }
 }
 
@@ -179,10 +169,9 @@ async function resolveScopeContext(
   organizationId: string,
   filters: DashboardScopeQuery
 ): Promise<ScopeContext> {
-  const resolvedParcelId = await resolveParcelIdForOrg(
-    organizationId,
-    filters.parcelId
-  )
+  const resolvedParcelId = filters.parcelId
+    ? await resolveParcelIdForOrg(organizationId, filters.parcelId)
+    : null
 
   const campaign = filters.campaignId
     ? await resolveCampaignById(filters.campaignId)
@@ -202,7 +191,8 @@ async function resolveScopeContext(
 async function listTransactionsForScope(
   organizationId: string,
   dateRange: { from: string; to: string },
-  parcelId?: string | null
+  parcelId?: string | null,
+  includeParcelNames = false
 ) {
   const conditions = [
     eq(schema.transactions.organizationId, organizationId),
@@ -214,10 +204,19 @@ async function listTransactionsForScope(
     conditions.push(eq(schema.transactions.parcelId, parcelId))
   }
 
-  return db.query.transactions.findMany({
+  const transactions = await db.query.transactions.findMany({
     where: and(...conditions),
     orderBy: [desc(schema.transactions.date)],
   })
+
+  if (!includeParcelNames) {
+    return { transactions, parcelNameById: null as Map<string, string> | null }
+  }
+
+  const parcels = await listParcels(organizationId)
+  const parcelNameById = new Map(parcels.map((p) => [p.id, p.name]))
+
+  return { transactions, parcelNameById }
 }
 
 async function loadFinancialSummaries(
@@ -291,21 +290,52 @@ async function loadPreviousCashflow(
   })
 }
 
-async function getVirgenExtraPrice(): Promise<number> {
+async function getOlivePriceItemsForDashboard(): Promise<
+  DashboardOlivePriceItem[]
+> {
   const today = todayIso()
   const marketFrom = daysAgoIso(MARKET_HISTORY_DAYS)
-  const pricesByGrade = await fetchMarketPricesByGrade(marketFrom, today)
-  const olivePrices = buildOlivePriceItems(pricesByGrade)
+  const pricesByGrade = await getCachedMarketPricesByGrade(marketFrom, today)
+  return buildOlivePriceItems(pricesByGrade)
+}
+
+async function getVirgenExtraPrice(): Promise<number> {
+  const olivePrices = await getOlivePriceItemsForDashboard()
   return olivePrices.find((item) => item.name === "Virgen Extra")?.price ?? 0
 }
 
 export async function getOlivePricesForDashboard(): Promise<
   DashboardOlivePriceItem[]
 > {
-  const today = todayIso()
-  const marketFrom = daysAgoIso(MARKET_HISTORY_DAYS)
-  const pricesByGrade = await fetchMarketPricesByGrade(marketFrom, today)
-  return buildOlivePriceItems(pricesByGrade)
+  return getOlivePriceItemsForDashboard()
+}
+
+type FinancialSummaryRow = Awaited<
+  ReturnType<typeof loadFinancialSummaries>
+>[number]
+
+function buildSellingWindowFromSummaries(
+  virgenExtraPrice: number,
+  financialSummaries: FinancialSummaryRow[]
+): DashboardSellingWindow {
+  const primarySummary = financialSummaries[0]
+  const totalExpectedKg = financialSummaries.reduce(
+    (sum, row) => sum + Number(row.expectedYieldKg ?? row.totalKg ?? 0),
+    0
+  )
+
+  return {
+    lonjaPrice: virgenExtraPrice,
+    costPerKg: primarySummary?.costPerKg ? Number(primarySummary.costPerKg) : 0,
+    lastSalePrice: primarySummary?.revenuePerKg
+      ? Number(primarySummary.revenuePerKg)
+      : undefined,
+    estimatedKg:
+      totalExpectedKg || Number(primarySummary?.expectedYieldKg ?? 0),
+    campaignTarget: primarySummary?.avgMarketPrice
+      ? Number(primarySummary.avgMarketPrice)
+      : virgenExtraPrice,
+  }
 }
 
 export async function getSellingWindowForDashboard(
@@ -321,24 +351,39 @@ export async function getSellingWindowForDashboard(
     loadFinancialSummaries(campaignId, parcelId),
   ])
 
-  const primarySummary = financialSummaries[0]
-  const totalExpectedKg = financialSummaries.reduce(
-    (sum, row) => sum + Number(row.expectedYieldKg ?? row.totalKg ?? 0),
-    0
+  return buildSellingWindowFromSummaries(virgenExtraPrice, financialSummaries)
+}
+
+export async function getParcelsSellingWindowsForDashboard(
+  organizationId: string,
+  filters: DashboardScopeQuery = {}
+): Promise<DashboardParcelsSellingWindows> {
+  const { campaignId } = await resolveScopeContext(organizationId, filters)
+
+  const [parcels, virgenExtraPrice, summaries] = await Promise.all([
+    listParcels(organizationId),
+    getVirgenExtraPrice(),
+    loadFinancialSummaries(campaignId, null),
+  ])
+
+  const summariesByParcelId = new Map(
+    summaries.map((row) => [row.parcelId, row])
   )
 
   return {
-    lonjaPrice: virgenExtraPrice,
-    costPerKg: primarySummary?.costPerKg
-      ? Number(primarySummary.costPerKg)
-      : 0,
-    lastSalePrice: primarySummary?.revenuePerKg
-      ? Number(primarySummary.revenuePerKg)
-      : undefined,
-    estimatedKg: totalExpectedKg || Number(primarySummary?.expectedYieldKg ?? 0),
-    campaignTarget: primarySummary?.avgMarketPrice
-      ? Number(primarySummary.avgMarketPrice)
-      : virgenExtraPrice,
+    parcels: parcels.map((parcel) => {
+      const summary = summariesByParcelId.get(parcel.id)
+      const sellingWindow = buildSellingWindowFromSummaries(
+        virgenExtraPrice,
+        summary ? [summary] : []
+      )
+
+      return {
+        parcelId: parcel.id,
+        name: parcel.name,
+        ...sellingWindow,
+      }
+    }),
   }
 }
 
@@ -351,14 +396,19 @@ export async function getFinanceResumeForDashboard(
     filters
   )
 
-  const campaign = campaignId
-    ? await resolveCampaignById(campaignId)
-    : null
+  const campaign = campaignId ? await resolveCampaignById(campaignId) : null
 
-  const [transactions, previousSummaries] = await Promise.all([
-    listTransactionsForScope(organizationId, dateRange, parcelId),
+  const [txResult, previousSummaries] = await Promise.all([
+    listTransactionsForScope(
+      organizationId,
+      dateRange,
+      parcelId,
+      parcelId === null
+    ),
     loadPreviousSummaries(campaign?.name ?? null),
   ])
+
+  const { transactions, parcelNameById } = txResult
 
   const previousIncome = previousSummaries.reduce(
     (sum, row) => sum + Number(row.totalIncome ?? 0),
@@ -372,7 +422,14 @@ export async function getFinanceResumeForDashboard(
   return {
     transactions: transactions
       .slice(0, RECENT_TRANSACTION_LIMIT)
-      .map(mapTransactionToSnapshot),
+      .map((tx) =>
+        mapTransactionToSnapshot(
+          tx,
+          tx.parcelId && parcelNameById
+            ? (parcelNameById.get(tx.parcelId) ?? undefined)
+            : undefined
+        )
+      ),
     previousCampaign:
       previousIncome > 0 || previousExpenses > 0
         ? { totalIncome: previousIncome, totalExpenses: previousExpenses }
@@ -389,11 +446,7 @@ export async function getCampaignMarginForDashboard(
     filters
   )
 
-  const cashflowDaily = await loadCashflowDaily(
-    parcelId,
-    campaignId,
-    dateRange
-  )
+  const cashflowDaily = await loadCashflowDaily(parcelId, campaignId, dateRange)
 
   return buildCampaignMarginSeries(
     dateRange.from,
@@ -411,13 +464,53 @@ export async function getRecentTransactionsForDashboard(
   )
   const limit = filters.limit ?? RECENT_TRANSACTION_LIMIT
 
-  const transactions = await listTransactionsForScope(
+  const { transactions, parcelNameById } = await listTransactionsForScope(
     organizationId,
     dateRange,
-    parcelId
+    parcelId,
+    parcelId === null
   )
 
-  return transactions.slice(0, limit).map(mapTransactionToSnapshot)
+  return transactions.slice(0, limit).map((tx) =>
+    mapTransactionToSnapshot(
+      tx,
+      tx.parcelId && parcelNameById
+        ? (parcelNameById.get(tx.parcelId) ?? undefined)
+        : undefined
+    )
+  )
+}
+
+export async function getParcelsFinanceComparisonForDashboard(
+  organizationId: string,
+  filters: DashboardScopeQuery = {}
+): Promise<DashboardParcelsFinanceComparison> {
+  const { campaignId } = await resolveScopeContext(organizationId, filters)
+
+  const [parcels, summaries] = await Promise.all([
+    listParcels(organizationId),
+    loadFinancialSummaries(campaignId, null),
+  ])
+
+  const summaryByParcelId = new Map(
+    summaries.map((row) => [row.parcelId, row])
+  )
+
+  return {
+    parcels: parcels.map((parcel) => {
+      const summary = summaryByParcelId.get(parcel.id)
+      const income = Number(summary?.totalIncome ?? 0)
+      const expense = Number(summary?.totalExpense ?? 0)
+      return {
+        parcelId: parcel.id,
+        name: parcel.name,
+        income,
+        expense,
+        profit: Number(summary?.profit ?? income - expense),
+        totalKg: Number(summary?.totalKg ?? 0),
+      }
+    }),
+  }
 }
 
 export async function getProductionValueForDashboard(
@@ -429,9 +522,7 @@ export async function getProductionValueForDashboard(
     filters
   )
 
-  const campaign = campaignId
-    ? await resolveCampaignById(campaignId)
-    : null
+  const campaign = campaignId ? await resolveCampaignById(campaignId) : null
 
   const [parcels, virgenExtraPrice, cashflowDaily, previousCashflowDaily] =
     await Promise.all([

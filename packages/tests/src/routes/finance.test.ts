@@ -13,6 +13,8 @@ const financeMocks = vi.hoisted(() => ({
   getCampaignMarginForDashboard: vi.fn(),
   getRecentTransactionsForDashboard: vi.fn(),
   getProductionValueForDashboard: vi.fn(),
+  getParcelsFinanceComparisonForDashboard: vi.fn(),
+  getParcelsSellingWindowsForDashboard: vi.fn(),
 }))
 
 vi.mock("@/services/finance", () => financeMocks)
@@ -95,7 +97,9 @@ describe("finance routes", () => {
     mockAuthenticatedSession()
     financeMocks.deleteTransaction.mockResolvedValue(undefined)
 
-    const res = await apiRequest(app, "/api/v1/finance/tx-1", { method: "DELETE" })
+    const res = await apiRequest(app, "/api/v1/finance/tx-1", {
+      method: "DELETE",
+    })
     expect(res.status).toBe(200)
   })
 
@@ -215,5 +219,58 @@ describe("finance routes", () => {
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.productionValue.numOlivos).toBe(100)
+  })
+
+  it("GET /finance/parcels-comparison returns 401 without auth", async () => {
+    const res = await apiRequest(app, "/api/v1/finance/parcels-comparison")
+    expect(res.status).toBe(401)
+  })
+
+  it("GET /finance/parcels-comparison returns parcel comparison", async () => {
+    mockAuthenticatedSession()
+    financeMocks.getParcelsFinanceComparisonForDashboard.mockResolvedValue({
+      parcels: [
+        {
+          parcelId: "00000000-0000-4000-8000-000000000001",
+          name: "La Mata",
+          income: 12000,
+          expense: 8000,
+          profit: 4000,
+          totalKg: 5000,
+        },
+      ],
+    })
+
+    const res = await apiRequest(app, "/api/v1/finance/parcels-comparison")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.parcelsComparison.parcels).toHaveLength(1)
+    expect(body.parcelsComparison.parcels[0].name).toBe("La Mata")
+  })
+
+  it("GET /finance/selling-windows returns 401 without auth", async () => {
+    const res = await apiRequest(app, "/api/v1/finance/selling-windows")
+    expect(res.status).toBe(401)
+  })
+
+  it("GET /finance/selling-windows returns bulk selling windows", async () => {
+    mockAuthenticatedSession()
+    financeMocks.getParcelsSellingWindowsForDashboard.mockResolvedValue({
+      parcels: [
+        {
+          parcelId: "00000000-0000-4000-8000-000000000001",
+          name: "La Mata",
+          lonjaPrice: 5.42,
+          costPerKg: 3.8,
+          estimatedKg: 1000,
+        },
+      ],
+    })
+
+    const res = await apiRequest(app, "/api/v1/finance/selling-windows")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.sellingWindows.parcels).toHaveLength(1)
+    expect(body.sellingWindows.parcels[0].lonjaPrice).toBe(5.42)
   })
 })

@@ -1,4 +1,14 @@
-import { db, schema, eq, and, asc, desc, isNotNull, gte, lte } from "@workspace/db"
+import {
+  db,
+  schema,
+  eq,
+  and,
+  asc,
+  desc,
+  isNotNull,
+  gte,
+  lte,
+} from "@workspace/db"
 import { HTTPException } from "hono/http-exception"
 import type {
   TransactionCategory,
@@ -446,12 +456,7 @@ export async function bulkCreateTransactions(
           campaignByDate.get(item.date) ??
           (await ensureCampaignForDate(item.date, tx))
 
-        return buildTransactionValues(
-          organizationId,
-          userId,
-          campaignId,
-          item
-        )
+        return buildTransactionValues(organizationId, userId, campaignId, item)
       })
     )
 
@@ -461,7 +466,9 @@ export async function bulkCreateTransactions(
       .returning()
 
     if (created.length === 0) {
-      throw new HTTPException(500, { message: "Bulk transaction creation failed" })
+      throw new HTTPException(500, {
+        message: "Bulk transaction creation failed",
+      })
     }
 
     return created
@@ -475,4 +482,6 @@ export {
   getCampaignMarginForDashboard,
   getRecentTransactionsForDashboard,
   getProductionValueForDashboard,
+  getParcelsFinanceComparisonForDashboard,
+  getParcelsSellingWindowsForDashboard,
 } from "@/services/finance-dashboard"

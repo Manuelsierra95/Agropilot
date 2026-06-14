@@ -10,6 +10,8 @@ import {
   getCampaignMarginForDashboard,
   getFinanceResumeForDashboard,
   getOlivePricesForDashboard,
+  getParcelsFinanceComparisonForDashboard,
+  getParcelsSellingWindowsForDashboard,
   getProductionValueForDashboard,
   getRecentTransactionsForDashboard,
   getSellingWindowForDashboard,
@@ -50,18 +52,14 @@ export const financeRoutes = new Hono<{
       return c.json({ sellingWindow }, 200)
     }
   )
-  .get(
-    "/resume",
-    zValidator("query", dashboardScopeQuerySchema),
-    async (c) => {
-      const filters = c.req.valid("query")
-      const finance = await getFinanceResumeForDashboard(
-        c.get("organizationId"),
-        filters
-      )
-      return c.json({ finance }, 200)
-    }
-  )
+  .get("/resume", zValidator("query", dashboardScopeQuerySchema), async (c) => {
+    const filters = c.req.valid("query")
+    const finance = await getFinanceResumeForDashboard(
+      c.get("organizationId"),
+      filters
+    )
+    return c.json({ finance }, 200)
+  })
   .get(
     "/campaign-margin",
     zValidator("query", dashboardScopeQuerySchema),
@@ -96,6 +94,30 @@ export const financeRoutes = new Hono<{
         filters
       )
       return c.json({ productionValue }, 200)
+    }
+  )
+  .get(
+    "/selling-windows",
+    zValidator("query", dashboardScopeQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const sellingWindows = await getParcelsSellingWindowsForDashboard(
+        c.get("organizationId"),
+        filters
+      )
+      return c.json({ sellingWindows }, 200)
+    }
+  )
+  .get(
+    "/parcels-comparison",
+    zValidator("query", dashboardScopeQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const parcelsComparison = await getParcelsFinanceComparisonForDashboard(
+        c.get("organizationId"),
+        filters
+      )
+      return c.json({ parcelsComparison }, 200)
     }
   )
   .post("/bulk", zValidator("json", transactionBulkCreateSchema), async (c) => {

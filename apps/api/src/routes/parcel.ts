@@ -8,6 +8,9 @@ import {
   deleteParcel,
   getParcelById,
   getParcelCropOverview,
+  getParcelsCropOverviewsForDashboard,
+  getParcelsRecommendationsForDashboard,
+  getParcelsRisksForDashboard,
   getParcelRecommendations,
   getParcelRisks,
   getParcelsForMap,
@@ -32,6 +35,30 @@ export const parcelRoutes = new Hono<{
   .get("/map", async (c) => {
     const mapParcels = await getParcelsForMap(c.get("organizationId"))
     return c.json({ mapParcels }, 200)
+  })
+  .get(
+    "/crop-overviews",
+    zValidator("query", dashboardScopeQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const cropOverviews = await getParcelsCropOverviewsForDashboard(
+        c.get("organizationId"),
+        filters
+      )
+      return c.json({ cropOverviews }, 200)
+    }
+  )
+  .get("/parcels-recommendations", async (c) => {
+    const parcelsRecommendations = await getParcelsRecommendationsForDashboard(
+      c.get("organizationId")
+    )
+    return c.json({ parcelsRecommendations }, 200)
+  })
+  .get("/parcels-risks", async (c) => {
+    const parcelsRisks = await getParcelsRisksForDashboard(
+      c.get("organizationId")
+    )
+    return c.json({ parcelsRisks }, 200)
   })
   .get("/:id/recommendations", async (c) => {
     const recommendations = await getParcelRecommendations(
