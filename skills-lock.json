@@ -16,15 +16,11 @@
       "sourceType": "autoskills-registry",
       "computedHash": "0d59bc23f61ba03b850aa3b81392044c5c7fa3662a5f61b98490b20b0f14a56a"
     },
-    "cloudflare": {
-      "source": "cloudflare/skills",
-      "sourceType": "autoskills-registry",
-      "computedHash": "da4a0ac8024248882401e17848856237e063620c7781f47bd89fcdcf72f902b3"
-    },
-    "cloudflare-deploy": {
-      "source": "openai/skills",
-      "sourceType": "autoskills-registry",
-      "computedHash": "a0e0265fb534369d95944a58ab25159b7838f62abdcd86afa2266d69b3309561"
+    "bklit-ui": {
+      "source": "bklit/bklit-ui",
+      "sourceType": "github",
+      "skillPath": "skills/bklit-ui/SKILL.md",
+      "computedHash": "ace89f8b9a6d5d8f0367307f886cb9654065356db537df7b57b3d849aa503534"
     },
     "composition-patterns": {
       "source": "vercel-labs/agent-skills",
@@ -51,10 +47,11 @@
       "sourceType": "autoskills-registry",
       "computedHash": "bc1c40e71ec13faa82ab7e9464bfd57cc282780a1087b021d26ba0d2c082059b"
     },
-    "neon-postgres": {
-      "source": "neondatabase/agent-skills",
-      "sourceType": "autoskills-registry",
-      "computedHash": "afa90370212ed99bb472c8d64ca6a5169e3608a6c0d3e570565e7997b1dc81b2"
+    "improve": {
+      "source": "shadcn/improve",
+      "sourceType": "github",
+      "skillPath": "skills/improve/SKILL.md",
+      "computedHash": "7a0f09dd535fc84391dc63bea826d6aeab985b92423fa4dd93edacb5dfb82524"
     },
     "next-best-practices": {
       "source": "vercel-labs/next-skills",
@@ -117,9 +114,10 @@
       "computedHash": "ccb851c374e9d60af52bf37d80481dbeec54c3cebf6a9dc67492ea2f8514e283"
     },
     "turborepo": {
-      "source": "vercel/turborepo",
-      "sourceType": "autoskills-registry",
-      "computedHash": "7a4fdfa6bec01e502214a0ecf54d863bbce70a5646ff41e23982ba22af431f3c"
+      "source": "bklit/bklit-ui",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/turborepo/SKILL.md",
+      "computedHash": "65c73e2cbc0a64c52f8af30421789d59ba06365c27818beaf3e0f75ab72a28e0"
     },
     "twoFactor": {
       "source": "better-auth/skills",
@@ -135,16 +133,6 @@
       "source": "cloudflare/skills",
       "sourceType": "autoskills-registry",
       "computedHash": "02a46c6d1c10070034f6030f2e208bb306b14b04e535d3990ca4310b907e91a5"
-    },
-    "workers-best-practices": {
-      "source": "cloudflare/skills",
-      "sourceType": "autoskills-registry",
-      "computedHash": "9661260d852b07de738dd870fc92606b2a44c091b0e5c0df785ae097c26dc382"
-    },
-    "wrangler": {
-      "source": "cloudflare/skills",
-      "sourceType": "autoskills-registry",
-      "computedHash": "d9a05896e7ef591d4c499436ce0a53c510800832de30de866b2c2999efe3f622"
     },
     "zod": {
       "source": "pproenca/dot-skills",

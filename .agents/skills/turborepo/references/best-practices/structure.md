@@ -95,34 +95,7 @@ Package tasks enable Turborepo to:
 
 ```json
 {
-  "$schema": "https://v2-9-7-canary-13.turborepo.dev/schema.json",
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
-    },
-    "lint": {},
-    "test": {
-      "dependsOn": ["build"]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    }
-  }
-}
-```
-
-With `futureFlags.globalConfiguration`, global settings move under a `global` key:
-
-```json
-{
-  "$schema": "https://v2-9-7-canary-13.turborepo.dev/schema.json",
-  "futureFlags": { "globalConfiguration": true },
-  "global": {
-    "inputs": ["tsconfig.json"],
-    "env": ["CI"]
-  },
+  "$schema": "https://turborepo.dev/schema.v2.json",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -151,8 +124,8 @@ You can group packages by adding more workspace paths:
 packages:
   - "apps/*"
   - "packages/*"
-  - "packages/config/*" # Grouped configs
-  - "packages/features/*" # Feature packages
+  - "packages/config/*"    # Grouped configs
+  - "packages/features/*"  # Feature packages
 ```
 
 This allows:
@@ -175,7 +148,7 @@ packages/
 ```yaml
 # BAD: Nested wildcards cause ambiguous behavior
 packages:
-  - "packages/**" # Don't do this!
+  - "packages/**"  # Don't do this!
 ```
 
 ## Package Anatomy
@@ -194,11 +167,10 @@ packages/ui/
 
 ```json
 {
-  "name": "@repo/ui", // Unique, namespaced name
-  "version": "0.0.0", // Version (can be 0.0.0 for internal)
-  "private": true, // Prevents accidental publishing
-  "exports": {
-    // Entry points
+  "name": "@repo/ui",           // Unique, namespaced name
+  "version": "0.0.0",           // Version (can be 0.0.0 for internal)
+  "private": true,              // Prevents accidental publishing
+  "exports": {                  // Entry points
     "./button": "./src/button.tsx"
   }
 }
@@ -282,7 +254,7 @@ packages/
 ```js
 // apps/web/.eslintrc.js
 module.exports = {
-  extends: ["@repo/eslint-config/next"]
+  extends: ["@repo/eslint-config/next"],
 };
 ```
 
