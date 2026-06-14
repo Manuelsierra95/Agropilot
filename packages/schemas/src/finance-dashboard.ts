@@ -32,6 +32,7 @@ export const dashboardTransactionSnapshotSchema = z.object({
   paymentMethod: paymentMethodSchema,
   invoiceNumber: z.string().optional(),
   date: z.string().date(),
+  parcelName: z.string().optional(),
 })
 
 export const dashboardFinanceResumeSchema = z.object({
@@ -87,15 +88,66 @@ export const dashboardProductionValueResponseSchema = z.object({
   productionValue: dashboardProductionValueSchema,
 })
 
-export type DashboardOlivePriceItem = z.infer<typeof dashboardOlivePriceItemSchema>
-export type DashboardSellingWindow = z.infer<typeof dashboardSellingWindowSchema>
-export type DashboardFinanceResume = z.infer<typeof dashboardFinanceResumeSchema>
-export type DashboardCampaignMargin = z.infer<typeof dashboardCampaignMarginSchema>
+export const dashboardParcelFinanceComparisonItemSchema = z.object({
+  parcelId: z.string().uuid(),
+  name: z.string(),
+  income: z.number(),
+  expense: z.number(),
+  profit: z.number(),
+  totalKg: z.number(),
+})
+
+export const dashboardParcelsFinanceComparisonSchema = z.object({
+  parcels: z.array(dashboardParcelFinanceComparisonItemSchema),
+})
+
+export const dashboardParcelsFinanceComparisonResponseSchema = z.object({
+  parcelsComparison: dashboardParcelsFinanceComparisonSchema,
+})
+
+export const dashboardParcelSellingWindowItemSchema =
+  dashboardSellingWindowSchema.extend({
+    parcelId: z.string().uuid(),
+    name: z.string(),
+  })
+
+export const dashboardParcelsSellingWindowsSchema = z.object({
+  parcels: z.array(dashboardParcelSellingWindowItemSchema),
+})
+
+export const dashboardParcelsSellingWindowsResponseSchema = z.object({
+  sellingWindows: dashboardParcelsSellingWindowsSchema,
+})
+
+export type DashboardOlivePriceItem = z.infer<
+  typeof dashboardOlivePriceItemSchema
+>
+export type DashboardSellingWindow = z.infer<
+  typeof dashboardSellingWindowSchema
+>
+export type DashboardFinanceResume = z.infer<
+  typeof dashboardFinanceResumeSchema
+>
+export type DashboardCampaignMargin = z.infer<
+  typeof dashboardCampaignMarginSchema
+>
 export type DashboardProductionValue = z.infer<
   typeof dashboardProductionValueSchema
 >
 export type DashboardTransactionSnapshot = z.infer<
   typeof dashboardTransactionSnapshotSchema
+>
+export type DashboardParcelsFinanceComparison = z.infer<
+  typeof dashboardParcelsFinanceComparisonSchema
+>
+export type DashboardParcelFinanceComparisonItem = z.infer<
+  typeof dashboardParcelFinanceComparisonItemSchema
+>
+export type DashboardParcelsSellingWindows = z.infer<
+  typeof dashboardParcelsSellingWindowsSchema
+>
+export type DashboardParcelSellingWindowItem = z.infer<
+  typeof dashboardParcelSellingWindowItemSchema
 >
 
 /** @internal Used when aggregating market prices by grade */

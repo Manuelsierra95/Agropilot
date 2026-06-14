@@ -88,7 +88,59 @@ export const dashboardCropOverviewResponseSchema = z.object({
   olivar: dashboardOlivarSchema,
 })
 
+export const dashboardParcelCropOverviewItemSchema = dashboardOlivarSchema.extend(
+  {
+    parcelId: z.string().uuid(),
+  }
+)
+
+export const dashboardParcelsCropOverviewsSchema = z.object({
+  parcels: z.array(dashboardParcelCropOverviewItemSchema),
+})
+
+export const dashboardParcelsCropOverviewsResponseSchema = z.object({
+  cropOverviews: dashboardParcelsCropOverviewsSchema,
+})
+
+export const dashboardParcelRecommendationsItemSchema = z.object({
+  parcelId: z.string().uuid(),
+  name: z.string(),
+  recommendations: z.array(dashboardRecommendationSchema),
+})
+
+export const dashboardParcelsRecommendationsSchema = z.object({
+  parcels: z.array(dashboardParcelRecommendationsItemSchema),
+})
+
+export const dashboardParcelsRecommendationsResponseSchema = z.object({
+  parcelsRecommendations: dashboardParcelsRecommendationsSchema,
+})
+
+export const dashboardParcelRisksItemSchema = z.object({
+  parcelId: z.string().uuid(),
+  name: z.string(),
+  risks: dashboardRisksSchema,
+})
+
+export const dashboardParcelsRisksSchema = z.object({
+  parcels: z.array(dashboardParcelRisksItemSchema),
+})
+
+export const dashboardParcelsRisksResponseSchema = z.object({
+  parcelsRisks: dashboardParcelsRisksSchema,
+})
+
 export type DashboardOlivar = z.infer<typeof dashboardOlivarSchema>
 export type DashboardRisks = z.infer<typeof dashboardRisksSchema>
 export type DashboardRecommendation = z.infer<typeof dashboardRecommendationSchema>
 export type DashboardMapParcel = z.infer<typeof dashboardMapParcelSchema>
+export type DashboardParcelsCropOverviews = z.infer<
+  typeof dashboardParcelsCropOverviewsSchema
+>
+export type DashboardParcelCropOverviewItem = z.infer<
+  typeof dashboardParcelCropOverviewItemSchema
+>
+export type DashboardParcelsRecommendations = z.infer<
+  typeof dashboardParcelsRecommendationsSchema
+>
+export type DashboardParcelsRisks = z.infer<typeof dashboardParcelsRisksSchema>
