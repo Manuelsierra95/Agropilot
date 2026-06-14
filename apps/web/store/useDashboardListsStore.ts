@@ -12,6 +12,9 @@ export type DashboardOrganization = {
 /** Stable empty reference for Zustand selectors (avoids infinite SSR loops). */
 export const EMPTY_CAMPAIGNS: CampaignListItem[] = []
 
+/** Campaign list when no parcel is selected (org-wide / all parcels). */
+export const ORG_CAMPAIGNS_KEY = "__org__"
+
 type DashboardListsState = {
   organizations: DashboardOrganization[]
   parcels: ParcelSelect[]
@@ -66,26 +69,36 @@ export const useDashboardListsStore = create<DashboardListsState>((set) => ({
     }),
 }))
 
+function resolveCampaignsKey(
+  parcelId: string | null | undefined
+): string | null {
+  if (!parcelId) return ORG_CAMPAIGNS_KEY
+  return parcelId
+}
+
 export function selectCampaignsForParcel(
   state: DashboardListsState,
   parcelId: string | null | undefined
 ): CampaignListItem[] {
-  if (!parcelId) return EMPTY_CAMPAIGNS
-  return state.campaignsByParcelId[parcelId] ?? EMPTY_CAMPAIGNS
+  const key = resolveCampaignsKey(parcelId)
+  if (!key) return EMPTY_CAMPAIGNS
+  return state.campaignsByParcelId[key] ?? EMPTY_CAMPAIGNS
 }
 
 export function selectIsLoadingCampaigns(
   state: DashboardListsState,
   parcelId: string | null | undefined
 ): boolean {
-  if (!parcelId) return false
-  return state.loadingCampaignParcelIds[parcelId] ?? false
+  const key = resolveCampaignsKey(parcelId)
+  if (!key) return false
+  return state.loadingCampaignParcelIds[key] ?? false
 }
 
 export function selectHasLoadedCampaignsForParcel(
   state: DashboardListsState,
   parcelId: string | null | undefined
 ): boolean {
-  if (!parcelId) return false
-  return parcelId in state.campaignsByParcelId
+  const key = resolveCampaignsKey(parcelId)
+  if (!key) return false
+  return key in state.campaignsByParcelId
 }

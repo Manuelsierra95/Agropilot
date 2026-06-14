@@ -6,7 +6,10 @@ import { api } from "@/lib/api"
 import { authClient, useSession } from "@/lib/auth-client"
 import { parseAuthSession } from "@workspace/schemas"
 import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
-import { useDashboardListsStore } from "@/store/useDashboardListsStore"
+import {
+  ORG_CAMPAIGNS_KEY,
+  useDashboardListsStore,
+} from "@/store/useDashboardListsStore"
 import type { DashboardOrganization } from "@/store/useDashboardListsStore"
 
 function mapOrganizations(
@@ -99,24 +102,25 @@ export function useDashboardDataLoader() {
   }, [organizationId, setLoadingParcels, setParcels])
 
   useEffect(() => {
-    if (!parcelId) return
-    if (useDashboardListsStore.getState().campaignsByParcelId[parcelId]) {
+    const campaignsKey = parcelId ?? ORG_CAMPAIGNS_KEY
+    if (useDashboardListsStore.getState().campaignsByParcelId[campaignsKey]) {
       return
     }
 
     let cancelled = false
-    const requestParcelId = parcelId
 
     async function loadCampaigns() {
-      setLoadingCampaigns(requestParcelId, true)
+      setLoadingCampaigns(campaignsKey, true)
       try {
-        const campaigns = await api.campaign.list(requestParcelId)
+        const campaigns = parcelId
+          ? await api.campaign.list(parcelId)
+          : await api.campaign.list()
         if (!cancelled) {
-          setCampaignsForParcel(requestParcelId, campaigns)
+          setCampaignsForParcel(campaignsKey, campaigns)
         }
       } finally {
         if (!cancelled) {
-          setLoadingCampaigns(requestParcelId, false)
+          setLoadingCampaigns(campaignsKey, false)
         }
       }
     }

@@ -42,6 +42,12 @@
   --risk-chart-low: oklch(0.75 0.14 66);
   --risk-chart-medium: oklch(0.7 0.18 66);
   --risk-chart-high: oklch(0.65 0.22 66);
+  --risk-heat-safe: #e8f5e9;
+  --risk-heat-low: #a5d6a7;
+  --risk-heat-medium: #fff59d;
+  --risk-heat-high: #ffb74d;
+  --risk-heat-very-high: #e57373;
+  --risk-heat-critical: #c62828;
 
   /* Income colors */
   --primary-income: oklch(76.5% 0.177 163.223);
@@ -150,6 +156,12 @@
   --risk-chart-low: oklch(0.55 0.14 66);
   --risk-chart-medium: oklch(0.5 0.18 66);
   --risk-chart-high: oklch(0.45 0.22 66);
+  --risk-heat-safe: #1b2e1f;
+  --risk-heat-low: #2f4f35;
+  --risk-heat-medium: #524a18;
+  --risk-heat-high: #a65f14;
+  --risk-heat-very-high: #c75555;
+  --risk-heat-critical: #ef5350;
 
   /* Income colors */
   --primary-income: oklch(59.6% 0.145 163.225);

@@ -69,7 +69,7 @@ export function CampaignSwitcher() {
     selectHasLoadedCampaignsForParcel(state, parcelId)
   )
   const isPendingCampaigns =
-    Boolean(parcelId) && !hasLoadedCampaigns && !from && !to
+    !hasLoadedCampaigns && !from && !to
 
   const [customFrom, setCustomFrom] = React.useState(from ?? "")
   const [customTo, setCustomTo] = React.useState(to ?? "")
@@ -134,8 +134,7 @@ export function CampaignSwitcher() {
 
         {campaigns.map((campaign) => {
           const cfg = statusConfig[campaign.status]
-          const isActive =
-            !from && !to && activeCampaign.id === campaign.id
+          const isActive = !from && !to && activeCampaign.id === campaign.id
           const balancePositive =
             campaign.balance !== null && campaign.balance >= 0
 

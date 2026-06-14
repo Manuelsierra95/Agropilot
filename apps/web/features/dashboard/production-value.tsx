@@ -207,7 +207,7 @@ function KpiItem({
 // Subcomponents
 // ---------------------------------------------------------------------------
 
-function ProductionValueKPIs({
+export function ProductionValueKPIs({
   className,
   totalKg,
   totalEur,
@@ -303,7 +303,7 @@ function ProductionValueKPIs({
   )
 }
 
-function ProductionValueAreaChart({
+export function ProductionValueAreaChart({
   className,
   areaData,
 }: {

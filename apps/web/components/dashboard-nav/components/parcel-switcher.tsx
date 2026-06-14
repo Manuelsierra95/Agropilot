@@ -10,7 +10,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
-import { ChevronsUpDownIcon, PlusIcon } from "lucide-react"
+import { ChevronsUpDownIcon, LayersIcon, PlusIcon } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { useIsMobile } from "@workspace/ui/hooks/use-mobile"
 import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
@@ -23,24 +23,33 @@ interface ParcelSwitcherProps {
   variant?: "sidebar" | "dock"
 }
 
+const ALL_PARCELS_LABEL = "Todas las parcelas"
+
 export function ParcelSwitcher({ variant = "sidebar" }: ParcelSwitcherProps) {
   const isMobile = useIsMobile()
   const [{ parcelId }] = useDashboardScopeParams()
-  const { selectParcel } = useDashboardScopeActions()
+  const { selectAllParcels, selectParcel } = useDashboardScopeActions()
   const parcels = useDashboardListsStore((state) => state.parcels)
   const isLoading = useDashboardListsStore((state) => state.isLoadingParcels)
 
-  const activeParcel =
-    parcels.find((parcel) => parcel.id === parcelId) ?? parcels[0]
+  const isAllSelected = !parcelId
+  const activeParcel = parcelId
+    ? parcels.find((parcel) => parcel.id === parcelId)
+    : undefined
 
-  if (!activeParcel) {
+  if (parcels.length === 0) {
     if (isLoading) {
       return <ParcelSwitcherPlaceholder variant={variant} />
     }
     return null
   }
 
-  const ActiveIcon = getParcelIcon(activeParcel.cropType)
+  const ActiveIcon = isAllSelected
+    ? LayersIcon
+    : getParcelIcon(activeParcel?.cropType)
+  const displayName = isAllSelected
+    ? ALL_PARCELS_LABEL
+    : (activeParcel?.name ?? parcels[0]!.name)
   const isDock = variant === "dock"
 
   return (
@@ -61,12 +70,12 @@ export function ParcelSwitcher({ variant = "sidebar" }: ParcelSwitcherProps) {
           </div>
           {isDock ? (
             <span className="max-w-36 truncate text-xs font-medium sm:text-sm">
-              {activeParcel.name}
+              {displayName}
             </span>
           ) : (
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="max-w-36 truncate font-medium">
-                {activeParcel.name}
+                {displayName}
               </span>
             </div>
           )}
@@ -86,6 +95,17 @@ export function ParcelSwitcher({ variant = "sidebar" }: ParcelSwitcherProps) {
         <DropdownMenuLabel className="text-xs text-muted-foreground">
           Parcels
         </DropdownMenuLabel>
+        <DropdownMenuItem
+          onClick={() => void selectAllParcels()}
+          className="gap-2 p-2"
+        >
+          <div className="flex size-6 items-center justify-center rounded-md border">
+            <LayersIcon className="size-4" />
+          </div>
+          {ALL_PARCELS_LABEL}
+          <DropdownMenuShortcut>⌘0</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         {parcels.map((parcel, index) => {
           const ParcelIcon = getParcelIcon(parcel.cropType)
           return (

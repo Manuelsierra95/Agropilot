@@ -13,6 +13,10 @@ import { Input } from "@workspace/ui/components/input"
 import { TrendingUp, TrendingDown, Minus } from "lucide-react"
 
 import { useSellingWindowOverridesStore } from "@/store/useSellingWindowOverridesStore"
+import {
+  getSellingWindowSignal,
+  SELLING_WINDOW_SIGNAL_CONFIG,
+} from "@/features/dashboard/selling-window-utils"
 
 interface SellingWindowProps {
   className?: string
@@ -27,31 +31,23 @@ interface SellingWindowProps {
 type WindowSignal = "favorable" | "neutral" | "unfavorable"
 
 function getSignal(margin: number): WindowSignal {
-  if (margin >= 0.8) return "favorable"
-  if (margin >= 0.3) return "neutral"
-  return "unfavorable"
+  return getSellingWindowSignal(margin)
 }
 
 const SIGNAL_CONFIG = {
   favorable: {
+    ...SELLING_WINDOW_SIGNAL_CONFIG.favorable,
     label: "Ventana de venta favorable",
-    color: "text-(--primary-income)",
-    badgeVariant: "default" as const,
-    bg: "bg-(--primary-income)/10",
     Icon: TrendingUp,
   },
   neutral: {
+    ...SELLING_WINDOW_SIGNAL_CONFIG.neutral,
     label: "Margen ajustado — valorar esperar",
-    color: "text-amber-500",
-    badgeVariant: "secondary" as const,
-    bg: "bg-amber-500/10",
     Icon: Minus,
   },
   unfavorable: {
+    ...SELLING_WINDOW_SIGNAL_CONFIG.unfavorable,
     label: "Por debajo del umbral de rentabilidad",
-    color: "text-(--primary-expense)",
-    badgeVariant: "destructive" as const,
-    bg: "bg-(--primary-expense)/10",
     Icon: TrendingDown,
   },
 }

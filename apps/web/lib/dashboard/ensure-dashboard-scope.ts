@@ -26,8 +26,9 @@ export async function ensureDashboardScopeSearchParams(
   }
 
   const validParcelIds = new Set(parcels.map((parcel) => parcel.id))
+  const parcelIdInvalid = Boolean(parcelId && !validParcelIds.has(parcelId))
   const targetParcelId =
-    parcelId && validParcelIds.has(parcelId) ? parcelId : parcels[0]!.id
+    parcelId && validParcelIds.has(parcelId) ? parcelId : undefined
 
   const hasCustomRange = Boolean(from && to)
   let targetCampaignId = campaignId
@@ -35,7 +36,9 @@ export async function ensureDashboardScopeSearchParams(
   let targetTo = to
 
   if (!hasCustomRange) {
-    const campaigns = await api.campaign.list(targetParcelId)
+    const campaigns = targetParcelId
+      ? await api.campaign.list(targetParcelId)
+      : await api.campaign.list()
     const validCampaignIds = new Set(campaigns.map((campaign) => campaign.id))
     targetCampaignId =
       campaignId && validCampaignIds.has(campaignId)
@@ -45,7 +48,7 @@ export async function ensureDashboardScopeSearchParams(
     targetTo = undefined
   }
 
-  const parcelUnchanged = targetParcelId === parcelId
+  const parcelUnchanged = !parcelIdInvalid && targetParcelId === parcelId
   const campaignUnchanged = hasCustomRange
     ? targetFrom === from && targetTo === to && !campaignId
     : targetCampaignId === campaignId && !from && !to
@@ -55,7 +58,12 @@ export async function ensureDashboardScopeSearchParams(
   }
 
   const params = new URLSearchParams()
-  params.set("parcelId", targetParcelId)
+  const isDashboardOverview = pathname === "/dashboard"
+
+  // Normalizing redirects on the overview default to org-wide scope (all parcels).
+  if (targetParcelId && !isDashboardOverview) {
+    params.set("parcelId", targetParcelId)
+  }
 
   if (hasCustomRange && targetFrom && targetTo) {
     params.set("from", targetFrom)
@@ -64,5 +72,6 @@ export async function ensureDashboardScopeSearchParams(
     params.set("campaignId", targetCampaignId)
   }
 
-  return `${pathname}?${params.toString()}`
+  const query = params.toString()
+  return query ? `${pathname}?${query}` : pathname
 }

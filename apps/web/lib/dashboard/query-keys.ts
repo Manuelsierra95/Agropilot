@@ -38,14 +38,38 @@ export const dashboardQueryKeys = {
       "production-value",
       buildDashboardScopeKey(scope),
     ] as const,
-  parcelsMap: () => [...dashboardQueryKeys.all, "parcels-map"] as const,
-  recommendations: (parcelId: string, dailyKey: string = getDashboardDailyKey()) =>
+  parcelsFinanceComparison: (scope: DashboardScopeParams) =>
     [
       ...dashboardQueryKeys.all,
-      "recommendations",
-      parcelId,
+      "parcels-finance-comparison",
+      buildDashboardScopeKey(scope),
+    ] as const,
+  parcelsSellingWindows: (scope: DashboardScopeParams) =>
+    [
+      ...dashboardQueryKeys.all,
+      "parcels-selling-windows",
+      buildDashboardScopeKey(scope),
+    ] as const,
+  parcelsCropOverviews: (scope: DashboardScopeParams) =>
+    [
+      ...dashboardQueryKeys.all,
+      "parcels-crop-overviews",
+      buildDashboardScopeKey(scope),
+    ] as const,
+  parcelsRecommendations: (dailyKey: string = getDashboardDailyKey()) =>
+    [
+      ...dashboardQueryKeys.all,
+      "parcels-recommendations",
       dailyKey,
     ] as const,
+  parcelsRisks: (dailyKey: string = getDashboardDailyKey()) =>
+    [...dashboardQueryKeys.all, "parcels-risks", dailyKey] as const,
+  parcelsMap: () => [...dashboardQueryKeys.all, "parcels-map"] as const,
+  recommendations: (
+    parcelId: string,
+    dailyKey: string = getDashboardDailyKey()
+  ) =>
+    [...dashboardQueryKeys.all, "recommendations", parcelId, dailyKey] as const,
   risks: (parcelId: string, dailyKey: string = getDashboardDailyKey()) =>
     [...dashboardQueryKeys.all, "risks", parcelId, dailyKey] as const,
   cropOverview: (scope: DashboardScopeParams) =>

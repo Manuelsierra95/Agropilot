@@ -11,6 +11,8 @@ import {
   type DashboardFinanceResume,
   type DashboardOlivePriceItem,
   type DashboardProductionValue,
+  type DashboardParcelsFinanceComparison,
+  type DashboardParcelsSellingWindows,
   type DashboardSellingWindow,
   type DashboardTransactionSnapshot,
 } from "@workspace/schemas"
@@ -93,6 +95,14 @@ const getSellingWindow = (
     .then((res) => res.json())
     .then((res) => res.sellingWindow)
 
+const getParcelsSellingWindows = (
+  scope: DashboardScopeParams
+): Promise<DashboardParcelsSellingWindows> =>
+  client.api.v1.finance["selling-windows"]
+    .$get({ query: toScopeQuery(scope) })
+    .then((res) => res.json())
+    .then((res) => res.sellingWindows)
+
 const getFinanceResume = (
   scope: DashboardScopeParams
 ): Promise<DashboardFinanceResume> =>
@@ -125,6 +135,14 @@ const getProductionValue = (
     .then((res) => res.json())
     .then((res) => res.productionValue)
 
+const getParcelsFinanceComparison = (
+  scope: DashboardScopeParams
+): Promise<DashboardParcelsFinanceComparison> =>
+  client.api.v1.finance["parcels-comparison"]
+    .$get({ query: toScopeQuery(scope) })
+    .then((res) => res.json())
+    .then((res) => res.parcelsComparison)
+
 export const financeApi = {
   listTransactions,
   getTransactionById,
@@ -138,4 +156,6 @@ export const financeApi = {
   getCampaignMargin,
   getRecentTransactions,
   getProductionValue,
+  getParcelsFinanceComparison,
+  getParcelsSellingWindows,
 }

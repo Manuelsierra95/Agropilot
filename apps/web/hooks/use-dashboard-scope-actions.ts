@@ -15,6 +15,7 @@ import {
   useDashboardScopeTransition,
 } from "@/hooks/use-dashboard-scope-transition"
 import {
+  ORG_CAMPAIGNS_KEY,
   selectCampaignsForParcel,
   useDashboardListsStore,
 } from "@/store/useDashboardListsStore"
@@ -33,6 +34,23 @@ async function resolveCampaignsForParcel(parcelId: string) {
     return campaigns
   } finally {
     store.setLoadingCampaigns(parcelId, false)
+  }
+}
+
+async function resolveOrgCampaigns() {
+  const store = useDashboardListsStore.getState()
+  const cached = selectCampaignsForParcel(store, null)
+  if (cached.length > 0) {
+    return cached
+  }
+
+  store.setLoadingCampaigns(ORG_CAMPAIGNS_KEY, true)
+  try {
+    const campaigns = await api.campaign.list()
+    store.setCampaignsForParcel(ORG_CAMPAIGNS_KEY, campaigns)
+    return campaigns
+  } finally {
+    store.setLoadingCampaigns(ORG_CAMPAIGNS_KEY, false)
   }
 }
 
@@ -96,14 +114,13 @@ export function useDashboardScopeActions() {
           return
         }
 
-        const parcelId = parcels[0]!.id
-        const campaigns = await resolveCampaignsForParcel(parcelId)
+        const campaigns = await resolveOrgCampaigns()
         const campaignId = pickDefaultCampaignId(campaigns)
-        const expectedKey = buildDashboardScopeKey({ parcelId, campaignId })
+        const expectedKey = buildDashboardScopeKey({ campaignId })
 
         updatePendingScopeKey(expectedKey)
         await setScopeParams({
-          parcelId,
+          parcelId: null,
           campaignId: campaignId ?? null,
           from: null,
           to: null,
@@ -120,6 +137,22 @@ export function useDashboardScopeActions() {
       updatePendingScopeKey,
     ]
   )
+
+  const selectAllParcels = useCallback(() => {
+    navigateScope(SCOPE_LOADING_KEY, async () => {
+      const campaigns = await resolveOrgCampaigns()
+      const campaignId = pickDefaultCampaignId(campaigns)
+      const expectedKey = buildDashboardScopeKey({ campaignId })
+
+      updatePendingScopeKey(expectedKey)
+      await setScopeParams({
+        parcelId: null,
+        campaignId: campaignId ?? null,
+        from: null,
+        to: null,
+      })
+    })
+  }, [navigateScope, setScopeParams, updatePendingScopeKey])
 
   const selectParcel = useCallback(
     (parcelId: string) => {
@@ -179,6 +212,7 @@ export function useDashboardScopeActions() {
 
   return {
     selectOrganization,
+    selectAllParcels,
     selectParcel,
     selectCampaign,
     selectDateRange,

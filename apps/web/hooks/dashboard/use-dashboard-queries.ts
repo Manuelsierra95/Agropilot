@@ -61,7 +61,7 @@ export function useFinanceResume() {
   return useQuery({
     queryKey: dashboardQueryKeys.financeResume(scope),
     queryFn: () => api.finance.getFinanceResume(scope),
-    ...useScopedQueryOptions(scope),
+    placeholderData: keepPreviousData,
     ...mutationQueryOptions,
   })
 }
@@ -83,7 +83,7 @@ export function useRecentTransactions() {
   return useQuery({
     queryKey: dashboardQueryKeys.recentTransactions(scope),
     queryFn: () => api.finance.getRecentTransactions(scope),
-    ...useScopedQueryOptions(scope),
+    placeholderData: keepPreviousData,
     ...mutationQueryOptions,
   })
 }
@@ -94,7 +94,7 @@ export function useProductionValue() {
   return useQuery({
     queryKey: dashboardQueryKeys.productionValue(scope),
     queryFn: () => api.finance.getProductionValue(scope),
-    ...useScopedQueryOptions(scope),
+    placeholderData: keepPreviousData,
     ...mutationQueryOptions,
   })
 }
@@ -152,7 +152,7 @@ export function useUpcomingWeekTasks() {
   return useQuery({
     queryKey: dashboardQueryKeys.upcomingWeek(scope),
     queryFn: () => api.tasks.getUpcomingWeek(scope),
-    ...useScopedQueryOptions(scope),
+    placeholderData: keepPreviousData,
     ...mutationQueryOptions,
   })
 }

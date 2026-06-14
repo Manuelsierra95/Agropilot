@@ -29,6 +29,7 @@ type TransactionSnapshot = Omit<
   "date"
 > & {
   date: string | Date
+  parcelName?: string
 }
 
 function toDate(value: string | Date): Date {
@@ -80,11 +81,13 @@ function getVisibleTransactions(data: TransactionSnapshot[]) {
 interface RecentTransactionsProps {
   data: TransactionSnapshot[]
   className?: string
+  showParcelColumn?: boolean
 }
 
 export function RecentTransactions({
   data,
   className,
+  showParcelColumn = false,
 }: RecentTransactionsProps) {
   const visible = getVisibleTransactions(data)
 
@@ -106,6 +109,9 @@ export function RecentTransactions({
               <TableHead className="pl-6" scope="col">
                 Movimiento
               </TableHead>
+              {showParcelColumn ? (
+                <TableHead scope="col">Parcela</TableHead>
+              ) : null}
               <TableHead scope="col">Metodo</TableHead>
               <TableHead className="text-end tabular-nums" scope="col">
                 Importe
@@ -120,16 +126,19 @@ export function RecentTransactions({
               <TableRow>
                 <TableCell
                   className="px-6 py-6 text-center text-xs text-muted-foreground"
-                  colSpan={4}
+                  colSpan={showParcelColumn ? 5 : 4}
                 >
                   Sin transacciones recientes.
                 </TableCell>
               </TableRow>
             ) : (
-              visible.map((tx) => (
+              visible.map((tx, index) => (
                 <TableRow
                   className="hover:bg-transparent"
-                  key={tx.invoiceNumber ?? toDate(tx.date).toISOString()}
+                  key={
+                    tx.invoiceNumber ??
+                    `${tx.parcelName ?? "org"}-${toDate(tx.date).toISOString()}-${index}`
+                  }
                 >
                   <TableCell className="max-w-[260px] truncate pl-6">
                     <div className="flex items-center gap-2">
@@ -146,6 +155,11 @@ export function RecentTransactions({
                         : "Sin factura"}
                     </p>
                   </TableCell>
+                  {showParcelColumn ? (
+                    <TableCell className="max-w-[140px] truncate text-xs text-muted-foreground">
+                      {tx.parcelName ?? "—"}
+                    </TableCell>
+                  ) : null}
                   <TableCell className="text-xs text-muted-foreground">
                     {paymentLabels[tx.paymentMethod] ?? tx.paymentMethod}
                   </TableCell>

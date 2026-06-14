@@ -8,6 +8,9 @@ import {
   ParcelUpdateInput,
   type DashboardMapParcel,
   type DashboardOlivar,
+  type DashboardParcelsCropOverviews,
+  type DashboardParcelsRecommendations,
+  type DashboardParcelsRisks,
   type DashboardRecommendation,
   type DashboardRisks,
 } from "@workspace/schemas"
@@ -105,6 +108,27 @@ const getParcelCropOverview = (
     .then((res) => res.json())
     .then((res) => res.olivar)
 
+const getParcelsCropOverviews = (
+  scope: DashboardScopeParams
+): Promise<DashboardParcelsCropOverviews> =>
+  client.api.v1.parcel["crop-overviews"]
+    .$get({ query: toScopeQuery(scope) })
+    .then((res) => res.json())
+    .then((res) => res.cropOverviews)
+
+const getParcelsRecommendations =
+  (): Promise<DashboardParcelsRecommendations> =>
+    client.api.v1.parcel["parcels-recommendations"]
+      .$get()
+      .then((res) => res.json())
+      .then((res) => res.parcelsRecommendations)
+
+const getParcelsRisks = (): Promise<DashboardParcelsRisks> =>
+  client.api.v1.parcel["parcels-risks"]
+    .$get()
+    .then((res) => res.json())
+    .then((res) => res.parcelsRisks)
+
 export const parcelApi = {
   getListParcels: getListParcels,
   getParcelById: getParcelById,
@@ -115,4 +139,7 @@ export const parcelApi = {
   getParcelRecommendations,
   getParcelRisks,
   getParcelCropOverview,
+  getParcelsCropOverviews,
+  getParcelsRecommendations,
+  getParcelsRisks,
 }

@@ -7,8 +7,7 @@ import {
   dashboardMainClassName,
 } from "@/features/dashboard/dashboard-grid-layout"
 
-const skeletonBlockClassName =
-  "animate-pulse rounded-lg bg-secondary"
+const skeletonBlockClassName = "animate-pulse rounded-lg bg-secondary"
 
 function SkeletonBlock({ className }: { className?: string }) {
   return <div className={cn(skeletonBlockClassName, className)} aria-hidden />
@@ -87,7 +86,9 @@ export function ResumeCropSkeleton({ className }: { className?: string }) {
 
 export function MapSkeleton({ className }: { className?: string }) {
   return (
-    <Card className={cn("min-w-0 overflow-hidden bg-background ring-0", className)}>
+    <Card
+      className={cn("min-w-0 overflow-hidden bg-background ring-0", className)}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-2">
           <SkeletonBlock className="h-4 w-28" />
@@ -130,12 +131,18 @@ export function DashboardSkeleton() {
             className={dashboardGridSlot.horizSepMobile}
           />
           <div className={dashboardGridSlot.rowInner}>
-            <WidgetSkeleton className="min-w-0 flex-2" contentHeight="h-[140px]" />
+            <WidgetSkeleton
+              className="min-w-0 flex-2"
+              contentHeight="h-[140px]"
+            />
             <GradientSeparator
               orientation="vertical"
               className={dashboardGridSlot.verticalSepDesktop}
             />
-            <WidgetSkeleton className="min-w-0 flex-1" contentHeight="h-[140px]" />
+            <WidgetSkeleton
+              className="min-w-0 flex-1"
+              contentHeight="h-[140px]"
+            />
           </div>
         </div>
 
@@ -150,19 +157,28 @@ export function DashboardSkeleton() {
         <div className={dashboardGridSlot.financeRow}>
           <GradientSeparator orientation="horizontal" />
           <div className={dashboardGridSlot.rowInner}>
-            <WidgetSkeleton className="min-w-0 flex-1" contentHeight="h-[200px]" />
+            <WidgetSkeleton
+              className="min-w-0 flex-1"
+              contentHeight="h-[200px]"
+            />
             <GradientSeparator
               orientation="vertical"
               className={dashboardGridSlot.verticalSepDesktop}
             />
-            <WidgetSkeleton className="min-w-0 flex-2" contentHeight="h-[200px]" />
+            <WidgetSkeleton
+              className="min-w-0 flex-2"
+              contentHeight="h-[200px]"
+            />
           </div>
         </div>
 
         <div className={dashboardGridSlot.recoMapRow}>
           <GradientSeparator orientation="horizontal" />
           <div className={dashboardGridSlot.rowInner}>
-            <WidgetSkeleton className="min-w-0 flex-1" contentHeight="h-[240px]" />
+            <WidgetSkeleton
+              className="min-w-0 flex-1"
+              contentHeight="h-[240px]"
+            />
             <GradientSeparator
               orientation="vertical"
               className={dashboardGridSlot.verticalSepDesktop}
@@ -172,19 +188,28 @@ export function DashboardSkeleton() {
               orientation="vertical"
               className={dashboardGridSlot.verticalSepDesktop}
             />
-            <WidgetSkeleton className="min-w-0 flex-[1.5]" contentHeight="h-[240px]" />
+            <WidgetSkeleton
+              className="min-w-0 flex-[1.5]"
+              contentHeight="h-[240px]"
+            />
           </div>
         </div>
 
         <div className={dashboardGridSlot.tablesRow}>
           <GradientSeparator orientation="horizontal" />
           <div className={dashboardGridSlot.rowInner}>
-            <WidgetSkeleton className="min-w-0 flex-1" contentHeight="h-[220px]" />
+            <WidgetSkeleton
+              className="min-w-0 flex-1"
+              contentHeight="h-[220px]"
+            />
             <GradientSeparator
               orientation="vertical"
               className={dashboardGridSlot.verticalSepDesktop}
             />
-            <WidgetSkeleton className="min-w-0 flex-1" contentHeight="h-[220px]" />
+            <WidgetSkeleton
+              className="min-w-0 flex-1"
+              contentHeight="h-[220px]"
+            />
           </div>
         </div>
 
