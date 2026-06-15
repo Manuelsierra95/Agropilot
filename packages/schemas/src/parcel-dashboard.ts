@@ -130,6 +130,142 @@ export const dashboardParcelsRisksResponseSchema = z.object({
   parcelsRisks: dashboardParcelsRisksSchema,
 })
 
+export const dashboardParcelAgroclimateDailyItemSchema = z.object({
+  date: z.string().date(),
+  icon: z.string(),
+  tempMin: z.number(),
+  tempMax: z.number(),
+  precipitation: z.number(),
+  waterBalance: z.number(),
+  hasWaterDeficit: z.boolean(),
+})
+
+export const dashboardParcelAgroclimateMetricsSchema = z.object({
+  water: z.object({
+    deficit7d: z.number(),
+    deficit15d: z.number(),
+    deficit30d: z.number(),
+    eto7d: z.number(),
+    eto30d: z.number(),
+  }),
+  temperature: z.object({
+    avg7d: z.number(),
+    avg30d: z.number(),
+    trend: z.number(),
+    heatStressDays: z.number(),
+    coldStressDays: z.number(),
+  }),
+  rain: z.object({
+    rain7d: z.number(),
+    rain30d: z.number(),
+    trend: z.number(),
+    dryDaysConsecutive: z.number(),
+    dryDays7d: z.number(),
+  }),
+  crop: z.object({
+    gdd: z.number(),
+    gdd30d: z.number(),
+    kc: z.number(),
+    stage: z.string(),
+    isCritical: z.boolean(),
+  }),
+  environment: z.object({
+    humidityAvg7d: z.number(),
+    humidityAvg30d: z.number(),
+    variabilityIndex: z.number(),
+  }),
+})
+
+export const dashboardParcelAgroclimateSchema = z.object({
+  request: z.object({
+    parcelId: z.string().uuid(),
+    coords: z.object({ lat: z.number(), lng: z.number() }),
+    cropType: z.string(),
+    cropName: z.string(),
+    days: z.number().int(),
+  }),
+  summary: z.object({
+    stationId: z.string(),
+    lastUpdate: z.string(),
+  }),
+  dataRange: z.object({
+    start: z.string().date(),
+    end: z.string().date(),
+  }),
+  daily: z.object({
+    data: z.array(dashboardParcelAgroclimateDailyItemSchema),
+    recent: z.array(dashboardParcelAgroclimateDailyItemSchema),
+  }),
+  metrics: dashboardParcelAgroclimateMetricsSchema,
+  risks: dashboardRisksSchema,
+  units: z.object({
+    daily: z.object({
+      tempMin: z.string(),
+      tempMax: z.string(),
+      precipitation: z.string(),
+      waterBalance: z.string(),
+    }),
+    metrics: z.object({
+      water: z.object({
+        deficit7d: z.string(),
+        deficit15d: z.string(),
+        deficit30d: z.string(),
+        eto7d: z.string(),
+        eto30d: z.string(),
+      }),
+      temperature: z.object({
+        avg7d: z.string(),
+        avg30d: z.string(),
+        trend: z.string(),
+        heatStressDays: z.string(),
+        coldStressDays: z.string(),
+      }),
+      rain: z.object({
+        rain7d: z.string(),
+        rain30d: z.string(),
+        trend: z.string(),
+        dryDaysConsecutive: z.string(),
+        dryDays7d: z.string(),
+      }),
+      crop: z.object({
+        gdd: z.string(),
+        gdd30d: z.string(),
+        kc: z.string(),
+      }),
+      environment: z.object({
+        humidityAvg7d: z.string(),
+        humidityAvg30d: z.string(),
+        variabilityIndex: z.string(),
+      }),
+    }),
+    risks: z.object({ score: z.string() }),
+  }),
+  recommendations: z.array(dashboardRecommendationSchema),
+})
+
+export const dashboardParcelAgroclimateResponseSchema = z.object({
+  agroclimate: dashboardParcelAgroclimateSchema,
+})
+
+export const dashboardParcelComparisonItemSchema = z.object({
+  name: z.string(),
+  area: z.number(),
+  rain30d: z.number(),
+  tempAvg: z.number(),
+  waterDeficit30d: z.number(),
+  dryDaysConsecutive: z.number(),
+  heatStressDays: z.number(),
+  waterStress: z.enum(["low", "medium", "high"]),
+})
+
+export const dashboardParcelsWeatherComparisonSchema = z.object({
+  parcels: z.array(dashboardParcelComparisonItemSchema),
+})
+
+export const dashboardParcelsWeatherComparisonResponseSchema = z.object({
+  comparison: dashboardParcelsWeatherComparisonSchema,
+})
+
 export type DashboardOlivar = z.infer<typeof dashboardOlivarSchema>
 export type DashboardRisks = z.infer<typeof dashboardRisksSchema>
 export type DashboardRecommendation = z.infer<typeof dashboardRecommendationSchema>
@@ -144,3 +280,12 @@ export type DashboardParcelsRecommendations = z.infer<
   typeof dashboardParcelsRecommendationsSchema
 >
 export type DashboardParcelsRisks = z.infer<typeof dashboardParcelsRisksSchema>
+export type DashboardParcelAgroclimate = z.infer<
+  typeof dashboardParcelAgroclimateSchema
+>
+export type DashboardParcelComparisonItem = z.infer<
+  typeof dashboardParcelComparisonItemSchema
+>
+export type DashboardParcelsWeatherComparison = z.infer<
+  typeof dashboardParcelsWeatherComparisonSchema
+>

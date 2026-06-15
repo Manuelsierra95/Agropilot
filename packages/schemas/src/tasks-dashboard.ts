@@ -1,4 +1,5 @@
 import z from "zod"
+import { dashboardScopeQuerySchema } from "./dashboard-scope"
 import { taskCategorySchema } from "./tasks"
 
 export const dashboardCalendarEventSchema = z.object({
@@ -26,4 +27,13 @@ export const dashboardUpcomingWeekResponseSchema = z.object({
   events: z.array(dashboardCalendarEventSchema),
 })
 
+export const dashboardCalendarEventsQuerySchema = dashboardScopeQuerySchema
+
+export const dashboardCalendarEventsResponseSchema = z.object({
+  events: z.array(dashboardCalendarEventSchema),
+})
+
 export type DashboardCalendarEvent = z.infer<typeof dashboardCalendarEventSchema>
+export type DashboardCalendarEventsQuery = z.infer<
+  typeof dashboardCalendarEventsQuerySchema
+>

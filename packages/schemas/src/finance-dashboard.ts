@@ -84,6 +84,27 @@ export const dashboardRecentTransactionsResponseSchema = z.object({
   transactions: z.array(dashboardTransactionSnapshotSchema),
 })
 
+export const dashboardFinanceTransactionSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().nullable(),
+  concept: z.string(),
+  description: z.string().nullable(),
+  type: z.enum(["ingreso", "gasto"]),
+  category: z.string(),
+  amount: z.number(),
+  paymentMethod: paymentMethodSchema.nullable(),
+  invoiceNumber: z.string().nullable(),
+  date: z.string().date(),
+  parcelId: z.string().uuid().nullable(),
+  parcelName: z.string().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+})
+
+export const dashboardFinanceTransactionsResponseSchema = z.object({
+  transactions: z.array(dashboardFinanceTransactionSchema),
+})
+
 export const dashboardProductionValueResponseSchema = z.object({
   productionValue: dashboardProductionValueSchema,
 })
@@ -136,6 +157,9 @@ export type DashboardProductionValue = z.infer<
 >
 export type DashboardTransactionSnapshot = z.infer<
   typeof dashboardTransactionSnapshotSchema
+>
+export type DashboardFinanceTransaction = z.infer<
+  typeof dashboardFinanceTransactionSchema
 >
 export type DashboardParcelsFinanceComparison = z.infer<
   typeof dashboardParcelsFinanceComparisonSchema
