@@ -16,6 +16,7 @@ import {
   getRecentTransactionsForDashboard,
   getSellingWindowForDashboard,
   getTransactionById,
+  getTransactionsForDashboard,
   listTransactions,
   updateTransaction,
 } from "@/services/finance"
@@ -78,6 +79,18 @@ export const financeRoutes = new Hono<{
     async (c) => {
       const filters = c.req.valid("query")
       const transactions = await getRecentTransactionsForDashboard(
+        c.get("organizationId"),
+        filters
+      )
+      return c.json({ transactions }, 200)
+    }
+  )
+  .get(
+    "/transactions",
+    zValidator("query", dashboardScopeQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const transactions = await getTransactionsForDashboard(
         c.get("organizationId"),
         filters
       )

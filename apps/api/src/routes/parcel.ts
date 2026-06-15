@@ -8,9 +8,11 @@ import {
   deleteParcel,
   getParcelById,
   getParcelCropOverview,
+  getParcelAgroclimateForDashboard,
   getParcelsCropOverviewsForDashboard,
   getParcelsRecommendationsForDashboard,
   getParcelsRisksForDashboard,
+  getParcelsWeatherComparisonForDashboard,
   getParcelRecommendations,
   getParcelRisks,
   getParcelsForMap,
@@ -60,6 +62,18 @@ export const parcelRoutes = new Hono<{
     )
     return c.json({ parcelsRisks }, 200)
   })
+  .get(
+    "/weather-comparison",
+    zValidator("query", dashboardScopeQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const comparison = await getParcelsWeatherComparisonForDashboard(
+        c.get("organizationId"),
+        filters
+      )
+      return c.json({ comparison }, 200)
+    }
+  )
   .get("/:id/recommendations", async (c) => {
     const recommendations = await getParcelRecommendations(
       c.get("organizationId"),
@@ -85,6 +99,19 @@ export const parcelRoutes = new Hono<{
         filters
       )
       return c.json({ olivar }, 200)
+    }
+  )
+  .get(
+    "/:id/agroclimate",
+    zValidator("query", dashboardScopeQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const agroclimate = await getParcelAgroclimateForDashboard(
+        c.get("organizationId"),
+        c.req.param("id"),
+        filters
+      )
+      return c.json({ agroclimate }, 200)
     }
   )
   .get("/:id", async (c) => {

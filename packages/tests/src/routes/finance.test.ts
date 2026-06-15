@@ -12,6 +12,7 @@ const financeMocks = vi.hoisted(() => ({
   getFinanceResumeForDashboard: vi.fn(),
   getCampaignMarginForDashboard: vi.fn(),
   getRecentTransactionsForDashboard: vi.fn(),
+  getTransactionsForDashboard: vi.fn(),
   getProductionValueForDashboard: vi.fn(),
   getParcelsFinanceComparisonForDashboard: vi.fn(),
   getParcelsSellingWindowsForDashboard: vi.fn(),
@@ -203,6 +204,48 @@ describe("finance routes", () => {
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.transactions).toEqual([])
+  })
+
+  it("GET /finance/transactions returns 401 without auth", async () => {
+    const res = await apiRequest(app, "/api/v1/finance/transactions")
+    expect(res.status).toBe(401)
+  })
+
+  it("GET /finance/transactions returns scoped transactions", async () => {
+    mockAuthenticatedSession()
+    financeMocks.getTransactionsForDashboard.mockResolvedValue([
+      {
+        id: "00000000-0000-4000-8000-000000000099",
+        userId: "user-1",
+        concept: "Venta aceite",
+        description: null,
+        type: "ingreso",
+        category: "Venta de cosecha",
+        amount: 1200,
+        paymentMethod: "transferencia",
+        invoiceNumber: null,
+        date: "2026-01-15",
+        parcelId: "00000000-0000-4000-8000-000000000001",
+        createdAt: "2026-01-15T10:00:00.000Z",
+        updatedAt: "2026-01-15T10:00:00.000Z",
+      },
+    ])
+
+    const res = await apiRequest(app, "/api/v1/finance/transactions")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.transactions).toHaveLength(1)
+    expect(body.transactions[0].concept).toBe("Venta aceite")
+  })
+
+  it("GET /finance/transactions returns 400 for invalid parcelId", async () => {
+    mockAuthenticatedSession()
+
+    const res = await apiRequest(
+      app,
+      "/api/v1/finance/transactions?parcelId=not-a-uuid"
+    )
+    expect(res.status).toBe(400)
   })
 
   it("GET /finance/production-value returns production value", async () => {

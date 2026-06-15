@@ -2,19 +2,33 @@ import type { Env } from "@env"
 import { Hono } from "hono"
 import { zValidator } from "@hono/zod-validator"
 import {
+  dashboardCalendarEventsQuerySchema,
   dashboardUpcomingWeekQuerySchema,
   taskCreateInputSchema,
 } from "@workspace/schemas"
 
 import { requireAuth } from "@/middlewares/require-auth"
 import type { AuthVariables } from "@/types/variables"
-import { createTask, listUpcomingWeekTasks } from "@/services/tasks"
+import {
+  createTask,
+  listCalendarTasks,
+  listUpcomingWeekTasks,
+} from "@/services/tasks"
 
 export const taskRoutes = new Hono<{
   Bindings: Env
   Variables: AuthVariables
 }>()
   .use(requireAuth)
+  .get(
+    "/calendar-events",
+    zValidator("query", dashboardCalendarEventsQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const events = await listCalendarTasks(c.get("organizationId"), filters)
+      return c.json({ events }, 200)
+    }
+  )
   .get(
     "/upcoming-week",
     zValidator("query", dashboardUpcomingWeekQuerySchema),

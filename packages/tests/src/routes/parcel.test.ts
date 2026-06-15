@@ -13,6 +13,8 @@ const parcelMocks = vi.hoisted(() => ({
   getParcelsCropOverviewsForDashboard: vi.fn(),
   getParcelsRecommendationsForDashboard: vi.fn(),
   getParcelsRisksForDashboard: vi.fn(),
+  getParcelAgroclimateForDashboard: vi.fn(),
+  getParcelsWeatherComparisonForDashboard: vi.fn(),
 }))
 
 vi.mock("@/services/parcel", () => parcelMocks)
@@ -219,5 +221,149 @@ describe("parcel routes", () => {
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.parcelsRisks.parcels).toHaveLength(1)
+  })
+
+  it("GET /parcel/:id/agroclimate returns 401 without auth", async () => {
+    const res = await apiRequest(app, "/api/v1/parcel/p-1/agroclimate")
+    expect(res.status).toBe(401)
+  })
+
+  it("GET /parcel/:id/agroclimate returns agroclimate data", async () => {
+    mockAuthenticatedSession()
+    parcelMocks.getParcelAgroclimateForDashboard.mockResolvedValue({
+      request: {
+        parcelId: "p-1",
+        coords: { lat: 38, lng: -3.37 },
+        cropType: "olivo",
+        cropName: "La Mata",
+        days: 30,
+      },
+      summary: { stationId: "st-1", lastUpdate: "2026-01-01T00:00:00.000Z" },
+      dataRange: { start: "2025-01-01", end: "2025-12-31" },
+      daily: { data: [], recent: [] },
+      metrics: {
+        water: {
+          deficit7d: 0,
+          deficit15d: 0,
+          deficit30d: 0,
+          eto7d: 0,
+          eto30d: 0,
+        },
+        temperature: {
+          avg7d: 18,
+          avg30d: 17,
+          trend: 1,
+          heatStressDays: 0,
+          coldStressDays: 0,
+        },
+        rain: {
+          rain7d: 10,
+          rain30d: 40,
+          trend: 2,
+          dryDaysConsecutive: 0,
+          dryDays7d: 1,
+        },
+        crop: {
+          gdd: 500,
+          gdd30d: 200,
+          kc: 0.5,
+          stage: "Vegetativo",
+          isCritical: false,
+        },
+        environment: {
+          humidityAvg7d: 30,
+          humidityAvg30d: 28,
+          variabilityIndex: 2,
+        },
+      },
+      risks: {
+        waterStress: { level: "low", score: 0.25, reasons: [] },
+        fungalRisk: { level: "low", score: 0.25, reasons: [] },
+        insectRisk: { level: "low", score: 0.25, reasons: [] },
+        thermalStress: { level: "low", score: 0.25, reasons: [] },
+      },
+      units: {
+        daily: {
+          tempMin: "°C",
+          tempMax: "°C",
+          precipitation: "mm",
+          waterBalance: "mm",
+        },
+        metrics: {
+          water: {
+            deficit7d: "mm",
+            deficit15d: "mm",
+            deficit30d: "mm",
+            eto7d: "mm",
+            eto30d: "mm",
+          },
+          temperature: {
+            avg7d: "°C",
+            avg30d: "°C",
+            trend: "°C",
+            heatStressDays: "días",
+            coldStressDays: "días",
+          },
+          rain: {
+            rain7d: "mm",
+            rain30d: "mm",
+            trend: "mm",
+            dryDaysConsecutive: "días",
+            dryDays7d: "días",
+          },
+          crop: { gdd: "°C·día", gdd30d: "°C·día", kc: "" },
+          environment: {
+            humidityAvg7d: "%",
+            humidityAvg30d: "%",
+            variabilityIndex: "",
+          },
+        },
+        risks: { score: "0-1" },
+      },
+      recommendations: [],
+    })
+
+    const res = await apiRequest(app, "/api/v1/parcel/p-1/agroclimate")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.agroclimate.request.parcelId).toBe("p-1")
+  })
+
+  it("GET /parcel/:id/agroclimate returns 400 for invalid parcelId in scope", async () => {
+    mockAuthenticatedSession()
+
+    const res = await apiRequest(
+      app,
+      "/api/v1/parcel/p-1/agroclimate?parcelId=not-a-uuid"
+    )
+    expect(res.status).toBe(400)
+  })
+
+  it("GET /parcel/weather-comparison returns 401 without auth", async () => {
+    const res = await apiRequest(app, "/api/v1/parcel/weather-comparison")
+    expect(res.status).toBe(401)
+  })
+
+  it("GET /parcel/weather-comparison returns comparison list", async () => {
+    mockAuthenticatedSession()
+    parcelMocks.getParcelsWeatherComparisonForDashboard.mockResolvedValue({
+      parcels: [
+        {
+          name: "La Mata",
+          area: 10,
+          rain30d: 40,
+          tempAvg: 18,
+          waterDeficit30d: 5,
+          dryDaysConsecutive: 2,
+          heatStressDays: 1,
+          waterStress: "low",
+        },
+      ],
+    })
+
+    const res = await apiRequest(app, "/api/v1/parcel/weather-comparison")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.comparison.parcels).toHaveLength(1)
   })
 })

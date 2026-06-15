@@ -445,3 +445,7 @@ export {
   getParcelsRisksForDashboard,
   resolvePrimaryParcelId,
 } from "@/services/parcel-dashboard"
+export {
+  getParcelAgroclimateForDashboard,
+  getParcelsWeatherComparisonForDashboard,
+} from "@/services/parcel-agroclimate"

@@ -2,6 +2,7 @@ import { db, schema, eq, and, asc, desc, gte, lte } from "@workspace/db"
 import type {
   DashboardCampaignMargin,
   DashboardFinanceResume,
+  DashboardFinanceTransaction,
   DashboardOlivePriceItem,
   DashboardParcelsFinanceComparison,
   DashboardParcelsSellingWindows,
@@ -29,6 +30,7 @@ import { listParcels, resolveParcelIdForOrg } from "@/services/parcel"
 
 const MARKET_HISTORY_DAYS = 90
 const RECENT_TRANSACTION_LIMIT = 50
+const FINANCE_TRANSACTION_LIMIT = 1000
 const TREES_PER_HECTARE = 200
 
 const OLIVE_PRICE_DISPLAY_NAMES: Record<OilGrade, string> = {
@@ -70,6 +72,13 @@ function buildOlivePriceItems(
   })
 }
 
+function mapTransactionCategoryLabel(tx: TransactionSelect): string {
+  return (
+    TRANSACTION_CATEGORY_LABELS[tx.category as TransactionCategory] ??
+    tx.category
+  )
+}
+
 function mapTransactionToSnapshot(
   tx: TransactionSelect,
   parcelName?: string
@@ -78,14 +87,34 @@ function mapTransactionToSnapshot(
 
   return {
     type: tx.flow === "income" ? "ingreso" : "gasto",
-    category:
-      TRANSACTION_CATEGORY_LABELS[tx.category as TransactionCategory] ??
-      tx.category,
+    category: mapTransactionCategoryLabel(tx),
     amount: Number(tx.amount),
     paymentMethod,
     invoiceNumber: tx.invoiceNumber ?? undefined,
     date: tx.date,
     ...(parcelName ? { parcelName } : {}),
+  }
+}
+
+function mapTransactionToFinanceRow(
+  tx: TransactionSelect,
+  parcelName?: string
+): DashboardFinanceTransaction {
+  return {
+    id: tx.id,
+    userId: tx.userId ?? null,
+    concept: tx.concept,
+    description: tx.description ?? null,
+    type: tx.flow === "income" ? "ingreso" : "gasto",
+    category: mapTransactionCategoryLabel(tx),
+    amount: Number(tx.amount),
+    paymentMethod: tx.paymentMethod ?? null,
+    invoiceNumber: tx.invoiceNumber ?? null,
+    date: tx.date,
+    parcelId: tx.parcelId ?? null,
+    ...(parcelName ? { parcelName } : {}),
+    createdAt: tx.createdAt.toISOString(),
+    updatedAt: tx.updatedAt.toISOString(),
   }
 }
 
@@ -451,6 +480,34 @@ export async function getCampaignMarginForDashboard(
   return buildCampaignMarginSeries(
     dateRange.from,
     aggregateCashflowByDate(cashflowDaily)
+  )
+}
+
+export async function getTransactionsForDashboard(
+  organizationId: string,
+  filters: DashboardScopeQuery = {}
+): Promise<DashboardFinanceTransaction[]> {
+  const { parcelId, dateRange } = await resolveScopeContext(
+    organizationId,
+    filters
+  )
+
+  const includeParcelNames = parcelId === null || parcelId === undefined
+
+  const { transactions, parcelNameById } = await listTransactionsForScope(
+    organizationId,
+    dateRange,
+    parcelId,
+    includeParcelNames
+  )
+
+  return transactions.slice(0, FINANCE_TRANSACTION_LIMIT).map((tx) =>
+    mapTransactionToFinanceRow(
+      tx,
+      tx.parcelId && parcelNameById
+        ? (parcelNameById.get(tx.parcelId) ?? undefined)
+        : undefined
+    )
   )
 }
 

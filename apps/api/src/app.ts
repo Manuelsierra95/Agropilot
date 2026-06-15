@@ -13,6 +13,7 @@ import { financeRoutes } from "./routes/finance"
 import { copilotRoutes } from "./routes/copilot"
 import { campaignRoutes } from "./routes/campaign"
 import { taskRoutes } from "./routes/tasks"
+import { weatherRoutes } from "./routes/weather"
 import { logger } from "hono/logger"
 
 export const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
@@ -35,5 +36,7 @@ export const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .route("/copilot", copilotRoutes)
   .route("/campaign", campaignRoutes)
   .route("/tasks", taskRoutes)
+  .route("/weather", weatherRoutes)
+  // ruta para weather
 
 export type AppType = typeof app

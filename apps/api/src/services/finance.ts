@@ -480,6 +480,7 @@ export {
   getSellingWindowForDashboard,
   getFinanceResumeForDashboard,
   getCampaignMarginForDashboard,
+  getTransactionsForDashboard,
   getRecentTransactionsForDashboard,
   getProductionValueForDashboard,
   getParcelsFinanceComparisonForDashboard,

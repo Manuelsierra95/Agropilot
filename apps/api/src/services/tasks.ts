@@ -1,11 +1,17 @@
 import { db, schema, eq, and, asc, gte, lte } from "@workspace/db"
 import type {
   DashboardCalendarEvent,
+  DashboardCalendarEventsQuery,
   DashboardUpcomingWeekQuery,
   TaskCategory,
   TaskCreateInput,
   TaskStatus,
 } from "@workspace/schemas"
+import {
+  resolveActiveCampaign,
+  resolveCampaignById,
+  resolveScopeDateRange,
+} from "@/services/campaign"
 import { resolveParcelIdForOrg, listParcels } from "@/services/parcel"
 
 export type { TaskCategory, TaskStatus } from "@workspace/schemas"
@@ -126,6 +132,45 @@ function mapTaskToCalendarEvent(
         }
       : undefined,
   }
+}
+
+const CALENDAR_EVENTS_LIMIT = 500
+
+export async function listCalendarTasks(
+  organizationId: string,
+  filters: DashboardCalendarEventsQuery = {}
+): Promise<DashboardCalendarEvent[]> {
+  const campaign = filters.campaignId
+    ? await resolveCampaignById(filters.campaignId)
+    : await resolveActiveCampaign()
+
+  const { from, to } = resolveScopeDateRange(campaign, filters)
+  const resolvedParcelId = filters.parcelId
+    ? await resolveParcelIdForOrg(organizationId, filters.parcelId)
+    : null
+
+  const tasks = await db.query.tasks.findMany({
+    where: and(
+      eq(schema.tasks.organizationId, organizationId),
+      gte(schema.tasks.startDate, new Date(`${from}T00:00:00.000Z`)),
+      lte(schema.tasks.startDate, new Date(`${to}T23:59:59.999Z`)),
+      ...(resolvedParcelId
+        ? [eq(schema.tasks.parcelId, resolvedParcelId)]
+        : [])
+    ),
+    orderBy: [asc(schema.tasks.startDate)],
+    limit: CALENDAR_EVENTS_LIMIT,
+  })
+
+  const parcels = await listParcels(organizationId)
+  const parcelNameById = new Map(parcels.map((p) => [p.id, p.name]))
+
+  return tasks.map((task) =>
+    mapTaskToCalendarEvent(
+      task,
+      task.parcelId ? (parcelNameById.get(task.parcelId) ?? "—") : "—"
+    )
+  )
 }
 
 export async function listUpcomingWeekTasks(
