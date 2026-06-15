@@ -21,40 +21,13 @@ export interface WeatherData {
 }
 
 export interface ForecastDay {
+  date: string
   day: string
   condition: "sunny" | "cloudy" | "partly-cloudy" | "rainy" | "snowy"
   tempMax: number
   tempMin: number
   humidity: number
 }
-
-export const mockWeatherData: WeatherData = {
-  condition: "partly-cloudy",
-  temperature: 22,
-  humidity: 65,
-  windSpeed: 12,
-  location: "Parcela Principal",
-}
-
-export const mockForecast: ForecastDay[] = [
-  { day: "Lun", condition: "sunny", tempMax: 24, tempMin: 14, humidity: 55 },
-  {
-    day: "Mar",
-    condition: "partly-cloudy",
-    tempMax: 22,
-    tempMin: 13,
-    humidity: 60,
-  },
-  { day: "Mié", condition: "cloudy", tempMax: 19, tempMin: 12, humidity: 70 },
-  { day: "Jue", condition: "rainy", tempMax: 17, tempMin: 11, humidity: 85 },
-  {
-    day: "Vie",
-    condition: "partly-cloudy",
-    tempMax: 20,
-    tempMin: 12,
-    humidity: 65,
-  },
-]
 
 const weatherIcons = {
   sunny: Sun,
@@ -73,14 +46,26 @@ const weatherLabels = {
 }
 
 interface TimeWeatherCardProps {
-  weather?: WeatherData
-  forecast?: ForecastDay[]
+  weather: WeatherData | null
+  forecast: ForecastDay[]
 }
 
 export function TimeWeatherCard({
-  weather = mockWeatherData,
-  forecast = mockForecast,
+  weather,
+  forecast,
 }: TimeWeatherCardProps) {
+  if (!weather) {
+    return (
+      <Card className="w-full overflow-hidden border-border/60 bg-linear-to-br from-background via-background to-muted/30 shadow-sm">
+        <CardContent className="flex h-32 items-center justify-center p-4">
+          <p className="text-xs text-muted-foreground">
+            Sin datos meteorológicos
+          </p>
+        </CardContent>
+      </Card>
+    )
+  }
+
   const WeatherIcon = weatherIcons[weather.condition]
 
   return (
@@ -160,7 +145,7 @@ export function TimeWeatherCard({
                 const DayIcon = weatherIcons[day.condition]
                 return (
                   <div
-                    key={day.day}
+                    key={day.date}
                     className="flex min-h-28 flex-col items-center gap-2 rounded-xl border border-border/50 bg-secondary/30 px-3 py-3 text-center"
                   >
                     <span className="text-xs font-medium text-foreground">

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import type { WeatherDaily, WeatherMetrics } from "@/store/parcel-weather.mock"
+import type { WeatherDaily, WeatherMetrics } from "@/lib/parcel/types"
 
 import { ParcelCropStatusCard } from "./parcel-crop-status-card"
 import { ParcelDeficitChart } from "./parcel-deficit-chart"

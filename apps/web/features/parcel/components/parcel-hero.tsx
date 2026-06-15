@@ -24,48 +24,25 @@ import {
 } from "@workspace/ui/components/tooltip"
 import { GradientSeparator } from "@/components/ui/gradient-separator"
 
-import type { ParcelApiResponse } from "./parcel-types"
-import type { WeatherRisks } from "@/store/parcel-weather.mock"
-import type { AllModeSummary, ParcelItem } from "./parcel-types"
+import type {
+  AgroclimateMetrics,
+  AllModeSummary,
+  ParcelApiResponse,
+  ParcelItem,
+  YieldData,
+} from "./parcel-types"
 import { formatDateTime } from "./parcel-utils"
 
-// ─────────────────────────────────────────────
-// Agroclimatic metrics types & mock
-// ─────────────────────────────────────────────
+type TempTrend = AgroclimateMetrics["tempTrend"]
 
-type TempTrend = "up" | "down" | "stable"
-
-type AgroclimateMetrics = {
-  currentTemp: number
-  tempTrendPct: number
-  tempTrend: TempTrend
-  kc: number
-  gdd: number
-  phenoStage: string
+const DEFAULT_AGROCLIMATE: AgroclimateMetrics = {
+  currentTemp: 0,
+  tempTrendPct: 0,
+  tempTrend: "stable",
+  kc: 0,
+  gdd: 0,
+  phenoStage: "—",
 }
-
-const MOCK_AGROCLIMATIC: AgroclimateMetrics = {
-  currentTemp: 22.4,
-  tempTrendPct: 3.2,
-  tempTrend: "up",
-  kc: 0.85,
-  gdd: 312,
-  phenoStage: "Brotación",
-}
-
-// ─────────────────────────────────────────────
-// Yield types
-// ─────────────────────────────────────────────
-
-type YieldData = {
-  /** Número total de árboles en la parcela */
-  trees: number
-  /** Producción total estimada o real en kg */
-  totalKg: number
-}
-
-// ─────────────────────────────────────────────
-// Color tokens mapeados a CSS vars
 //
 // Vars existentes reutilizadas:
 //   --primary-expense   → temperatura subiendo, alertas críticas, salud baja
@@ -112,26 +89,15 @@ function riskLevelToPenalty(level: RiskLevel): number {
   }
 }
 
-function computeParcelScore(
-  risks?: WeatherRisks,
-  apiResponse?: ParcelApiResponse
-): number {
-  const penalties: number[] = []
-  if (apiResponse) {
-    const r = apiResponse.risks
-    penalties.push(
-      riskLevelToPenalty(r.waterStress.level),
-      riskLevelToPenalty(r.fungalRisk.level),
-      riskLevelToPenalty(r.insectRisk.level),
-      riskLevelToPenalty(r.thermalStress.level)
-    )
-  } else if (risks) {
-    penalties.push(
-      riskLevelToPenalty(risks.waterStress),
-      riskLevelToPenalty(risks.pestRisk)
-    )
-  }
-  if (penalties.length === 0) return 75
+function computeParcelScore(apiResponse?: ParcelApiResponse): number {
+  if (!apiResponse) return 75
+  const r = apiResponse.risks
+  const penalties = [
+    riskLevelToPenalty(r.waterStress.level),
+    riskLevelToPenalty(r.fungalRisk.level),
+    riskLevelToPenalty(r.insectRisk.level),
+    riskLevelToPenalty(r.thermalStress.level),
+  ]
   const totalPenalty = penalties.reduce((a, b) => a + b, 0)
   const maxPenalty = penalties.length * 25
   return Math.round(((maxPenalty - totalPenalty) / maxPenalty) * 100)
@@ -213,9 +179,9 @@ function MetricCell({ value, label, tooltip, href }: MetricCellProps) {
 
 type ParcelHeroProps = {
   isAllSelected: boolean
-  activeParcel: ParcelItem
+  activeParcel?: ParcelItem
+  parcelCount?: number
   allModeSummary: AllModeSummary
-  risks?: WeatherRisks
   apiResponse?: ParcelApiResponse
   income?: number
   trend?: TempTrend
@@ -223,25 +189,24 @@ type ParcelHeroProps = {
   tasksPending?: number
   tasksInProgress?: number
   agroclimate?: AgroclimateMetrics
-  /** Datos de rendimiento: árboles y kg totales para calcular kg/árbol */
   yieldData?: YieldData
 }
 
 export function ParcelHero({
   isAllSelected,
   activeParcel,
+  parcelCount = 0,
   allModeSummary,
-  risks,
   apiResponse,
   income,
   trend = "stable",
   employeeCount = 0,
   tasksPending = 0,
   tasksInProgress = 0,
-  agroclimate = MOCK_AGROCLIMATIC,
+  agroclimate = DEFAULT_AGROCLIMATE,
   yieldData,
 }: ParcelHeroProps) {
-  const score = isAllSelected ? null : computeParcelScore(risks, apiResponse)
+  const score = isAllSelected ? null : computeParcelScore(apiResponse)
   const scoreTokens = score !== null ? scoreToTokens(score) : null
 
   const { currentTemp, tempTrendPct, tempTrend, kc, gdd, phenoStage } =
@@ -386,7 +351,7 @@ export function ParcelHero({
 
   const parcelName = isAllSelected
     ? "Todas las parcelas"
-    : (apiResponse?.request.cropName ?? activeParcel.name)
+    : (apiResponse?.request.cropName ?? activeParcel?.name ?? "Parcela")
 
   return (
     <Card className="gap-0 overflow-hidden bg-background pt-0 ring-0">
@@ -401,7 +366,7 @@ export function ParcelHero({
             {parcelName}
           </h1>
           {/* Metadatos con divisores */}
-          {!isAllSelected && apiResponse && (
+          {!isAllSelected && apiResponse && activeParcel && (
             <div className="mt-1 flex items-center gap-4">
               <span className="font-mono text-sm text-muted-foreground">
                 Coords: {apiResponse.request.coords.lat.toFixed(4)},&nbsp;

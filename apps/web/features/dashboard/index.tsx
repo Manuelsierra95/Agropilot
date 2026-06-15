@@ -1,7 +1,7 @@
 "use client"
 
 import { GradientSeparator } from "@/components/ui/gradient-separator"
-import type { DashboardCalendarEvent } from "@workspace/schemas"
+import { toCalendarEvents } from "@/lib/calendar/mappers"
 
 import { OlivePrice } from "@/features/dashboard/olive-price"
 import { ResumeCrop } from "@/features/dashboard/resume-crop"
@@ -50,16 +50,6 @@ import {
   useUpcomingWeekTasks,
 } from "@/hooks/dashboard"
 import { useIsAllParcelsSelected } from "@/hooks/use-is-all-parcels-selected"
-
-function toCalendarEvents(
-  events: DashboardCalendarEvent[]
-): import("@/lib/calendar-mock").CalendarEvent[] {
-  return events.map((event) => ({
-    ...event,
-    start: new Date(event.start),
-    end: new Date(event.end),
-  }))
-}
 
 export default function DashboardOverview() {
   const isAllParcels = useIsAllParcelsSelected()

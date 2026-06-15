@@ -12,14 +12,26 @@ const GLOBAL_KEY_SEGMENTS = new Set(["olive-prices", "parcels-map"])
 const FAMILY_KEY_SEGMENTS: Record<DashboardCacheFamily, readonly string[]> = {
   finance: [
     "finance-resume",
+    "finance-transactions",
     "campaign-margin",
     "recent-transactions",
     "selling-window",
   ],
   production: ["production-value", "selling-window"],
-  events: ["upcoming-week"],
-  parcels: ["parcels-map", "crop-overview"],
-  daily: ["olive-prices", "recommendations", "risks"],
+  events: ["upcoming-week", "calendar-events"],
+  parcels: [
+    "parcels-map",
+    "crop-overview",
+    "parcel-agroclimate",
+    "parcels-weather-comparison",
+  ],
+  daily: [
+    "olive-prices",
+    "recommendations",
+    "risks",
+    "parcel-agroclimate",
+    "parcels-weather-comparison",
+  ],
 }
 
 function segmentsForFamilies(

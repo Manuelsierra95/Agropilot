@@ -8,6 +8,7 @@ import { copilotApi } from "./routes/copilot"
 import { parcelApi } from "./routes/parcel"
 import { campaignApi } from "./routes/campaign"
 import { tasksApi } from "./routes/tasks"
+import { weatherApi } from "./routes/weather"
 
 export const api = {
   example: exampleApi,
@@ -20,4 +21,5 @@ export const api = {
   parcel: parcelApi,
   campaign: campaignApi,
   tasks: tasksApi,
+  weather: weatherApi,
 }

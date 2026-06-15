@@ -1,7 +1,6 @@
 import { Badge } from "@workspace/ui/components/badge"
 import { Card, CardContent, CardHeader } from "@workspace/ui/components/card"
 import { ScrollArea } from "@workspace/ui/components/scroll-area"
-import { Separator } from "@workspace/ui/components/separator"
 import {
   Sparkles,
   Droplets,
@@ -10,7 +9,7 @@ import {
   CalendarPlus,
 } from "lucide-react"
 
-// ── types & mock ─────────────────────────────────────────────────────────────
+// ── types ────────────────────────────────────────────────────────────────────
 
 export type RecommendationAction = "irrigate" | "treat" | "inspect" | "schedule"
 
@@ -23,45 +22,6 @@ export interface Recommendation {
   parcelName: string
   urgency: "now" | "soon" | "plan"
 }
-
-export const mockRecommendations: Recommendation[] = [
-  {
-    id: "rec-1",
-    title: "Regar Olivar La Loma",
-    reason: "Humedad del suelo por debajo del 30% según última lectura.",
-    action: "irrigate",
-    when: "Mañana, 06:30",
-    parcelName: "Olivar La Loma",
-    urgency: "now",
-  },
-  {
-    id: "rec-2",
-    title: "Inspeccionar Finca El Cerro",
-    reason: "Trampas de mosca del olivo con capturas superiores al umbral.",
-    action: "inspect",
-    when: "Esta semana",
-    parcelName: "Finca El Cerro",
-    urgency: "soon",
-  },
-  {
-    id: "rec-3",
-    title: "Planificar fertilización de verano",
-    reason: "La fertilización de primavera concluye en 2 semanas.",
-    action: "schedule",
-    when: "Próximas 2 semanas",
-    parcelName: "Todas las parcelas",
-    urgency: "plan",
-  },
-  {
-    id: "rec-4",
-    title: "Aplicar cobre preventivo",
-    reason: "Temperatura y humedad favorables para repilo.",
-    action: "treat",
-    when: "En 3 días",
-    parcelName: "Finca El Cerro",
-    urgency: "soon",
-  },
-]
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -85,11 +45,11 @@ const URGENCY_CONFIG: Record<
 // ── component ────────────────────────────────────────────────────────────────
 
 interface RecommendationsCardProps {
-  recommendations?: Recommendation[]
+  recommendations: Recommendation[]
 }
 
 export function RecommendationsCard({
-  recommendations = mockRecommendations,
+  recommendations,
 }: RecommendationsCardProps) {
   const urgent = recommendations.filter((r) => r.urgency === "now").length
 

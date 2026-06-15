@@ -32,6 +32,12 @@ export const dashboardQueryKeys = {
       "recent-transactions",
       buildDashboardScopeKey(scope),
     ] as const,
+  financeTransactions: (scope: DashboardScopeParams) =>
+    [
+      ...dashboardQueryKeys.all,
+      "finance-transactions",
+      buildDashboardScopeKey(scope),
+    ] as const,
   productionValue: (scope: DashboardScopeParams) =>
     [
       ...dashboardQueryKeys.all,
@@ -78,11 +84,37 @@ export const dashboardQueryKeys = {
       "crop-overview",
       buildDashboardScopeKey(scope),
     ] as const,
+  parcelAgroclimate: (scope: DashboardScopeParams) =>
+    [
+      ...dashboardQueryKeys.all,
+      "parcel-agroclimate",
+      buildDashboardScopeKey(scope),
+    ] as const,
+  parcelsWeatherComparison: (scope: DashboardScopeParams) =>
+    [
+      ...dashboardQueryKeys.all,
+      "parcels-weather-comparison",
+      buildDashboardScopeKey(scope),
+    ] as const,
   upcomingWeek: (scope: DashboardScopeParams) =>
     [
       ...dashboardQueryKeys.all,
       "upcoming-week",
       buildDashboardScopeKey(scope),
+    ] as const,
+  calendarEvents: (scope: DashboardScopeParams) =>
+    [
+      ...dashboardQueryKeys.all,
+      "calendar-events",
+      buildDashboardScopeKey(scope),
+    ] as const,
+  parcelWeather: (parcelId: string, from: string, to: string) =>
+    [
+      ...dashboardQueryKeys.all,
+      "parcel-weather",
+      parcelId,
+      from,
+      to,
     ] as const,
 }
 

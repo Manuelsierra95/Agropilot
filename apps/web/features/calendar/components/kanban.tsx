@@ -11,8 +11,8 @@ import type {
   CalendarEvent,
   CalendarEventStatus,
   CalendarEventType,
-} from "@/lib/calendar-mock"
-import { useState, useMemo } from "react"
+} from "@/lib/calendar/types"
+import { useEffect, useMemo, useState } from "react"
 import {
   Card,
   CardContent,
@@ -152,6 +152,10 @@ export function Kanban({ events }: KanbanProps) {
     toKanbanCards(events)
   )
   const [filter, setFilter] = useState<FilterRange>("day")
+
+  useEffect(() => {
+    setCards(toKanbanCards(events))
+  }, [events])
 
   const filteredCards = useMemo(
     () => filterCardsByRange(cards, filter),

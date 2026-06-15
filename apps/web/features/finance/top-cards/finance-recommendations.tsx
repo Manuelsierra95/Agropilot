@@ -1,5 +1,5 @@
 import { TrendingUp, AlertTriangle, Lightbulb, ShieldCheck } from "lucide-react"
-import type { Transaction } from "@/store/mockTransactions"
+import type { FinanceTransactionSnapshot } from "@/lib/finance/types"
 import type { KpiItem } from "./kpi-card/price-kpi-card"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
@@ -15,12 +15,12 @@ interface Recommendation {
 }
 
 interface FinanceRecommendationsProps {
-  transactions: Transaction[]
+  transactions: FinanceTransactionSnapshot[]
   oils: KpiItem[]
 }
 
 function buildRecommendations(
-  transactions: Transaction[],
+  transactions: FinanceTransactionSnapshot[],
   oils: KpiItem[]
 ): { recs: Recommendation[]; totalIncome: number; totalExpenses: number } {
   const recs: Recommendation[] = []

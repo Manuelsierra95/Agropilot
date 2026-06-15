@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import type { Transaction } from "@/store/mockTransactions"
+import type { FinanceTransactionSnapshot } from "@/lib/finance/types"
 import type { Item } from "./olive-price"
 import { Gauge } from "@workspace/ui/components/charts"
 import { Card, CardHeader } from "@workspace/ui/components/card"
@@ -11,10 +11,7 @@ import { LinkButton } from "@/components/ui/link-button"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type TransactionSnapshot = Pick<
-  Transaction,
-  "type" | "category" | "amount" | "paymentMethod" | "invoiceNumber"
->
+type TransactionSnapshot = FinanceTransactionSnapshot
 
 interface FinanceRecommendationsProps {
   transactions: TransactionSnapshot[]

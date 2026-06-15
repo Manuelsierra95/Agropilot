@@ -9,7 +9,7 @@ import {
   TrendingUp,
 } from "lucide-react"
 
-import type { Transaction } from "@/store/mockTransactions"
+import type { FinanceTransactionSnapshot } from "@/lib/finance/types"
 import type { KpiItem } from "../../features/dashboard/olive-price"
 import { Gauge } from "@workspace/ui/components/charts"
 import { Badge } from "@workspace/ui/components/badge"
@@ -32,10 +32,7 @@ import { buttonVariants } from "@workspace/ui/components/button"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type TransactionSnapshot = Pick<
-  Transaction,
-  "type" | "category" | "amount" | "paymentMethod" | "invoiceNumber"
->
+type TransactionSnapshot = FinanceTransactionSnapshot
 
 interface Recommendation {
   id: string

@@ -17,7 +17,7 @@ import {
 } from "@workspace/ui/components/chart"
 import { cn } from "@workspace/ui/lib/utils"
 
-import type { WeatherMetrics } from "@/store/parcel-weather.mock"
+import type { WeatherMetrics } from "@/lib/parcel/types"
 
 import type { ParcelApiResponse, ParcelItem } from "./parcel-types"
 import { formatLongDate, formatNumber } from "./parcel-utils"

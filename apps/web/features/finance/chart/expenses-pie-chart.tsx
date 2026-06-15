@@ -2,50 +2,57 @@
 
 import * as React from "react"
 import { type ChartConfig } from "@workspace/ui/components/chart"
-import { type Transaction } from "@/store/mockTransactions"
+import type { FinanceTransaction } from "@/lib/finance/types"
 import { ExpensesDrawer } from "../drawer/expenses-drawer"
 import type { CategoryTransaction } from "../drawer/components/category-drawer"
 import { FinancePieChart, type PieChartDataItem } from "./components/pie-chart"
 
 const chartConfig = {
-  semillas: { label: "Semillas", color: "var(--pie-expense-1)" },
-  fertilizantes: { label: "Fertilizantes", color: "var(--pie-expense-2)" },
-  fitosanitarios: { label: "Fitosanitarios", color: "var(--pie-expense-3)" },
+  riego: { label: "Riego", color: "var(--pie-expense-1)" },
+  fertilizacion: { label: "Fertilización", color: "var(--pie-expense-2)" },
+  tratamiento: { label: "Tratamiento", color: "var(--pie-expense-3)" },
   combustible: { label: "Combustible", color: "var(--pie-expense-4)" },
   manodeobra: { label: "Mano de obra", color: "var(--pie-expense-5)" },
-  seguros: { label: "Seguros", color: "var(--pie-expense-6)" },
-  maquinaria: { label: "Maquinaria", color: "var(--pie-expense-7)" },
-  riego: { label: "Riego", color: "var(--pie-expense-8)" },
+  maquinaria: { label: "Maquinaria", color: "var(--pie-expense-6)" },
+  cosecha: { label: "Cosecha", color: "var(--pie-expense-7)" },
+  otros: { label: "Otros", color: "var(--pie-expense-8)" },
 } satisfies ChartConfig
 
 const categoryToKey: Record<string, string> = {
-  Semillas: "semillas",
-  Fertilizantes: "fertilizantes",
-  Fitosanitarios: "fitosanitarios",
+  Riego: "riego",
+  Fertilización: "fertilizacion",
+  Tratamiento: "tratamiento",
   Combustible: "combustible",
   "Mano de obra": "manodeobra",
-  Seguros: "seguros",
   Maquinaria: "maquinaria",
-  Riego: "riego",
+  Cosecha: "cosecha",
+  Otros: "otros",
+}
+
+function resolveCategoryKey(category: string): string {
+  return categoryToKey[category] ?? "otros"
 }
 
 function buildExpenseChartData(
-  transactions: Transaction[]
+  transactions: FinanceTransaction[]
 ): PieChartDataItem[] {
   const totalsByCategory = transactions
     .filter((transaction) => transaction.type === "gasto")
     .reduce<Record<string, number>>((acc, transaction) => {
-      const key = categoryToKey[transaction.category]
-      if (!key) return acc
+      const key = resolveCategoryKey(transaction.category)
+      const label =
+        key === "otros" && !categoryToKey[transaction.category]
+          ? transaction.category
+          : (chartConfig[key as keyof typeof chartConfig]?.label ??
+            transaction.category)
 
-      acc[transaction.category] =
-        (acc[transaction.category] ?? 0) + transaction.amount
+      acc[label] = (acc[label] ?? 0) + transaction.amount
       return acc
     }, {})
 
   return Object.entries(totalsByCategory)
     .map(([category, amount]) => {
-      const key = categoryToKey[category]
+      const key = categoryToKey[category] ?? "otros"
       return {
         category,
         amount,
@@ -56,13 +63,17 @@ function buildExpenseChartData(
 }
 
 function buildExpenseTransactionsByCategory(
-  transactions: Transaction[]
+  transactions: FinanceTransaction[]
 ): Record<string, CategoryTransaction[]> {
   return transactions
     .filter((transaction) => transaction.type === "gasto")
     .reduce<Record<string, CategoryTransaction[]>>((acc, transaction) => {
-      const key = categoryToKey[transaction.category]
-      if (!key) return acc
+      const key = resolveCategoryKey(transaction.category)
+      const normalizedCategory =
+        key === "otros" && !categoryToKey[transaction.category]
+          ? transaction.category
+          : (chartConfig[key as keyof typeof chartConfig]?.label ??
+            transaction.category)
 
       const tx: CategoryTransaction = {
         id: transaction.id,
@@ -73,15 +84,15 @@ function buildExpenseTransactionsByCategory(
         invoiceNumber: transaction.invoiceNumber,
       }
 
-      if (!acc[transaction.category]) {
-        acc[transaction.category] = []
+      if (!acc[normalizedCategory]) {
+        acc[normalizedCategory] = []
       }
-      acc[transaction.category]!.push(tx)
+      acc[normalizedCategory]!.push(tx)
       return acc
     }, {})
 }
 
-export function ExpensesPieChart({ data }: { data: Transaction[] }) {
+export function ExpensesPieChart({ data }: { data: FinanceTransaction[] }) {
   const chartData = React.useMemo(() => buildExpenseChartData(data), [data])
   const transactionsByCategory = React.useMemo(
     () => buildExpenseTransactionsByCategory(data),

@@ -1,5 +1,5 @@
 import type { ParcelApiResponse, ParcelItem } from "./parcel-types"
-import type { WeatherDaily, WeatherMetrics } from "@/store/parcel-weather.mock"
+import type { WeatherDaily, WeatherMetrics } from "@/lib/parcel/types"
 import { ParcelWeatherDashboard } from "./parcel-weather-dashboard"
 
 type ParcelSingleViewProps = {

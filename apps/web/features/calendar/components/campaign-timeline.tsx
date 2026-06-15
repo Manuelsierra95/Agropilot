@@ -27,169 +27,9 @@ import {
   Link2,
 } from "lucide-react"
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-
-const CAMPAIGN_DAYS = [
-  "Lun 1",
-  "Mar 2",
-  "Mié 3",
-  "Jue 4",
-  "Vie 5",
-  "Sáb 6",
-  "Dom 7",
-  "Lun 8",
-  "Mar 9",
-  "Mié 10",
-  "Jue 11",
-  "Vie 12",
-  "Sáb 13",
-  "Dom 14",
-  "Lun 15",
-  "Mar 16",
-  "Mié 17",
-  "Jue 18",
-  "Vie 19",
-  "Sáb 20",
-  "Dom 21",
-  "Lun 22",
-  "Mar 23",
-  "Mié 24",
-  "Jue 25",
-  "Vie 26",
-  "Sáb 27",
-  "Dom 28",
-  "Lun 29",
-  "Mar 30",
-]
-
-/**
- * @typedef {"pending" | "in_progress" | "completed"} TaskStatus
- *
- * @typedef {Object} CampaignTask
- * @property {string}     id
- * @property {string}     name
- * @property {string}     [dependsOn]   - id of another task this one depends on
- * @property {TaskStatus} status
- * @property {number}     startDay      - 0-indexed (0 = Lun)
- * @property {number}     durationDays
- * @property {string}     [note]
- */
-
-/** @type {CampaignTask[]} */
-export const MOCK_CAMPAIGN_TASKS = [
-  {
-    id: "soil-prep",
-    name: "Preparación del suelo",
-    status: "completed",
-    startDay: 0,
-    durationDays: 2,
-    note: "Arado y nivelación completados",
-  },
-  {
-    id: "seed-sowing",
-    name: "Siembra de semillas",
-    dependsOn: "soil-prep",
-    status: "completed",
-    startDay: 2,
-    durationDays: 3,
-    note: "Variedad: tomate cherry",
-  },
-  {
-    id: "irrigation",
-    name: "Instalación de riego",
-    dependsOn: "soil-prep",
-    status: "in_progress",
-    startDay: 4,
-    durationDays: 3,
-    note: "Riego por goteo",
-  },
-  {
-    id: "fertilization",
-    name: "Fertilización",
-    dependsOn: "seed-sowing",
-    status: "in_progress",
-    startDay: 5,
-    durationDays: 3,
-    note: "Abono orgánico NPK",
-  },
-  {
-    id: "pest-control",
-    name: "Control de plagas",
-    dependsOn: "seed-sowing",
-    status: "pending",
-    startDay: 7,
-    durationDays: 4,
-    note: "Tratamiento preventivo",
-  },
-  {
-    id: "harvest-early",
-    name: "Cosecha temprana",
-    dependsOn: "irrigation",
-    status: "pending",
-    startDay: 10,
-    durationDays: 3,
-    note: "Primera recolección",
-  },
-  {
-    id: "pruning",
-    name: "Poda de mantenimiento",
-    dependsOn: "pest-control",
-    status: "pending",
-    startDay: 12,
-    durationDays: 2,
-    note: "Eliminar ramas improductivas",
-  },
-  {
-    id: "second-fertilization",
-    name: "Segunda fertilización",
-    dependsOn: "fertilization",
-    status: "pending",
-    startDay: 14,
-    durationDays: 2,
-    note: "Refuerzo de nutrientes",
-  },
-  {
-    id: "quality-check",
-    name: "Control de calidad",
-    dependsOn: "harvest-early",
-    status: "pending",
-    startDay: 16,
-    durationDays: 3,
-    note: "Inspección de frutos",
-  },
-  {
-    id: "main-harvest",
-    name: "Cosecha principal",
-    dependsOn: "quality-check",
-    status: "pending",
-    startDay: 19,
-    durationDays: 5,
-    note: "Recolección masiva",
-  },
-  {
-    id: "post-harvest",
-    name: "Tratamiento post-cosecha",
-    dependsOn: "main-harvest",
-    status: "pending",
-    startDay: 24,
-    durationDays: 3,
-    note: "Limpieza y clasificación",
-  },
-  {
-    id: "storage",
-    name: "Almacenamiento",
-    dependsOn: "post-harvest",
-    status: "pending",
-    startDay: 27,
-    durationDays: 3,
-    note: "Cámara frigorífica",
-  },
-]
+import type { CampaignTimelineTask } from "@/lib/calendar/types"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-
-/** Today is Thursday = index 3 */
-const TODAY_INDEX = 8
 
 const STATUS_CONFIG = {
   completed: {
@@ -255,15 +95,7 @@ function LegendDot({
   )
 }
 
-interface CampaignTask {
-  id: string
-  name: string
-  dependsOn?: string
-  status: "pending" | "in_progress" | "completed"
-  startDay: number
-  durationDays: number
-  note?: string
-}
+type CampaignTask = CampaignTimelineTask
 
 function EnhancedTooltipContent({
   task,
@@ -431,15 +263,15 @@ function TaskRow({
  * CampaignTimeline
  */
 export function CampaignTimeline({
-  tasks = MOCK_CAMPAIGN_TASKS,
-  todayIndex = TODAY_INDEX,
-  days = CAMPAIGN_DAYS,
-  title = "Temporada de Cultivo",
+  tasks,
+  todayIndex,
+  days,
+  title,
 }: {
-  tasks?: CampaignTask[]
-  todayIndex?: number
-  days?: string[]
-  title?: string
+  tasks: CampaignTask[]
+  todayIndex: number
+  days: string[]
+  title: string
 }) {
   const totalDays = days.length
   const columnWidth = 80 // px per day
@@ -697,7 +529,7 @@ export function CampaignTimeline({
               >
                 {days.map((day, i) => (
                   <div
-                    key={day}
+                    key={i}
                     className={cn(
                       "flex items-center justify-center border-l border-border/30 text-xs first:border-l-0",
                       i === todayIndex

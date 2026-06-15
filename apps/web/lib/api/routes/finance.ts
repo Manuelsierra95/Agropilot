@@ -9,6 +9,7 @@ import {
   TransactionUpdateInput,
   type DashboardCampaignMargin,
   type DashboardFinanceResume,
+  type DashboardFinanceTransaction,
   type DashboardOlivePriceItem,
   type DashboardProductionValue,
   type DashboardParcelsFinanceComparison,
@@ -127,6 +128,14 @@ const getRecentTransactions = (
     .then((res) => res.json())
     .then((res) => res.transactions)
 
+const getScopedTransactions = (
+  scope: DashboardScopeParams
+): Promise<DashboardFinanceTransaction[]> =>
+  client.api.v1.finance.transactions
+    .$get({ query: toScopeQuery(scope) })
+    .then((res) => res.json())
+    .then((res) => res.transactions)
+
 const getProductionValue = (
   scope: DashboardScopeParams
 ): Promise<DashboardProductionValue> =>
@@ -155,6 +164,7 @@ export const financeApi = {
   getFinanceResume,
   getCampaignMargin,
   getRecentTransactions,
+  getScopedTransactions,
   getProductionValue,
   getParcelsFinanceComparison,
   getParcelsSellingWindows,

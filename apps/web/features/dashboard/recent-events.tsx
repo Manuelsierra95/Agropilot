@@ -18,7 +18,7 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 import { ArrowRightIcon } from "lucide-react"
-import type { CalendarEvent } from "@/lib/calendar-mock"
+import type { CalendarEvent } from "@/lib/calendar/types"
 import Link from "next/link"
 
 const dateFormatter = new Intl.DateTimeFormat("es-ES", {

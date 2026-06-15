@@ -17,8 +17,6 @@ import {
 
 import type { AllModeSummary, ParcelComparisonItem } from "./parcel-types"
 import { formatNumber } from "./parcel-utils"
-import { KpiCard } from "./price-kpi-card"
-import { genericPriceKpis } from "./price-kpi-mock"
 
 const comparisonChartConfig = {
   area: {
@@ -65,7 +63,7 @@ export function ParcelAllView({
   return (
     <div className="grid gap-4">
       <section className="grid gap-4 xl:grid-cols-3">
-        <Card className="xl:col-span-2">
+        <Card className="bg-background ring-0 xl:col-span-2">
           <CardHeader>
             <CardTitle>Comparativa entre parcelas</CardTitle>
             <CardDescription>
@@ -102,7 +100,7 @@ export function ParcelAllView({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-background ring-0">
           <CardHeader>
             <CardTitle>Lectura rápida</CardTitle>
             <CardDescription>
@@ -130,7 +128,7 @@ export function ParcelAllView({
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <Card>
+        <Card className="bg-background ring-0">
           <CardHeader>
             <CardTitle>Temperatura vs déficit hídrico</CardTitle>
             <CardDescription>
@@ -167,7 +165,7 @@ export function ParcelAllView({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-background ring-0">
           <CardHeader>
             <CardTitle>Sequía y estrés térmico</CardTitle>
             <CardDescription>

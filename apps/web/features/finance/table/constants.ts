@@ -2,19 +2,19 @@ export const PAYMENT_METHOD_LABELS: Record<string, string> = {
   transferencia: "Transferencia",
   tarjeta: "Tarjeta",
   efectivo: "Efectivo",
+  cheque: "Cheque",
   otro: "Otro",
 }
 
 export const CATEGORIES = [
-  "Semillas",
-  "Fertilizantes",
-  "Fitosanitarios",
+  "Riego",
+  "Fertilización",
+  "Tratamiento",
+  "Mano de obra",
   "Maquinaria",
   "Combustible",
-  "Mano de obra",
-  "Riego",
+  "Cosecha",
   "Venta de cosecha",
   "Subvenciones",
-  "Seguros",
   "Otros",
 ]

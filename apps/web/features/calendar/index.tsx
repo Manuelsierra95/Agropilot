@@ -1,24 +1,130 @@
+"use client"
+
+import { useMemo } from "react"
+
 import { PageContainer } from "@/components/ui/page-container"
-import { calendarMockData } from "@/lib/calendar-mock"
-import { CalendarClient } from "@/features/calendar/components/calendar/calendar-client"
 import { GradientSeparator } from "@/components/ui/gradient-separator"
+import { WidgetSkeleton } from "@/features/dashboard/dashboard-skeleton"
+import { CalendarClient } from "@/features/calendar/components/calendar/calendar-client"
+import { ActiveAlertsCard } from "@/features/calendar/components/active-alerts-card"
+import { CampaignTimeline } from "@/features/calendar/components/campaign-timeline"
+import { KpisCard } from "@/features/calendar/components/kpis-card"
+import { RecommendationsCard } from "@/features/calendar/components/recommendations-card"
+import { Kanban } from "@/features/calendar/components/kanban"
 import {
-  TimeWeatherCard,
-  mockForecast,
-  mockWeatherData,
-} from "@/features/calendar/components/calendar/sidecards/time-weather-card"
-import { ActiveAlertsCard } from "./components/active-alerts-card"
-import { CampaignTimeline } from "./components/campaign-timeline"
-import { KpisCard } from "./components/kpis-card"
-import { RecommendationsCard } from "./components/recommendations-card"
-import { Kanban } from "./components/kanban"
+  useAllParcelsRecommendations,
+  useAllParcelsRisks,
+  useParcelRecommendations,
+  useParcelRisks,
+} from "@/hooks/dashboard"
+import {
+  useCalendarEvents,
+  useParcelWeatherForecast,
+} from "@/hooks/calendar"
+import { useIsAllParcelsSelected } from "@/hooks/use-is-all-parcels-selected"
+import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
+import {
+  allParcelsRecommendationsToCardItems,
+  eventsToCampaignTimeline,
+  parcelRecommendationsToCardItems,
+  risksToActiveAlerts,
+  risksToActiveAlertsAll,
+} from "@/lib/calendar/mappers"
+import {
+  selectCampaignsForParcel,
+  useDashboardListsStore,
+} from "@/store/useDashboardListsStore"
 
 export default function Calendar() {
+  const isAllParcels = useIsAllParcelsSelected()
+  const [{ parcelId, campaignId, from, to }] = useDashboardScopeParams()
+
+  const campaigns = useDashboardListsStore((state) =>
+    selectCampaignsForParcel(state, parcelId)
+  )
+
+  const calendarEvents = useCalendarEvents()
+  const weatherForecast = useParcelWeatherForecast()
+  const parcelRecommendations = useParcelRecommendations()
+  const allRecommendations = useAllParcelsRecommendations()
+  const parcelRisks = useParcelRisks()
+  const allRisks = useAllParcelsRisks()
+
+  const events = calendarEvents.data ?? []
+
+  const activeCampaign = useMemo(() => {
+    if (from && to) {
+      return {
+        name: "Rango personalizado",
+        startDate: from,
+        endDate: to,
+      }
+    }
+    return (
+      campaigns.find((campaign) => campaign.id === campaignId) ??
+      campaigns.find((campaign) => campaign.status === "active") ??
+      campaigns[0]
+    )
+  }, [campaignId, campaigns, from, to])
+
+  const timelineData = useMemo(() => {
+    if (!activeCampaign) return null
+    return eventsToCampaignTimeline(
+      events,
+      activeCampaign.startDate,
+      activeCampaign.endDate,
+      activeCampaign.name
+    )
+  }, [activeCampaign, events])
+
+  const alerts = useMemo(() => {
+    if (isAllParcels) {
+      return risksToActiveAlertsAll(allRisks.data ?? [])
+    }
+    if (!parcelRisks.data) return []
+    const parcelName =
+      events.find((event) => event.parcelId === parcelId)?.parcelName ?? "Parcela"
+    return risksToActiveAlerts(parcelRisks.data, parcelName)
+  }, [allRisks.data, events, isAllParcels, parcelId, parcelRisks.data])
+
+  const recommendations = useMemo(() => {
+    if (isAllParcels) {
+      return allParcelsRecommendationsToCardItems(allRecommendations.data ?? [])
+    }
+    const parcelName =
+      events.find((event) => event.parcelId === parcelId)?.parcelName ?? "Parcela"
+    return parcelRecommendationsToCardItems(
+      parcelRecommendations.data ?? [],
+      parcelName
+    )
+  }, [
+    allRecommendations.data,
+    events,
+    isAllParcels,
+    parcelId,
+    parcelRecommendations.data,
+  ])
+
+  const forecast = isAllParcels ? undefined : weatherForecast.forecast
+
   return (
     <PageContainer className="grid grid-cols-[1fr_auto_1fr_auto_1fr] grid-rows-[minmax(0,300px)_auto_minmax(0,1120px)_auto_auto] gap-4">
-      {/* 🔴 TOP: DECISION LAYER */}
       <div className="col-start-1 row-start-1">
-        <ActiveAlertsCard />
+        {isAllParcels
+          ? allRisks.isPending && !allRisks.data?.length
+            ? (
+                <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
+              )
+            : (
+                <ActiveAlertsCard alerts={alerts} />
+              )
+          : parcelRisks.isPending && !parcelRisks.data
+            ? (
+                <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
+              )
+            : (
+                <ActiveAlertsCard alerts={alerts} />
+              )}
       </div>
 
       <GradientSeparator
@@ -27,7 +133,22 @@ export default function Calendar() {
       />
 
       <div className="col-start-3 row-start-1">
-        <RecommendationsCard />
+        {isAllParcels
+          ? allRecommendations.isPending &&
+            allRecommendations.data === undefined
+            ? (
+                <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
+              )
+            : (
+                <RecommendationsCard recommendations={recommendations} />
+              )
+          : parcelRecommendations.isPending && !parcelRecommendations.data
+            ? (
+                <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
+              )
+            : (
+                <RecommendationsCard recommendations={recommendations} />
+              )}
       </div>
 
       <GradientSeparator
@@ -36,7 +157,11 @@ export default function Calendar() {
       />
 
       <div className="col-start-5 row-start-1">
-        <KpisCard events={calendarMockData} />
+        {calendarEvents.isPending && !calendarEvents.data ? (
+          <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
+        ) : (
+          <KpisCard events={events} />
+        )}
       </div>
 
       <GradientSeparator
@@ -44,12 +169,12 @@ export default function Calendar() {
         className="col-span-5 col-start-1 row-start-2"
       />
 
-      {/* 🗓️ MAIN */}
       <div className="col-span-3 row-start-3 overflow-auto">
-        <CalendarClient
-          initialEvents={calendarMockData}
-          forecast={mockForecast}
-        />
+        {calendarEvents.isPending && !calendarEvents.data ? (
+          <WidgetSkeleton className="h-full min-h-[480px]" contentHeight="h-full" />
+        ) : (
+          <CalendarClient initialEvents={events} forecast={forecast} />
+        )}
       </div>
 
       <GradientSeparator
@@ -58,17 +183,29 @@ export default function Calendar() {
       />
 
       <div className="col-start-5 row-start-3">
-        <Kanban events={calendarMockData} />
+        {calendarEvents.isPending && !calendarEvents.data ? (
+          <WidgetSkeleton className="h-full min-h-[480px]" contentHeight="h-full" />
+        ) : (
+          <Kanban events={events} />
+        )}
       </div>
 
-      {/* 📊 Timeline */}
       <GradientSeparator
         orientation="horizontal"
         className="col-span-5 col-start-1 row-start-4"
       />
 
       <div className="col-span-5 col-start-1 row-start-5">
-        <CampaignTimeline />
+        {!timelineData ? (
+          <WidgetSkeleton className="h-[280px]" contentHeight="h-[240px]" />
+        ) : (
+          <CampaignTimeline
+            tasks={timelineData.tasks}
+            days={timelineData.days}
+            todayIndex={timelineData.todayIndex}
+            title={timelineData.title}
+          />
+        )}
       </div>
     </PageContainer>
   )

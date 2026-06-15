@@ -2,65 +2,46 @@
 
 import * as React from "react"
 import { type ChartConfig } from "@workspace/ui/components/chart"
-import { type Transaction } from "@/store/mockTransactions"
+import type { FinanceTransaction } from "@/lib/finance/types"
 import { IncomeDrawer } from "../drawer/income-drawer"
 import type { CategoryTransaction } from "../drawer/components/category-drawer"
 import { FinancePieChart, type PieChartDataItem } from "./components/pie-chart"
 
 const chartConfig = {
-  cereales: { label: "Venta de cereales", color: "var(--pie-income-1)" },
-  girasol: { label: "Venta de girasol", color: "var(--pie-income-2)" },
-  pac: { label: "Subvenciones PAC", color: "var(--pie-income-3)" },
-  arrendamiento: {
-    label: "Arrendamiento de tierras",
-    color: "var(--pie-income-4)",
-  },
-  leguminosas: { label: "Venta de leguminosas", color: "var(--pie-income-5)" },
-  servicios: { label: "Servicios agronómicos", color: "var(--pie-income-6)" },
-  agroseguros: {
-    label: "Agroseguros / indemnizaciones",
-    color: "var(--pie-income-7)",
-  },
-  otros: { label: "Otros ingresos", color: "var(--pie-income-8)" },
+  venta: { label: "Venta de cosecha", color: "var(--pie-income-1)" },
+  subvenciones: { label: "Subvenciones", color: "var(--pie-income-2)" },
+  otros: { label: "Otros", color: "var(--pie-income-3)" },
 } satisfies ChartConfig
 
 const categoryToKey: Record<string, string> = {
-  "Venta de cereales": "cereales",
-  "Venta de girasol": "girasol",
-  "Subvenciones PAC": "pac",
-  "Arrendamiento de tierras": "arrendamiento",
-  "Venta de leguminosas": "leguminosas",
-  "Servicios agronómicos": "servicios",
-  "Agroseguros / indemnizaciones": "agroseguros",
-  "Otros ingresos": "otros",
-  // Alias para categorías actuales del mock
-  "Venta de cosecha": "cereales",
-  Subvenciones: "pac",
+  "Venta de cosecha": "venta",
+  Subvenciones: "subvenciones",
 }
 
-function buildIncomeChartData(transactions: Transaction[]): PieChartDataItem[] {
+function resolveCategoryKey(category: string): string {
+  return categoryToKey[category] ?? "otros"
+}
+
+function buildIncomeChartData(
+  transactions: FinanceTransaction[]
+): PieChartDataItem[] {
   const totalsByCategory = transactions
     .filter((transaction) => transaction.type === "ingreso")
     .reduce<Record<string, number>>((acc, transaction) => {
-      const key = categoryToKey[transaction.category]
-      if (!key) return acc
+      const key = resolveCategoryKey(transaction.category)
+      const label =
+        key === "otros" && !categoryToKey[transaction.category]
+          ? transaction.category
+          : (chartConfig[key as keyof typeof chartConfig]?.label ??
+            transaction.category)
 
-      const normalizedCategory =
-        key === "cereales"
-          ? "Venta de cereales"
-          : key === "pac"
-            ? "Subvenciones PAC"
-            : transaction.category
-
-      acc[normalizedCategory] =
-        (acc[normalizedCategory] ?? 0) + transaction.amount
-
+      acc[label] = (acc[label] ?? 0) + transaction.amount
       return acc
     }, {})
 
   return Object.entries(totalsByCategory)
     .map(([category, amount]) => {
-      const key = categoryToKey[category]
+      const key = categoryToKey[category] ?? "otros"
       return {
         category,
         amount,
@@ -71,20 +52,17 @@ function buildIncomeChartData(transactions: Transaction[]): PieChartDataItem[] {
 }
 
 function buildIncomeTransactionsByCategory(
-  transactions: Transaction[]
+  transactions: FinanceTransaction[]
 ): Record<string, CategoryTransaction[]> {
   return transactions
     .filter((transaction) => transaction.type === "ingreso")
     .reduce<Record<string, CategoryTransaction[]>>((acc, transaction) => {
-      const key = categoryToKey[transaction.category]
-      if (!key) return acc
-
+      const key = resolveCategoryKey(transaction.category)
       const normalizedCategory =
-        key === "cereales"
-          ? "Venta de cereales"
-          : key === "pac"
-            ? "Subvenciones PAC"
-            : transaction.category
+        key === "otros" && !categoryToKey[transaction.category]
+          ? transaction.category
+          : (chartConfig[key as keyof typeof chartConfig]?.label ??
+            transaction.category)
 
       const tx: CategoryTransaction = {
         id: transaction.id,
@@ -103,7 +81,7 @@ function buildIncomeTransactionsByCategory(
     }, {})
 }
 
-export function IncomePieChart({ data }: { data: Transaction[] }) {
+export function IncomePieChart({ data }: { data: FinanceTransaction[] }) {
   const chartData = React.useMemo(() => buildIncomeChartData(data), [data])
   const transactionsByCategory = React.useMemo(
     () => buildIncomeTransactionsByCategory(data),

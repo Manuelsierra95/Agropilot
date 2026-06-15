@@ -18,18 +18,11 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 import { ArrowRightIcon } from "lucide-react"
-import type { Transaction } from "@/store/mockTransactions"
+import type { FinanceTransactionSnapshot } from "@/lib/finance/types"
 import Link from "next/link"
 
-type TransactionSnapshot = Omit<
-  Pick<
-    Transaction,
-    "type" | "category" | "amount" | "paymentMethod" | "invoiceNumber" | "date"
-  >,
-  "date"
-> & {
+type TransactionSnapshot = FinanceTransactionSnapshot & {
   date: string | Date
-  parcelName?: string
 }
 
 function toDate(value: string | Date): Date {
@@ -47,12 +40,15 @@ const shortDateFormatter = new Intl.DateTimeFormat("es-ES", {
   month: "short",
 })
 
-const typeLabels: Record<Transaction["type"], string> = {
+const typeLabels: Record<TransactionSnapshot["type"], string> = {
   ingreso: "Ingreso",
   gasto: "Gasto",
 }
 
-const paymentLabels: Record<Transaction["paymentMethod"], string> = {
+const paymentLabels: Record<
+  NonNullable<TransactionSnapshot["paymentMethod"]>,
+  string
+> = {
   efectivo: "Efectivo",
   transferencia: "Transferencia",
   tarjeta: "Tarjeta",
@@ -60,13 +56,13 @@ const paymentLabels: Record<Transaction["paymentMethod"], string> = {
   otro: "Otro",
 }
 
-function formatSignedAmount(type: Transaction["type"], amount: number) {
+function formatSignedAmount(type: TransactionSnapshot["type"], amount: number) {
   const formatted = currencyFormatter.format(Math.abs(amount))
   if (amount === 0) return formatted
   return type === "ingreso" ? `+${formatted}` : `-${formatted}`
 }
 
-function toneClass(type: Transaction["type"]) {
+function toneClass(type: TransactionSnapshot["type"]) {
   return type === "ingreso"
     ? "text-(--primary-income)"
     : "text-(--primary-expense)"

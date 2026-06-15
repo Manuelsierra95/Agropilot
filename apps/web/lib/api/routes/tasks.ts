@@ -22,6 +22,19 @@ const createTask = (data: TaskCreateInput): Promise<TaskSelect> =>
       return body.task
     })
 
+const getCalendarEvents = (
+  scope: DashboardScopeParams
+): Promise<DashboardCalendarEvent[]> =>
+  client.api.v1.tasks["calendar-events"]
+    .$get({ query: toScopeQuery(scope) })
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch calendar events")
+      }
+      return res.json()
+    })
+    .then((body) => body.events)
+
 const getUpcomingWeek = (
   scope: DashboardScopeParams
 ): Promise<DashboardCalendarEvent[]> =>
@@ -37,5 +50,6 @@ const getUpcomingWeek = (
 
 export const tasksApi = {
   createTask,
+  getCalendarEvents,
   getUpcomingWeek,
 }

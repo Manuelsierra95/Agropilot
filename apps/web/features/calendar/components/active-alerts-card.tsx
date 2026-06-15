@@ -25,50 +25,6 @@ export interface ActiveAlert {
   until?: string
 }
 
-// ── mock data ────────────────────────────────────────────────────────────────
-
-export const mockAlerts: ActiveAlert[] = [
-  {
-    id: "alert-1",
-    title: "Viento fuerte",
-    description: "Rachas superiores a 40 km/h. Evitar tratamientos foliares.",
-    severity: "critical",
-    parcelName: "Olivar La Loma",
-    type: "wind",
-    since: "2026-04-07T00:00:00",
-    until: "2026-04-07T23:59:00",
-  },
-  {
-    id: "alert-2",
-    title: "Riesgo mosca del olivo",
-    description:
-      "Presencia detectada en trampas. Revisar antes del tratamiento.",
-    severity: "warning",
-    parcelName: "Finca El Cerro",
-    type: "pest",
-    since: "2026-04-05T08:00:00",
-  },
-  {
-    id: "alert-3",
-    title: "Temperatura elevada",
-    description: "Máximas >32 °C previstas. Adelantar riegos a primera hora.",
-    severity: "warning",
-    parcelName: "Todas las parcelas",
-    type: "heat",
-    since: "2026-04-12T06:00:00",
-    until: "2026-04-14T20:00:00",
-  },
-  {
-    id: "alert-4",
-    title: "Lluvia prevista",
-    description: "10–15 mm en las próximas 48 h. Posponer fertilización.",
-    severity: "info",
-    parcelName: "Todas las parcelas",
-    type: "rain",
-    since: "2026-04-15T00:00:00",
-  },
-]
-
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 const SEVERITY_CONFIG: Record<
@@ -120,16 +76,14 @@ function relativeDate(iso: string) {
 // ── component ────────────────────────────────────────────────────────────────
 
 interface ActiveAlertsCardProps {
-  alerts?: ActiveAlert[]
+  alerts: ActiveAlert[]
 }
 
-export function ActiveAlertsCard({
-  alerts = mockAlerts,
-}: ActiveAlertsCardProps) {
+export function ActiveAlertsCard({ alerts }: ActiveAlertsCardProps) {
   const critical = alerts.filter((a) => a.severity === "critical").length
 
   return (
-    <Card className="flex h-full flex-col gap-0 overflow-hidden bg-background ring-0">
+    <Card className="flex h-full flex-col gap-0 overflow-hidden bg-background pt-0 ring-0">
       {/* Header */}
       <CardHeader className="flex shrink-0 flex-row items-center justify-between border-b px-4">
         <div className="flex items-center gap-2">

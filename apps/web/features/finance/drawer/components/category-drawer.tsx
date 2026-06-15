@@ -28,7 +28,7 @@ import { cn } from "@workspace/ui/lib/utils"
 // ---------------------------------------------------------------------------
 
 export interface CategoryTransaction {
-  id: number
+  id: string
   date: Date
   concept: string
   amount: number
@@ -61,7 +61,7 @@ export interface CategoryDrawerProps {
   /** Mapa de nombre de categoría → icono. Si falta la categoría se usa IconSettings. */
   categoryIcons?: Record<string, IconComponent>
   /** Datos de transacciones indexados por nombre de categoría */
-  dataByCategory: Record<string, CategoryTransaction[]>
+  dataByCategory?: Record<string, CategoryTransaction[]>
   /** Permite inyectar transacciones ya filtradas desde el pie chart */
   transactions?: CategoryTransaction[]
 }
@@ -178,7 +178,7 @@ export function CategoryDrawer({
   const cfg = VARIANT_CONFIG[variant]
 
   const transactions = React.useMemo(
-    () => transactionsProp ?? dataByCategory[category] ?? [],
+    () => transactionsProp ?? dataByCategory?.[category] ?? [],
     [transactionsProp, dataByCategory, category]
   )
 
@@ -202,8 +202,8 @@ export function CategoryDrawer({
         .sort((a, b) => b.date.getTime() - a.date.getTime())
         .map((tx) => ({
           id: tx.id,
-          userId: "drawer",
-          parcelId: 1,
+          userId: null,
+          parcelId: null,
           type: variant === "income" ? "ingreso" : "gasto",
           category,
           concept: tx.concept,

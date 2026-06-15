@@ -4,7 +4,7 @@ import {
   IconFileInvoice,
   IconTrash,
 } from "@tabler/icons-react"
-import { type ColumnDef } from "@tanstack/react-table"
+import type { ColumnDef } from "@tanstack/react-table"
 import { toast } from "sonner"
 
 import { Badge } from "@workspace/ui/components/badge"
@@ -23,6 +23,16 @@ import { PAYMENT_METHOD_LABELS } from "./constants"
 import { formatCurrency, formatDate } from "./helpers"
 import { TypeBadge } from "./components/type-badge"
 import { TableCellViewer } from "./components/table-cell-viewer"
+
+const parcelColumn: ColumnDef<Transaction> = {
+  accessorKey: "parcelName",
+  header: "Parcela",
+  cell: ({ row }) => (
+    <span className="text-sm text-muted-foreground">
+      {row.original.parcelName ?? "—"}
+    </span>
+  ),
+}
 
 export const columns: ColumnDef<Transaction>[] = [
   // ── Selection ────────────────────────────────────────────────────────────
@@ -182,3 +192,16 @@ export const columns: ColumnDef<Transaction>[] = [
     ),
   },
 ]
+
+export function getColumns(showParcelColumn = false): ColumnDef<Transaction>[] {
+  if (!showParcelColumn) return columns
+
+  const conceptIndex = columns.findIndex((col) => col.accessorKey === "concept")
+  if (conceptIndex === -1) return [...columns, parcelColumn]
+
+  return [
+    ...columns.slice(0, conceptIndex + 1),
+    parcelColumn,
+    ...columns.slice(conceptIndex + 1),
+  ]
+}

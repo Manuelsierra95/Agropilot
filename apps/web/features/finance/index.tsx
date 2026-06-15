@@ -1,55 +1,45 @@
+"use client"
+
+import { useMemo } from "react"
+
 import { PageContainer } from "@/components/ui/page-container"
 import { GradientSeparator } from "@/components/ui/gradient-separator"
-
-import { KpiCard, type KpiItem } from "./top-cards/price-kpi-card"
+import { CashFlowSummaryCard } from "@/components/cards/cash-flow-summary-card"
+import { FinanceRecommendationsCard } from "@/components/cards/finance-recommendations-card"
+import { ParcelsFinanceBars } from "@/features/dashboard/all/parcels-finance-bars"
+import { WidgetSkeleton } from "@/features/dashboard/dashboard-skeleton"
 import { ExpensesPieChart } from "./chart/expenses-pie-chart"
 import { IncomePieChart } from "./chart/income-pie-chart"
-
 import { TransactionTable } from "./table"
-
-import { mockTransactions as data } from "@/store/mockTransactions"
-import { ComparativeAreaChart } from "@/components/charts/comparative-area-chart"
-import { FinanceRecommendations } from "./top-cards/finance-recommendations"
-import { CampaignPredictionsCard } from "@/components/cards/campaign-predictions-card"
-import { FinanceRecommendationsCard } from "@/components/cards/finance-recommendations-card"
-import { dashboardPriceKpis, dashboardTransactions } from "../dashboard/mocks"
-import { CashFlowSummaryCard } from "@/components/cards/cash-flow-summary-card"
-
-// Aceites
-const oils: KpiItem[] = [
-  {
-    name: "Virgen Extra",
-    price: 7.85,
-    priceMin: 7.5,
-    priceMax: 8.1,
-    unit: "kg",
-    updatedAt: "2025-03-24",
-  },
-  {
-    name: "Virgen",
-    price: 6.4,
-    priceMin: 6.2,
-    priceMax: 6.9,
-    unit: "kg",
-    updatedAt: "2025-03-24",
-  },
-  {
-    name: "Lampante",
-    price: 2.4,
-    priceMin: 2.2,
-    priceMax: 2.6,
-    unit: "kg",
-    updatedAt: "2025-03-24",
-  },
-]
+import {
+  useOlivePrices,
+  useParcelsFinanceComparison,
+} from "@/hooks/dashboard"
+import { useFinanceTransactions } from "@/hooks/finance"
+import { useIsAllParcelsSelected } from "@/hooks/use-is-all-parcels-selected"
+import { toTransactionSnapshots } from "@/lib/finance/mappers"
 
 export default function Finance() {
+  const isAllParcels = useIsAllParcelsSelected()
+
+  const transactionsQuery = useFinanceTransactions()
+  const olivePrices = useOlivePrices()
+  const parcelsComparison = useParcelsFinanceComparison()
+
+  const rows = transactionsQuery.data ?? []
+  const snapshots = useMemo(() => toTransactionSnapshots(rows), [rows])
+
+  const isLoadingCharts =
+    transactionsQuery.isPending && transactionsQuery.data === undefined
+
   return (
     <PageContainer className="grid grid-cols-[1fr_auto_1fr] grid-rows-[auto] gap-4">
-
-      {/* Row 1 */}
       <div className="col-span-1 row-span-2">
-        <IncomePieChart data={data} />
+        {isLoadingCharts ? (
+          <WidgetSkeleton contentHeight="h-[280px]" />
+        ) : (
+          <IncomePieChart data={rows} />
+        )}
       </div>
 
       <GradientSeparator
@@ -57,22 +47,38 @@ export default function Finance() {
         className="col-span-1 row-span-5"
       />
 
-      <FinanceRecommendationsCard
-        className="col-span-1 col-start-3 row-span-3 row-start-1"
-        transactions={dashboardTransactions}
-        oils={dashboardPriceKpis}
-        redirectButton={false}
-      />
+      <div className="col-span-1 col-start-3 row-span-3 row-start-1 flex flex-col gap-4">
+        {isAllParcels &&
+        parcelsComparison.isPending &&
+        !parcelsComparison.data ? (
+          <WidgetSkeleton contentHeight="h-[140px]" />
+        ) : isAllParcels && parcelsComparison.data?.parcels.length ? (
+          <ParcelsFinanceBars parcels={parcelsComparison.data.parcels} />
+        ) : null}
+
+        {isLoadingCharts || (olivePrices.isPending && !olivePrices.data) ? (
+          <WidgetSkeleton contentHeight="h-[280px]" />
+        ) : (
+          <FinanceRecommendationsCard
+            className="flex-1"
+            transactions={snapshots}
+            oils={olivePrices.data ?? []}
+            redirectButton={false}
+          />
+        )}
+      </div>
 
       <GradientSeparator
         orientation="horizontal"
         className="col-span-1 row-start-3"
       />
 
-      {/* Row 2 */}
-
       <div className="col-span-1 row-span-2 row-start-4">
-        <ExpensesPieChart data={data} />
+        {isLoadingCharts ? (
+          <WidgetSkeleton contentHeight="h-[280px]" />
+        ) : (
+          <ExpensesPieChart data={rows} />
+        )}
       </div>
 
       <GradientSeparator
@@ -81,7 +87,11 @@ export default function Finance() {
       />
 
       <div className="col-span-1 col-start-3 row-start-5">
-        <CashFlowSummaryCard transactions={dashboardTransactions} />
+        {isLoadingCharts ? (
+          <WidgetSkeleton contentHeight="h-[200px]" />
+        ) : (
+          <CashFlowSummaryCard transactions={snapshots} />
+        )}
       </div>
 
       <GradientSeparator
@@ -90,7 +100,11 @@ export default function Finance() {
       />
 
       <div className="col-span-3 row-start-7">
-        <TransactionTable data={data} />
+        {isLoadingCharts ? (
+          <WidgetSkeleton contentHeight="h-[320px]" />
+        ) : (
+          <TransactionTable data={rows} showParcelColumn={isAllParcels} />
+        )}
       </div>
     </PageContainer>
   )

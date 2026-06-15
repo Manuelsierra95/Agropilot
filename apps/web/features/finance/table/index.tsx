@@ -17,7 +17,7 @@ import { toast } from "sonner"
 
 import { Card, CardContent, CardHeader } from "@workspace/ui/components/card"
 
-import { columns } from "./columns"
+import { getColumns } from "./columns"
 import { EmptyState } from "./components/empty-state"
 import {
   TransactionFiltersSection,
@@ -32,12 +32,23 @@ export function TransactionTable({
   data: initialData,
   filtersSection = true,
   enabledFilters,
+  showParcelColumn = false,
 }: {
   data: Transaction[]
   filtersSection?: boolean
   enabledFilters?: readonly FiltersBarFilterOption[]
+  showParcelColumn?: boolean
 }) {
   const [data, setData] = React.useState(() => initialData)
+
+  React.useEffect(() => {
+    setData(initialData)
+  }, [initialData])
+
+  const tableColumns = React.useMemo(
+    () => getColumns(showParcelColumn),
+    [showParcelColumn]
+  )
 
   const { filters, setField, resetFilters, hasActiveFilters, filteredData } =
     useTransactionFilters(data)
@@ -61,7 +72,7 @@ export function TransactionTable({
 
   const table = useReactTable({
     data: filteredData,
-    columns,
+    columns: tableColumns,
     state: {
       sorting,
       columnVisibility,

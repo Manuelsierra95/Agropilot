@@ -8,9 +8,11 @@ import {
   ParcelUpdateInput,
   type DashboardMapParcel,
   type DashboardOlivar,
+  type DashboardParcelAgroclimate,
   type DashboardParcelsCropOverviews,
   type DashboardParcelsRecommendations,
   type DashboardParcelsRisks,
+  type DashboardParcelsWeatherComparison,
   type DashboardRecommendation,
   type DashboardRisks,
 } from "@workspace/schemas"
@@ -129,6 +131,26 @@ const getParcelsRisks = (): Promise<DashboardParcelsRisks> =>
     .then((res) => res.json())
     .then((res) => res.parcelsRisks)
 
+const getParcelAgroclimate = (
+  parcelId: string,
+  scope: DashboardScopeParams
+): Promise<DashboardParcelAgroclimate> =>
+  client.api.v1.parcel[":id"].agroclimate
+    .$get({
+      param: { id: parcelId },
+      query: toScopeQuery(scope),
+    })
+    .then((res) => res.json())
+    .then((res) => res.agroclimate)
+
+const getParcelsWeatherComparison = (
+  scope: DashboardScopeParams
+): Promise<DashboardParcelsWeatherComparison> =>
+  client.api.v1.parcel["weather-comparison"]
+    .$get({ query: toScopeQuery(scope) })
+    .then((res) => res.json())
+    .then((res) => res.comparison)
+
 export const parcelApi = {
   getListParcels: getListParcels,
   getParcelById: getParcelById,
@@ -142,4 +164,6 @@ export const parcelApi = {
   getParcelsCropOverviews,
   getParcelsRecommendations,
   getParcelsRisks,
+  getParcelAgroclimate,
+  getParcelsWeatherComparison,
 }

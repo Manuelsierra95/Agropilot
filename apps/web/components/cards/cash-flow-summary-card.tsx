@@ -18,11 +18,14 @@ import {
 } from "@workspace/ui/components/chart"
 import { cn } from "@workspace/ui/lib/utils"
 
-import type { Transaction } from "@/store/mockTransactions"
+import type { FinanceTransactionSnapshot } from "@/lib/finance/types"
 import { ArrowDown, ArrowUp } from "lucide-react"
 import { GradientSeparator } from "@/components/ui/gradient-separator"
 
-type CashFlowTransaction = Pick<Transaction, "type" | "amount" | "date">
+type CashFlowTransaction = Pick<
+  FinanceTransactionSnapshot,
+  "type" | "amount" | "date"
+>
 
 type BalanceSnapshot = {
   income: number

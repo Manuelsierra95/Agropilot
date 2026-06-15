@@ -1,6 +1,5 @@
-import { mockParcels } from "@/store/mockParcels"
 import type { ParcelApiResponse } from "./parcel-types"
-import type { WeatherMetrics } from "@/store/parcel-weather.mock"
+import type { WeatherMetrics } from "@/lib/parcel/types"
 
 import {
   Card,
@@ -15,6 +14,7 @@ import { formatNumber } from "./parcel-utils"
 
 type ParcelKpiGridProps = {
   isAllSelected: boolean
+  parcelCount?: number
   metrics?: WeatherMetrics
   allModeSummary: AllModeSummary
   olivePriceValue: number
@@ -24,6 +24,7 @@ type ParcelKpiGridProps = {
 
 export function ParcelKpiGrid({
   isAllSelected,
+  parcelCount = 0,
   metrics,
   allModeSummary,
   olivePriceValue,
@@ -49,7 +50,7 @@ export function ParcelKpiGrid({
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
           {isAllSelected
-            ? `Parcelas activas: ${mockParcels.length}`
+            ? `Parcelas activas: ${parcelCount}`
             : apiResponse
               ? `15d: ${formatNumber(apiMetrics?.water.deficit15d ?? 0)} mm · 30d: ${formatNumber(apiMetrics?.water.deficit30d ?? 0)} mm`
               : `Déficit 15d: ${formatNumber(metrics?.waterDeficit15d ?? 0)} mm`}
