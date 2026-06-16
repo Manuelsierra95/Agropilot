@@ -1,68 +1,66 @@
-import type { Env } from "@env"
 import type { MiddlewareHandler } from "hono"
+import { redis } from "@workspace/db"
 
-/**
- * Middleware para manejar la caché de respuestas
- * Almacena en caché las respuestas de las peticiones GET
- * Soporta la invalidación de caché a través de un parámetro de consulta
- */
+interface CacheConfig {
+  ttlSeconds?: number
+}
 
-// TODO: Falta tests
+export function createCacheMiddleware(
+  config: CacheConfig = {}
+): MiddlewareHandler {
+  const { ttlSeconds = 300 } = config
 
-export const cacheMiddleware: MiddlewareHandler<{ Bindings: Env }> = async (
-  c,
-  next
-) => {
-  const env = c.env
-  const maxAge = env.CACHE_MAX_AGE || 604800 // Default 7 días
-  const staleWhileRevalidate = env.CACHE_STALE_WHILE_REVALIDATE || 259200 // Default 3 días
-  const cacheKey = c.req.url
+  return async (c, next) => {
+    if (c.req.method !== "GET") {
+      return await next()
+    }
 
-  if (c.req.method !== "GET") {
-    return await next()
-  }
+    const session = c.get("session")
+    const organizationId = session?.activeOrganizationId
+    if (!organizationId) {
+      return await next()
+    }
 
-  const force = c.req.query("force") === "true"
-  const cache = (globalThis as any).caches?.default
+    const force = c.req.query("force") === "true"
 
-  const cacheKeyRequest = new Request(cacheKey)
+    const url = new URL(c.req.url)
+    const path = url.pathname
+    url.searchParams.delete("force")
+    const cacheKey = `cache:${organizationId}:${path}:${url.searchParams.toString()}`
 
-  try {
-    if (!force && cache) {
-      const cachedResponse = await cache.match(cacheKeyRequest)
-      if (cachedResponse) {
-        const res = new Response(cachedResponse.body, cachedResponse)
-        res.headers.set("X-Cache", "HIT")
-        return res
+    try {
+      if (!force) {
+        const cached = await redis.get(cacheKey)
+        if (cached) {
+          const data = JSON.parse(cached)
+          const res = Response.json(data.body, { status: data.status })
+          res.headers.set("X-Cache", "HIT")
+          res.headers.set("Content-Type", "application/json")
+          return res
+        }
       }
-    }
 
-    await next()
-
-    if (c.res && c.res.status === 200 && cache) {
-      const response = c.res.clone()
-
-      response.headers.set(
-        "Cache-Control",
-        `public, max-age=${maxAge}${
-          staleWhileRevalidate
-            ? `, stale-while-revalidate=${staleWhileRevalidate}`
-            : ""
-        }`
-      )
-      response.headers.set(
-        "Expires",
-        new Date(Date.now() + maxAge * 1000).toUTCString()
-      )
-      response.headers.set("X-Cache", "MISS")
-
-      c.executionCtx?.waitUntil(cache.put(cacheKeyRequest, response))
-    }
-  } catch {
-    if (!c.res) {
       await next()
-    }
-  }
 
-  return c.res
+      if (c.res && c.res.status === 200) {
+        const responseClone = c.res.clone()
+        const body = await responseClone.json()
+
+        await redis.setex(
+          cacheKey,
+          ttlSeconds,
+          JSON.stringify({
+            body,
+            status: c.res.status,
+          })
+        )
+
+        c.res.headers.set("X-Cache", "MISS")
+      }
+    } catch (error) {
+      console.error("Cache middleware error:", error)
+    }
+
+    return c.res
+  }
 }

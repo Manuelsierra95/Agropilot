@@ -3,6 +3,7 @@ import type { Env } from "@env"
 import type { AuthVariables } from "@/types/variables"
 import { zValidator } from "@hono/zod-validator"
 import { requireAuth } from "@/middlewares/require-auth"
+import { createCacheMiddleware } from "@/middlewares/cache"
 import {
   bulkCreateTransactions,
   createTransaction,
@@ -28,6 +29,9 @@ import {
   dashboardRecentTransactionsQuerySchema,
 } from "@workspace/schemas"
 
+const cache5min = createCacheMiddleware({ ttlSeconds: 300 })
+const cache1min = createCacheMiddleware({ ttlSeconds: 60 })
+
 export const financeRoutes = new Hono<{
   Bindings: Env
   Variables: AuthVariables
@@ -37,12 +41,13 @@ export const financeRoutes = new Hono<{
     const transactions = await listTransactions(c.get("organizationId"))
     return c.json({ transactions }, 200)
   })
-  .get("/olive-prices", async (c) => {
+  .get("/olive-prices", cache5min, async (c) => {
     const olivePrices = await getOlivePricesForDashboard()
     return c.json({ olivePrices }, 200)
   })
   .get(
     "/selling-window",
+    cache5min,
     zValidator("query", dashboardScopeQuerySchema),
     async (c) => {
       const filters = c.req.valid("query")
@@ -53,16 +58,22 @@ export const financeRoutes = new Hono<{
       return c.json({ sellingWindow }, 200)
     }
   )
-  .get("/resume", zValidator("query", dashboardScopeQuerySchema), async (c) => {
-    const filters = c.req.valid("query")
-    const finance = await getFinanceResumeForDashboard(
-      c.get("organizationId"),
-      filters
-    )
-    return c.json({ finance }, 200)
-  })
+  .get(
+    "/resume",
+    cache5min,
+    zValidator("query", dashboardScopeQuerySchema),
+    async (c) => {
+      const filters = c.req.valid("query")
+      const finance = await getFinanceResumeForDashboard(
+        c.get("organizationId"),
+        filters
+      )
+      return c.json({ finance }, 200)
+    }
+  )
   .get(
     "/campaign-margin",
+    cache5min,
     zValidator("query", dashboardScopeQuerySchema),
     async (c) => {
       const filters = c.req.valid("query")

@@ -3,6 +3,7 @@ import type { Env } from "@env"
 import type { AuthVariables } from "@/types/variables"
 import { zValidator } from "@hono/zod-validator"
 import { requireAuth } from "@/middlewares/require-auth"
+import { createCacheMiddleware } from "@/middlewares/cache"
 import {
   createParcel,
   deleteParcel,
@@ -25,12 +26,15 @@ import {
   dashboardScopeQuerySchema,
 } from "@workspace/schemas"
 
+const cache5min = createCacheMiddleware({ ttlSeconds: 300 })
+const cache1min = createCacheMiddleware({ ttlSeconds: 60 })
+
 export const parcelRoutes = new Hono<{
   Bindings: Env
   Variables: AuthVariables
 }>()
   .use(requireAuth)
-  .get("/", async (c) => {
+  .get("/", cache1min, async (c) => {
     const parcels = await listParcels(c.get("organizationId"))
     return c.json({ parcels }, 200)
   })
@@ -40,6 +44,7 @@ export const parcelRoutes = new Hono<{
   })
   .get(
     "/crop-overviews",
+    cache5min,
     zValidator("query", dashboardScopeQuerySchema),
     async (c) => {
       const filters = c.req.valid("query")
@@ -103,6 +108,7 @@ export const parcelRoutes = new Hono<{
   )
   .get(
     "/:id/agroclimate",
+    cache5min,
     zValidator("query", dashboardScopeQuerySchema),
     async (c) => {
       const filters = c.req.valid("query")
