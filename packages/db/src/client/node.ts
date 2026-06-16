@@ -2,15 +2,15 @@ import * as schema from "../schemas"
 import { drizzle } from "drizzle-orm/node-postgres"
 import { Pool } from "pg"
 
-export const createLocalDatabase = () => {
-  const databaseUrl = process.env.DATABASE_URL
+export function createDatabaseClient() {
+  const databaseURL = process.env.DATABASE_URL
 
-  if (!databaseUrl) {
+  if (!databaseURL) {
     throw new Error("DATABASE_URL environment variable is not set")
   }
 
   const pool = new Pool({
-    connectionString: databaseUrl,
+    connectionString: databaseURL,
   })
 
   return drizzle(pool, { schema })
