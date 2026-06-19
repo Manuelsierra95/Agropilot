@@ -1,4 +1,4 @@
-import { db, schema, eq, and } from "@workspace/db"
+import { db, schema, eq, and, sql } from "@workspace/db"
 import { HTTPException } from "hono/http-exception"
 import {
   parcelWeatherDataSchema,
@@ -8,6 +8,8 @@ import {
   type WeatherForecastDay,
 } from "@workspace/schemas"
 import { resolveParcelIdForOrg } from "@/services/parcel"
+import { computeSeedRisks, getOlivePhenology } from "./weathercloud"
+import { getNearest, getWeather } from "./weathercloud/helpers"
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)
@@ -53,10 +55,7 @@ export async function getParcelWeatherForCalendar(
   parcelIdParam: string,
   query: ParcelWeatherQuery = {}
 ): Promise<ParcelWeatherResponse> {
-  const parcelId = await resolveParcelIdForOrg(
-    organizationId,
-    parcelIdParam
-  )
+  const parcelId = await resolveParcelIdForOrg(organizationId, parcelIdParam)
 
   if (!parcelId) {
     throw new HTTPException(404, { message: "Parcel not found" })
@@ -120,10 +119,7 @@ export async function getParcelWeatherForCalendar(
     ? {
         temperature: todayEntry.temperature,
         humidity: todayEntry.soilMoisture,
-        condition: deriveCondition(
-          todayEntry.temperature,
-          todayEntry.rainfall
-        ),
+        condition: deriveCondition(todayEntry.temperature, todayEntry.rainfall),
       }
     : null
 
@@ -132,5 +128,97 @@ export async function getParcelWeatherForCalendar(
     parcelName: parcel.name,
     current,
     forecast,
+  }
+}
+
+export async function getParcelRisks(
+  organizationId: string,
+  parcelIdParam: string
+) {
+  const parcelId = await resolveParcelIdForOrg(organizationId, parcelIdParam)
+
+  if (!parcelId) {
+    throw new HTTPException(404, { message: "Parcel not found" })
+  }
+
+  const [parcel] = await db
+    .select({
+      id: schema.parcels.id,
+      name: schema.parcels.name,
+      cropType: schema.parcels.cropType,
+      irrigationType: schema.parcels.irrigationType,
+      lat: sql`ST_Y(${schema.parcels.centroid})`.as("lat"),
+      lng: sql`ST_X(${schema.parcels.centroid})`.as("lng"),
+    })
+    .from(schema.parcels)
+    .where(
+      and(
+        eq(schema.parcels.organizationId, organizationId),
+        eq(schema.parcels.id, parcelId)
+      )
+    )
+    .limit(1)
+
+  if (!parcel) {
+    throw new HTTPException(404, { message: "Parcel not found" })
+  }
+
+  const { lat, lng } = parcel
+
+  if (lat == null || lng == null) {
+    throw new HTTPException(400, { message: "Parcel has no valid coordinates" })
+  }
+
+  /* ---------------- 1. estaciones cercanas ---------------- */
+  const devices = await getNearest(lat, lng, 20)
+
+  if (!devices || !Array.isArray(devices) || devices.length === 0) {
+    throw new HTTPException(500, { message: "No weather stations found" })
+  }
+
+  const nearest = devices[0]
+
+  if (!nearest?.code) {
+    throw new HTTPException(500, { message: "Invalid station data" })
+  }
+
+  /* ---------------- 2. clima ---------------- */
+  const weather = await getWeather(nearest.code)
+
+  if (!weather || "error" in weather) {
+    throw new HTTPException(500, { message: "Failed to fetch weather" })
+  }
+
+  /* ---------------- 3. contexto agronómico ---------------- */
+  const phenology = getOlivePhenology(new Date())
+
+  const context = {
+    crop: parcel.cropType ?? "unknown",
+    irrigation: parcel.irrigationType !== "dry",
+    phenology,
+  }
+
+  /* ---------------- 4. riesgos ---------------- */
+  const risks = computeSeedRisks(
+    {
+      ...weather,
+      device: nearest.id,
+      distance: nearest.distance,
+    },
+    context
+  )
+
+  return {
+    parcelId: parcel.id,
+    parcelName: parcel.name,
+    risks,
+    meta: {
+      stationId: nearest.id,
+      distance: nearest.distance,
+      phenology,
+      crop: context.crop,
+      irrigation: context.irrigation,
+      updatedAt: weather.epoch,
+    },
   }
 }
