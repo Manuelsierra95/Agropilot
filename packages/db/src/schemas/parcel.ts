@@ -13,25 +13,51 @@ import {
 import { organizations } from "./auth"
 import { geometry, geometryPolygon } from "../utils/post-gis"
 import { weatherStation } from "./weatherStation"
-import { campaigns } from "./finance"
 import { primaryKeyField } from "../helper"
+import { campaigns } from "./campaign"
 
 // Tables
 
-export const parcels = pgTable("parcels", {
+export const parcels = pgTable(
+  "parcels",
+  {
+    id: primaryKeyField(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+
+    // TODO: Add more crop types as needed
+    cropType: text("crop_type", {
+      enum: ["olive"],
+    }).notNull(),
+    irrigationType: text("irrigation_type", {
+      enum: ["dryland", "irrigated"],
+    }),
+    areaHa: numeric("area_ha", { precision: 10, scale: 4 }), // Optional user-entered area in hectares
+    areaM2: integer("area_m2"), // Reserved; not computed from geometry
+    centroid: geometry("centroid"), // Centroid point of the parcel (lat/lng fast querys)
+    polygon: geometryPolygon("polygon"), // Full polygon geometry
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [index("parcels_organization_id_idx").on(table.organizationId)]
+)
+
+export const parcelCrops = pgTable("parcel_crops", {
   id: primaryKeyField(),
-  organizationId: text("organization_id")
+  parcelId: text("parcel_id")
     .notNull()
-    .references(() => organizations.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  cropType: text("crop_type").notNull(),
-  irrigationType: text("irrigation_type", {
-    enum: ["dryland", "irrigated"],
-  }),
-  areaHa: numeric("area_ha", { precision: 10, scale: 4 }), // Optional user-entered area in hectares
-  areaM2: integer("area_m2"), // Reserved; not computed from geometry
-  centroid: geometry("centroid"), // Centroid point of the parcel (lat/lng fast querys)
-  polygon: geometryPolygon("polygon"), // Full polygon geometry
+    .unique()
+    .references(() => parcels.id, { onDelete: "cascade" }),
+  variety: text("variety"),
+  soilType: text("soil_type"),
+  plantingDate: timestamp("planting_date"),
+  plantCount: integer("plant_count"),
+  data: jsonb("data").notNull(), // TODO: Añadir en aceite un esquema que añada el tipo de cultivo (intensivo, superintensivo, tradicional)
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -83,7 +109,7 @@ export const parcelWeather = pgTable("parcel_weather", {
   status: text("status", {
     enum: ["ok", "no-data", "error"],
   }).notNull(),
-  data: jsonb("data").notNull(),
+  data: jsonb("data").notNull().default({}),
   metrics: jsonb("metrics").notNull(),
   risks: jsonb("risks").notNull(),
   recommendations: jsonb("recommendations"),
@@ -91,8 +117,8 @@ export const parcelWeather = pgTable("parcel_weather", {
   algorithmVersion: text("algorithm_version").notNull(),
 })
 
-export const parcelFinancialSummaries = pgTable(
-  "parcel_financial_summaries",
+export const parcelCropSeasons = pgTable(
+  "parcel_crop_seasons",
   {
     id: primaryKeyField(),
     parcelId: text("parcel_id")
@@ -101,77 +127,25 @@ export const parcelFinancialSummaries = pgTable(
     campaignId: text("campaign_id")
       .notNull()
       .references(() => campaigns.id),
-    totalIncome: numeric("total_income", { precision: 12, scale: 2 }).default(
-      "0"
-    ),
-    totalExpense: numeric("total_expense", { precision: 12, scale: 2 }).default(
-      "0"
-    ),
-    profit: numeric("profit", { precision: 12, scale: 2 }).default("0"),
-    totalKg: numeric("total_kg", { precision: 12, scale: 2 }).default("0"),
-
-    // KPIs
-    costPerKg: numeric("cost_per_kg", { precision: 12, scale: 4 }),
-    revenuePerKg: numeric("revenue_per_kg", { precision: 12, scale: 4 }),
-    marginPerKg: numeric("margin_per_kg", { precision: 12, scale: 4 }),
-
-    // Comparative metrics vs market
-    avgMarketPrice: numeric("avg_market_price", {
-      precision: 12,
-      scale: 4,
-    }),
-    marginVsMarket: numeric("margin_vs_market", {
-      precision: 12,
-      scale: 4,
-    }),
-
-    // Proyections
-    expectedYieldKg: numeric("expected_yield_kg", {
-      precision: 12,
+    year: integer("year").notNull(),
+    yieldActualKg: numeric("yield_actual_kg", { precision: 12, scale: 2 }),
+    yieldTargetKg: numeric("yield_target_kg", { precision: 12, scale: 2 }),
+    expectedYieldKg: numeric("expected_yield_kg", { precision: 12, scale: 2 }),
+    targetPricePerKg: numeric("target_price_per_kg", {
+      precision: 10,
       scale: 2,
     }),
-    expectedRevenue: numeric("expected_revenue", {
-      precision: 12,
-      scale: 2,
-    }),
-    expectedProfit: numeric("expected_profit", {
-      precision: 12,
-      scale: 2,
-    }),
-
-    calculationVersion: text("calculation_version").default("v1"),
+    notes: text("notes"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => ({
-    parcelCampaignIdx: index("parcel_financial_campaign_idx").on(
-      table.parcelId,
-      table.campaignId
-    ),
-
-    uniqueParcelSeason: unique("parcel_financial_unique").on(
-      table.parcelId,
-      table.campaignId
-    ),
-  })
+  (table) => [
+    unique("parcel_crop_season_unique").on(table.parcelId, table.campaignId),
+  ]
 )
-
-export const parcelCashflowDaily = pgTable("parcel_cashflow_daily", {
-  id: primaryKeyField(),
-  parcelId: text("parcel_id")
-    .notNull()
-    .references(() => parcels.id, { onDelete: "cascade" }),
-  campaignId: text("campaign_id")
-    .notNull()
-    .references(() => campaigns.id),
-  date: date("date").notNull(),
-  income: numeric("income", { precision: 12, scale: 2 }).default("0"),
-  expense: numeric("expense", { precision: 12, scale: 2 }).default("0"),
-  createdAt: timestamp("created_at").defaultNow(),
-})
 
 // Relations
 
@@ -189,6 +163,11 @@ export const parcelsRelations = relations(parcels, ({ one }) => ({
   station: one(parcelStation, {
     fields: [parcels.id],
     references: [parcelStation.parcelId],
+  }),
+
+  crop: one(parcelCrops, {
+    fields: [parcels.id],
+    references: [parcelCrops.parcelId],
   }),
 }))
 

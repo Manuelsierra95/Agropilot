@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, jsonb } from "drizzle-orm/pg-core"
+import { pgTable, text, timestamp, integer, jsonb, index } from "drizzle-orm/pg-core"
 import { organizations } from "./auth"
 import { parcels } from "./parcel"
 import { relations } from "drizzle-orm"
@@ -39,7 +39,13 @@ export const tasks = pgTable("tasks", {
     .$onUpdate(() => new Date())
     .defaultNow()
     .notNull(),
-})
+},
+(table) => [
+  index("tasks_organization_id_idx").on(table.organizationId),
+  index("tasks_org_start_date_idx").on(table.organizationId, table.startDate),
+  index("tasks_org_parcel_idx").on(table.organizationId, table.parcelId),
+  index("tasks_org_status_idx").on(table.organizationId, table.status),
+])
 
 export const taskRelations = relations(tasks, ({ one }) => ({
   organization: one(organizations, {

@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1779956813355,
-      "tag": "0000_tan_cammi",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1779958723105,
-      "tag": "0001_cultured_pestilence",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1780645890613,
-      "tag": "0002_amazing_the_watchers",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1780737915765,
-      "tag": "0003_happy_shatterstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1780998238108,
-      "tag": "0004_puzzling_tyrannus",
+      "when": 1781773866376,
+      "tag": "0000_previous_kate_bishop",
       "breakpoints": true
     }
   ]

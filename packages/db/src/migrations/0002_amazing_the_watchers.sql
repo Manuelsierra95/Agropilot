@@ -1,1 +1,0 @@
-ALTER TABLE "parcel_location" ADD COLUMN "postal_code" text;
