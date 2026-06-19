@@ -2,5 +2,5 @@
  * Reemplaza estos UUIDs tras tu primer login con Google.
  * Puedes obtenerlos desde Drizzle Studio o la tabla users/organizations.
  */
-export const SEED_USER_ID = "nyKpzgYqFK5dBJx9bGL32CYsrnHX36Yz"
-export const SEED_ORGANIZATION_ID = "bf7d156b-1303-4238-bb9a-f21d5960c825"
+export const SEED_USER_ID = "sen98rFx1sCselffs0a9wWIINSOB7Oal"
+export const SEED_ORGANIZATION_ID = "dceffff7-5ddf-40d6-b8be-64651961a676"

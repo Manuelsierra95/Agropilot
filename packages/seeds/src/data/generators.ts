@@ -60,7 +60,7 @@ export function generateParcels() {
       id: crypto.randomUUID(),
       organizationId: SEED_ORGANIZATION_ID,
       name: c.name,
-      cropType: "olivo",
+      cropType: "olive" as const,
       irrigationType: (index % 2 === 0 ? "dryland" : "irrigated") as
         | "dryland"
         | "irrigated",
@@ -374,6 +374,175 @@ export function generateTasks(parcelIds: string[]) {
       meta: { seeded: true },
     })
   }
+
+  return rows
+}
+
+export function generateParcelCrops(parcelIds: string[]) {
+  const varieties = ["Picual", "Hojiblanca", "Arbequina", "Cornicabra"] as const
+  const soilTypes = ["arcilloso", "franco-arcilloso", "franco-arenoso", "calizo"] as const
+
+  return parcelIds.map((parcelId, index) => ({
+    id: crypto.randomUUID(),
+    parcelId,
+    variety: varieties[index % varieties.length]!,
+    soilType: soilTypes[index % soilTypes.length]!,
+    plantingDate: new Date(isoDate(2018 + (index % 5), 11, 15)),
+    plantCount: 800 + index * 200,
+    data: {
+      type: index % 2 === 0 ? "intensivo" : "tradicional",
+      rowSpacing: index % 2 === 0 ? 7 : 10,
+      plantSpacing: index % 2 === 0 ? 5 : 8,
+    },
+  }))
+}
+
+export function generateParcelCropSeasons(
+  parcelIds: string[],
+  campaigns: { id: string; startDate: string }[]
+) {
+  const rows: {
+    id: string
+    parcelId: string
+    campaignId: string
+    year: number
+    yieldActualKg: string | null
+    yieldTargetKg: string | null
+    expectedYieldKg: string | null
+    targetPricePerKg: string | null
+    notes: string | null
+  }[] = []
+
+  for (const campaign of campaigns) {
+    const year = Number.parseInt(campaign.startDate.slice(0, 4), 10)
+
+    parcelIds.forEach((parcelId, index) => {
+      const baseYield = 6200 + index * 800
+      rows.push({
+        id: crypto.randomUUID(),
+        parcelId,
+        campaignId: campaign.id,
+        year,
+        yieldActualKg: campaign.startDate < "2026-01-01"
+          ? (baseYield + (index % 3) * 200).toFixed(2)
+          : null,
+        yieldTargetKg: (baseYield + 500).toFixed(2),
+        expectedYieldKg: (baseYield + 300).toFixed(2),
+        targetPricePerKg: "5.5000",
+        notes: index % 3 === 0 ? "Campaña consequat" : null,
+      })
+    })
+  }
+
+  return rows
+}
+
+export function generateHarvestDeliveries(
+  parcelIds: string[],
+  campaigns: { id: string }[]
+) {
+  const destinations = ["Cooperativa San Francisco", "Almazara La Ermita", "Bodega El Campillo"] as const
+  const grades = ["virgen_extra", "virgen", "lampante"] as const
+  const activeCampaign = campaigns[0]
+
+  if (!activeCampaign) return []
+
+  const rows: {
+    id: string
+    organizationId: string
+    parcelId: string
+    campaignId: string
+    deliveryDate: string
+    destinationName: string
+    rawQuantity: string
+    rawUnit: string
+    conversionRate: string
+    processedQuantity: string
+    processedUnit: string
+    grade: string
+    quantityRemaining: string
+    status: "stored" | "partial" | "sold"
+    targetSalePricePerUnit: string
+    notes: string | null
+  }[] = []
+
+  parcelIds.forEach((parcelId, index) => {
+    const rawQty = 12000 + index * 2500
+    const convRate = 18 + (index % 3) * 2
+    const processedQty = Math.round((rawQty * convRate) / 100)
+    const isPartial = index % 3 === 0
+
+    rows.push({
+      id: crypto.randomUUID(),
+      organizationId: SEED_ORGANIZATION_ID,
+      parcelId,
+      campaignId: activeCampaign.id,
+      deliveryDate: isoDate(2025, 11, 10 + index),
+      destinationName: destinations[index % destinations.length]!,
+      rawQuantity: rawQty.toFixed(2),
+      rawUnit: "kg",
+      conversionRate: convRate.toFixed(2),
+      processedQuantity: processedQty.toFixed(2),
+      processedUnit: "l",
+      grade: grades[index % grades.length]!,
+      quantityRemaining: isPartial
+        ? (processedQty * 0.4).toFixed(2)
+        : processedQty.toFixed(2),
+      status: isPartial ? "partial" : "stored",
+      targetSalePricePerUnit: "5.8000",
+      notes: isPartial ? "Venta parcial a cooperativa" : null,
+    })
+  })
+
+  return rows
+}
+
+export function generateHarvestSales(
+  deliveries: { id: string; parcelId: string; campaignId: string; processedQuantity: string; grade: string | null }[]
+) {
+  const buyers = ["Cooperativa San Francisco", "Almazara La Ermita", "Distribuidora Sur"] as const
+  const pricesByGrade: Record<string, number> = {
+    virgen_extra: 6.2,
+    virgen: 5.1,
+    lampante: 1.8,
+  }
+
+  const rows: {
+    id: string
+    organizationId: string
+    deliveryId: string
+    parcelId: string
+    campaignId: string
+    transactionId: string | null
+    saleDate: string
+    quantitySold: string
+    pricePerUnit: string
+    totalAmount: string
+    buyerName: string
+    notes: string | null
+  }[] = []
+
+  deliveries.forEach((delivery, index) => {
+    const qty = Number.parseFloat(delivery.processedQuantity)
+    const soldQty = index % 3 === 0 ? Math.round(qty * 0.6) : qty
+    const grade = delivery.grade ?? "virgen_extra"
+    const price = pricesByGrade[grade] ?? 5.0
+
+    rows.push({
+      id: crypto.randomUUID(),
+      organizationId: SEED_ORGANIZATION_ID,
+      deliveryId: delivery.id,
+      parcelId: delivery.parcelId,
+      campaignId: delivery.campaignId,
+      transactionId: null,
+      saleDate: isoDate(2025, 12, 5 + index),
+      quantitySold: soldQty.toFixed(2),
+      pricePerUnit: price.toFixed(4),
+      totalAmount: (soldQty * price).toFixed(2),
+      buyerName: buyers[index % buyers.length]!,
+      notes: index % 3 === 0 ? "Entrega parcial" : null,
+    })
+  })
 
   return rows
 }

@@ -13,6 +13,7 @@ import { seedFinance } from "./seeds/finance"
 import { seedInvitations } from "./seeds/invitations"
 import { seedParcelWeather } from "./seeds/parcel-weather"
 import { seedParcels } from "./seeds/parcels"
+import { seedProduction } from "./seeds/production"
 import { seedTasks } from "./seeds/tasks"
 
 async function main() {
@@ -21,11 +22,15 @@ async function main() {
   console.log("✓ user, organization y membership verificados\n")
 
   const { campaigns, weatherStations } = await seedCatalog()
-  const { parcels } = await seedParcels(weatherStations.map((s) => s.id))
+  const { parcels } = await seedParcels(
+    weatherStations.map((s) => s.id),
+    campaigns.map((c) => ({ id: c.id, startDate: c.startDate }))
+  )
   const parcelIds = parcels.map((p) => p.id)
 
   await seedParcelWeather(parcelIds)
   await seedFinance(parcelIds, campaigns)
+  await seedProduction(parcelIds, campaigns)
   await seedTasks(parcelIds)
   await seedBilling()
   await seedInvitations()

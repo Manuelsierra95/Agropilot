@@ -1,6 +1,10 @@
 import { db, schema } from "@workspace/db"
 
-import { generateParcels } from "../data/generators"
+import {
+  generateParcelCropSeasons,
+  generateParcelCrops,
+  generateParcels,
+} from "../data/generators"
 
 const MUNICIPALITIES = ["Úbeda", "Baeza", "Linares", "Andújar"] as const
 
@@ -9,7 +13,8 @@ export type ParcelSeedResult = {
 }
 
 export async function seedParcels(
-  weatherStationIds: string[]
+  weatherStationIds: string[],
+  campaigns: { id: string; startDate: string }[]
 ): Promise<ParcelSeedResult> {
   const parcels = generateParcels()
 
@@ -47,6 +52,16 @@ export async function seedParcels(
     )
     console.log("✓ parcel_station")
   }
+
+  const parcelIds = parcels.map((p) => p.id)
+
+  const crops = generateParcelCrops(parcelIds)
+  await db.insert(schema.parcelCrops).values(crops)
+  console.log("✓ parcel_crops")
+
+  const seasons = generateParcelCropSeasons(parcelIds, campaigns)
+  await db.insert(schema.parcelCropSeasons).values(seasons)
+  console.log(`✓ parcel_crop_seasons (${seasons.length})`)
 
   return { parcels }
 }
