@@ -8,6 +8,13 @@
       "when": 1781773866376,
       "tag": "0000_previous_kate_bishop",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781862593699,
+      "tag": "0001_numerous_warbird",
+      "breakpoints": true
     }
   ]
 }
