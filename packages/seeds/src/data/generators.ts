@@ -64,7 +64,6 @@ export function generateParcels() {
       irrigationType: (index % 2 === 0 ? "dryland" : "irrigated") as
         | "dryland"
         | "irrigated",
-      areaHa: areaHa.toFixed(4),
       areaM2: Math.round(areaHa * 10_000),
       centroid: pointWkt(c.lng, c.lat),
       polygon: `POLYGON((${c.lng} ${c.lat}, ${c.lng + 0.002} ${c.lat}, ${c.lng + 0.002} ${c.lat + 0.002}, ${c.lng} ${c.lat + 0.002}, ${c.lng} ${c.lat}))`,

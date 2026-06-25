@@ -9,13 +9,11 @@ import {
 } from "@workspace/ui/components/field"
 import { ScrollArea } from "@workspace/ui/components/scroll-area"
 import { CropTypeSelector } from "./crop-type-selector"
-import { IrrigationToggle } from "./irrigation-toggle"
 import { ParcelSearch } from "./parcel-search/parcel-search"
 import type { ParcelAddress } from "@/lib/cadastre/types"
 import type { ParcelSearchResult } from "./parcel-search/types"
 import type { SearchParcelFn } from "@/lib/cadastre/types"
 import {
-  hectaresToSquareMeters,
   type ParcelCreateInput,
   type ParcelUpdateInput,
 } from "@workspace/schemas"
@@ -24,13 +22,13 @@ import {
   draftCentroidFromCoordinates,
   toWktPolygon,
 } from "@/lib/cadastre/geometry"
-import { DEFAULT_CROP_TYPE, type IrrigationType } from "./parcel-constants"
+import { DEFAULT_CROP_TYPE, type CropTypeValue, type IrrigationType } from "./parcel-constants"
 
 export interface FieldFormData {
   id: string
   serverId?: string | null
   name: string
-  cropType: string
+  cropType: CropTypeValue
   irrigationType?: IrrigationType
   areaHa?: number | null
   polygon?: string | null
@@ -41,7 +39,6 @@ export interface FieldFormData {
 
 export type ParcelFormErrors = {
   name?: string
-  irrigationType?: string
   geometry?: string
 }
 
@@ -134,10 +131,6 @@ export function validateParcelForm(data: FieldFormData): ParcelFormErrors {
     errors.name = "Introduce un nombre para la parcela."
   }
 
-  if (!data.irrigationType) {
-    errors.irrigationType = "Selecciona un régimen hídrico."
-  }
-
   if (!hasParcelGeometry(data)) {
     errors.geometry = "Localiza la parcela con el buscador antes de continuar."
   }
@@ -171,10 +164,10 @@ function toParcelCoreFields(data: FieldFormData) {
 
   return {
     name: data.name.trim(),
-    cropType: data.cropType || DEFAULT_CROP_TYPE,
+    cropType: (data.cropType || DEFAULT_CROP_TYPE) as "olive",
     irrigationType: data.irrigationType,
     ...(data.areaHa != null
-      ? { areaHa: data.areaHa, areaM2: hectaresToSquareMeters(data.areaHa) }
+      ? { areaM2: Math.round(data.areaHa * 10_000) }
       : {}),
     ...(centroid ? { centroid } : {}),
     ...(polygon ? { polygon } : {}),
@@ -220,7 +213,7 @@ export function ParcelForm({
   searchParcel,
   searchDisabled = false,
 }: ParcelFormProps) {
-  const { name, cropType, irrigationType } = value
+  const { name, cropType } = value
   const located = hasParcelGeometry(value)
 
   return (
@@ -266,30 +259,6 @@ export function ParcelForm({
           />
 
           <Field>
-            <FieldLabel htmlFor="parcel-area-ha">Superficie (ha)</FieldLabel>
-            <Input
-              id="parcel-area-ha"
-              name="areaHa"
-              type="number"
-              inputMode="decimal"
-              min={0}
-              step="0.0001"
-              placeholder="Ej: 2,45"
-              value={value.areaHa ?? ""}
-              onChange={(e) => {
-                const raw = e.target.value.trim()
-                onChange({
-                  ...value,
-                  areaHa: raw === "" ? null : Number(raw),
-                })
-              }}
-            />
-            <FieldDescription>
-              Opcional. Introduce las hectáreas de la parcela.
-            </FieldDescription>
-          </Field>
-
-          <Field>
             <FieldLabel>Tipo de cultivo</FieldLabel>
             <CropTypeSelector
               value={cropType || DEFAULT_CROP_TYPE}
@@ -299,24 +268,6 @@ export function ParcelForm({
             />
           </Field>
 
-          <Field data-invalid={Boolean(errors.irrigationType) || undefined}>
-            <FieldLabel htmlFor="parcel-irrigation">
-              Régimen hídrico
-              <span className="text-destructive">*</span>
-            </FieldLabel>
-            <IrrigationToggle
-              value={irrigationType}
-              invalid={Boolean(errors.irrigationType)}
-              onChange={(nextIrrigation) =>
-                onChange({ ...value, irrigationType: nextIrrigation })
-              }
-            />
-            {errors.irrigationType ? (
-              <FieldDescription className="text-destructive">
-                {errors.irrigationType}
-              </FieldDescription>
-            ) : null}
-          </Field>
         </FieldGroup>
       </div>
     </ScrollArea>

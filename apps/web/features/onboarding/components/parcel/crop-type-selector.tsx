@@ -2,11 +2,11 @@
 
 import { cn } from "@workspace/ui/lib/utils"
 import { Check } from "lucide-react"
-import { CROP_OPTIONS } from "./parcel-constants"
+import { CROP_OPTIONS, type CropTypeValue } from "./parcel-constants"
 
 interface CropTypeSelectorProps {
-  value: string
-  onChange: (value: string) => void
+  value: CropTypeValue
+  onChange: (value: CropTypeValue) => void
 }
 
 export function CropTypeSelector({ value, onChange }: CropTypeSelectorProps) {

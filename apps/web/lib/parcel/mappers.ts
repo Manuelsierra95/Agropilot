@@ -4,6 +4,7 @@ import type {
   DashboardParcelsWeatherComparison,
   ParcelSelect,
 } from "@workspace/schemas"
+import { squareMetersToHectares } from "@workspace/schemas"
 
 import type {
   AgroclimateMetrics,
@@ -19,7 +20,7 @@ export function toParcelItem(parcel: ParcelSelect): ParcelItem {
   return {
     id: parcel.id,
     name: parcel.name,
-    area: parcel.areaHa ? Number(parcel.areaHa) : 0,
+    area: parcel.areaM2 ? squareMetersToHectares(parcel.areaM2) : 0,
     type: parcel.cropType,
     irrigationType: parcel.irrigationType,
   }

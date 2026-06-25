@@ -591,7 +591,7 @@ export async function getProductionValueForDashboard(
 
   const aggregatedCashflow = aggregateCashflowByDate(cashflowDaily)
   const totalAreaHa = parcels.reduce(
-    (sum, p) => sum + (p.areaHa ? Number(p.areaHa) : 0),
+    (sum, p) => sum + (p.areaM2 ? p.areaM2 / 10000 : 0),
     0
   )
 

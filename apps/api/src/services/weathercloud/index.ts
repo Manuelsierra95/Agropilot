@@ -228,3 +228,331 @@ export function computeSeedRisks(
     },
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/*                           Recommendation Types                             */
+/* -------------------------------------------------------------------------- */
+
+export type WeatherRiskLevel = "low" | "medium" | "high"
+
+export type RiskAction = {
+  type: "irrigation" | "treatment" | "inspection" | "note"
+  label: string
+  payload?: Record<string, unknown>
+}
+
+export type RiskRecommendation = {
+  riskType: "frost" | "drought" | "waterStress" | "fungalRisk" | "insectRisk" | "thermalStress"
+  title: string
+  description: string
+  urgency: "low" | "medium" | "high"
+  window?: string
+  actions: RiskAction[]
+}
+
+export type ParcelApiRiskDetail = {
+  level: WeatherRiskLevel
+  score: number
+  reasons: string[]
+  recommendation?: RiskRecommendation
+}
+
+/* -------------------------------------------------------------------------- */
+/*                         Recommendation Generator                           */
+/* -------------------------------------------------------------------------- */
+
+function getPhenologyWindow(phenology: PhenologyStage): string | undefined {
+  const windows: Partial<Record<PhenologyStage, string>> = {
+    dormancy: "Aplicar antes de brotación",
+    sprouting: "Recomendar antes de floración",
+    flowering: "Actuar antes de cuajado",
+    fruit_set: "Mantener hasta envero",
+    ripening: "Vigilar hasta recolección",
+  }
+  return windows[phenology]
+}
+
+function recommendWaterStress(
+  score: number,
+  _weather: any,
+  context: AgroContext
+): RiskRecommendation | undefined {
+  if (score < 40) return undefined
+
+  const isHigh = score >= 70
+  const window = getPhenologyWindow(context.phenology)
+
+  if (isHigh) {
+    return {
+      riskType: "waterStress",
+      title: "Riego urgente requerido",
+      description:
+        "Las condiciones indican estrés hídrico severo. Se recomienda aplicar riego suplementario inmediato para evitar daños en el cultivo.",
+      urgency: "high",
+      window,
+      actions: [
+        { type: "irrigation", label: "Aplicar riego suplementario (+30%)" },
+        ...(context.irrigation
+          ? [{ type: "inspection" as const, label: "Revisar sistema de riego" }]
+          : []),
+        { type: "note", label: "Monitorizar humedad del suelo" },
+      ],
+    }
+  }
+
+  return {
+    riskType: "waterStress",
+    title: "Incrementar volumen de riego",
+    description:
+      "Estrés hídrico moderado detectado. Considere aumentar la cantidad de riego y aplicar en las horas de menor evapotranspiración.",
+    urgency: "medium",
+    window,
+    actions: [
+      { type: "irrigation", label: "Regar en horas tempranas o tardías" },
+      { type: "note", label: "Aplicar acolchado para retener humedad" },
+    ],
+  }
+}
+
+function recommendFungal(
+  score: number,
+  _weather: any,
+  context: AgroContext
+): RiskRecommendation | undefined {
+  if (score < 40) return undefined
+
+  const isHigh = score >= 70
+  const isSproutingFlowering =
+    context.phenology === "sprouting" || context.phenology === "flowering"
+
+  if (isHigh) {
+    return {
+      riskType: "fungalRisk",
+      title: "Tratamiento fungicida preventivo",
+      description:
+        "Condiciones favorables para el desarrollo de hongos (humedad alta, temperatura moderada). Se recomienda aplicar tratamiento preventivo.",
+      urgency: "high",
+      window: isSproutingFlowering
+        ? "CRÍTICO — Fase sensible a repilo"
+        : "Aplicar en las próximas 48h",
+      actions: [
+        { type: "treatment", label: "Aplicar fungicida preventivo" },
+        { type: "inspection", label: "Revisar hojas en zonas bajas" },
+        { type: "note", label: "Evitar riego por aspersión" },
+      ],
+    }
+  }
+
+  return {
+    riskType: "fungalRisk",
+    title: "Mejorar ventilación del copa",
+    description:
+      "Riesgo moderado de hongos. Considere mejorar la ventilación del copa y vigilar los primeros síntomas.",
+    urgency: "medium",
+    window: getPhenologyWindow(context.phenology),
+    actions: [
+      { type: "inspection", label: "Vigilar síntomas de repilo" },
+      { type: "note", label: "Evitar densidad excesiva en copa" },
+    ],
+  }
+}
+
+function recommendInsect(
+  score: number,
+  _weather: any,
+  context: AgroContext
+): RiskRecommendation | undefined {
+  if (score < 40) return undefined
+
+  const isHigh = score >= 70
+  const isFlySeason =
+    context.phenology === "fruit_set" || context.phenology === "ripening"
+
+  if (isHigh) {
+    return {
+      riskType: "insectRisk",
+      title: "Instalar trampas mosca del olivo",
+      description:
+        "Condiciones favorables para la mosca del olivo. Se recomienda instalar trampas y realizar monitoreo activo.",
+      urgency: "high",
+      window: isFlySeason
+        ? "CRÍTICO — Periodo activo de mosca"
+        : "Preparar antes de periodo de riesgo",
+      actions: [
+        { type: "treatment", label: "Instalar trampas con atrayente" },
+        { type: "inspection", label: "Revisar frutos cada 3-4 días" },
+        ...(isFlySeason
+          ? [{ type: "treatment" as const, label: "Considerar tratamiento fitosanitario" }]
+          : []),
+      ],
+    }
+  }
+
+  return {
+    riskType: "insectRisk",
+    title: "Monitoreo activo de plagas",
+    description:
+      "Condiciones moderadas para actividad de plagas. Se recomienda vigilancia periódica.",
+    urgency: "medium",
+    window: getPhenologyWindow(context.phenology),
+    actions: [
+      { type: "inspection", label: "Revisar trampas semanalmente" },
+      { type: "note", label: "Control biológico preventivo" },
+    ],
+  }
+}
+
+function recommendThermal(
+  score: number,
+  weather: any,
+  context: AgroContext
+): RiskRecommendation | undefined {
+  if (score < 40) return undefined
+
+  const isHigh = score >= 70
+  const perceived = weather.computed?.feel ?? weather.temp
+
+  if (isHigh && perceived > 30) {
+    return {
+      riskType: "thermalStress",
+      title: "Sombreado y riego de emergencia",
+      description:
+        "Estrés térmico severo por calor. Proteger el cultivo con sombreado y aplicar riego de emergencia.",
+      urgency: "high",
+      window: context.phenology === "flowering"
+        ? "CRÍTICO — Afecta a floración"
+        : undefined,
+      actions: [
+        { type: "irrigation", label: "Riego de emergencia en horas pico" },
+        { type: "note", label: "Activar sombra si disponible" },
+        { type: "note", label: "Evitar poda o laboreo" },
+      ],
+    }
+  }
+
+  if (isHigh && perceived < 5) {
+    return {
+      riskType: "thermalStress",
+      title: "Protección contra frío",
+      description:
+        "Estrés térmico por frío relevante. Proteger los órganos sensibles del cultivo.",
+      urgency: "high",
+      window: context.phenology === "flowering"
+        ? "CRÍTICO — Floración sensible al frío"
+        : undefined,
+      actions: [
+        { type: "note", label: "Activar sistemas antihelada" },
+        { type: "note", label: "No regar antes de la helada" },
+      ],
+    }
+  }
+
+  return {
+    riskType: "thermalStress",
+    title: "Incrementar riego en horas pico",
+    description:
+      "Estrés térmico moderado. Aumente la frecuencia de riego y evite trabajo de campo en las horas más calurosas.",
+    urgency: "medium",
+    window: getPhenologyWindow(context.phenology),
+    actions: [
+      { type: "irrigation", label: "Regar temprano o al atardecer" },
+      { type: "note", label: "Evitar campo entre 12:00-16:00" },
+    ],
+  }
+}
+
+function recommendFrost(
+  score: SeedRiskLevel,
+  context: AgroContext
+): RiskRecommendation | undefined {
+  if (score === "low") return undefined
+
+  const isHigh = score === "high"
+
+  return {
+    riskType: "frost",
+    title: isHigh ? "Protección urgente contra heladas" : "Vigilancia de heladas",
+    description: isHigh
+      ? "Riesgo alto de helada. Activar todos los sistemas de protección disponibles."
+      : "Posible helada leve. Preparar sistemas de protección.",
+    urgency: isHigh ? "high" : "medium",
+    window: context.phenology === "flowering"
+      ? "CRÍTICO — Floración muy sensible"
+      : context.phenology === "sprouting"
+        ? "Brotación sensible al frío"
+        : undefined,
+    actions: [
+      { type: "note", label: "Activar sistemas antihelada" },
+      { type: "note", label: "No regar antes de la helada (suelo húmedo irradia más frío)" },
+      ...(isHigh
+        ? [{ type: "note" as const, label: "Cubrir con mantas térmicas" }]
+        : []),
+    ],
+  }
+}
+
+function recommendDrought(
+  score: SeedRiskLevel,
+  _weather: any,
+  _context: AgroContext
+): RiskRecommendation | undefined {
+  if (score === "low") return undefined
+
+  const isHigh = score === "high"
+
+  return {
+    riskType: "drought",
+    title: isHigh
+      ? "Sequía severa — Riego prioritario"
+      : "Condiciones de sequía — Optimizar riego",
+    description: isHigh
+      ? "Sequía severa detectada. Priorice el riego y reduzca al mínimo el consumo de agua no esencial."
+      : "Condiciones secas. Optimice el programa de riego para mantener la humedad del suelo.",
+    urgency: isHigh ? "high" : "medium",
+    actions: [
+      { type: "irrigation", label: "Regar en horas de menor evapotranspiración" },
+      { type: "note", label: "Aplicar acolchado orgánico" },
+      { type: "note", label: "Monitorizar humedad del suelo" },
+    ],
+  }
+}
+
+export function generateRecommendations(
+  weather: any,
+  risks: SeedRisks,
+  context: AgroContext
+): RiskRecommendation[] {
+  const recommendations: RiskRecommendation[] = []
+
+  if (risks.frost) {
+    const rec = recommendFrost(risks.frost, context)
+    if (rec) recommendations.push(rec)
+  }
+
+  if (risks.drought) {
+    const rec = recommendDrought(risks.drought, weather, context)
+    if (rec) recommendations.push(rec)
+  }
+
+  if (risks.waterStress?.score != null) {
+    const rec = recommendWaterStress(risks.waterStress.score, weather, context)
+    if (rec) recommendations.push(rec)
+  }
+
+  if (risks.fungalRisk?.score != null) {
+    const rec = recommendFungal(risks.fungalRisk.score, weather, context)
+    if (rec) recommendations.push(rec)
+  }
+
+  if (risks.insectRisk?.score != null) {
+    const rec = recommendInsect(risks.insectRisk.score, weather, context)
+    if (rec) recommendations.push(rec)
+  }
+
+  if (risks.thermalStress?.score != null) {
+    const rec = recommendThermal(risks.thermalStress.score, weather, context)
+    if (rec) recommendations.push(rec)
+  }
+
+  return recommendations
+}

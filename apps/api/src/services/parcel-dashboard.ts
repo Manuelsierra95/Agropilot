@@ -10,10 +10,7 @@ import type {
   DashboardRisks,
   DashboardScopeQuery,
 } from "@workspace/schemas"
-import {
-  resolveActiveCampaign,
-  resolveCampaignById,
-} from "@/services/campaign"
+import { resolveActiveCampaign, resolveCampaignById } from "@/services/campaign"
 import {
   getParcelById,
   listParcels,
@@ -23,6 +20,7 @@ import {
   mapDbRecommendationsToDashboard,
   mapDbRisksToDashboard,
 } from "@/services/parcel-dashboard-mappers"
+import { parseWktPoint } from "./geometry-utils"
 
 const TREES_PER_HECTARE = 200
 
@@ -51,26 +49,12 @@ function parseWktPolygon(wkt: string | null | undefined): number[][][] | null {
   return ring.length > 0 ? [ring] : null
 }
 
-function parseWktPoint(
-  wkt: string | null | undefined
-): { lat: number; lng: number } | null {
-  if (!wkt) return null
-
-  const match = wkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i)
-  if (!match?.[1] || !match[2]) return null
-
-  return {
-    lng: Number(match[1]),
-    lat: Number(match[2]),
-  }
-}
-
 function mapParcelsToMapFeatures(
   parcels: {
     id: string
     name: string
     cropType: string
-    areaHa: string | null
+    areaM2: number | null
     polygon: string | null
   }[]
 ): DashboardMapParcel[] {
@@ -82,7 +66,7 @@ function mapParcelsToMapFeatures(
       {
         id: parcel.id,
         name: parcel.name,
-        area: parcel.areaHa ? Number(parcel.areaHa) : 0,
+        area: parcel.areaM2 ? parcel.areaM2 / 10000 : 0,
         type: parcel.cropType,
         color: MAP_PARCEL_COLORS[index % MAP_PARCEL_COLORS.length]!,
         geometryType: "Polygon" as const,
@@ -93,15 +77,17 @@ function mapParcelsToMapFeatures(
 }
 
 function emptyOlivarOverview(
-  parcel: { name: string; cropType: string; areaHa: string | null },
+  parcel: { name: string; cropType: string; areaM2: number | null },
   coordinates: { lat: number; lng: number }
 ): DashboardOlivar {
+  const areaHa = parcel.areaM2 ? parcel.areaM2 / 10000 : 0
+
   return {
     name: parcel.name,
     coordinates,
     stationId: "—",
     cropType: parcel.cropType,
-    area: parcel.areaHa ? Number(parcel.areaHa) : 0,
+    area: areaHa,
     lastUpdate: new Date().toISOString(),
     temperature: 0,
     temperatureChange: 0,
@@ -114,9 +100,7 @@ function emptyOlivarOverview(
     participants: 1,
     pendingTasks: 0,
     completedTasks: 0,
-    totalTrees: parcel.areaHa
-      ? Math.round(Number(parcel.areaHa) * TREES_PER_HECTARE)
-      : 0,
+    totalTrees: Math.round(areaHa * TREES_PER_HECTARE),
     totalYieldKg: 0,
     aiInsight: "",
   }
@@ -194,8 +178,7 @@ function buildCropOverview(
     stationId: station?.primaryStationId ?? "—",
     lastUpdate: weather?.computedAt?.toISOString() ?? new Date().toISOString(),
     temperature:
-      latestDailyTemp ??
-      Number(tempMetrics.avg7d ?? tempMetrics.avg30d ?? 0),
+      latestDailyTemp ?? Number(tempMetrics.avg7d ?? tempMetrics.avg30d ?? 0),
     temperatureChange: Number(tempMetrics.trend ?? 0),
     phenologicalStage: String(cropMetrics.stage ?? "Vegetativo"),
     gdd: Number(cropMetrics.gdd ?? 0),
@@ -209,9 +192,7 @@ function buildCropOverview(
       : 0,
     pendingTasks: taskCounts.pending,
     completedTasks: taskCounts.done,
-    totalYieldKg: primarySummary?.totalKg
-      ? Number(primarySummary.totalKg)
-      : 0,
+    totalYieldKg: primarySummary?.totalKg ? Number(primarySummary.totalKg) : 0,
     aiInsight: recommendationsList[0]?.message ?? "",
   }
 }
@@ -242,15 +223,6 @@ export async function getParcelRecommendations(
   await getParcelById(organizationId, parcelId)
   const weather = await loadParcelWeather(parcelId)
   return mapDbRecommendationsToDashboard(weather?.recommendations)
-}
-
-export async function getParcelRisks(
-  organizationId: string,
-  parcelId: string
-): Promise<DashboardRisks> {
-  await getParcelById(organizationId, parcelId)
-  const weather = await loadParcelWeather(parcelId)
-  return mapDbRisksToDashboard(weather?.risks)
 }
 
 export async function getParcelCropOverview(

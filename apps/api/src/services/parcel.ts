@@ -1,19 +1,18 @@
-import { db, schema, eq, and, asc, gte, lte } from "@workspace/db"
+import { db, schema, eq, and, asc, gte, lte, sql } from "@workspace/db"
 import { z } from "zod"
 import { HTTPException } from "hono/http-exception"
 import {
+  ParcelCreateOutput,
+  ParcelUpdateOutput,
   parcelWeatherDataSchema,
   type ParcelCreateInput,
   type ParcelSelect,
   type ParcelUpdateInput,
   type ParcelWeatherMetric,
 } from "@workspace/schemas"
-
-const HECTARES_TO_SQUARE_METERS = 10_000
-
-function hectaresToSquareMeters(areaHa: number): number {
-  return Math.round(areaHa * HECTARES_TO_SQUARE_METERS)
-}
+import { getStations } from "@/services/weather"
+import { geoService } from "./geometry-utils"
+import type { RiskRecommendation } from "@/services/weathercloud"
 
 type ParcelLocationValues = {
   refcat: string | null
@@ -25,21 +24,9 @@ type ParcelLocationValues = {
   postalCode: string | null
 }
 
-function resolveParcelAreaFields(data: {
-  areaHa?: number | string | null
-  areaM2?: number | string | null
-}): { areaHa: string | null; areaM2: number | null } {
-  if (data.areaHa == null) {
-    return { areaHa: null, areaM2: null }
-  }
-
-  const areaHa = String(data.areaHa)
-  const areaM2 =
-    data.areaM2 != null
-      ? Math.round(Number(data.areaM2))
-      : hectaresToSquareMeters(Number(data.areaHa))
-
-  return { areaHa, areaM2 }
+function resolveParcelAreaM2(areaM2?: number | string | null): number | null {
+  if (areaM2 == null) return null
+  return Math.round(Number(areaM2))
 }
 
 function extractLocationFields(data: {
@@ -66,33 +53,17 @@ function extractLocationFields(data: {
   return { location, hasLocation }
 }
 
-function splitCreateInput(data: ParcelCreateInput) {
-  const {
-    refcat,
-    province,
-    municipality,
-    streetType,
-    streetName,
-    streetNumber,
-    postalCode,
-    ...parcelData
-  } = data
-
-  return {
-    parcelData,
-    ...extractLocationFields({
-      refcat,
-      province,
-      municipality,
-      streetType,
-      streetName,
-      streetNumber,
-      postalCode,
-    }),
-  }
-}
-
-function splitUpdateInput(data: ParcelUpdateInput) {
+function splitLocationInput<
+  T extends {
+    refcat?: string | null
+    province?: string | null
+    municipality?: string | null
+    streetType?: string | null
+    streetName?: string | null
+    streetNumber?: string | null
+    postalCode?: string | null
+  },
+>(data: T) {
   const {
     refcat,
     province,
@@ -345,22 +316,123 @@ export async function getParcelById(
   return parcel
 }
 
+type WeatherRiskDetail = {
+  level?: string
+  score?: number
+  reasons?: string[]
+}
+
+type WeatherRiskWithRecommendations = WeatherRiskDetail & {
+  recommendations: RiskRecommendation[]
+}
+
+function isRiskObject(value: unknown): value is WeatherRiskDetail {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+}
+
+function nestRecommendationsIntoRisks(
+  risks: Record<string, unknown>,
+  recommendations: RiskRecommendation[] | null
+): Record<string, WeatherRiskWithRecommendations | string | undefined> {
+  const recMap = new Map<string, RiskRecommendation[]>()
+
+  if (recommendations) {
+    for (const rec of recommendations) {
+      const existing = recMap.get(rec.riskType)
+      if (existing) {
+        existing.push(rec)
+      } else {
+        recMap.set(rec.riskType, [rec])
+      }
+    }
+  }
+
+  const result: Record<
+    string,
+    WeatherRiskWithRecommendations | string | undefined
+  > = {}
+
+  for (const [key, risk] of Object.entries(risks)) {
+    if (!risk) {
+      result[key] = undefined
+      continue
+    }
+
+    if (!isRiskObject(risk)) {
+      result[key] = risk as string
+      continue
+    }
+
+    result[key] = {
+      ...risk,
+      recommendations: recMap.get(key) ?? [],
+    }
+  }
+
+  return result
+}
+
+export async function getParcelWeather(
+  organizationId: string,
+  parcelIdParam: string
+) {
+  const parcelId = await resolveParcelIdForOrg(organizationId, parcelIdParam)
+  if (!parcelId) throw new HTTPException(404, { message: "Parcel not found" })
+
+  const weather = await db.query.parcelWeather.findFirst({
+    where: eq(schema.parcelWeather.parcelId, parcelId),
+  })
+
+  if (!weather) throw new HTTPException(404, { message: "Weather not found" })
+
+  const risksWithRecommendations = nestRecommendationsIntoRisks(
+    weather.risks as Record<string, unknown>,
+    weather.recommendations as RiskRecommendation[] | null
+  )
+
+  const { recommendations: _recs, ...weatherWithoutRecs } = weather
+
+  return {
+    data: {
+      ...weatherWithoutRecs,
+      risks: risksWithRecommendations,
+    },
+  }
+}
+
 export async function createParcel(
   organizationId: string,
   data: ParcelCreateInput
-): Promise<ParcelSelect> {
-  const { parcelData, location, hasLocation } = splitCreateInput(data)
-  const area = resolveParcelAreaFields(parcelData)
+): Promise<ParcelCreateOutput> {
+  const { parcelData, location, hasLocation } = splitLocationInput(data)
+  const fallbackAreaM2 = resolveParcelAreaM2(parcelData.areaM2)
+
+  const computedAreaM2 = parcelData.polygon
+    ? geoService.areaM2(parcelData.polygon)
+    : null
 
   return db.transaction(async (tx) => {
     const [created] = await tx
       .insert(schema.parcels)
       .values({
-        organizationId,
         ...parcelData,
-        ...area,
+        organizationId,
+        areaM2: computedAreaM2 ?? fallbackAreaM2,
       })
-      .returning()
+      .returning({
+        id: schema.parcels.id,
+        name: schema.parcels.name,
+        cropType: schema.parcels.cropType,
+        irrigationType: schema.parcels.irrigationType,
+        areaM2: schema.parcels.areaM2,
+        centroid: schema.parcels.centroid,
+        polygon: schema.parcels.polygon,
+        createdAt: schema.parcels.createdAt,
+        updatedAt: schema.parcels.updatedAt,
+
+        lat: geoService.lat(schema.parcels.centroid),
+        lng: geoService.lng(schema.parcels.centroid),
+      })
 
     if (!created) {
       throw new HTTPException(500, { message: "Parcel creation failed" })
@@ -373,6 +445,13 @@ export async function createParcel(
       })
     }
 
+    // opcional side-effect
+    if (created.lat && created.lng) {
+      queueMicrotask(() => {
+        getStations(created.id, created.lat, created.lng).catch(() => {})
+      })
+    }
+
     return created
   })
 }
@@ -381,20 +460,27 @@ export async function updateParcel(
   organizationId: string,
   parcelId: string,
   data: ParcelUpdateInput
-): Promise<ParcelSelect> {
-  const { parcelData, location, hasLocation } = splitUpdateInput(data)
-  const { areaHa, areaM2, ...restParcelData } = parcelData
-  const area =
-    areaHa !== undefined
-      ? resolveParcelAreaFields({ areaHa, areaM2 })
-      : undefined
+): Promise<ParcelUpdateOutput> {
+  const { parcelData, location } = splitLocationInput(data)
+  const { areaM2, ...restParcelData } = parcelData
+
+  const fallbackAreaM2 =
+    areaM2 !== undefined ? resolveParcelAreaM2(areaM2) : null
+
+  const computedAreaM2 = restParcelData.polygon
+    ? geoService.areaM2(restParcelData.polygon)
+    : null
+
+  const shouldReassignStations =
+    restParcelData.centroid !== undefined ||
+    restParcelData.polygon !== undefined
 
   return db.transaction(async (tx) => {
     const [updated] = await tx
       .update(schema.parcels)
       .set({
         ...restParcelData,
-        ...(area ?? {}),
+        areaM2: computedAreaM2 ?? fallbackAreaM2,
       })
       .where(
         and(
@@ -402,14 +488,31 @@ export async function updateParcel(
           eq(schema.parcels.id, parcelId)
         )
       )
-      .returning()
+      .returning({
+        id: schema.parcels.id,
+        name: schema.parcels.name,
+        cropType: schema.parcels.cropType,
+        irrigationType: schema.parcels.irrigationType,
+        areaM2: schema.parcels.areaM2,
+        centroid: schema.parcels.centroid,
+        polygon: schema.parcels.polygon,
+        createdAt: schema.parcels.createdAt,
+        updatedAt: schema.parcels.updatedAt,
+
+        lat: geoService.lat(schema.parcels.centroid),
+        lng: geoService.lng(schema.parcels.centroid),
+      })
 
     if (!updated) {
       throw new HTTPException(404, { message: "Parcel not found" })
     }
 
-    if (hasLocation) {
-      await upsertParcelLocation(tx, parcelId, location)
+    await upsertParcelLocation(tx, updated.id, location)
+
+    if (shouldReassignStations && updated.lat && updated.lng) {
+      queueMicrotask(() => {
+        getStations(updated.id, updated.lat!, updated.lng!).catch(() => {})
+      })
     }
 
     return updated
@@ -438,7 +541,6 @@ export async function deleteParcel(
 export {
   getParcelsForMap,
   getParcelRecommendations,
-  getParcelRisks,
   getParcelCropOverview,
   getParcelsCropOverviewsForDashboard,
   getParcelsRecommendationsForDashboard,

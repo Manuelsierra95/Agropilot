@@ -1,6 +1,6 @@
 export type IrrigationType = "dryland" | "irrigated"
 
-export const DEFAULT_CROP_TYPE = "olivar" as const
+export const DEFAULT_CROP_TYPE = "olive" as const
 
 export type CropTypeValue =
   | typeof DEFAULT_CROP_TYPE
@@ -18,7 +18,7 @@ export const CROP_OPTIONS: {
   label: string
   enabled: boolean
 }[] = [
-  { value: "olivar", label: "Olivar", enabled: true },
+  { value: "olive", label: "Olivar", enabled: true },
   { value: "wheat", label: "Trigo", enabled: false },
   { value: "corn", label: "Maíz", enabled: false },
   { value: "sunflower", label: "Girasol", enabled: false },
@@ -30,7 +30,7 @@ export const CROP_OPTIONS: {
 ]
 
 export const CROP_TYPE_LABELS: Record<CropTypeValue, string> = {
-  olivar: "Olivar",
+  olive: "Olivar",
   wheat: "Trigo",
   corn: "Maíz",
   sunflower: "Girasol",

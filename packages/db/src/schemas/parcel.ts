@@ -34,8 +34,7 @@ export const parcels = pgTable(
     irrigationType: text("irrigation_type", {
       enum: ["dryland", "irrigated"],
     }),
-    areaHa: numeric("area_ha", { precision: 10, scale: 4 }), // Optional user-entered area in hectares
-    areaM2: integer("area_m2"), // Reserved; not computed from geometry
+    areaM2: integer("area_m2"),
     centroid: geometry("centroid"), // Centroid point of the parcel (lat/lng fast querys)
     polygon: geometryPolygon("polygon"), // Full polygon geometry
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -127,7 +126,6 @@ export const parcelCropSeasons = pgTable(
     campaignId: text("campaign_id")
       .notNull()
       .references(() => campaigns.id),
-    year: integer("year").notNull(),
     yieldActualKg: numeric("yield_actual_kg", { precision: 12, scale: 2 }),
     yieldTargetKg: numeric("yield_target_kg", { precision: 12, scale: 2 }),
     expectedYieldKg: numeric("expected_yield_kg", { precision: 12, scale: 2 }),

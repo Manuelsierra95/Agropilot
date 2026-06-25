@@ -1,4 +1,4 @@
-import { db, schema, eq, and, sql } from "@workspace/db"
+import { db, schema, eq, and, sql, inArray } from "@workspace/db"
 import { HTTPException } from "hono/http-exception"
 import {
   parcelWeatherDataSchema,
@@ -8,11 +8,88 @@ import {
   type WeatherForecastDay,
 } from "@workspace/schemas"
 import { resolveParcelIdForOrg } from "@/services/parcel"
-import { computeSeedRisks, getOlivePhenology } from "./weathercloud"
-import { getNearest, getWeather } from "./weathercloud/helpers"
+import {
+  computeSeedRisks,
+  generateRecommendations,
+  getOlivePhenology,
+  type ParcelApiRiskDetail,
+} from "./weathercloud"
+import {
+  getBestStations,
+  getWeather,
+  type StationCandidate,
+} from "./weathercloud/helpers"
+import { geoService } from "./geometry-utils"
+
+export type ParcelRisksResponse = {
+  parcelId: string
+  parcelName: string
+  risks: {
+    waterStress?: ParcelApiRiskDetail
+    fungalRisk?: ParcelApiRiskDetail
+    insectRisk?: ParcelApiRiskDetail
+    thermalStress?: ParcelApiRiskDetail
+  }
+}
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)
+}
+
+type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
+
+function pointWkt(lng: number, lat: number): string {
+  return `POINT(${lng} ${lat})`
+}
+
+async function ensureWeatherStation(
+  tx: DbTransaction,
+  device: StationCandidate
+): Promise<string> {
+  const existing = await tx.query.weatherStation.findFirst({
+    where: eq(schema.weatherStation.stationId, device.code),
+    columns: { id: true },
+  })
+  if (existing) return existing.id
+
+  const [created] = await tx
+    .insert(schema.weatherStation)
+    .values({
+      id: crypto.randomUUID(),
+      stationId: device.code,
+      name: device.name,
+      location: pointWkt(device.longitude, device.latitude),
+      altitude: device.elevation,
+    })
+    .returning({ id: schema.weatherStation.id })
+  return created!.id
+}
+
+async function upsertParcelStation(
+  tx: DbTransaction,
+  parcelId: string,
+  primaryStationId: string,
+  fallbacks: { stationId: string; distanceKm: number }[]
+) {
+  const existing = await tx.query.parcelStation.findFirst({
+    where: eq(schema.parcelStation.parcelId, parcelId),
+    columns: { parcelId: true },
+  })
+
+  const data = {
+    primaryStationId,
+    fallbackStations: fallbacks,
+    computedAt: new Date(),
+  }
+
+  if (existing) {
+    await tx
+      .update(schema.parcelStation)
+      .set(data)
+      .where(eq(schema.parcelStation.parcelId, parcelId))
+  } else {
+    await tx.insert(schema.parcelStation).values({ parcelId, ...data })
+  }
 }
 
 function deriveCondition(
@@ -131,95 +208,225 @@ export async function getParcelWeatherForCalendar(
   }
 }
 
-// TODO:
-export async function getParcelRisks(
-  organizationId: string,
-  parcelIdParam: string
-) {
-  const parcelId = await resolveParcelIdForOrg(organizationId, parcelIdParam)
+export async function getStations(
+  parcelId: string,
+  lat?: number,
+  lng?: number
+): Promise<void> {
+  if (lat == null || lng == null) {
+    const [parcel] = await db
+      .select({
+        lat: geoService.lat(schema.parcels.centroid),
+        lng: geoService.lng(schema.parcels.centroid),
+      })
+      .from(schema.parcels)
+      .where(eq(schema.parcels.id, parcelId))
+      .limit(1)
 
-  if (!parcelId) {
-    throw new HTTPException(404, { message: "Parcel not found" })
+    if (!parcel) return
+
+    const coords = parcel as { lat: number; lng: number }
+    lat = coords.lat
+    lng = coords.lng
   }
 
-  const [parcel] = await db
-    .select({
-      id: schema.parcels.id,
-      name: schema.parcels.name,
-      cropType: schema.parcels.cropType,
-      irrigationType: schema.parcels.irrigationType,
-      lat: sql`ST_Y(${schema.parcels.centroid})`.as("lat"),
-      lng: sql`ST_X(${schema.parcels.centroid})`.as("lng"),
-    })
-    .from(schema.parcels)
-    .where(
-      and(
-        eq(schema.parcels.organizationId, organizationId),
-        eq(schema.parcels.id, parcelId)
-      )
+  if (lat == null || lng == null) return
+
+  const selection = await getBestStations(lat, lng)
+
+  await db.transaction(async (tx) => {
+    const mainStationId = await ensureWeatherStation(tx, selection.main)
+    const fallbackIds = await Promise.all(
+      selection.fallbacks.map((fb) => ensureWeatherStation(tx, fb))
     )
-    .limit(1)
+    await upsertParcelStation(
+      tx,
+      parcelId,
+      mainStationId,
+      selection.fallbacks.map((fb, i) => ({
+        stationId: fallbackIds[i]!,
+        distanceKm: fb.distance,
+      }))
+    )
+  })
+}
+
+async function fetchWeatherWithFallback(
+  primaryCode: string | undefined,
+  fallbacks: { stationId: string; distanceKm: number }[],
+  stationCodeMap: Map<string, string>
+): Promise<{
+  weather: any
+  usedStationId: string
+  usedDistanceKm: number
+} | null> {
+  if (primaryCode) {
+    const weather = await getWeather(primaryCode as any)
+    if (weather && !("error" in weather)) {
+      return { weather, usedStationId: "", usedDistanceKm: 0 }
+    }
+  }
+
+  for (const fb of fallbacks) {
+    const fbCode = stationCodeMap.get(fb.stationId)
+    if (!fbCode) continue
+
+    const weather = await getWeather(fbCode as any)
+    if (weather && !("error" in weather)) {
+      return {
+        weather,
+        usedStationId: fb.stationId,
+        usedDistanceKm: fb.distanceKm,
+      }
+    }
+  }
+
+  return null
+}
+
+export async function generateParcelRisks(
+  organizationId: string,
+  parcelId: string
+): Promise<ParcelRisksResponse> {
+  const parcel = await db.query.parcels.findFirst({
+    where: and(
+      eq(schema.parcels.organizationId, organizationId),
+      eq(schema.parcels.id, parcelId)
+    ),
+    columns: { id: true, name: true, cropType: true, irrigationType: true },
+    with: {
+      station: {
+        columns: { primaryStationId: true, fallbackStations: true },
+        with: {
+          primaryStation: { columns: { id: true, stationId: true } },
+        },
+      },
+    },
+  })
 
   if (!parcel) {
     throw new HTTPException(404, { message: "Parcel not found" })
   }
 
-  const { lat, lng } = parcel
+  const parcelStation = parcel.station
 
-  if (lat == null || lng == null) {
-    throw new HTTPException(400, { message: "Parcel has no valid coordinates" })
+  if (!parcelStation) {
+    throw new HTTPException(404, {
+      message: "No weather stations found for this parcel",
+    })
   }
 
-  /* ---------------- 1. estaciones cercanas ---------------- */
-  const devices = await getNearest(lat, lng, 20)
-
-  if (!devices || !Array.isArray(devices) || devices.length === 0) {
-    throw new HTTPException(500, { message: "No weather stations found" })
+  const stationCodeMap = new Map<string, string>()
+  if (parcelStation.primaryStation) {
+    stationCodeMap.set(
+      parcelStation.primaryStation.id,
+      parcelStation.primaryStation.stationId
+    )
   }
 
-  const nearest = devices[0]
+  if (parcelStation.fallbackStations.length > 0) {
+    const fallbackIds = parcelStation.fallbackStations.map((fb) => fb.stationId)
+    const fallbackRows = await db
+      .select({
+        id: schema.weatherStation.id,
+        stationId: schema.weatherStation.stationId,
+      })
+      .from(schema.weatherStation)
+      .where(inArray(schema.weatherStation.id, fallbackIds))
 
-  if (!nearest?.code) {
-    throw new HTTPException(500, { message: "Invalid station data" })
+    for (const row of fallbackRows) {
+      stationCodeMap.set(row.id, row.stationId)
+    }
   }
 
-  /* ---------------- 2. clima ---------------- */
-  const weather = await getWeather(nearest.code)
+  const result = await fetchWeatherWithFallback(
+    parcelStation.primaryStation?.stationId,
+    parcelStation.fallbackStations,
+    stationCodeMap
+  )
 
-  if (!weather || "error" in weather) {
-    throw new HTTPException(500, { message: "Failed to fetch weather" })
+  if (!result) {
+    throw new HTTPException(500, {
+      message: "Failed to fetch weather from all available stations",
+    })
   }
 
-  /* ---------------- 3. contexto agronómico ---------------- */
+  const { weather, usedStationId, usedDistanceKm } = result
+  const usedStationCode = usedStationId
+    ? (stationCodeMap.get(usedStationId) ?? "unknown")
+    : (parcelStation.primaryStation?.stationId ?? "unknown")
+
   const phenology = getOlivePhenology(new Date())
 
   const context = {
     crop: parcel.cropType ?? "unknown",
-    irrigation: parcel.irrigationType !== "dry",
+    irrigation: parcel.irrigationType !== "dryland",
     phenology,
   }
 
-  /* ---------------- 4. riesgos ---------------- */
-  const risks = computeSeedRisks(
-    {
-      ...weather,
-      device: nearest.id,
-      distance: nearest.distance,
+  const risks = computeSeedRisks(weather, context)
+  const recommendations = generateRecommendations(weather, risks, context)
+
+  const today = todayIso()
+  const weatherRow = {
+    rangeStart: today,
+    rangeEnd: today,
+    status: "ok" as const,
+    data: {
+      daily: [
+        {
+          date: today,
+          soilMoisture: weather.hum ?? 0,
+          rainfall: weather.rainrate ?? weather.rain ?? 0,
+          temperature: weather.temp ?? 0,
+        },
+      ],
     },
-    context
-  )
+    metrics: {
+      temp: weather.temp,
+      hum: weather.hum,
+      wspd: weather.wspd,
+      rainrate: weather.rainrate,
+      bar: weather.bar,
+      computed: weather.computed,
+    },
+    risks,
+    recommendations,
+    computedAt: new Date(),
+    algorithmVersion: "v1",
+  }
+
+  await db
+    .insert(schema.parcelWeather)
+    .values({ id: crypto.randomUUID(), parcelId, ...weatherRow })
+    .onConflictDoUpdate({
+      target: schema.parcelWeather.parcelId,
+      set: weatherRow,
+    })
+
+  const recMap = new Map(recommendations.map((r) => [r.riskType, r]))
+
+  function toDetail(
+    risk: { level?: string; score?: number; reasons?: string[] } | undefined,
+    riskType: Parameters<typeof recMap.get>[0]
+  ): ParcelApiRiskDetail | undefined {
+    if (!risk) return undefined
+    return {
+      level: (risk.level ?? "low") as ParcelApiRiskDetail["level"],
+      score: risk.score ?? 0,
+      reasons: risk.reasons ?? [],
+      recommendation: recMap.get(riskType),
+    }
+  }
 
   return {
     parcelId: parcel.id,
     parcelName: parcel.name,
-    risks,
-    meta: {
-      stationId: nearest.id,
-      distance: nearest.distance,
-      phenology,
-      crop: context.crop,
-      irrigation: context.irrigation,
-      updatedAt: weather.epoch,
+    risks: {
+      waterStress: toDetail(risks.waterStress, "waterStress"),
+      fungalRisk: toDetail(risks.fungalRisk, "fungalRisk"),
+      insectRisk: toDetail(risks.insectRisk, "insectRisk"),
+      thermalStress: toDetail(risks.thermalStress, "thermalStress"),
     },
   }
 }

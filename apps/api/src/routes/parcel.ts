@@ -15,7 +15,7 @@ import {
   getParcelsRisksForDashboard,
   getParcelsWeatherComparisonForDashboard,
   getParcelRecommendations,
-  getParcelRisks,
+  getParcelWeather,
   getParcelsForMap,
   listParcels,
   updateParcel,
@@ -26,6 +26,7 @@ import {
   dashboardScopeQuerySchema,
 } from "@workspace/schemas"
 
+const cache60min = createCacheMiddleware({ ttlSeconds: 3600 })
 const cache5min = createCacheMiddleware({ ttlSeconds: 300 })
 const cache1min = createCacheMiddleware({ ttlSeconds: 60 })
 
@@ -86,12 +87,12 @@ export const parcelRoutes = new Hono<{
     )
     return c.json({ recommendations }, 200)
   })
-  .get("/:id/risks", async (c) => {
-    const risks = await getParcelRisks(
+  .get("/:id/weather", async (c) => {
+    const weather = await getParcelWeather(
       c.get("organizationId"),
       c.req.param("id")
     )
-    return c.json({ risks }, 200)
+    return c.json({ weather }, 200)
   })
   .get(
     "/:id/crop-overview",

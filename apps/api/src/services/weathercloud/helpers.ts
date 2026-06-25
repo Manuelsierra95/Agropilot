@@ -36,7 +36,7 @@ export async function fetchData(
       },
       body: data,
     })
-    const respData = await resp.json()
+    const respData: any = await resp.json()
     return respData
   } catch (err) {
     return { error: true, err }
@@ -110,7 +110,28 @@ export const heatFn = (temp: number, hum: number) => {
   return Math.max(temp, heat)
 }
 
+// Station selection types
+
+export interface StationCandidate {
+  code: weatherCloudId
+  name: string
+  latitude: number
+  longitude: number
+  elevation: number
+  distance: number
+  followers: number
+  score: number
+}
+
+export interface StationSelection {
+  main: StationCandidate
+  fallbacks: StationCandidate[]
+  radiusUsed: number
+}
+
 // Functions
+
+const RADIUS_STEPS = [5, 10, 20, 50] as const
 
 export async function getNearest(
   lat: string | number,
@@ -129,6 +150,103 @@ export async function getNearest(
   }
 }
 
+export async function getNearestWithRetry(
+  lat: string | number,
+  lon: string | number
+): Promise<{ devices: ReturnType<typeof parseDevicesList>; radiusUsed: number }> {
+  for (const radius of RADIUS_STEPS) {
+    const devices = await getNearest(lat, lon, radius)
+    if (
+      Array.isArray(devices) &&
+      devices.length > 0 &&
+      !("error" in devices[0])
+    ) {
+      return { devices: devices as ReturnType<typeof parseDevicesList>, radiusUsed: radius }
+    }
+  }
+  throw new Error("No weather stations found within 50km")
+}
+
+export function scoreStation(
+  distance: number,
+  followers: number,
+  maxFollowers: number,
+  radius: number
+): number {
+  const normFollowers = maxFollowers > 0 ? followers / maxFollowers : 0
+  const normDistance = radius > 0 ? distance / radius : 1
+  return 0.7 * normFollowers + 0.3 * (1 - normDistance)
+}
+
+export async function getBestStations(
+  lat: string | number,
+  lon: string | number
+): Promise<StationSelection> {
+  const { devices, radiusUsed } = await getNearestWithRetry(lat, lon)
+
+  const followerResults = await Promise.allSettled(
+    devices.map((d) => getFollowers(d.code as weatherCloudId))
+  )
+
+  const followersList = followerResults.map((r) =>
+    r.status === "fulfilled" && typeof r.value === "number" ? r.value : 0
+  )
+
+  const maxFollowers = Math.max(...followersList, 0)
+
+  const candidates: StationCandidate[] = devices.map((device, i) => {
+    const distance = (device as any).distance as number
+    const followers = followersList[i]!
+    return {
+      code: device.code as weatherCloudId,
+      name: device.name,
+      latitude: +device.latitude,
+      longitude: +device.longitude,
+      elevation: +device.elevation,
+      distance,
+      followers,
+      score: scoreStation(distance, followers, maxFollowers, radiusUsed),
+    }
+  })
+
+  candidates.sort((a, b) => b.score - a.score)
+
+  const [main, ...rest] = candidates
+  if (!main) throw new Error("No weather stations found")
+
+  const fallbacks = [...rest]
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, 2)
+
+  return { main, fallbacks, radiusUsed }
+}
+
+export async function getFollowers(
+  id: weatherCloudId
+): Promise<number | { error: any }> {
+  const type = checkId(id)
+
+  if (!type) {
+    throw new Error("Invalid ID")
+  }
+
+  try {
+    const profile = await fetchData(
+      `https://app.weathercloud.net/${type}/ajaxprofile`,
+      `d=${id}`
+    ) as any
+    const followers = profile?.followers?.number
+
+    if (typeof followers !== "number") {
+      throw new Error("Failed to fetch")
+    }
+
+    return followers
+  } catch (err) {
+    return { error: err }
+  }
+}
+
 export function checkId(id: weatherCloudId) {
   // check ID validity and return if is metar or device type
   const deviceRegex = /^[0-9]{9,10}$/
@@ -139,11 +257,13 @@ export function checkId(id: weatherCloudId) {
 }
 
 export async function getWeather(id: weatherCloudId) {
-  // fetch general weather data
-  try {
-    let type = checkId(id)
-    if (!type) throw new Error("Invalid ID")
+  const type = checkId(id)
 
+  if (!type) {
+    throw new Error("Invalid ID")
+  }
+
+  try {
     const data = await fetchData(
       `https://app.weathercloud.net/${type}/values?code=${id}`
     )
@@ -220,9 +340,12 @@ export async function getWeather(id: weatherCloudId) {
 }
 
 export async function getWind(id: weatherCloudId) {
+  const type = checkId(id)
+
+  if (!type) {
+    throw new Error("Invalid ID")
+  }
   try {
-    let type = checkId(id)
-    if (!type) throw new Error("Invalid ID")
     const data = await fetchData(
       `https://app.weathercloud.net/${type}/wind?code=${id}`
     )

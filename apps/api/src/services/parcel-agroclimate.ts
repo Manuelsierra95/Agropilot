@@ -69,14 +69,7 @@ const AGROCLIMATE_UNITS: DashboardParcelAgroclimate["units"] = {
   risks: { score: "0-1" },
 }
 
-function parseWktPoint(
-  wkt: string | null | undefined
-): { lat: number; lng: number } | null {
-  if (!wkt) return null
-  const match = wkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i)
-  if (!match?.[1] || !match?.[2]) return null
-  return { lng: Number(match[1]), lat: Number(match[2]) }
-}
+import { parseWktPoint } from "./geometry-utils"
 
 function deriveIcon(temperature: number, rainfall: number): string {
   if (rainfall >= 8) return "rainy"
@@ -416,7 +409,7 @@ export async function getParcelsWeatherComparisonForDashboard(
 
     return {
       name: parcel.name,
-      area: parcel.areaHa ? Number(parcel.areaHa) : 0,
+      area: parcel.areaM2 ? parcel.areaM2 / 10000 : 0,
       ...aggregated,
       waterStress: risks.waterStress.level,
     }

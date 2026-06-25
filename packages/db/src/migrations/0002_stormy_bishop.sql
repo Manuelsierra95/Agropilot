@@ -1,0 +1,1 @@
+ALTER TABLE "parcel_crop_seasons" DROP COLUMN "year";

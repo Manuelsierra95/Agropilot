@@ -1,0 +1,1 @@
+ALTER TABLE "parcels" DROP COLUMN "area_ha";

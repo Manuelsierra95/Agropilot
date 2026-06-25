@@ -22,10 +22,9 @@ const parcelLocationFieldShape = {
 
 export const parcelCreateSchema = z.object({
   name: z.string().trim().min(1),
-  cropType: z.string().min(1),
+  cropType: z.enum(["olive"]),
   irrigationType: z.enum(["dryland", "irrigated"]).nullish(),
-  areaHa: z.coerce.number().positive().optional(),
-  areaM2: z.coerce.number().int().positive().optional(),
+  areaM2: z.coerce.number().int().positive().optional().nullish(),
   centroid: z.string().nullish(),
   polygon: z.string().nullish(),
   ...parcelLocationFieldShape,
@@ -34,10 +33,9 @@ export const parcelCreateSchema = z.object({
 export const parcelUpdateInputSchema = z
   .object({
     name: z.string().trim().min(1).optional(),
-    cropType: z.string().min(1).optional(),
+    cropType: z.enum(["olive"]).optional(),
     irrigationType: z.enum(["dryland", "irrigated"]).nullish(),
-    areaHa: z.coerce.number().positive().optional(),
-    areaM2: z.coerce.number().int().positive().optional(),
+    areaM2: z.coerce.number().int().positive().optional().nullish(),
     centroid: z.string().nullish(),
     polygon: z.string().nullish(),
     ...parcelLocationFieldShape,
@@ -50,8 +48,17 @@ export type ParcelSelect = ReturnType<typeof parcelSelectSchema.parse>
 export type ParcelInsert = ReturnType<typeof parcelInsertSchema.parse>
 export type ParcelUpdate = ReturnType<typeof parcelUpdateSchema.parse>
 
+export type GeoPoint = {
+  lat: number | null
+  lng: number | null
+}
+
 export type ParcelCreateInput = z.infer<typeof parcelCreateSchema>
 export type ParcelUpdateInput = z.infer<typeof parcelUpdateInputSchema>
+
+export type ParcelCreateOutput = z.infer<typeof parcelCreateSchema> & GeoPoint
+export type ParcelUpdateOutput = z.infer<typeof parcelUpdateInputSchema> &
+  GeoPoint
 
 export const parseParcelSelect = (value: unknown): ParcelSelect | null => {
   const parsed = parcelSelectSchema.safeParse(value)

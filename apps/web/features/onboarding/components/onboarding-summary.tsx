@@ -118,7 +118,7 @@ export function OnboardingSummary({
                   const parcelName = parcel.name.trim() || "Parcela sin nombre"
                   const cropLabel =
                     CROP_TYPE_LABELS[
-                      (parcel.cropType ?? "olivar") as CropTypeValue
+                      (parcel.cropType ?? "olive") as CropTypeValue
                     ]
                   const irrigationLabel = parcel.irrigationType
                     ? IRRIGATION_TYPE_LABELS[parcel.irrigationType]

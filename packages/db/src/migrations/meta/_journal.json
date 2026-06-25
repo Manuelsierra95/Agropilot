@@ -15,6 +15,27 @@
       "when": 1781862593699,
       "tag": "0001_numerous_warbird",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782371788505,
+      "tag": "0002_stormy_bishop",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782374420405,
+      "tag": "0003_first_juggernaut",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1782385885645,
+      "tag": "0004_stale_franklin_richards",
+      "breakpoints": true
     }
   ]
 }
