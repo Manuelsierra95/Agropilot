@@ -18,7 +18,7 @@ import {
   getBestStations,
   getWeather,
   type StationCandidate,
-} from "./weathercloud/helpers"
+} from "@workspace/scrapers"
 import { geoService } from "./geometry-utils"
 
 export type ParcelRisksResponse = {

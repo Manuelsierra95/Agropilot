@@ -6,7 +6,8 @@
     "paths": {
       "@/*": ["../../apps/api/src/*"],
       "@env": ["../../apps/api/env.d.ts"],
-      "api/app": ["../../apps/api/src/app.ts"]
+      "api/app": ["../../apps/api/src/app.ts"],
+      "@workspace/scrapers": ["../../packages/scrapers/src/index.ts"]
     }
   },
   "include": ["src", "vitest.config.ts"]

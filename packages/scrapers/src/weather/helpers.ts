@@ -9,7 +9,7 @@ import {
   Device,
   Map,
   weatherCloudId,
-} from "./types"
+} from "./types.js"
 
 // Helpers
 
@@ -159,7 +159,7 @@ export async function getNearestWithRetry(
     if (
       Array.isArray(devices) &&
       devices.length > 0 &&
-      !("error" in devices[0])
+      !("error" in devices[0]!)
     ) {
       return { devices: devices as ReturnType<typeof parseDevicesList>, radiusUsed: radius }
     }
@@ -358,11 +358,11 @@ export async function getWind(id: weatherCloudId) {
     let calm = 0
 
     data.values.forEach((value) => {
-      const wdir = value.scale.reduce((a, b) => a + b, 0) - value.scale[0] // total of scale[] - scale[0] (which is no wind)
+      const wdir = value.scale.reduce((a, b) => a + b, 0) - (value.scale[0] ?? 0) // total of scale[] - scale[0] (which is no wind)
       wdirdistData.push(wdir)
       wspddistData.push(wdir > 0 ? value.sum / wdir : 0)
       total += wdir
-      calm += value.scale[0]
+      calm += value.scale[0] ?? 0
     })
     total += calm
 

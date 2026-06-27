@@ -3,7 +3,7 @@ import {
   scoreStation,
   getNearestWithRetry,
   getBestStations,
-} from "@/services/weathercloud/helpers"
+} from "@workspace/scrapers"
 
 function makeDevice(overrides: Partial<{ code: string; name: string; latitude: string; longitude: string; elevation: string; data: string; values: any }> = {}) {
   return {

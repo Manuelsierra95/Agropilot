@@ -106,11 +106,11 @@ export interface Statistic {
 
   rain_current: singleStatistic
   rain_day_max: singleStatistic
-  rain_day_total: singleStatistic
+  rain_day_min: singleStatistic
   rain_month_max: singleStatistic
-  rain_month_total: singleStatistic
+  rain_month_min: singleStatistic
   rain_year_max: singleStatistic
-  rain_year_total: singleStatistic
+  rain_year_min: singleStatistic
 
   // optional
   wspd_current?: singleStatistic

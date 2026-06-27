@@ -39,7 +39,7 @@ vi.mock("@workspace/db", () => ({
   },
 }))
 
-vi.mock("@/services/weathercloud/helpers", () => ({
+vi.mock("@workspace/scrapers", () => ({
   getBestStations: getBestStationsMock,
 }))
 

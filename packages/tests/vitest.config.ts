@@ -26,6 +26,7 @@ export default defineConfig({
       ),
       "@workspace/auth": path.resolve(packagesRoot, "auth/src/index.ts"),
       "@workspace/schemas": path.resolve(packagesRoot, "schemas/src/index.ts"),
+      "@workspace/scrapers": path.resolve(packagesRoot, "scrapers/src/index.ts"),
       "@workspace/copilot": path.resolve(packagesRoot, "copilot/src/index.ts"),
     },
   },
