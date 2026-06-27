@@ -19,11 +19,13 @@ import { useDashboardListsStore } from "@/store/useDashboardListsStore"
 import { ParcelAllView } from "./components/parcel-all-view"
 import { ParcelHero } from "./components/parcel-hero"
 import { ParcelSingleView } from "./components/parcel-single-view"
+import { EditParcelSheet } from "./components/edit-parcel-sheet"
 
 export default function Parcel() {
   const [{ parcelId }] = useDashboardScopeParams()
   const isAllParcels = useIsAllParcelsSelected()
   const parcels = useDashboardListsStore((s) => s.parcels)
+  const [editSheetOpen, setEditSheetOpen] = React.useState(false)
 
   const activeParcel = React.useMemo(() => {
     if (isAllParcels || !parcelId) return undefined
@@ -119,7 +121,17 @@ export default function Parcel() {
         employeeCount={cropOverview.data?.participants}
         tasksPending={cropOverview.data?.pendingTasks}
         yieldData={yieldData}
+        onEditParcel={() => setEditSheetOpen(true)}
       />
+
+      {activeParcel && (
+        <EditParcelSheet
+          open={editSheetOpen}
+          onOpenChange={setEditSheetOpen}
+          parcel={activeParcel}
+          apiResponse={apiResponse}
+        />
+      )}
 
       {!isAllParcels && activeParcel && daily && metrics && apiResponse ? (
         <ParcelSingleView

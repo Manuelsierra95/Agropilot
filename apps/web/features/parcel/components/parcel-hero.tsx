@@ -13,11 +13,13 @@ import {
   Sprout,
   Sun,
   Wheat,
+  Pencil,
 } from "lucide-react"
 import { PreservedLink } from "@/components/preserved-link"
 import { SCOPE_KEYS } from "@/lib/navigation/scope"
 import type { ScopeKey } from "@/lib/navigation/scope"
 import { Card, CardContent } from "@workspace/ui/components/card"
+import { Button } from "@workspace/ui/components/button"
 import {
   Tooltip,
   TooltipContent,
@@ -196,6 +198,7 @@ type ParcelHeroProps = {
   tasksInProgress?: number
   agroclimate?: AgroclimateMetrics
   yieldData?: YieldData
+  onEditParcel?: () => void
 }
 
 export function ParcelHero({
@@ -211,6 +214,7 @@ export function ParcelHero({
   tasksInProgress = 0,
   agroclimate = DEFAULT_AGROCLIMATE,
   yieldData,
+  onEditParcel,
 }: ParcelHeroProps) {
   const score = isAllSelected ? null : computeParcelScore(apiResponse)
   const scoreTokens = score !== null ? scoreToTokens(score) : null
@@ -375,9 +379,22 @@ export function ParcelHero({
           <p className="text-lg font-extralight tracking-wide text-muted-foreground uppercase">
             Inteligencia de Parcela
           </p>
-          <h1 className="text-3xl leading-none font-semibold tracking-tight">
-            {parcelName}
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-3xl leading-none font-semibold tracking-tight">
+              {parcelName}
+            </h1>
+            {!isAllSelected && activeParcel && onEditParcel && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-8 shrink-0"
+                onClick={onEditParcel}
+                aria-label="Editar parcela"
+              >
+                <Pencil className="size-4" />
+              </Button>
+            )}
+          </div>
           {/* Metadatos con divisores */}
           {!isAllSelected && apiResponse && activeParcel && (
             <div className="mt-1 flex items-center gap-4">
