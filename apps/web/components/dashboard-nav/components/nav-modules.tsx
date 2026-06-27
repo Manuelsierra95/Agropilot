@@ -1,4 +1,5 @@
-import Link from "next/link"
+import { PreservedLink } from "@/components/preserved-link"
+import { SCOPE_KEYS } from "@/lib/navigation/scope"
 import { ChevronRightIcon, Lock } from "lucide-react"
 
 import {
@@ -78,9 +79,9 @@ export function NavModules({ items }: { items: NavigationNavModulesItem[] }) {
                     {item.items?.map((subItem: NavigationNavSubItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <Link href={subItem.url}>
+                          <PreservedLink href={subItem.url} include={SCOPE_KEYS.global}>
                             <span>{subItem.title}</span>
-                          </Link>
+                          </PreservedLink>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}

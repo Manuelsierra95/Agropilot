@@ -1,4 +1,5 @@
-import Link from "next/link"
+import { PreservedLink } from "@/components/preserved-link"
+import { SCOPE_KEYS } from "@/lib/navigation/scope"
 import type { LucideIcon } from "lucide-react"
 
 import {
@@ -23,10 +24,10 @@ export function NavSettings({ items }: { items: NavSettingsItem[] }) {
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild tooltip={item.title}>
-              <Link href={item.url}>
+              <PreservedLink href={item.url} include={SCOPE_KEYS.global}>
                 <item.icon className="size-4" />
                 <span>{item.title}</span>
-              </Link>
+              </PreservedLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

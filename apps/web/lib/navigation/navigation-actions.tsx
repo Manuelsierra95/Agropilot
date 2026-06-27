@@ -3,10 +3,11 @@ import {
   NavigationData,
 } from "@/lib/navigation/navigation-data"
 import { SearchAction } from "@/components/dashboard-nav/components/search/search-menu"
+import type { ScopeKey } from "./scope"
 
 export function navigationToSearchActions(
   data: NavigationData,
-  navigate: (url: string) => void
+  navigate: (url: string, scope?: ScopeKey[]) => void
 ): SearchAction[] {
   const actions: SearchAction[] = []
 
@@ -18,7 +19,7 @@ export function navigationToSearchActions(
       keywords: item.title.toLowerCase(),
       section: "Navigation",
       icon: <item.icon className="size-4" />,
-      perform: () => navigate(item.url),
+      perform: () => navigate(item.url, item.scope),
     })
   }
 
@@ -85,15 +86,25 @@ export function navigationToSearchActions(
 
 // ── Ready-to-use hook ─────────────────────────────────────
 
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import * as React from "react"
+import { usePreservedSearchParams } from "@/hooks/use-preserved-search-params"
+import { SCOPE_KEYS } from "./scope"
 
 export function useNavigationSearchActions(): SearchAction[] {
   const router = useRouter()
+  const buildUrl = usePreservedSearchParams()
+
+  const handleNavigate = useCallback(
+    (url: string, scope?: ScopeKey[]) => {
+      router.push(buildUrl(url, { include: scope ?? SCOPE_KEYS.global }))
+    },
+    [router, buildUrl]
+  )
 
   return useMemo(
-    () => navigationToSearchActions(navigationData, (url) => router.push(url)),
-    [router]
+    () => navigationToSearchActions(navigationData, handleNavigate),
+    [handleNavigate]
   )
 }

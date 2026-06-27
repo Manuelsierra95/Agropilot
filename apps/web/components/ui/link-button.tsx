@@ -2,15 +2,18 @@ import { buttonVariants } from "@workspace/ui/components/button"
 import { CardFooter } from "@workspace/ui/components/card"
 import { cn } from "@workspace/ui/lib/utils"
 import { ArrowRight } from "lucide-react"
-import Link from "next/link"
+import { PreservedLink } from "@/components/preserved-link"
+import type { ScopeKey } from "@/lib/navigation/scope"
 
 export const LinkButton = ({
   text,
   href,
+  include,
   className,
 }: {
   text: string
   href: string
+  include?: ScopeKey[]
   className?: string
 }) => {
   return (
@@ -20,8 +23,9 @@ export const LinkButton = ({
         className
       )}
     >
-      <Link
+      <PreservedLink
         href={href}
+        include={include}
         className={cn(
           buttonVariants({ variant: "outline" }),
           "w-full gap-2 border-0 bg-muted-foreground/5 text-xs"
@@ -29,7 +33,7 @@ export const LinkButton = ({
       >
         <span>{text}</span>
         <ArrowRight className="size-3.5" />
-      </Link>
+      </PreservedLink>
     </CardFooter>
   )
 }

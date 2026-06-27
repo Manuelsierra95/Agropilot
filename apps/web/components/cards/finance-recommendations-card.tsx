@@ -26,7 +26,8 @@ import {
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
-import Link from "next/link"
+import { PreservedLink } from "@/components/preserved-link"
+import { SCOPE_KEYS } from "@/lib/navigation/scope"
 import { Separator } from "@workspace/ui/components/separator"
 import { buttonVariants } from "@workspace/ui/components/button"
 
@@ -278,8 +279,9 @@ export function FinanceRecommendationsCard({
 
       {redirectButton && (
         <CardFooter className="flex items-center justify-center border-0 bg-background px-4 py-2">
-          <Link
+          <PreservedLink
             href="/dashboard/finance"
+            include={SCOPE_KEYS.parcel}
             className={cn(
               buttonVariants({ variant: "outline" }),
               "w-full gap-2 border-0 bg-muted-foreground/5 text-xs"
@@ -287,7 +289,7 @@ export function FinanceRecommendationsCard({
           >
             <span>Ver recomendaciones detalladas</span>
             <ArrowRight className="size-3.5" />
-          </Link>
+          </PreservedLink>
         </CardFooter>
       )}
     </Card>

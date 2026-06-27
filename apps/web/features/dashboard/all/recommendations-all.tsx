@@ -10,6 +10,7 @@ import {
 } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
 import { LinkButton } from "@/components/ui/link-button"
+import { SCOPE_KEYS } from "@/lib/navigation/scope"
 
 type RecommendationItem = {
   parcelId: string
@@ -111,7 +112,7 @@ export function RecommendationsAll({
           </ul>
         )}
       </CardContent>
-      <LinkButton text="Ver detalle" href="/dashboard/parcel" />
+      <LinkButton text="Ver detalle" href="/dashboard/parcel" include={SCOPE_KEYS.parcel} />
     </Card>
   )
 }

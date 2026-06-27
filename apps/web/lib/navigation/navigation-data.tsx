@@ -1,4 +1,5 @@
 import { Euro, LucideIcon, TriangleAlert } from "lucide-react"
+import type { ScopeKey } from "@/lib/navigation/scope"
 import {
   Cpu,
   BookOpen,
@@ -35,6 +36,7 @@ export type NavigationNavItem = {
   title: string
   url: string
   icon: LucideIcon
+  scope?: ScopeKey[]
 }
 
 export type NavigationNavModulesItem = NavigationNavItem & {
@@ -71,10 +73,30 @@ export const navigationData: NavigationData = {
     { name: "Cortijo Peal", crop: "Tomates", icon: "Circle" },
   ],
   navMain: [
-    { title: "Dashboard", url: "/dashboard", icon: Home },
-    { title: "Calendar", url: "/dashboard/calendar", icon: Calendar },
-    { title: "Finance", url: "/dashboard/finance", icon: Euro },
-    { title: "Parcel", url: "/dashboard/parcel", icon: TreePine },
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: Home,
+      scope: ["campaignId", "parcelId"],
+    },
+    {
+      title: "Calendar",
+      url: "/dashboard/calendar",
+      icon: Calendar,
+      scope: ["campaignId", "parcelId"],
+    },
+    {
+      title: "Finance",
+      url: "/dashboard/finance",
+      icon: Euro,
+      scope: ["campaignId", "parcelId"],
+    },
+    {
+      title: "Parcel",
+      url: "/dashboard/parcel",
+      icon: TreePine,
+      scope: ["campaignId", "parcelId"],
+    },
     {
       title: "Notifications",
       url: "/dashboard/notifications",

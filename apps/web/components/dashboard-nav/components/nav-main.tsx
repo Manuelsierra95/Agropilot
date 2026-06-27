@@ -1,4 +1,5 @@
-import Link from "next/link"
+import { PreservedLink } from "@/components/preserved-link"
+import { SCOPE_KEYS } from "@/lib/navigation/scope"
 
 import {
   SidebarGroup,
@@ -15,10 +16,10 @@ export function NavMain({ items }: { items: NavigationNavItem[] }) {
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
-              <Link href={item.url}>
+              <PreservedLink href={item.url} include={item.scope ?? SCOPE_KEYS.global}>
                 <item.icon className="size-4" />
                 <span>{item.title}</span>
-              </Link>
+              </PreservedLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

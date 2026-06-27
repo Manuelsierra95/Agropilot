@@ -1,4 +1,3 @@
-import Link from "next/link"
 import {
   Leaf,
   Zap,
@@ -15,6 +14,9 @@ import {
   Sun,
   Wheat,
 } from "lucide-react"
+import { PreservedLink } from "@/components/preserved-link"
+import { SCOPE_KEYS } from "@/lib/navigation/scope"
+import type { ScopeKey } from "@/lib/navigation/scope"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import {
   Tooltip,
@@ -134,9 +136,13 @@ type MetricCellProps = {
   label: string
   tooltip?: string
   href?: string
+  linkProps?: {
+    include?: ScopeKey[]
+    override?: Partial<Record<ScopeKey, string | null>>
+  }
 }
 
-function MetricCell({ value, label, tooltip, href }: MetricCellProps) {
+function MetricCell({ value, label, tooltip, href, linkProps }: MetricCellProps) {
   const inner = (
     <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 px-4 py-4 transition-colors hover:bg-muted/40">
       <div className="text-xl leading-none font-semibold tabular-nums">
@@ -149,9 +155,9 @@ function MetricCell({ value, label, tooltip, href }: MetricCellProps) {
   )
 
   const wrapped = href ? (
-    <Link href={href} className="flex h-full w-full">
+    <PreservedLink href={href} {...linkProps} className="flex h-full w-full">
       {inner}
-    </Link>
+    </PreservedLink>
   ) : (
     inner
   )
@@ -251,6 +257,10 @@ export function ParcelHero({
     label: string
     tooltip?: string
     href?: string
+    linkProps?: {
+      include?: ScopeKey[]
+      override?: Partial<Record<ScopeKey, string | null>>
+    }
   }
 
   const bottomCols: Col[] = [
@@ -324,6 +334,7 @@ export function ParcelHero({
             label: "Rentabilidad",
             tooltip: "Ingresos netos del período actual",
             href: "/dashboard/finance",
+            linkProps: { include: SCOPE_KEYS.parcel },
           } satisfies Col,
         ]
       : []),
@@ -338,6 +349,7 @@ export function ParcelHero({
             ),
             label: "Empleados",
             href: "/dashboard/settings/organization",
+            linkProps: { include: SCOPE_KEYS.global },
           } satisfies Col,
         ]
       : []),
@@ -346,6 +358,7 @@ export function ParcelHero({
       label: "Tareas",
       tooltip: tasksTooltip,
       href: "/dashboard/calendar",
+      linkProps: { include: SCOPE_KEYS.parcel },
     },
   ]
 

@@ -8,6 +8,7 @@ import { Gauge } from "@workspace/ui/components/charts"
 import { Card, CardHeader } from "@workspace/ui/components/card"
 import { cn } from "@workspace/ui/lib/utils"
 import { LinkButton } from "@/components/ui/link-button"
+import { SCOPE_KEYS } from "@/lib/navigation/scope"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -154,6 +155,7 @@ export function FinanceResume({
       <LinkButton
         href="/dashboard/finance"
         text="Ver recomendaciones detalladas"
+        include={SCOPE_KEYS.parcel}
       />
     </Card>
   )
