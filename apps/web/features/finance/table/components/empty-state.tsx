@@ -1,7 +1,11 @@
 import { IconFileInvoice, IconPlus } from "@tabler/icons-react"
 import { Button } from "@workspace/ui/components/button"
 
-export function EmptyState() {
+export function EmptyState({
+  onNewTransaction,
+}: {
+  onNewTransaction?: () => void
+}) {
   return (
     <div className="mx-4 flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed bg-muted/20 px-6 py-16 text-center lg:mx-6">
       <div className="flex size-14 items-center justify-center rounded-full bg-muted">
@@ -14,7 +18,7 @@ export function EmptyState() {
           añadir la primera.
         </p>
       </div>
-      <Button size="sm" className="mt-1">
+      <Button size="sm" className="mt-1" onClick={onNewTransaction}>
         <IconPlus className="size-4" />
         Nueva transacción
       </Button>

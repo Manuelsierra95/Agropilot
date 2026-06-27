@@ -17,15 +17,18 @@ export type { FiltersBarFilterOption }
 
 type TransactionFiltersSectionProps = BaseFiltersBarProps & {
   table: TanStackTable<Transaction>
+  onNewTransaction?: () => void
 }
 
 export function TransactionFiltersSection({
   table,
+  onNewTransaction,
   ...filtersProps
 }: TransactionFiltersSectionProps) {
   return (
     <FiltersBar
       {...filtersProps}
+      onNewTransaction={onNewTransaction}
       columns={table
         .getAllColumns()
         .filter(

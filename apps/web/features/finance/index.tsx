@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 
 import { PageContainer } from "@/components/ui/page-container"
 import { GradientSeparator } from "@/components/ui/gradient-separator"
@@ -11,6 +11,7 @@ import { WidgetSkeleton } from "@/features/dashboard/dashboard-skeleton"
 import { ExpensesPieChart } from "./chart/expenses-pie-chart"
 import { IncomePieChart } from "./chart/income-pie-chart"
 import { TransactionTable } from "./table"
+import { NewTransactionSheet } from "./components/new-transaction-sheet"
 import {
   useOlivePrices,
   useParcelsFinanceComparison,
@@ -21,6 +22,7 @@ import { toTransactionSnapshots } from "@/lib/finance/mappers"
 
 export default function Finance() {
   const isAllParcels = useIsAllParcelsSelected()
+  const [newTransactionOpen, setNewTransactionOpen] = useState(false)
 
   const transactionsQuery = useFinanceTransactions()
   const olivePrices = useOlivePrices()
@@ -103,9 +105,19 @@ export default function Finance() {
         {isLoadingCharts ? (
           <WidgetSkeleton contentHeight="h-[320px]" />
         ) : (
-          <TransactionTable data={rows} showParcelColumn={isAllParcels} />
+          <TransactionTable
+            data={rows}
+            showParcelColumn={isAllParcels}
+            onNewTransaction={() => setNewTransactionOpen(true)}
+          />
         )}
       </div>
+
+      <NewTransactionSheet
+        open={newTransactionOpen}
+        onOpenChange={setNewTransactionOpen}
+        onSuccess={() => transactionsQuery.refetch()}
+      />
     </PageContainer>
   )
 }

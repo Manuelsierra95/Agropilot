@@ -33,11 +33,13 @@ export function TransactionTable({
   filtersSection = true,
   enabledFilters,
   showParcelColumn = false,
+  onNewTransaction,
 }: {
   data: Transaction[]
   filtersSection?: boolean
   enabledFilters?: readonly FiltersBarFilterOption[]
   showParcelColumn?: boolean
+  onNewTransaction?: () => void
 }) {
   const [data, setData] = React.useState(() => initialData)
 
@@ -146,7 +148,7 @@ export function TransactionTable({
   return (
     <div className="w-full flex-col justify-start gap-6">
       {data.length === 0 ? (
-        <EmptyState />
+        <EmptyState onNewTransaction={onNewTransaction} />
       ) : (
         <Card className="gap-0 bg-background ring-0">
           {filtersSection ? (
@@ -159,6 +161,7 @@ export function TransactionTable({
                 hasActiveFilters={hasActiveFilters}
                 totalResults={filteredData.length}
                 enabledFilters={enabledFilters}
+                onNewTransaction={onNewTransaction}
               />
             </CardHeader>
           ) : null}

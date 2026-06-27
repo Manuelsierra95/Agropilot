@@ -60,6 +60,7 @@ interface FiltersBarProps {
   hasActiveFilters: boolean
   totalResults: number
   enabledFilters?: readonly FiltersBarFilterOption[]
+  onNewTransaction?: () => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: Column<any, unknown>[]
 }
@@ -356,6 +357,7 @@ export function FiltersBar({
   hasActiveFilters,
   totalResults,
   enabledFilters = FILTERS_BAR_FILTER_OPTIONS,
+  onNewTransaction,
   columns,
 }: FiltersBarProps) {
   const enabledFiltersSet = new Set(enabledFilters)
@@ -523,6 +525,7 @@ export function FiltersBar({
         <Button
           size="sm"
           className="ml-auto h-8 shrink-0 gap-1.5 bg-accent-foreground/80 text-background hover:bg-accent-foreground"
+          onClick={onNewTransaction}
         >
           <IconPlus className="size-3.5" />
           <span className="hidden sm:inline">Nueva transacción</span>
