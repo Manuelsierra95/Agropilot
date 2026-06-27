@@ -1,18 +1,29 @@
 "use client"
 
 import type { UIMessage } from "ai"
-import { cn } from "@workspace/ui/lib/utils"
+
+import { Bubble, BubbleContent } from "@workspace/ui/components/bubble"
+import {
+  Message,
+  MessageContent,
+  MessageFooter,
+  MessageHeader,
+} from "@workspace/ui/components/message"
+import { MessageScrollerItem } from "@workspace/ui/components/message-scroller"
 
 import { AssistantMessage } from "./assistant-message"
 import { type ChatTurn, getMessageText } from "./turn-utils"
 
 function HistoryUserBubble({ message }: { message: UIMessage }) {
+  const text = getMessageText(message)
   return (
-    <div className="flex justify-end">
-      <div className="max-w-[90%] rounded-2xl bg-primary px-4 py-2 text-sm text-primary-foreground">
-        {getMessageText(message)}
-      </div>
-    </div>
+    <Message align="end">
+      <MessageContent>
+        <Bubble variant="default" align="end">
+          <BubbleContent>{text}</BubbleContent>
+        </Bubble>
+      </MessageContent>
+    </Message>
   )
 }
 
@@ -22,23 +33,23 @@ interface MessageHistoryProps {
 }
 
 export function MessageHistory({ turns, className }: MessageHistoryProps) {
+  if (turns.length === 0) return null
+
   return (
-    <div className={cn("flex flex-col", className)}>
-      {turns.length > 0 ? (
-        <div className="flex flex-col gap-4 p-4">
-          {turns.map((turn) => (
-            <div key={turn.user.id} className="flex flex-col gap-2">
-              <HistoryUserBubble message={turn.user} />
-              {turn.assistant ? (
-                <AssistantMessage
-                  message={turn.assistant}
-                  isStreaming={false}
-                />
-              ) : null}
-            </div>
-          ))}
-        </div>
-      ) : null}
+    <div className={className}>
+      {turns.map((turn) => (
+        <MessageScrollerItem key={turn.user.id} messageId={turn.user.id}>
+          <div className="space-y-3 px-4 py-3">
+            <HistoryUserBubble message={turn.user} />
+            {turn.assistant ? (
+              <AssistantMessage
+                message={turn.assistant}
+                isStreaming={false}
+              />
+            ) : null}
+          </div>
+        </MessageScrollerItem>
+      ))}
     </div>
   )
 }

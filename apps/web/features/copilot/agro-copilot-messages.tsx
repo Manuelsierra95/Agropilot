@@ -1,8 +1,14 @@
 "use client"
 
-import { useLayoutEffect, useRef } from "react"
-
 import { useCopilotChat } from "@/features/copilot/copilot-chat-provider"
+import {
+  MessageScroller,
+  MessageScrollerButton,
+  MessageScrollerContent,
+  MessageScrollerItem,
+  MessageScrollerProvider,
+  MessageScrollerViewport,
+} from "@workspace/ui/components/message-scroller"
 
 import { ActiveTurnPanel } from "./components/active-turn-panel"
 import { EditableUserQuestion } from "./components/editable-user-question"
@@ -12,57 +18,45 @@ import { groupTurns } from "./components/turn-utils"
 export function AgroCopilotMessages() {
   const { messages, isLoading, handleEditSubmit, hasMessages } = useCopilotChat()
 
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const activeTurnRef = useRef<HTMLDivElement>(null)
-  const lastActiveTurnIdRef = useRef<string | undefined>(undefined)
-
   const turns = groupTurns(messages)
   const historyTurns = turns.length > 1 ? turns.slice(0, -1) : []
   const activeTurn = turns.at(-1)
 
-  useLayoutEffect(() => {
-    const newId = activeTurn?.user.id
-    if (!newId || newId === lastActiveTurnIdRef.current) return
-    lastActiveTurnIdRef.current = newId
-
-    const scrollToAnchor = () => {
-      const container = scrollRef.current
-      const anchor = activeTurnRef.current
-      if (!container || !anchor) return
-      const containerRect = container.getBoundingClientRect()
-      const anchorRect = anchor.getBoundingClientRect()
-      container.scrollTop =
-        container.scrollTop + (anchorRect.top - containerRect.top)
-    }
-
-    scrollToAnchor()
-    requestAnimationFrame(scrollToAnchor)
-  }, [activeTurn?.user.id])
-
   if (!hasMessages) return null
 
   return (
-    <div
-      ref={scrollRef}
-      className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain"
+    <MessageScrollerProvider
+      autoScroll
+      defaultScrollPosition="last-anchor"
+      scrollPreviousItemPeek={64}
     >
-      <MessageHistory turns={historyTurns} />
+      <MessageScroller className="flex-1">
+        <MessageScrollerViewport>
+          <MessageScrollerContent>
+            <MessageHistory turns={historyTurns} />
 
-      <div
-        ref={activeTurnRef}
-        className="min-h-full shrink-0 space-y-3 px-4 py-3"
-      >
-        {activeTurn ? (
-          <EditableUserQuestion
-            message={activeTurn.user}
-            isDisabled={isLoading}
-            onEditSubmit={handleEditSubmit}
-          />
-        ) : null}
-        {activeTurn ? (
-          <ActiveTurnPanel turn={activeTurn} isStreaming={isLoading} />
-        ) : null}
-      </div>
-    </div>
+            {activeTurn ? (
+              <MessageScrollerItem
+                messageId={activeTurn.user.id}
+                scrollAnchor
+              >
+                <div className="space-y-3 px-4 py-3">
+                  <EditableUserQuestion
+                    message={activeTurn.user}
+                    isDisabled={isLoading}
+                    onEditSubmit={handleEditSubmit}
+                  />
+                  <ActiveTurnPanel
+                    turn={activeTurn}
+                    isStreaming={isLoading}
+                  />
+                </div>
+              </MessageScrollerItem>
+            ) : null}
+          </MessageScrollerContent>
+        </MessageScrollerViewport>
+        <MessageScrollerButton />
+      </MessageScroller>
+    </MessageScrollerProvider>
   )
 }

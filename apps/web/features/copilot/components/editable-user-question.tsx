@@ -6,6 +6,12 @@ import { Pencil, Send, X } from "lucide-react"
 import type { UIMessage } from "ai"
 import { Button } from "@workspace/ui/components/button"
 import { Textarea } from "@workspace/ui/components/textarea"
+import { Bubble, BubbleContent } from "@workspace/ui/components/bubble"
+import {
+  Message,
+  MessageContent,
+  MessageFooter,
+} from "@workspace/ui/components/message"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { getMessageText } from "./turn-utils"
@@ -68,7 +74,7 @@ export function EditableUserQuestion({
           onChange={(e) => setEditText(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={2}
-          className="min-h-[44px] resize-none text-sm"
+          className="min-h-[44px] resize-none bg-transparent text-sm focus:ring-0 focus-visible:ring-0"
         />
         <div className="flex justify-end gap-2">
           <Button
@@ -95,24 +101,28 @@ export function EditableUserQuestion({
   }
 
   return (
-    <div className="group flex items-start justify-end gap-2">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className={cn(
-          "mt-1 size-6 shrink-0 opacity-0 transition-opacity group-hover:opacity-100",
-          isDisabled && "pointer-events-none"
-        )}
-        disabled={isDisabled}
-        onClick={handleEditStart}
-        aria-label="Editar pregunta"
-      >
-        <Pencil className="size-3" />
-      </Button>
-      <div className="max-w-[90%] rounded-2xl bg-primary px-4 py-2 text-sm text-primary-foreground">
-        {text}
-      </div>
-    </div>
+    <Message align="end">
+      <MessageContent className="flex flex-row items-end justify-end gap-1">
+        <Bubble variant="default" align="end">
+          <BubbleContent>{text}</BubbleContent>
+        </Bubble>
+        <MessageFooter>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className={cn(
+              "size-6 opacity-0 transition-opacity group-hover/message:opacity-100",
+              isDisabled && "pointer-events-none"
+            )}
+            disabled={isDisabled}
+            onClick={handleEditStart}
+            aria-label="Editar pregunta"
+          >
+            <Pencil className="size-3" />
+          </Button>
+        </MessageFooter>
+      </MessageContent>
+    </Message>
   )
 }

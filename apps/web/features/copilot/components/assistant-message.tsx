@@ -2,10 +2,21 @@
 
 import { taskCreateInputSchema } from "@workspace/schemas"
 import type { UIMessage } from "ai"
-import { Check, Loader2 } from "lucide-react"
+import { Check } from "lucide-react"
 import { useState } from "react"
 
 import { useCopilotLayout } from "@/features/copilot/copilot-layout-context"
+import { Bubble, BubbleContent } from "@workspace/ui/components/bubble"
+import {
+  Message,
+  MessageContent,
+} from "@workspace/ui/components/message"
+import {
+  Marker,
+  MarkerContent,
+  MarkerIcon,
+} from "@workspace/ui/components/marker"
+import { Spinner } from "@workspace/ui/components/spinner"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { TaskFormCard } from "./task-form-card"
@@ -98,84 +109,87 @@ export function AssistantMessage({
   }
 
   return (
-    <div className={cn("flex w-full max-w-full flex-col gap-2", className)}>
-      {queryToolParts.map((toolPart) => (
-        <div
-          key={toolPart.toolCallId}
-          className="flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2 text-xs text-muted-foreground"
-        >
-          {isToolDone(toolPart.state) ? (
-            <Check className="size-3.5 text-green-600" />
-          ) : (
-            <Loader2 className="size-3.5 animate-spin" />
-          )}
-          <span>
-            {isToolDone(toolPart.state) ? "Consultado" : "Consultando"}{" "}
-            {formatToolLabel(getToolName(toolPart))}…
-          </span>
-        </div>
-      ))}
+    <Message align="start">
+      <MessageContent
+        className={cn(
+          isFullscreen ? "mx-auto max-w-3xl" : "max-w-full",
+          className
+        )}
+      >
+        {queryToolParts.map((toolPart) => (
+          <Marker key={toolPart.toolCallId} variant="border" role="status">
+            <MarkerIcon>
+              {isToolDone(toolPart.state) ? (
+                <Check className="size-3.5 text-green-600" />
+              ) : (
+                <Spinner className="size-3.5" />
+              )}
+            </MarkerIcon>
+            <MarkerContent>
+              {isToolDone(toolPart.state) ? "Consultado" : "Consultando"}{" "}
+              {formatToolLabel(getToolName(toolPart))}…
+            </MarkerContent>
+          </Marker>
+        ))}
 
-      {textContent ? (
-        <div
-          className={cn(
-            "rounded-lg border bg-card px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap",
-            isFullscreen ? "mx-auto max-w-3xl" : "max-w-full"
-          )}
-        >
-          {textContent}
-        </div>
-      ) : null}
+        {textContent ? (
+          <Bubble variant="ghost" align="start">
+            <BubbleContent>{textContent}</BubbleContent>
+          </Bubble>
+        ) : null}
 
-      {taskFormParts.map((toolPart) => {
-        const proposal = parseTaskFormProposal(toolPart)
-        if (!proposal || submittedFormIds.has(toolPart.toolCallId)) {
-          return null
-        }
+        {taskFormParts.map((toolPart) => {
+          const proposal = parseTaskFormProposal(toolPart)
+          if (!proposal || submittedFormIds.has(toolPart.toolCallId)) {
+            return null
+          }
 
-        return (
-          <TaskFormCard
-            key={toolPart.toolCallId}
-            defaults={proposal}
-            onSuccess={(title) => {
-              setSubmittedFormIds((current) =>
-                new Set(current).add(toolPart.toolCallId)
-              )
-              setTaskFeedback({
-                type: "success",
-                title: `Tarea "${title}" creada correctamente.`,
-              })
-            }}
-            onError={() => {
-              setTaskFeedback({
-                type: "error",
-                title: "No se pudo crear la tarea. Inténtalo de nuevo.",
-              })
-            }}
-          />
-        )
-      })}
+          return (
+            <TaskFormCard
+              key={toolPart.toolCallId}
+              defaults={proposal}
+              onSuccess={(title) => {
+                setSubmittedFormIds((current) =>
+                  new Set(current).add(toolPart.toolCallId)
+                )
+                setTaskFeedback({
+                  type: "success",
+                  title: `Tarea "${title}" creada correctamente.`,
+                })
+              }}
+              onError={() => {
+                setTaskFeedback({
+                  type: "error",
+                  title: "No se pudo crear la tarea. Inténtalo de nuevo.",
+                })
+              }}
+            />
+          )
+        })}
 
-      {taskFeedback ? (
-        <div
-          role="status"
-          className={cn(
-            "rounded-lg border px-3 py-2 text-sm",
-            taskFeedback.type === "success"
-              ? "border-green-200 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-950 dark:text-green-200"
-              : "border-destructive/50 bg-destructive/10 text-destructive"
-          )}
-        >
-          {taskFeedback.title}
-        </div>
-      ) : null}
+        {taskFeedback ? (
+          <div
+            role="status"
+            className={cn(
+              "rounded-lg border px-3 py-2 text-sm",
+              taskFeedback.type === "success"
+                ? "border-green-200 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-950 dark:text-green-200"
+                : "border-destructive/50 bg-destructive/10 text-destructive"
+            )}
+          >
+            {taskFeedback.title}
+          </div>
+        ) : null}
 
-      {isStreaming && !textContent && toolParts.length === 0 ? (
-        <div className="flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-          <Loader2 className="size-3.5 animate-spin" />
-          <span>Generando respuesta…</span>
-        </div>
-      ) : null}
-    </div>
+        {isStreaming && !textContent && toolParts.length === 0 ? (
+          <Marker role="status">
+            <MarkerIcon>
+              <Spinner className="size-3.5" />
+            </MarkerIcon>
+            <MarkerContent>Generando respuesta…</MarkerContent>
+          </Marker>
+        ) : null}
+      </MessageContent>
+    </Message>
   )
 }
