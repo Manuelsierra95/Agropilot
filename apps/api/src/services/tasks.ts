@@ -12,7 +12,7 @@ import {
   resolveCampaignById,
   resolveScopeDateRange,
 } from "@/services/campaign"
-import { resolveParcelIdForOrg, listParcels } from "@/services/parcel"
+import { listParcels } from "@/services/parcel"
 
 export type { TaskCategory, TaskStatus } from "@workspace/schemas"
 
@@ -145,17 +145,14 @@ export async function listCalendarTasks(
     : await resolveActiveCampaign()
 
   const { from, to } = resolveScopeDateRange(campaign, filters)
-  const resolvedParcelId = filters.parcelId
-    ? await resolveParcelIdForOrg(organizationId, filters.parcelId)
-    : null
 
   const tasks = await db.query.tasks.findMany({
     where: and(
       eq(schema.tasks.organizationId, organizationId),
       gte(schema.tasks.startDate, new Date(`${from}T00:00:00.000Z`)),
       lte(schema.tasks.startDate, new Date(`${to}T23:59:59.999Z`)),
-      ...(resolvedParcelId
-        ? [eq(schema.tasks.parcelId, resolvedParcelId)]
+      ...(filters.parcelId
+        ? [eq(schema.tasks.parcelId, filters.parcelId)]
         : [])
     ),
     orderBy: [asc(schema.tasks.startDate)],
@@ -178,17 +175,14 @@ export async function listUpcomingWeekTasks(
   filters: DashboardUpcomingWeekQuery = {}
 ): Promise<DashboardCalendarEvent[]> {
   const { from, to } = getWeekRange(filters.weekStart)
-  const resolvedParcelId = filters.parcelId
-    ? await resolveParcelIdForOrg(organizationId, filters.parcelId)
-    : null
 
   const tasks = await db.query.tasks.findMany({
     where: and(
       eq(schema.tasks.organizationId, organizationId),
       gte(schema.tasks.startDate, new Date(`${from}T00:00:00.000Z`)),
       lte(schema.tasks.startDate, new Date(`${to}T23:59:59.999Z`)),
-      ...(resolvedParcelId
-        ? [eq(schema.tasks.parcelId, resolvedParcelId)]
+      ...(filters.parcelId
+        ? [eq(schema.tasks.parcelId, filters.parcelId)]
         : [])
     ),
     orderBy: [asc(schema.tasks.startDate)],

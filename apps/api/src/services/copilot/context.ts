@@ -1,30 +1,24 @@
 import type { CopilotContext } from "@workspace/copilot"
 
 import { getOrganizationName } from "@/services/organization"
-import { getParcelNameForOrg, resolveParcelIdForOrg } from "@/services/parcel"
+import { getParcelNameForOrg } from "@/services/parcel"
 
 export async function resolveCopilotContext(
   organizationId: string,
   userId: string,
   requestedParcelId?: string
 ): Promise<CopilotContext> {
-  const activeParcelId = requestedParcelId
-    ? ((await resolveParcelIdForOrg(organizationId, requestedParcelId)) ??
-      undefined)
-    : undefined
+  const activeParcelName = requestedParcelId
+    ? await getParcelNameForOrg(organizationId, requestedParcelId)
+    : null
 
-  const [organizationName, activeParcelName] = await Promise.all([
-    getOrganizationName(organizationId),
-    activeParcelId
-      ? getParcelNameForOrg(organizationId, activeParcelId)
-      : Promise.resolve(null),
-  ])
+  const organizationName = await getOrganizationName(organizationId)
 
   return {
     organizationId,
     userId,
     organizationName: organizationName ?? undefined,
-    activeParcelId,
+    activeParcelId: requestedParcelId,
     activeParcelName: activeParcelName ?? undefined,
   }
 }

@@ -14,7 +14,6 @@ import { resolveActiveCampaign, resolveCampaignById } from "@/services/campaign"
 import {
   getParcelById,
   listParcels,
-  resolveParcelIdForOrg,
 } from "@/services/parcel"
 import {
   mapDbRecommendationsToDashboard,
@@ -381,9 +380,21 @@ export async function resolvePrimaryParcelId(
   organizationId: string,
   parcelId?: string
 ): Promise<string> {
-  const resolved = await resolveParcelIdForOrg(organizationId, parcelId)
-  if (!resolved) {
+  if (!parcelId) {
     throw new HTTPException(404, { message: "Parcel not found" })
   }
-  return resolved
+
+  const parcel = await db.query.parcels.findFirst({
+    where: and(
+      eq(schema.parcels.organizationId, organizationId),
+      eq(schema.parcels.id, parcelId)
+    ),
+    columns: { id: true },
+  })
+
+  if (!parcel) {
+    throw new HTTPException(404, { message: "Parcel not found" })
+  }
+
+  return parcel.id
 }

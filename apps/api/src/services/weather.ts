@@ -7,7 +7,6 @@ import {
   type WeatherCondition,
   type WeatherForecastDay,
 } from "@workspace/schemas"
-import { resolveParcelIdForOrg } from "@/services/parcel"
 import {
   computeSeedRisks,
   generateRecommendations,
@@ -129,15 +128,9 @@ function mapDailyToForecast(
 
 export async function getParcelWeatherForCalendar(
   organizationId: string,
-  parcelIdParam: string,
+  parcelId: string,
   query: ParcelWeatherQuery = {}
 ): Promise<ParcelWeatherResponse> {
-  const parcelId = await resolveParcelIdForOrg(organizationId, parcelIdParam)
-
-  if (!parcelId) {
-    throw new HTTPException(404, { message: "Parcel not found" })
-  }
-
   const parcel = await db.query.parcels.findFirst({
     where: and(
       eq(schema.parcels.organizationId, organizationId),

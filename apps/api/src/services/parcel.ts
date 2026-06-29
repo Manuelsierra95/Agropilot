@@ -196,22 +196,27 @@ export async function resolveParcelIdForOrg(
 
 export async function queryParcelCashflow(
   organizationId: string,
-  filters: ParcelCashflowQueryFilters,
-  defaultParcelId?: string
+  filters: ParcelCashflowQueryFilters
 ): Promise<ParcelCashflowRow[]> {
-  const parcelId = await resolveParcelIdForOrg(
-    organizationId,
-    filters.parcelId,
-    defaultParcelId
-  )
+  if (!filters.parcelId) {
+    return []
+  }
 
-  if (!parcelId) {
+  const parcel = await db.query.parcels.findFirst({
+    where: and(
+      eq(schema.parcels.organizationId, organizationId),
+      eq(schema.parcels.id, filters.parcelId)
+    ),
+    columns: { id: true },
+  })
+
+  if (!parcel) {
     return []
   }
 
   return db.query.parcelCashflowDaily.findMany({
     where: and(
-      eq(schema.parcelCashflowDaily.parcelId, parcelId),
+      eq(schema.parcelCashflowDaily.parcelId, filters.parcelId),
       gte(schema.parcelCashflowDaily.date, filters.from),
       lte(schema.parcelCashflowDaily.date, filters.to)
     ),
@@ -241,23 +246,16 @@ function weatherMetricValue(
 
 export async function queryParcelWeather(
   organizationId: string,
-  filters: ParcelWeatherQueryFilters,
-  defaultParcelId?: string
+  filters: ParcelWeatherQueryFilters
 ): Promise<ParcelWeatherDailyRow[]> {
-  const parcelId = await resolveParcelIdForOrg(
-    organizationId,
-    filters.parcelId,
-    defaultParcelId
-  )
-
-  if (!parcelId) {
+  if (!filters.parcelId) {
     return []
   }
 
   const parcel = await db.query.parcels.findFirst({
     where: and(
       eq(schema.parcels.organizationId, organizationId),
-      eq(schema.parcels.id, parcelId)
+      eq(schema.parcels.id, filters.parcelId)
     ),
     columns: { id: true, name: true },
   })
@@ -265,6 +263,8 @@ export async function queryParcelWeather(
   if (!parcel) {
     return []
   }
+
+  const parcelId = parcel.id
 
   const weather = await db.query.parcelWeather.findFirst({
     where: eq(schema.parcelWeather.parcelId, parcelId),
@@ -374,10 +374,17 @@ function nestRecommendationsIntoRisks(
 
 export async function getParcelWeather(
   organizationId: string,
-  parcelIdParam: string
+  parcelId: string
 ) {
-  const parcelId = await resolveParcelIdForOrg(organizationId, parcelIdParam)
-  if (!parcelId) throw new HTTPException(404, { message: "Parcel not found" })
+  const parcel = await db.query.parcels.findFirst({
+    where: and(
+      eq(schema.parcels.organizationId, organizationId),
+      eq(schema.parcels.id, parcelId)
+    ),
+    columns: { id: true },
+  })
+
+  if (!parcel) throw new HTTPException(404, { message: "Parcel not found" })
 
   const weather = await db.query.parcelWeather.findFirst({
     where: eq(schema.parcelWeather.parcelId, parcelId),

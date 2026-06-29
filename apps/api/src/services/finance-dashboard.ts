@@ -26,7 +26,7 @@ import {
   resolveScopeDateRange,
 } from "@/services/campaign"
 import { getCachedMarketPricesByGrade } from "@/services/market-prices-cache"
-import { listParcels, resolveParcelIdForOrg } from "@/services/parcel"
+import { listParcels } from "@/services/parcel"
 
 const MARKET_HISTORY_DAYS = 90
 const RECENT_TRANSACTION_LIMIT = 50
@@ -198,10 +198,6 @@ async function resolveScopeContext(
   organizationId: string,
   filters: DashboardScopeQuery
 ): Promise<ScopeContext> {
-  const resolvedParcelId = filters.parcelId
-    ? await resolveParcelIdForOrg(organizationId, filters.parcelId)
-    : null
-
   const campaign = filters.campaignId
     ? await resolveCampaignById(filters.campaignId)
     : filters.from && filters.to
@@ -211,7 +207,7 @@ async function resolveScopeContext(
   const dateRange = resolveScopeDateRange(campaign, filters)
 
   return {
-    parcelId: resolvedParcelId,
+    parcelId: filters.parcelId ?? null,
     campaignId: campaign?.id,
     dateRange,
   }
