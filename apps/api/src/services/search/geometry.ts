@@ -1,4 +1,4 @@
-import { parser, POLYGON_WFS_URL } from "./client"
+import { parser, POLYGON_WFS_URL } from "@workspace/api/services/search/client"
 
 function parsePolygon(json: any): [number, number][][] {
   const posListRaw =

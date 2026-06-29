@@ -1,6 +1,6 @@
 import type { MiddlewareHandler } from "hono"
 import type { Env } from "@env"
-import type { ApiVariables } from "@/types/variables"
+import type { ApiVariables } from "@workspace/api/types/variables"
 import { auth } from "@workspace/auth"
 import { parseAuthSession, parseAuthUser } from "@workspace/schemas"
 

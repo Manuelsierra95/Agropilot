@@ -6,8 +6,8 @@ import type {
   ParcelCreateInput,
   ParcelUpdateInput,
 } from "@workspace/schemas"
-import { getStations } from "@/services/weather"
-import { geoService } from "@/services/shared/geometry-utils"
+import { getStations } from "@workspace/api/services/weather"
+import { geoService } from "@workspace/api/services/shared/geometry-utils"
 
 type ParcelLocationValues = {
   refcat: string | null

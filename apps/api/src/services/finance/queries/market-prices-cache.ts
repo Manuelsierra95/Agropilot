@@ -1,7 +1,7 @@
 import type { OilGrade } from "@workspace/schemas"
 import { DASHBOARD_OIL_GRADES } from "@workspace/schemas"
-import { queryMarketPrices } from "../queries/transaction-queries"
-import type { MarketPriceRow } from "../domain/types"
+import { queryMarketPrices } from "@workspace/api/services/finance/queries/transaction-queries"
+import type { MarketPriceRow } from "@workspace/api/services/finance/domain/types"
 
 const CACHE_TTL_MS = 15 * 60 * 1000
 

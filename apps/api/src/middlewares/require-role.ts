@@ -1,5 +1,5 @@
 import type { MiddlewareHandler } from "hono"
-import type { ApiVariables } from "@/types/variables"
+import type { ApiVariables } from "@workspace/api/types/variables"
 import {
   ROLE_HIERARCHY,
   type OrganizationRole,

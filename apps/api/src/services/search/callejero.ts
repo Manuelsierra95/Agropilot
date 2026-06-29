@@ -4,7 +4,7 @@ import {
   postCatastro,
   PROVINCES_URL,
   STREETS_URL,
-} from "./client"
+} from "@workspace/api/services/search/client"
 
 export async function getProvinces(): Promise<Province[]> {
   return postCatastro<Province>(PROVINCES_URL)

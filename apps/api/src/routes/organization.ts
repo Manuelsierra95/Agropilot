@@ -1,9 +1,9 @@
 import { Hono } from "hono"
 import type { Env } from "@env"
-import type { AuthVariables } from "@/types/variables"
+import type { AuthVariables } from "@workspace/api/types/variables"
 import { zValidator } from "@hono/zod-validator"
-import { requireAuth } from "@/middlewares/require-auth"
-import { apiResponse } from "@/lib/api-response"
+import { requireAuth } from "@workspace/api/middlewares/require-auth"
+import { apiResponse } from "@workspace/api/lib/api-response"
 import {
   getActiveOrganization,
   updateOrganization,
@@ -13,13 +13,13 @@ import {
   cancelInvitation,
   createInvitation,
   listInvitations,
-} from "@/services/auth"
+} from "@workspace/api/services/auth"
 import {
   invitationBulkCreateSchema,
   invitationCreateSchema,
   updateOrganizationSchema,
 } from "@workspace/schemas"
-import { requireRole } from "@/middlewares/require-role"
+import { requireRole } from "@workspace/api/middlewares/require-role"
 
 export const organizationRoutes = new Hono<{
   Bindings: Env

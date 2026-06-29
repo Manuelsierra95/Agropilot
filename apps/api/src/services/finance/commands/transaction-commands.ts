@@ -16,7 +16,7 @@ import type {
   TransactionSelect,
   TransactionUpdateInput,
 } from "@workspace/schemas"
-import { ensureCampaignForDate } from "@/services/campaigns"
+import { ensureCampaignForDate } from "@workspace/api/services/campaigns"
 
 type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
 

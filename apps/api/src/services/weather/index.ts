@@ -1,6 +1,6 @@
-export { getParcelWeatherForCalendar } from "./queries/get-weather-for-calendar"
-export { getStations } from "./commands/get-stations"
+export { getParcelWeatherForCalendar } from "@workspace/api/services/weather/queries/get-weather-for-calendar"
+export { getStations } from "@workspace/api/services/weather/commands/get-stations"
 export {
   generateParcelRisks,
   type ParcelRisksResponse,
-} from "./commands/generate-risks"
+} from "@workspace/api/services/weather/commands/generate-risks"

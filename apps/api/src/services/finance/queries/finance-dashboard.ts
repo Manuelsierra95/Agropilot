@@ -24,9 +24,9 @@ import {
   resolveActiveCampaign,
   resolveCampaignById,
   resolveScopeDateRange,
-} from "@/services/campaigns"
-import { getCachedMarketPricesByGrade } from "./market-prices-cache"
-import { listParcels } from "@/services/parcels/queries/list-parcels"
+} from "@workspace/api/services/campaigns"
+import { getCachedMarketPricesByGrade } from "@workspace/api/services/finance/queries/market-prices-cache"
+import { listParcels } from "@workspace/api/services/parcels/queries/list-parcels"
 
 const MARKET_HISTORY_DAYS = 90
 const RECENT_TRANSACTION_LIMIT = 50

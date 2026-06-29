@@ -1,7 +1,7 @@
 import { cors } from "hono/cors"
 import type { Env } from "@env"
 import type { MiddlewareHandler } from "hono"
-import { DEVORIGINS, ORIGINS } from "@/config/constants"
+import { DEVORIGINS, ORIGINS } from "@workspace/api/config/constants"
 
 export const corsMiddleware: MiddlewareHandler<{ Bindings: Env }> = (
   c,

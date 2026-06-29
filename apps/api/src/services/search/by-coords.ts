@@ -1,11 +1,11 @@
 import type { ParcelSearchResponse } from "@workspace/schemas"
-import { COORDS_URL, parser } from "./client"
+import { COORDS_URL, parser } from "@workspace/api/services/search/client"
 import {
   buildParcelRefcat,
   formatRefcatSegment,
   getParcelMetadataByRefcat,
-} from "./refcat"
-import { toParcelSearchResponse } from "./parcel-search-result"
+} from "@workspace/api/services/search/refcat"
+import { toParcelSearchResponse } from "@workspace/api/services/search/parcel-search-result"
 
 function parseRefcatFromCoords(
   pc1: string | number | undefined,

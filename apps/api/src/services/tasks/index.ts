@@ -11,8 +11,8 @@ import {
   resolveActiveCampaign,
   resolveCampaignById,
   resolveScopeDateRange,
-} from "@/services/campaigns"
-import { listParcels } from "@/services/parcels/queries/list-parcels"
+} from "@workspace/api/services/campaigns"
+import { listParcels } from "@workspace/api/services/parcels/queries/list-parcels"
 
 export type { TaskCategory, TaskStatus } from "@workspace/schemas"
 

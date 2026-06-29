@@ -1,8 +1,8 @@
 import { Hono } from "hono"
 import type { Env } from "@env"
-import type { AuthVariables } from "@/types/variables"
+import type { AuthVariables } from "@workspace/api/types/variables"
 import { zValidator } from "@hono/zod-validator"
-import { requireAuth } from "@/middlewares/require-auth"
+import { requireAuth } from "@workspace/api/middlewares/require-auth"
 import {
   addressSearchQuerySchema,
   municipalitiesQuerySchema,
@@ -18,7 +18,7 @@ import {
   searchByAddress,
   searchByCoords,
   searchByRefcat,
-} from "@/services/search"
+} from "@workspace/api/services/search"
 
 export const searchRoutes = new Hono<{
   Bindings: Env

@@ -28,21 +28,31 @@ export function createCacheMiddleware(
     url.searchParams.delete("force")
     const cacheKey = `cache:${organizationId}:${path}:${url.searchParams.toString()}`
 
+    let cached: string | null = null
     try {
       if (!force) {
-        const cached = await redis.get(cacheKey)
-        if (cached) {
-          const data = JSON.parse(cached)
-          const res = Response.json(data.body, { status: data.status })
-          res.headers.set("X-Cache", "HIT")
-          res.headers.set("Content-Type", "application/json")
-          return res
-        }
+        cached = await redis.get(cacheKey)
       }
+    } catch (error) {
+      console.error("Cache middleware read error:", error)
+    }
 
-      await next()
+    if (cached) {
+      try {
+        const data = JSON.parse(cached)
+        const res = Response.json(data.body, { status: data.status })
+        res.headers.set("X-Cache", "HIT")
+        res.headers.set("Content-Type", "application/json")
+        return res
+      } catch {
+        // Fall through to fresh request if cache is corrupted
+      }
+    }
 
-      if (c.res && c.res.status === 200) {
+    await next()
+
+    if (c.res && c.res.status === 200) {
+      try {
         const responseClone = c.res.clone()
         const body = await responseClone.json()
 
@@ -56,9 +66,9 @@ export function createCacheMiddleware(
         )
 
         c.res.headers.set("X-Cache", "MISS")
+      } catch (error) {
+        console.error("Cache middleware write error:", error)
       }
-    } catch (error) {
-      console.error("Cache middleware error:", error)
     }
 
     return c.res

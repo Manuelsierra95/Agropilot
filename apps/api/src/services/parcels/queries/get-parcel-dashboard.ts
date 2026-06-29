@@ -13,13 +13,13 @@ import type {
 import {
   resolveActiveCampaign,
   resolveCampaignById,
-} from "@/services/campaigns"
-import { getParcelById, listParcels } from "./list-parcels"
+} from "@workspace/api/services/campaigns"
+import { getParcelById, listParcels } from "@workspace/api/services/parcels/queries/list-parcels"
 import {
   mapDbRecommendationsToDashboard,
   mapDbRisksToDashboard,
-} from "@/services/parcels/mappers/parcel-dashboard.mapper"
-import { parseWktPoint } from "@/services/shared/geometry-utils"
+} from "@workspace/api/services/parcels/mappers/parcel-dashboard.mapper"
+import { parseWktPoint } from "@workspace/api/services/shared/geometry-utils"
 
 const TREES_PER_HECTARE = 200
 

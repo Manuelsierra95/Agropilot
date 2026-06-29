@@ -9,9 +9,9 @@ import {
   type QuerySpec,
 } from "@workspace/copilot"
 
-import { queryMarketPrices, queryTransactions } from "@/services/finance"
-import { queryParcelCashflow, queryParcelWeather } from "@/services/parcels"
-import { queryTasks } from "@/services/tasks"
+import { queryMarketPrices, queryTransactions } from "@workspace/api/services/finance"
+import { queryParcelCashflow, queryParcelWeather } from "@workspace/api/services/parcels"
+import { queryTasks } from "@workspace/api/services/tasks"
 
 function queryDataKey(query: QuerySpec, index: number): string {
   switch (query.source) {

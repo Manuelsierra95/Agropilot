@@ -1,7 +1,7 @@
-import { fetchCatastroXml, parser, REFCAT_URL } from "./client"
-import { parseCatastroStructuredAddress } from "./catastro-address"
-import type { ParcelSearchMetadata } from "./parcel-search-result"
-import { toParcelSearchResponse } from "./parcel-search-result"
+import { fetchCatastroXml, parser, REFCAT_URL } from "@workspace/api/services/search/client"
+import { parseCatastroStructuredAddress } from "@workspace/api/services/search/catastro-address"
+import type { ParcelSearchMetadata } from "@workspace/api/services/search/parcel-search-result"
+import { toParcelSearchResponse } from "@workspace/api/services/search/parcel-search-result"
 import type { ParcelSearchResponse } from "@workspace/schemas"
 
 function mapRefCatBody(refcat: string) {

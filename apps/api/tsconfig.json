@@ -10,12 +10,16 @@
     "jsxImportSource": "hono/jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@workspace/api/*": ["src/*"],
       "@env": ["env.d.ts"],
       "@workspace/db": ["../../packages/db/src/index.ts"],
+      "@workspace/db/*": ["../../packages/db/src/*"],
       "@workspace/auth": ["../../packages/auth/src/index.ts"],
+      "@workspace/auth/*": ["../../packages/auth/src/*"],
       "@workspace/schemas": ["../../packages/schemas/src/index.ts"],
-      "@workspace/copilot": ["../../packages/copilot/src/index.ts"]
+      "@workspace/schemas/*": ["../../packages/schemas/src/*"],
+      "@workspace/copilot": ["../../packages/copilot/src/index.ts"],
+      "@workspace/copilot/*": ["../../packages/copilot/src/*"]
     }
   }
 }

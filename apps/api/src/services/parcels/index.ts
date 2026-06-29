@@ -3,7 +3,7 @@ export type {
   ParcelCashflowRow,
   ParcelWeatherQueryFilters,
   ParcelWeatherDailyRow,
-} from "./queries/get-parcel-queries"
+} from "@workspace/api/services/parcels/queries/get-parcel-queries"
 
 export {
   getParcelNameForOrg,
@@ -13,7 +13,7 @@ export {
   queryParcelCashflow,
   queryParcelWeather,
   getParcelWeather,
-} from "./queries/get-parcel-queries"
+} from "@workspace/api/services/parcels/queries/get-parcel-queries"
 
 export {
   getParcelsForMap,
@@ -23,16 +23,16 @@ export {
   getParcelsRecommendationsForDashboard,
   getParcelsRisksForDashboard,
   resolvePrimaryParcelId,
-} from "./queries/get-parcel-dashboard"
+} from "@workspace/api/services/parcels/queries/get-parcel-dashboard"
 
 export {
   getParcelAgroclimateForDashboard,
   getParcelsWeatherComparisonForDashboard,
-} from "./queries/get-parcel-agroclimate"
+} from "@workspace/api/services/parcels/queries/get-parcel-agroclimate"
 
-export { createParcel, updateParcel, deleteParcel } from "./commands/parcel-commands"
+export { createParcel, updateParcel, deleteParcel } from "@workspace/api/services/parcels/commands/parcel-commands"
 
 export {
   mapDbRisksToDashboard,
   mapDbRecommendationsToDashboard,
-} from "./mappers/parcel-dashboard.mapper"
+} from "@workspace/api/services/parcels/mappers/parcel-dashboard.mapper"

@@ -1,7 +1,7 @@
 import type { CopilotContext } from "@workspace/copilot"
 
-import { getOrganizationName } from "@/services/auth"
-import { getParcelNameForOrg } from "@/services/parcels"
+import { getOrganizationName } from "@workspace/api/services/auth"
+import { getParcelNameForOrg } from "@workspace/api/services/parcels"
 
 export async function resolveCopilotContext(
   organizationId: string,

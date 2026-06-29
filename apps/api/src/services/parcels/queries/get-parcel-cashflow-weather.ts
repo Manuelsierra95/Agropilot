@@ -4,7 +4,7 @@ import {
   parcelWeatherDataSchema,
   type ParcelWeatherMetric,
 } from "@workspace/schemas"
-import type { RiskRecommendation } from "@/services/weather/domain/weathercloud"
+import type { RiskRecommendation } from "@workspace/api/services/weather/domain/weathercloud"
 
 export type ParcelCashflowQueryFilters = {
   parcelId?: string

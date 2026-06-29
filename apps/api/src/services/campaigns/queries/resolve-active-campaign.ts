@@ -4,8 +4,8 @@ import {
   getCampaignPeriodForDate,
   resolveScopeDateRange,
   type ResolvedDateRange,
-} from "@/services/campaigns/domain/campaign"
-import { resolveCampaignById } from "@/services/campaigns/queries/get-campaign-by-id"
+} from "@workspace/api/services/campaigns/domain/campaign"
+import { resolveCampaignById } from "@workspace/api/services/campaigns/queries/get-campaign-by-id"
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)

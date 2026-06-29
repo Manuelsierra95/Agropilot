@@ -3,12 +3,12 @@ import {
   type AddressSearchQuery,
   type ParcelSearchResponse,
 } from "@workspace/schemas"
-import { buildParcelRefcat } from "./refcat"
-import { parseCatastroStructuredAddress } from "./catastro-address"
+import { buildParcelRefcat } from "@workspace/api/services/search/refcat"
+import { parseCatastroStructuredAddress } from "@workspace/api/services/search/catastro-address"
 import {
   toParcelSearchResponse,
   type ParcelSearchMetadata,
-} from "./parcel-search-result"
+} from "@workspace/api/services/search/parcel-search-result"
 
 const DNPLOC_JSON_URL =
   "http://ovc.catastro.meh.es/OVCServWeb/OVCWcfCallejero/COVCCallejero.svc/json/Consulta_DNPLOC"

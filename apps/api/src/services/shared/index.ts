@@ -1,1 +1,1 @@
-export { parseWktPoint, geoService } from "./geometry-utils"
+export { parseWktPoint, geoService } from "@workspace/api/services/shared/geometry-utils"

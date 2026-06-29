@@ -8,7 +8,7 @@ import {
   generateRecommendations,
   getOlivePhenology,
   type ParcelApiRiskDetail,
-} from "@/services/weather/domain/weathercloud"
+} from "@workspace/api/services/weather/domain/weathercloud"
 
 export type ParcelRisksResponse = {
   parcelId: string

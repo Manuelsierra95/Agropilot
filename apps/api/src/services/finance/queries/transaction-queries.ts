@@ -13,7 +13,7 @@ import type {
   TransactionCategory,
   TransactionSelect,
 } from "@workspace/schemas"
-import type { TransactionQueryFilters, MarketPricesQueryFilters, MarketPriceRow } from "../domain/types"
+import type { TransactionQueryFilters, MarketPricesQueryFilters, MarketPriceRow } from "@workspace/api/services/finance/domain/types"
 
 export async function listTransactions(
   organizationId: string

@@ -1,9 +1,9 @@
 import { Hono } from "hono"
 import type { Env } from "@env"
-import type { AuthVariables } from "@/types/variables"
-import { requireAuth } from "@/middlewares/require-auth"
-import { apiResponse } from "@/lib/api-response"
-import { getUserMe, updateUserOnboarding } from "@/services/auth"
+import type { AuthVariables } from "@workspace/api/types/variables"
+import { requireAuth } from "@workspace/api/middlewares/require-auth"
+import { apiResponse } from "@workspace/api/lib/api-response"
+import { getUserMe, updateUserOnboarding } from "@workspace/api/services/auth"
 import { zValidator } from "@hono/zod-validator"
 import { userOnboardingUpdateSchema } from "@workspace/schemas"
 

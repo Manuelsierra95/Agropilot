@@ -3,15 +3,15 @@ export {
   getActiveOrganization,
   getOrganizationMembers,
   getOrganizationMe,
-} from "./queries/organization-queries"
+} from "@workspace/api/services/auth/queries/organization-queries"
 
-export { updateOrganization } from "./commands/update-organization"
+export { updateOrganization } from "@workspace/api/services/auth/commands/update-organization"
 
 export {
   createInvitation,
   bulkCreateInvitations,
   listInvitations,
   cancelInvitation,
-} from "./commands/invitation-commands"
+} from "@workspace/api/services/auth/commands/invitation-commands"
 
-export { getUserMe, updateUserOnboarding } from "./queries/user-queries"
+export { getUserMe, updateUserOnboarding } from "@workspace/api/services/auth/queries/user-queries"

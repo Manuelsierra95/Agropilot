@@ -5,8 +5,8 @@ import {
   parcelWeatherDataSchema,
   type ParcelWeatherMetric,
 } from "@workspace/schemas"
-import type { RiskRecommendation } from "@/services/weather/domain/weathercloud"
-import { mapDbRisksToDashboard } from "@/services/parcels/mappers/parcel-dashboard.mapper"
+import type { RiskRecommendation } from "@workspace/api/services/weather/domain/weathercloud"
+import { mapDbRisksToDashboard } from "@workspace/api/services/parcels/mappers/parcel-dashboard.mapper"
 
 export type ParcelCashflowQueryFilters = {
   parcelId?: string

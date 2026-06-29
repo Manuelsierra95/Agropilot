@@ -1,6 +1,6 @@
 import { db, schema, eq, desc } from "@workspace/db"
 import type { CampaignListItem } from "@workspace/schemas"
-import { formatCampaignDisplayName } from "@/services/campaigns/domain/campaign"
+import { formatCampaignDisplayName } from "@workspace/api/services/campaigns/domain/campaign"
 
 export async function listCampaignsForSwitcher(
   parcelId?: string

@@ -1,11 +1,11 @@
 import { Hono } from "hono"
 import { zValidator } from "@hono/zod-validator"
 import type { Env } from "@env"
-import type { AuthVariables } from "@/types/variables"
-import { requireAuth } from "@/middlewares/require-auth"
+import type { AuthVariables } from "@workspace/api/types/variables"
+import { requireAuth } from "@workspace/api/middlewares/require-auth"
 import { campaignListQuerySchema } from "@workspace/schemas"
-import { apiResponse } from "@/lib/api-response"
-import { listCampaignsForSwitcher } from "@/services/campaigns"
+import { apiResponse } from "@workspace/api/lib/api-response"
+import { listCampaignsForSwitcher } from "@workspace/api/services/campaigns"
 
 export const campaignRoutes = new Hono<{
   Bindings: Env

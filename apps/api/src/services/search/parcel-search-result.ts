@@ -1,6 +1,6 @@
 import { parseCadastreLdt, type ParcelSearchResponse } from "@workspace/schemas"
-import { fetchPolygon, getPolygonCentroid } from "./geometry"
-import { lookupPostalCodeByCoords } from "./reverse-geocode"
+import { fetchPolygon, getPolygonCentroid } from "@workspace/api/services/search/geometry"
+import { lookupPostalCodeByCoords } from "@workspace/api/services/search/reverse-geocode"
 
 export type ParcelSearchMetadata = {
   refcat: string

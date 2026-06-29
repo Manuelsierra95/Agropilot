@@ -6,4 +6,4 @@ export {
   type RiskAction,
   type RiskRecommendation,
   type ParcelApiRiskDetail,
-} from "./weathercloud"
+} from "@workspace/api/services/weather/domain/weathercloud"

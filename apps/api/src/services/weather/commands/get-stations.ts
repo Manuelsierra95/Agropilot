@@ -3,7 +3,7 @@ import {
   getBestStations,
   type StationCandidate,
 } from "@workspace/scrapers"
-import { geoService } from "@/services/shared/geometry-utils"
+import { geoService } from "@workspace/api/services/shared/geometry-utils"
 
 type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
 

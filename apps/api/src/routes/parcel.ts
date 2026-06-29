@@ -1,12 +1,12 @@
 import { Hono } from "hono"
 import type { Env } from "@env"
-import type { AuthVariables } from "@/types/variables"
+import type { AuthVariables } from "@workspace/api/types/variables"
 import { zValidator } from "@hono/zod-validator"
-import { requireAuth } from "@/middlewares/require-auth"
-import { createCacheMiddleware } from "@/middlewares/cache"
+import { requireAuth } from "@workspace/api/middlewares/require-auth"
+import { createCacheMiddleware } from "@workspace/api/middlewares/cache"
 import { apiQuerySchema } from "@workspace/schemas"
-import { parseInclude } from "@/lib/parse-include"
-import { apiResponse } from "@/lib/api-response"
+import { parseInclude } from "@workspace/api/lib/parse-include"
+import { apiResponse } from "@workspace/api/lib/api-response"
 import {
   createParcel,
   deleteParcel,
@@ -22,7 +22,7 @@ import {
   getParcelsForMap,
   listParcels,
   updateParcel,
-} from "@/services/parcels"
+} from "@workspace/api/services/parcels"
 import {
   parcelCreateSchema,
   parcelUpdateInputSchema,

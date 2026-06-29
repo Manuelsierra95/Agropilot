@@ -5,10 +5,10 @@ import { copilotChatRequestSchema } from "@workspace/schemas"
 import { Hono } from "hono"
 import type { UIMessage } from "ai"
 
-import { requireAuth } from "@/middlewares/require-auth"
-import type { AuthVariables } from "@/types/variables"
-import { apiResponse } from "@/lib/api-response"
-import { resolveCopilotContext, executeCopilotQuery, getLastUserText, getCopilotSuggestions } from "@/services/copilot"
+import { requireAuth } from "@workspace/api/middlewares/require-auth"
+import type { AuthVariables } from "@workspace/api/types/variables"
+import { apiResponse } from "@workspace/api/lib/api-response"
+import { resolveCopilotContext, executeCopilotQuery, getLastUserText, getCopilotSuggestions } from "@workspace/api/services/copilot"
 
 export const copilotRoutes = new Hono<{
   Bindings: Env

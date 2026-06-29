@@ -1,6 +1,6 @@
 import { db, schema, eq } from "@workspace/db"
 import { HTTPException } from "hono/http-exception"
-import { getCampaignPeriodForDate } from "@/services/campaigns/domain/campaign"
+import { getCampaignPeriodForDate } from "@workspace/api/services/campaigns/domain/campaign"
 
 type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
 
