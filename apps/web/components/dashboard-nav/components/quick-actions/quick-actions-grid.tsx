@@ -26,7 +26,7 @@ export function QuickActionsGrid({
             <h4 className="mb-2 px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
               {group.group}
             </h4>
-            <div className="flex flex-col gap-1">
+            <div className="grid grid-cols-2 gap-1">
               {group.items.map((item) => {
                 if (item.href) {
                   return (

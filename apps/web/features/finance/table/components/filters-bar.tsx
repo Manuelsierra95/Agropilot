@@ -7,6 +7,7 @@ import {
   IconCheck,
   IconChevronDown,
   IconCurrencyEuro,
+  IconFileSpreadsheet,
   IconLayoutColumns,
   IconPlus,
   IconSearch,
@@ -34,6 +35,7 @@ import {
 } from "@workspace/ui/components/popover"
 import { Separator } from "@workspace/ui/components/separator"
 
+import { BulkFinanceDialog } from "@workspace/web/components/finance/bulk-finance-dialog"
 import { CATEGORIES, PAYMENT_METHOD_LABELS } from "@workspace/web/features/finance/table/constants"
 import type { TransactionFilters } from "@workspace/web/features/finance/table/hooks/use-transaction-filters"
 
@@ -364,6 +366,8 @@ export function FiltersBar({
   const isEnabled = (filter: FiltersBarFilterOption) =>
     enabledFiltersSet.has(filter)
 
+  const [importDialogOpen, setImportDialogOpen] = React.useState(false)
+
   const hasVisibleAdvancedFilters =
     isEnabled("amount") ||
     isEnabled("dates") ||
@@ -521,16 +525,31 @@ export function FiltersBar({
           </>
         )}
 
+        {/* Import finance */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto h-8 shrink-0 gap-1.5"
+          onClick={() => setImportDialogOpen(true)}
+        >
+          <IconFileSpreadsheet className="size-3.5" />
+          <span className="hidden sm:inline">Importar finanzas</span>
+        </Button>
+
         {/* New transaction */}
         <Button
           size="sm"
-          className="ml-auto h-8 shrink-0 gap-1.5 bg-accent-foreground/80 text-background hover:bg-accent-foreground"
+          className="h-8 shrink-0 gap-1.5 bg-accent-foreground/80 text-background hover:bg-accent-foreground"
           onClick={onNewTransaction}
         >
           <IconPlus className="size-3.5" />
           <span className="hidden sm:inline">Nueva transacción</span>
         </Button>
       </div>
+      <BulkFinanceDialog
+        open={importDialogOpen}
+        onOpenChange={setImportDialogOpen}
+      />
     </div>
   )
 }

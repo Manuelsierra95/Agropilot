@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CreateParcelDialog } from "@workspace/web/components/parcel"
+import { CreateParcelDialog } from "@workspace/web/components/parcel/create-parcel-dialog"
 import type { MiniFormProps } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-types"
 
 export function ParcelDialogForm({ onSuccess }: MiniFormProps) {
