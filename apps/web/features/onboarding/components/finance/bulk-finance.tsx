@@ -23,16 +23,16 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 import type { TransactionBulkRow } from "@workspace/schemas"
-import { financeApi } from "@/lib/api/routes/finance"
-import { MOCK_FINANCE_ROWS } from "../../mocks/onboarding-mocks"
-import type { FieldFormData } from "../parcel/parcel-form"
-import { OnboardingSplitLayout } from "../onboarding-split-layout"
+import { financeApi } from "@workspace/web/lib/api/routes/finance"
+import { MOCK_FINANCE_ROWS } from "@workspace/web/features/onboarding/mocks/onboarding-mocks"
+import type { FieldFormData } from "@workspace/web/features/onboarding/components/parcel/parcel-form"
+import { OnboardingSplitLayout } from "@workspace/web/features/onboarding/components/onboarding-split-layout"
 import {
   assignIncrementalInvoiceNumbers,
   EXAMPLE_PASTE,
   parsePastedFinance,
   PAYMENT_METHOD_LABELS,
-} from "./bulk-finance-utils"
+} from "@workspace/web/features/onboarding/components/finance/bulk-finance-utils"
 
 interface FinanceBulkImportBarProps {
   imported: boolean

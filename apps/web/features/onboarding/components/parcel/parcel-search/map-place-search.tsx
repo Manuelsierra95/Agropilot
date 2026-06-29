@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Loader2, MapPin, Search } from "lucide-react"
 
-import { zoomForPlaceType } from "@/lib/geocoding/search-places"
-import type { PlaceSuggestion } from "@/lib/geocoding/types"
+import { zoomForPlaceType } from "@workspace/web/lib/geocoding/search-places"
+import type { PlaceSuggestion } from "@workspace/web/lib/geocoding/types"
 import { useMap } from "@workspace/ui/components/map"
 import {
   InputGroup,
@@ -13,7 +13,7 @@ import {
 } from "@workspace/ui/components/input-group"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { usePlaceSearch } from "./use-place-search"
+import { usePlaceSearch } from "@workspace/web/features/onboarding/components/parcel/parcel-search/use-place-search"
 
 export function MapPlaceSearch() {
   const { map, isLoaded } = useMap()

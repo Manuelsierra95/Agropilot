@@ -2,8 +2,8 @@
 
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
-import { formMap } from "./forms"
-import { quickActionsItems } from "./quick-actions-items"
+import { formMap } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms"
+import { quickActionsItems } from "@workspace/web/components/dashboard-nav/components/quick-actions/quick-actions-items"
 
 interface FormContentProps {
   activeForm: string

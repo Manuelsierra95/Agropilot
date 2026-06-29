@@ -1,6 +1,6 @@
 "use client"
-import { useNavigationSearchActions } from "@/lib/navigation/navigation-actions"
-import { SearchMenu } from "@/components/dashboard-nav/components/search/search-menu"
+import { useNavigationSearchActions } from "@workspace/web/lib/navigation/navigation-actions"
+import { SearchMenu } from "@workspace/web/components/dashboard-nav/components/search/search-menu"
 
 export function SearchMenuWrapper() {
   const actions = useNavigationSearchActions()

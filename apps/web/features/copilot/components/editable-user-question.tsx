@@ -14,7 +14,7 @@ import {
 } from "@workspace/ui/components/message"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { getMessageText } from "./turn-utils"
+import { getMessageText } from "@workspace/web/features/copilot/components/turn-utils"
 
 interface EditableUserQuestionProps {
   message: UIMessage

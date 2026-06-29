@@ -20,9 +20,9 @@ import {
 } from "@workspace/ui/components/form"
 import { Input } from "@workspace/ui/components/input"
 import { Button } from "@workspace/ui/components/button"
-import { useCalendarContext } from "../calendar-context"
+import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 import { format } from "date-fns"
-import { DateTimePicker } from "@/components/form/date-time-picker"
+import { DateTimePicker } from "@workspace/web/components/form/date-time-picker"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

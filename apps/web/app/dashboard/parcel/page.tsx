@@ -1,4 +1,4 @@
-import Parcel from "@/features/parcel"
+import Parcel from "@workspace/web/features/parcel"
 
 export default function ParcelPage() {
   return <Parcel />

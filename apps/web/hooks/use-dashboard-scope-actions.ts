@@ -4,21 +4,21 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useCallback } from "react"
 import { useRouter } from "next/navigation"
 
-import { api } from "@/lib/api"
-import { authClient } from "@/lib/auth-client"
-import { invalidateDashboard } from "@/lib/dashboard/invalidate-dashboard"
-import { pickDefaultCampaignId } from "@/lib/dashboard/pick-default-campaign"
-import { buildDashboardScopeKey } from "@/lib/dashboard/scope-key"
-import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
+import { api } from "@workspace/web/lib/api"
+import { authClient } from "@workspace/web/lib/auth-client"
+import { invalidateDashboard } from "@workspace/web/lib/dashboard/invalidate-dashboard"
+import { pickDefaultCampaignId } from "@workspace/web/lib/dashboard/pick-default-campaign"
+import { buildDashboardScopeKey } from "@workspace/web/lib/dashboard/scope-key"
+import { useDashboardScopeParams } from "@workspace/web/hooks/use-dashboard-scope-params"
 import {
   SCOPE_LOADING_KEY,
   useDashboardScopeTransition,
-} from "@/hooks/use-dashboard-scope-transition"
+} from "@workspace/web/hooks/use-dashboard-scope-transition"
 import {
   ORG_CAMPAIGNS_KEY,
   selectCampaignsForParcel,
   useDashboardListsStore,
-} from "@/store/useDashboardListsStore"
+} from "@workspace/web/store/useDashboardListsStore"
 
 async function resolveCampaignsForParcel(parcelId: string) {
   const store = useDashboardListsStore.getState()

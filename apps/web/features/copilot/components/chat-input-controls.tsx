@@ -36,7 +36,7 @@ import {
 } from "@workspace/ui/components/attachment"
 import { Spinner } from "@workspace/ui/components/spinner"
 
-import { useCopilotChat } from "@/features/copilot/copilot-chat-provider"
+import { useCopilotChat } from "@workspace/web/features/copilot/copilot-chat-provider"
 
 function formatFileSize(bytes: number): string {
   if (bytes === 0) return "0 B"

@@ -4,8 +4,8 @@ import { useState, useEffect } from "react"
 import { Button } from "@workspace/ui/components/button"
 import { Menu, X } from "lucide-react"
 import Link from "next/link"
-import { navigation } from "@/config/navigation/landing"
-import { siteConfig } from "@/config/app/site"
+import { navigation } from "@workspace/web/config/navigation/landing"
+import { siteConfig } from "@workspace/web/config/app/site"
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)

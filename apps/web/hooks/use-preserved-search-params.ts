@@ -2,7 +2,7 @@
 
 import { useMemo } from "react"
 import { parseAsString, useQueryStates } from "nuqs"
-import type { ScopeKey } from "@/lib/navigation/scope"
+import type { ScopeKey } from "@workspace/web/lib/navigation/scope"
 
 const dashboardScopeParsers = {
   parcelId: parseAsString,

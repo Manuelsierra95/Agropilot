@@ -17,16 +17,16 @@ import { toast } from "sonner"
 
 import { Card, CardContent, CardHeader } from "@workspace/ui/components/card"
 
-import { getColumns } from "./columns"
-import { EmptyState } from "./components/empty-state"
+import { getColumns } from "@workspace/web/features/finance/table/columns"
+import { EmptyState } from "@workspace/web/features/finance/table/components/empty-state"
 import {
   TransactionFiltersSection,
   type FiltersBarFilterOption,
-} from "./filters-bar"
-import { formatDate } from "./helpers"
-import { useTransactionFilters } from "./hooks/use-transaction-filters"
-import { TransactionResultsTable } from "./transaction-table"
-import type { Transaction } from "./types"
+} from "@workspace/web/features/finance/table/filters-bar"
+import { formatDate } from "@workspace/web/features/finance/table/helpers"
+import { useTransactionFilters } from "@workspace/web/features/finance/table/hooks/use-transaction-filters"
+import { TransactionResultsTable } from "@workspace/web/features/finance/table/transaction-table"
+import type { Transaction } from "@workspace/web/features/finance/table/types"
 
 export function TransactionTable({
   data: initialData,

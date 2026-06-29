@@ -2,16 +2,16 @@
 
 import * as React from "react"
 
-import type { WeatherDaily, WeatherMetrics } from "@/lib/parcel/types"
+import type { WeatherDaily, WeatherMetrics } from "@workspace/web/lib/parcel/types"
 
-import { ParcelCropStatusCard } from "./parcel-crop-status-card"
-import { ParcelDeficitChart } from "./parcel-deficit-chart"
-import { ParcelRainBalanceChart } from "./parcel-rain-balance-chart"
-import { ParcelTemperatureChart } from "./parcel-temperature-chart"
-import { ParcelWaterBalanceChart } from "./parcel-water-balance-chart"
-import { ParcelWeatherRiskCard } from "./parcel-weather-risk-card"
-import type { ParcelApiResponse, ParcelItem } from "./parcel-types"
-import type { DailySeriesPoint } from "./parcel-weather-types"
+import { ParcelCropStatusCard } from "@workspace/web/features/parcel/components/parcel-crop-status-card"
+import { ParcelDeficitChart } from "@workspace/web/features/parcel/components/parcel-deficit-chart"
+import { ParcelRainBalanceChart } from "@workspace/web/features/parcel/components/parcel-rain-balance-chart"
+import { ParcelTemperatureChart } from "@workspace/web/features/parcel/components/parcel-temperature-chart"
+import { ParcelWaterBalanceChart } from "@workspace/web/features/parcel/components/parcel-water-balance-chart"
+import { ParcelWeatherRiskCard } from "@workspace/web/features/parcel/components/parcel-weather-risk-card"
+import type { ParcelApiResponse, ParcelItem } from "@workspace/web/features/parcel/components/parcel-types"
+import type { DailySeriesPoint } from "@workspace/web/features/parcel/components/parcel-weather-types"
 
 type ParcelWeatherDashboardProps = {
   activeParcel: ParcelItem

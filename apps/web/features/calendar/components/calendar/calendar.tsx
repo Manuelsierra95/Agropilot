@@ -1,11 +1,11 @@
-import type { CalendarProps } from "./calendar-types"
-import CalendarHeader from "./header/calendar-header"
-import CalendarBody from "../../body/calendar-body"
-import CalendarHeaderActions from "./header/actions/calendar-header-actions"
-import CalendarHeaderDate from "./header/date/calendar-header-date"
-import CalendarHeaderActionsMode from "./header/actions/calendar-header-actions-mode"
-import CalendarHeaderActionsAdd from "./header/actions/calendar-header-actions-add"
-import CalendarProvider from "./calendar-provider"
+import type { CalendarProps } from "@workspace/web/features/calendar/components/calendar/calendar-types"
+import CalendarHeader from "@workspace/web/features/calendar/components/calendar/header/calendar-header"
+import CalendarBody from "@workspace/web/features/calendar/body/calendar-body"
+import CalendarHeaderActions from "@workspace/web/features/calendar/components/calendar/header/actions/calendar-header-actions"
+import CalendarHeaderDate from "@workspace/web/features/calendar/components/calendar/header/date/calendar-header-date"
+import CalendarHeaderActionsMode from "@workspace/web/features/calendar/components/calendar/header/actions/calendar-header-actions-mode"
+import CalendarHeaderActionsAdd from "@workspace/web/features/calendar/components/calendar/header/actions/calendar-header-actions-add"
+import CalendarProvider from "@workspace/web/features/calendar/components/calendar/calendar-provider"
 
 export default function Calendar({
   events,

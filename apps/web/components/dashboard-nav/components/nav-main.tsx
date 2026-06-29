@@ -1,5 +1,5 @@
-import { PreservedLink } from "@/components/preserved-link"
-import { SCOPE_KEYS } from "@/lib/navigation/scope"
+import { PreservedLink } from "@workspace/web/components/preserved-link"
+import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
 
 import {
   SidebarGroup,
@@ -7,7 +7,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar"
-import type { NavigationNavItem } from "@/lib/navigation/navigation-data"
+import type { NavigationNavItem } from "@workspace/web/lib/navigation/navigation-data"
 
 export function NavMain({ items }: { items: NavigationNavItem[] }) {
   return (

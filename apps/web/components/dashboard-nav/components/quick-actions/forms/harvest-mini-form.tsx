@@ -21,9 +21,9 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 
-import { MiniFormShell } from "./mini-form-shell"
-import { DESTINATIONS, PARCELS } from "./mini-form-data"
-import type { MiniFormProps } from "./mini-form-types"
+import { MiniFormShell } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-shell"
+import { DESTINATIONS, PARCELS } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-data"
+import type { MiniFormProps } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-types"
 
 const harvestSchema = z.object({
   parcelId: z.string().min(1),

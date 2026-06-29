@@ -1,9 +1,9 @@
 "use client"
 
-import { AgroCopilotMessages } from "@/features/copilot/agro-copilot-messages"
-import { ChatInput } from "@/features/copilot/components/chat-input"
-import { CopilotHeader } from "@/features/copilot/components/copilot-header"
-import { CopilotRecommendations } from "@/features/copilot/components/copilot-recommendations"
+import { AgroCopilotMessages } from "@workspace/web/features/copilot/agro-copilot-messages"
+import { ChatInput } from "@workspace/web/features/copilot/components/chat-input"
+import { CopilotHeader } from "@workspace/web/features/copilot/components/copilot-header"
+import { CopilotRecommendations } from "@workspace/web/features/copilot/components/copilot-recommendations"
 
 export function CopilotPanel() {
   return (

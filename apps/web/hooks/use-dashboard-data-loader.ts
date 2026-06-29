@@ -2,15 +2,15 @@
 
 import { useEffect } from "react"
 
-import { api } from "@/lib/api"
-import { authClient, useSession } from "@/lib/auth-client"
+import { api } from "@workspace/web/lib/api"
+import { authClient, useSession } from "@workspace/web/lib/auth-client"
 import { parseAuthSession } from "@workspace/schemas"
-import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
+import { useDashboardScopeParams } from "@workspace/web/hooks/use-dashboard-scope-params"
 import {
   ORG_CAMPAIGNS_KEY,
   useDashboardListsStore,
-} from "@/store/useDashboardListsStore"
-import type { DashboardOrganization } from "@/store/useDashboardListsStore"
+} from "@workspace/web/store/useDashboardListsStore"
+import type { DashboardOrganization } from "@workspace/web/store/useDashboardListsStore"
 
 function mapOrganizations(
   organizations: Array<{

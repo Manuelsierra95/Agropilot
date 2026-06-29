@@ -1,5 +1,5 @@
-import { SettingsBillingSection } from "@/features/settings/billing"
-import { api } from "@/lib/api"
+import { SettingsBillingSection } from "@workspace/web/features/settings/billing"
+import { api } from "@workspace/web/lib/api"
 
 export default async function SettingsBillingPage() {
   const billing = await api.billing.getMe()

@@ -12,7 +12,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { useSidebar } from "@workspace/ui/components/sidebar"
 
-import { preloadCopilotPanel } from "@/components/copilot/copilot-panel-shell"
+import { preloadCopilotPanel } from "@workspace/web/components/copilot/copilot-panel-shell"
 
 export function CopilotButton({ className }: { className?: string }) {
   const { open, toggleSidebar } = useSidebar()

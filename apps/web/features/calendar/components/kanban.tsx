@@ -11,7 +11,7 @@ import type {
   CalendarEvent,
   CalendarEventStatus,
   CalendarEventType,
-} from "@/lib/calendar/types"
+} from "@workspace/web/lib/calendar/types"
 import { useEffect, useMemo, useState } from "react"
 import {
   Card,

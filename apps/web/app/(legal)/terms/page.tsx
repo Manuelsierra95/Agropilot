@@ -1,5 +1,5 @@
 import { Metadata } from "next"
-import { TermsDocument } from "@/features/legal/terms"
+import { TermsDocument } from "@workspace/web/features/legal/terms"
 
 export const metadata: Metadata = {
   title: "Terminos de servicio | AgroPilot",

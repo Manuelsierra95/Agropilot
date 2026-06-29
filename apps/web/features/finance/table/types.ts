@@ -3,4 +3,4 @@ export {
   paymentMethodEnum,
   transactionTypeEnum,
   type FinanceTransaction as Transaction,
-} from "@/lib/finance/types"
+} from "@workspace/web/lib/finance/types"

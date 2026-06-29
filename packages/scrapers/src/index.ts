@@ -13,7 +13,7 @@ export {
   getWind,
   type StationCandidate,
   type StationSelection,
-} from "./weather/helpers.js"
+} from "./weather"
 
 export type {
   LastUpdate,
@@ -29,4 +29,6 @@ export type {
   regularID,
   metarID,
   deviceMapElement,
-} from "./weather/types.js"
+} from "./weather"
+
+export { getOilPrices } from "./oil-prices"

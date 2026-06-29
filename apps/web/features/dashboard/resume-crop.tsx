@@ -15,10 +15,10 @@ import { MapPin, Leaf, Activity, MessageCircle, ArrowRight } from "lucide-react"
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { useSidebar } from "@workspace/ui/components/sidebar"
 import { cn } from "@workspace/ui/lib/utils"
-import { HighlightedText } from "@/lib/highlight-text"
+import { HighlightedText } from "@workspace/web/lib/highlight-text"
 import { useState, useCallback } from "react"
 import Link from "next/link"
-import { GradientSeparator } from "@/components/ui/gradient-separator"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
 
 interface OlivarData {
   name: string

@@ -25,9 +25,9 @@ import {
   ToggleGroupItem,
 } from "@workspace/ui/components/toggle-group"
 
-import { MiniFormShell } from "./mini-form-shell"
-import { PARCELS, PEST_TYPES } from "./mini-form-data"
-import type { MiniFormProps } from "./mini-form-types"
+import { MiniFormShell } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-shell"
+import { PARCELS, PEST_TYPES } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-data"
+import type { MiniFormProps } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-types"
 
 const pestSchema = z.object({
   parcelId: z.string().min(1),

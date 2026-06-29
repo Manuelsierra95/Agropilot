@@ -1,6 +1,6 @@
-import type { ParcelApiResponse, ParcelItem } from "./parcel-types"
-import type { WeatherDaily, WeatherMetrics } from "@/lib/parcel/types"
-import { ParcelWeatherDashboard } from "./parcel-weather-dashboard"
+import type { ParcelApiResponse, ParcelItem } from "@workspace/web/features/parcel/components/parcel-types"
+import type { WeatherDaily, WeatherMetrics } from "@workspace/web/lib/parcel/types"
+import { ParcelWeatherDashboard } from "@workspace/web/features/parcel/components/parcel-weather-dashboard"
 
 type ParcelSingleViewProps = {
   activeParcel: ParcelItem

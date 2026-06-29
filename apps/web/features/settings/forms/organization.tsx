@@ -5,7 +5,7 @@ import type {
   UpdateOrganizationInput,
   AuthOrganization,
 } from "@workspace/schemas"
-import { useUpdateOrganization } from "@/features/settings/hooks/use-update-organization"
+import { useUpdateOrganization } from "@workspace/web/features/settings/hooks/use-update-organization"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"

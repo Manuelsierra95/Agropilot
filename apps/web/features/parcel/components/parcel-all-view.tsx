@@ -15,8 +15,8 @@ import {
   type ChartConfig,
 } from "@workspace/ui/components/chart"
 
-import type { AllModeSummary, ParcelComparisonItem } from "./parcel-types"
-import { formatNumber } from "./parcel-utils"
+import type { AllModeSummary, ParcelComparisonItem } from "@workspace/web/features/parcel/components/parcel-types"
+import { formatNumber } from "@workspace/web/features/parcel/components/parcel-utils"
 
 const comparisonChartConfig = {
   area: {

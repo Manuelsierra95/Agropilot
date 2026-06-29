@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic"
 
-import { CampaignSwitcherPlaceholder } from "@/components/dashboard-nav/components/switcher-placeholders"
+import { CampaignSwitcherPlaceholder } from "@workspace/web/components/dashboard-nav/components/switcher-placeholders"
 
 const CampaignSwitcherClient = dynamic(
   () =>
-    import("@/components/dashboard-nav/components/campaign-switcher").then(
+    import("@workspace/web/components/dashboard-nav/components/campaign-switcher").then(
       (mod) => ({
         default: mod.CampaignSwitcher,
       })

@@ -28,7 +28,7 @@ import { Textarea } from "@workspace/ui/components/textarea"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 
-import { api } from "@/lib/api"
+import { api } from "@workspace/web/lib/api"
 
 const taskFormSchema = taskCreateInputSchema
 

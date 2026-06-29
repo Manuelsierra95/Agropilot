@@ -2,38 +2,38 @@
 
 import { useMemo } from "react"
 
-import { PageContainer } from "@/components/ui/page-container"
-import { GradientSeparator } from "@/components/ui/gradient-separator"
-import { WidgetSkeleton } from "@/features/dashboard/dashboard-skeleton"
-import { CalendarClient } from "@/features/calendar/components/calendar/calendar-client"
-import { ActiveAlertsCard } from "@/features/calendar/components/active-alerts-card"
-import { CampaignTimeline } from "@/features/calendar/components/campaign-timeline"
-import { KpisCard } from "@/features/calendar/components/kpis-card"
-import { RecommendationsCard } from "@/features/calendar/components/recommendations-card"
-import { Kanban } from "@/features/calendar/components/kanban"
+import { PageContainer } from "@workspace/web/components/ui/page-container"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
+import { WidgetSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
+import { CalendarClient } from "@workspace/web/features/calendar/components/calendar/calendar-client"
+import { ActiveAlertsCard } from "@workspace/web/features/calendar/components/active-alerts-card"
+import { CampaignTimeline } from "@workspace/web/features/calendar/components/campaign-timeline"
+import { KpisCard } from "@workspace/web/features/calendar/components/kpis-card"
+import { RecommendationsCard } from "@workspace/web/features/calendar/components/recommendations-card"
+import { Kanban } from "@workspace/web/features/calendar/components/kanban"
 import {
   useAllParcelsRecommendations,
   useAllParcelsRisks,
   useParcelRecommendations,
   useParcelRisks,
-} from "@/hooks/dashboard"
+} from "@workspace/web/hooks/dashboard"
 import {
   useCalendarEvents,
   useParcelWeatherForecast,
-} from "@/hooks/calendar"
-import { useIsAllParcelsSelected } from "@/hooks/use-is-all-parcels-selected"
-import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
+} from "@workspace/web/hooks/calendar"
+import { useIsAllParcelsSelected } from "@workspace/web/hooks/use-is-all-parcels-selected"
+import { useDashboardScopeParams } from "@workspace/web/hooks/use-dashboard-scope-params"
 import {
   allParcelsRecommendationsToCardItems,
   eventsToCampaignTimeline,
   parcelRecommendationsToCardItems,
   risksToActiveAlerts,
   risksToActiveAlertsAll,
-} from "@/lib/calendar/mappers"
+} from "@workspace/web/lib/calendar/mappers"
 import {
   selectCampaignsForParcel,
   useDashboardListsStore,
-} from "@/store/useDashboardListsStore"
+} from "@workspace/web/store/useDashboardListsStore"
 
 export default function Calendar() {
   const isAllParcels = useIsAllParcelsSelected()

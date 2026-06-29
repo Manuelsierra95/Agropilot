@@ -4,6 +4,8 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { toast } from "sonner"
+import { type TransactionCategory } from "@workspace/schemas"
 import {
   Form,
   FormControl,
@@ -21,9 +23,11 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 
-import { MiniFormShell } from "./mini-form-shell"
-import { EXPENSE_CATEGORIES, PARCELS_WITH_ALL } from "./mini-form-data"
-import type { MiniFormProps } from "./mini-form-types"
+import { MiniFormShell } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-shell"
+import { EXPENSE_CATEGORIES } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-data"
+import { useParcels } from "@workspace/web/hooks/parcel"
+import { api } from "@workspace/web/lib/api"
+import type { MiniFormProps } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-types"
 
 const expenseSchema = z.object({
   parcelId: z.string().min(1),
@@ -34,7 +38,18 @@ const expenseSchema = z.object({
 
 type ExpenseValues = z.infer<typeof expenseSchema>
 
+const CATEGORY_MAP: Record<string, string> = {
+  "Semillas / Plantones": "fertilization",
+  Fertilizantes: "fertilization",
+  Fitosanitarios: "treatment",
+  Combustible: "fuel",
+  "Maquinaria / Alquiler": "machinery",
+  "Mano de obra": "labor",
+  Otro: "other",
+}
+
 export function ExpenseMiniForm({ onSuccess }: MiniFormProps) {
+  const { data: parcels = [], isLoading: loadingParcels } = useParcels()
   const form = useForm<ExpenseValues>({
     resolver: zodResolver(expenseSchema),
     defaultValues: { date: new Date().toISOString().slice(0, 10) },
@@ -44,9 +59,18 @@ export function ExpenseMiniForm({ onSuccess }: MiniFormProps) {
   async function onSubmit(values: ExpenseValues) {
     setLoading(true)
     try {
-      await new Promise((r) => setTimeout(r, 700))
-      console.log("Gasto:", values)
+      await api.finance.createTransaction({
+        concept: values.category,
+        flow: "expense",
+        category: (CATEGORY_MAP[values.category] ?? "other") as TransactionCategory,
+        amount: values.amount,
+        date: values.date,
+        parcelId: values.parcelId === "all" ? undefined : values.parcelId,
+      })
+      toast.success("Gasto registrado")
       onSuccess()
+    } catch {
+      toast.error("Error al registrar el gasto")
     } finally {
       setLoading(false)
     }
@@ -68,11 +92,18 @@ export function ExpenseMiniForm({ onSuccess }: MiniFormProps) {
                 >
                   <FormControl>
                     <SelectTrigger className="h-7 text-xs">
-                      <SelectValue placeholder="Selecciona" />
+                      <SelectValue
+                        placeholder={
+                          loadingParcels ? "Cargando…" : "Selecciona"
+                        }
+                      />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {PARCELS_WITH_ALL.map((p) => (
+                    <SelectItem value="all" className="text-xs">
+                      Todas las parcelas
+                    </SelectItem>
+                    {parcels.map((p) => (
                       <SelectItem key={p.id} value={p.id} className="text-xs">
                         {p.name}
                       </SelectItem>

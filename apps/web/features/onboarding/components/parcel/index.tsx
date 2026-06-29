@@ -4,9 +4,9 @@ import { useMemo, useState, useTransition } from "react"
 import { Button } from "@workspace/ui/components/button"
 import { Badge } from "@workspace/ui/components/badge"
 import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar"
-import { OnboardingSplitLayout } from "../onboarding-split-layout"
-import { parcelSearchResultToDraft } from "@/lib/cadastre/apply-search-response"
-import { searchParcel } from "@/lib/cadastre/search-parcel"
+import { OnboardingSplitLayout } from "@workspace/web/features/onboarding/components/onboarding-split-layout"
+import { parcelSearchResultToDraft } from "@workspace/web/lib/cadastre/apply-search-response"
+import { searchParcel } from "@workspace/web/lib/cadastre/search-parcel"
 import {
   ParcelForm,
   PARCEL_ONBOARDING_FORM_ID,
@@ -16,17 +16,17 @@ import {
   type FieldFormData,
   type ParcelFormErrors,
   type ParcelSaveStatus,
-} from "./parcel-form"
-import type { ParcelSearchResult } from "./parcel-search/types"
-import { ParcelMap } from "./parcel-map-preview"
-import { ParcelList } from "./parcel-list"
-import { clearParcelDraftData } from "./parcel-draft-utils"
+} from "@workspace/web/features/onboarding/components/parcel/parcel-form"
+import type { ParcelSearchResult } from "@workspace/web/features/onboarding/components/parcel/parcel-search/types"
+import { ParcelMap } from "@workspace/web/features/onboarding/components/parcel/parcel-map-preview"
+import { ParcelList } from "@workspace/web/features/onboarding/components/parcel/parcel-list"
+import { clearParcelDraftData } from "@workspace/web/features/onboarding/components/parcel/parcel-draft-utils"
 import {
   CROP_TYPE_LABELS,
   DEFAULT_CROP_TYPE,
   IRRIGATION_TYPE_LABELS,
   type CropTypeValue,
-} from "./parcel-constants"
+} from "@workspace/web/features/onboarding/components/parcel/parcel-constants"
 
 export type { FieldFormData }
 

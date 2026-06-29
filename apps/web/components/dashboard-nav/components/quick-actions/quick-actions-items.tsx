@@ -7,6 +7,7 @@ import {
   Banknote,
   Map,
   CalendarPlus,
+  FileSpreadsheet,
   type LucideIcon,
 } from "lucide-react"
 
@@ -66,6 +67,12 @@ export const quickActionsItems: QuickActionsGroup[] = [
         label: "Ingreso",
         description: "Venta de cosecha u otro",
         icon: Banknote,
+      },
+      {
+        id: "bulkFinance",
+        label: "Importar finanzas",
+        description: "Importar movimientos desde Excel",
+        icon: FileSpreadsheet,
       },
     ],
   },

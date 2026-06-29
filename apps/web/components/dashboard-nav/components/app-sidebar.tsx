@@ -1,15 +1,15 @@
-import { NavMain } from "@/components/dashboard-nav/components/nav-main"
-import { NavModules } from "@/components/dashboard-nav/components/nav-modules"
-import { NavSettings } from "@/components/dashboard-nav/components/nav-settings"
-import { NavUser } from "@/components/dashboard-nav/components/nav-user"
-import { OrgSwitcher } from "@/components/dashboard-nav/components/org-switcher-shell"
+import { NavMain } from "@workspace/web/components/dashboard-nav/components/nav-main"
+import { NavModules } from "@workspace/web/components/dashboard-nav/components/nav-modules"
+import { NavSettings } from "@workspace/web/components/dashboard-nav/components/nav-settings"
+import { NavUser } from "@workspace/web/components/dashboard-nav/components/nav-user"
+import { OrgSwitcher } from "@workspace/web/components/dashboard-nav/components/org-switcher-shell"
 import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
 } from "@workspace/ui/components/sidebar"
-import { navigationData } from "@/lib/navigation/navigation-data"
-import { SearchMenuWrapper } from "@/components/dashboard-nav/components/search/search-menu-wrapper"
+import { navigationData } from "@workspace/web/lib/navigation/navigation-data"
+import { SearchMenuWrapper } from "@workspace/web/components/dashboard-nav/components/search/search-menu-wrapper"
 
 export function AppSidebar() {
   return (

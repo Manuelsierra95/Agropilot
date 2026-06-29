@@ -3,7 +3,7 @@
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { Check, Plus, X } from "lucide-react"
-import type { FieldFormData, ParcelSaveStatus } from "./parcel-form"
+import type { FieldFormData, ParcelSaveStatus } from "@workspace/web/features/onboarding/components/parcel/parcel-form"
 
 interface ParcelListProps {
   parcels: FieldFormData[]

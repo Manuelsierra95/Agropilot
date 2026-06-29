@@ -1,11 +1,11 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { authClient } from "@/lib/auth-client"
-import { api } from "@/lib/api"
+import { authClient } from "@workspace/web/lib/auth-client"
+import { api } from "@workspace/web/lib/api"
 import { parseAuthSession } from "@workspace/schemas"
-import { useSession } from "@/lib/auth-client"
-import type { DashboardOrganization } from "@/store/useDashboardListsStore"
+import { useSession } from "@workspace/web/lib/auth-client"
+import type { DashboardOrganization } from "@workspace/web/store/useDashboardListsStore"
 
 function mapOrganizations(
   organizations: Array<{

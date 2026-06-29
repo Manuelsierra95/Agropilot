@@ -1,7 +1,7 @@
-import { useCalendarContext } from "../../components/calendar/calendar-context"
+import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 import { startOfWeek, addDays } from "date-fns"
-import CalendarBodyMarginDayMargin from "../day/calendar-body-margin-day-margin"
-import CalendarBodyDayContent from "../day/calendar-body-day-content"
+import CalendarBodyMarginDayMargin from "@workspace/web/features/calendar/body/day/calendar-body-margin-day-margin"
+import CalendarBodyDayContent from "@workspace/web/features/calendar/body/day/calendar-body-day-content"
 
 export default function CalendarBodyWeek() {
   const { date } = useCalendarContext()

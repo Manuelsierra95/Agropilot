@@ -27,7 +27,7 @@ import {
   Link2,
 } from "lucide-react"
 
-import type { CampaignTimelineTask } from "@/lib/calendar/types"
+import type { CampaignTimelineTask } from "@workspace/web/lib/calendar/types"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 

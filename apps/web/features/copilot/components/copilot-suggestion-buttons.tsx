@@ -1,6 +1,6 @@
 "use client"
 
-import { useCopilotChat } from "@/features/copilot/copilot-chat-provider"
+import { useCopilotChat } from "@workspace/web/features/copilot/copilot-chat-provider"
 
 export function CopilotSuggestionButtons({
   suggestions,

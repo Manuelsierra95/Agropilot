@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@workspace/ui/components/button"
 import { ArrowRight } from "lucide-react"
-import { AnimatedTetrahedron } from "./animated-tetrahedron"
+import { AnimatedTetrahedron } from "@workspace/web/features/landing/animated-tetrahedron"
 
 export function CtaSection() {
   const [isVisible, setIsVisible] = useState(false)

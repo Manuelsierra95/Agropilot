@@ -2,13 +2,13 @@
 
 import * as React from "react"
 
-import type { FinanceTransactionSnapshot } from "@/lib/finance/types"
-import type { Item } from "./olive-price"
+import type { FinanceTransactionSnapshot } from "@workspace/web/lib/finance/types"
+import type { Item } from "@workspace/web/features/dashboard/olive-price"
 import { Gauge } from "@workspace/ui/components/charts"
 import { Card, CardHeader } from "@workspace/ui/components/card"
 import { cn } from "@workspace/ui/lib/utils"
-import { LinkButton } from "@/components/ui/link-button"
-import { SCOPE_KEYS } from "@/lib/navigation/scope"
+import { LinkButton } from "@workspace/web/components/ui/link-button"
+import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

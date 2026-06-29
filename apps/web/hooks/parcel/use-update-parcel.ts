@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { api } from "@/lib/api"
+import { api } from "@workspace/web/lib/api"
 import type { ParcelUpdateInput } from "@workspace/schemas"
 
 export function useUpdateParcel() {

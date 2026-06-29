@@ -23,7 +23,7 @@ import {
 import type { DashboardRisks } from "@workspace/schemas"
 import { cn } from "@workspace/ui/lib/utils"
 import { TrendingUp } from "lucide-react"
-import { LinkButton } from "@/components/ui/link-button"
+import { LinkButton } from "@workspace/web/components/ui/link-button"
 
 type RiskRadarProps = {
   risks?: DashboardRisks

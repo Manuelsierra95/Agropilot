@@ -2,23 +2,23 @@
 
 import { useMemo, useState } from "react"
 
-import { PageContainer } from "@/components/ui/page-container"
-import { GradientSeparator } from "@/components/ui/gradient-separator"
-import { CashFlowSummaryCard } from "@/components/cards/cash-flow-summary-card"
-import { FinanceRecommendationsCard } from "@/components/cards/finance-recommendations-card"
-import { ParcelsFinanceBars } from "@/features/dashboard/all/parcels-finance-bars"
-import { WidgetSkeleton } from "@/features/dashboard/dashboard-skeleton"
-import { ExpensesPieChart } from "./chart/expenses-pie-chart"
-import { IncomePieChart } from "./chart/income-pie-chart"
-import { TransactionTable } from "./table"
-import { NewTransactionSheet } from "./components/new-transaction-sheet"
+import { PageContainer } from "@workspace/web/components/ui/page-container"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
+import { CashFlowSummaryCard } from "@workspace/web/components/cards/cash-flow-summary-card"
+import { FinanceRecommendationsCard } from "@workspace/web/components/cards/finance-recommendations-card"
+import { ParcelsFinanceBars } from "@workspace/web/features/dashboard/all/parcels-finance-bars"
+import { WidgetSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
+import { ExpensesPieChart } from "@workspace/web/features/finance/chart/expenses-pie-chart"
+import { IncomePieChart } from "@workspace/web/features/finance/chart/income-pie-chart"
+import { TransactionTable } from "@workspace/web/features/finance/table"
+import { NewTransactionSheet } from "@workspace/web/features/finance/components/new-transaction-sheet"
 import {
   useOlivePrices,
   useParcelsFinanceComparison,
-} from "@/hooks/dashboard"
-import { useFinanceTransactions } from "@/hooks/finance"
-import { useIsAllParcelsSelected } from "@/hooks/use-is-all-parcels-selected"
-import { toTransactionSnapshots } from "@/lib/finance/mappers"
+} from "@workspace/web/hooks/dashboard"
+import { useFinanceTransactions } from "@workspace/web/hooks/finance"
+import { useIsAllParcelsSelected } from "@workspace/web/hooks/use-is-all-parcels-selected"
+import { toTransactionSnapshots } from "@workspace/web/lib/finance/mappers"
 
 export default function Finance() {
   const isAllParcels = useIsAllParcelsSelected()

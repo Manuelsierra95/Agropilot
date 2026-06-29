@@ -1,11 +1,11 @@
-import { GradientSeparator } from "@/components/ui/gradient-separator"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
 import { Card, CardContent, CardHeader } from "@workspace/ui/components/card"
 import { cn } from "@workspace/ui/lib/utils"
 import {
   dashboardContainerClassName,
   dashboardGridSlot,
   dashboardMainClassName,
-} from "@/features/dashboard/dashboard-grid-layout"
+} from "@workspace/web/features/dashboard/dashboard-grid-layout"
 
 const skeletonBlockClassName = "animate-pulse rounded-lg bg-secondary"
 

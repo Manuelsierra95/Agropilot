@@ -1,4 +1,4 @@
-import { PageContainer } from "@/components/ui/page-container"
+import { PageContainer } from "@workspace/web/components/ui/page-container"
 
 export default function DashboardSettingsLayout({
   children,

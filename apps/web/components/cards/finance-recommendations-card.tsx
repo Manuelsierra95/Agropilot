@@ -9,8 +9,8 @@ import {
   TrendingUp,
 } from "lucide-react"
 
-import type { FinanceTransactionSnapshot } from "@/lib/finance/types"
-import type { KpiItem } from "../../features/dashboard/olive-price"
+import type { FinanceTransactionSnapshot } from "@workspace/web/lib/finance/types"
+import type { KpiItem } from "@workspace/web/features/dashboard/olive-price"
 import { Gauge } from "@workspace/ui/components/charts"
 import { Badge } from "@workspace/ui/components/badge"
 import {
@@ -26,8 +26,8 @@ import {
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
-import { PreservedLink } from "@/components/preserved-link"
-import { SCOPE_KEYS } from "@/lib/navigation/scope"
+import { PreservedLink } from "@workspace/web/components/preserved-link"
+import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
 import { Separator } from "@workspace/ui/components/separator"
 import { buttonVariants } from "@workspace/ui/components/button"
 

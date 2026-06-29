@@ -1,4 +1,4 @@
-import type { ParcelAddress } from "@/lib/cadastre/types"
+import type { ParcelAddress } from "@workspace/web/lib/cadastre/types"
 
 interface ParcelLocationSummaryProps {
   refcat?: string | null

@@ -15,7 +15,7 @@ import type { DashboardSellingWindow } from "@workspace/schemas"
 import {
   getSellingWindowSignal,
   SELLING_WINDOW_SIGNAL_CONFIG,
-} from "@/features/dashboard/selling-window-utils"
+} from "@workspace/web/features/dashboard/selling-window-utils"
 
 export type ParcelSellingWindowItem = {
   parcelId: string

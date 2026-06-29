@@ -5,7 +5,7 @@ import { Bot, Maximize2, Minimize2, X } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { useCopilotLayout } from "@/features/copilot/copilot-layout-context"
+import { useCopilotLayout } from "@workspace/web/features/copilot/copilot-layout-context"
 
 export function CopilotHeader({ className }: { className?: string }) {
   const { isFullscreen, toggleFullscreen, closeCopilot } = useCopilotLayout()

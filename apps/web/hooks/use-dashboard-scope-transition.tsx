@@ -11,8 +11,8 @@ import {
   type ReactNode,
 } from "react"
 
-import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
-import { buildDashboardScopeKey } from "@/lib/dashboard/scope-key"
+import { useDashboardScopeParams } from "@workspace/web/hooks/use-dashboard-scope-params"
+import { buildDashboardScopeKey } from "@workspace/web/lib/dashboard/scope-key"
 
 const SCOPE_LOADING_KEY = "__loading__"
 

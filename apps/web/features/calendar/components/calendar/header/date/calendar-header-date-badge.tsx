@@ -1,4 +1,4 @@
-import { useCalendarContext } from "../../calendar-context"
+import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 import { isSameMonth } from "date-fns"
 
 export default function CalendarHeaderDateBadge() {

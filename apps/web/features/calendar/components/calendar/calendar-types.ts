@@ -1,4 +1,4 @@
-import type { ForecastDay } from "@/features/calendar/components/calendar/sidecards/time-weather-card"
+import type { ForecastDay } from "@workspace/web/features/calendar/components/calendar/sidecards/time-weather-card"
 
 export type CalendarProps = {
   events: CalendarEvent[]

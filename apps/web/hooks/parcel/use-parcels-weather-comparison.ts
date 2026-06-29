@@ -2,15 +2,15 @@
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
-import { api } from "@/lib/api"
-import { mutationQueryOptions } from "@/lib/dashboard/cache-policy"
-import { dashboardQueryKeys } from "@/lib/dashboard/query-keys"
+import { api } from "@workspace/web/lib/api"
+import { mutationQueryOptions } from "@workspace/web/lib/dashboard/cache-policy"
+import { dashboardQueryKeys } from "@workspace/web/lib/dashboard/query-keys"
 import {
   buildAllModeSummary,
   toParcelComparisonItems,
-} from "@/lib/parcel/mappers"
-import { useDashboardScope } from "@/hooks/dashboard/use-dashboard-scope"
-import { useIsAllParcelsSelected } from "@/hooks/use-is-all-parcels-selected"
+} from "@workspace/web/lib/parcel/mappers"
+import { useDashboardScope } from "@workspace/web/hooks/dashboard/use-dashboard-scope"
+import { useIsAllParcelsSelected } from "@workspace/web/hooks/use-is-all-parcels-selected"
 
 export function useParcelsWeatherComparison() {
   const scope = useDashboardScope()

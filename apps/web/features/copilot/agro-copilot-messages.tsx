@@ -1,6 +1,6 @@
 "use client"
 
-import { useCopilotChat } from "@/features/copilot/copilot-chat-provider"
+import { useCopilotChat } from "@workspace/web/features/copilot/copilot-chat-provider"
 import {
   MessageScroller,
   MessageScrollerButton,
@@ -10,10 +10,10 @@ import {
   MessageScrollerViewport,
 } from "@workspace/ui/components/message-scroller"
 
-import { ActiveTurnPanel } from "./components/active-turn-panel"
-import { EditableUserQuestion } from "./components/editable-user-question"
-import { MessageHistory } from "./components/message-history"
-import { groupTurns } from "./components/turn-utils"
+import { ActiveTurnPanel } from "@workspace/web/features/copilot/components/active-turn-panel"
+import { EditableUserQuestion } from "@workspace/web/features/copilot/components/editable-user-question"
+import { MessageHistory } from "@workspace/web/features/copilot/components/message-history"
+import { groupTurns } from "@workspace/web/features/copilot/components/turn-utils"
 
 export function AgroCopilotMessages() {
   const { messages, isLoading, handleEditSubmit, hasMessages } = useCopilotChat()

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Button } from "@workspace/ui/components/button"
 import { ArrowRight } from "lucide-react"
-import { AnimatedSphere } from "./animated-sphere"
+import { AnimatedSphere } from "@workspace/web/features/landing/animated-sphere"
 
 const words = ["create", "build", "scale", "ship"]
 

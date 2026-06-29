@@ -8,7 +8,7 @@ import {
   Grid,
   YAxis,
 } from "@workspace/ui/components/charts"
-import { buildParcelChartRows } from "@/features/dashboard/chart-parcel-categories"
+import { buildParcelChartRows } from "@workspace/web/features/dashboard/chart-parcel-categories"
 import {
   Card,
   CardContent,

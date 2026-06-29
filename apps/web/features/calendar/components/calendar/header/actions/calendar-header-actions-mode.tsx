@@ -1,7 +1,7 @@
 "use client"
 
-import { Mode, calendarModes, calendarMobilesModes } from "../../calendar-types"
-import { useCalendarContext } from "../../calendar-context"
+import { Mode, calendarModes, calendarMobilesModes } from "@workspace/web/features/calendar/components/calendar/calendar-types"
+import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 import { useIsMobile } from "@workspace/ui/hooks/use-mobile"
 
 const filterLabels: Record<string, string> = {

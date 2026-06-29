@@ -31,18 +31,18 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { Button } from "@workspace/ui/components/button"
-import { CropTypeSelector } from "@/features/onboarding/components/parcel/crop-type-selector"
-import { ParcelSearch } from "@/features/onboarding/components/parcel/parcel-search/parcel-search"
-import { searchParcel } from "@/lib/cadastre/search-parcel"
-import type { ParcelSearchResult } from "@/features/onboarding/components/parcel/parcel-search/types"
-import type { ParcelAddress } from "@/lib/cadastre/types"
+import { CropTypeSelector } from "@workspace/web/features/onboarding/components/parcel/crop-type-selector"
+import { ParcelSearch } from "@workspace/web/features/onboarding/components/parcel/parcel-search/parcel-search"
+import { searchParcel } from "@workspace/web/lib/cadastre/search-parcel"
+import type { ParcelSearchResult } from "@workspace/web/features/onboarding/components/parcel/parcel-search/types"
+import type { ParcelAddress } from "@workspace/web/lib/cadastre/types"
 import {
   DEFAULT_CROP_TYPE,
   type CropTypeValue,
   type IrrigationType,
-} from "@/features/onboarding/components/parcel/parcel-constants"
-import { useUpdateParcel } from "@/hooks/parcel/use-update-parcel"
-import type { ParcelItem, ParcelApiResponse } from "@/lib/parcel/types"
+} from "@workspace/web/features/onboarding/components/parcel/parcel-constants"
+import { useUpdateParcel } from "@workspace/web/hooks/parcel/use-update-parcel"
+import type { ParcelItem, ParcelApiResponse } from "@workspace/web/lib/parcel/types"
 import { parcelUpdateInputSchema } from "@workspace/schemas"
 
 const formSchema = parcelUpdateInputSchema

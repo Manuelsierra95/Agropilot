@@ -13,4 +13,4 @@ export type {
   WeatherMetrics,
   WeatherRiskLevel,
   YieldData,
-} from "@/lib/parcel/types"
+} from "@workspace/web/lib/parcel/types"

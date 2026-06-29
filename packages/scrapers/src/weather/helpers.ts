@@ -9,7 +9,7 @@ import {
   Device,
   Map,
   weatherCloudId,
-} from "./types.js"
+} from "./types"
 
 // Helpers
 

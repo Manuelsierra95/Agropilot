@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react"
 
-import CalendarComponent from "@/features/calendar/components/calendar/calendar"
-import type { Mode } from "@/features/calendar/components/calendar/calendar-types"
-import type { ForecastDay } from "@/features/calendar/components/calendar/sidecards/time-weather-card"
-import type { CalendarEvent } from "@/lib/calendar/types"
+import CalendarComponent from "@workspace/web/features/calendar/components/calendar/calendar"
+import type { Mode } from "@workspace/web/features/calendar/components/calendar/calendar-types"
+import type { ForecastDay } from "@workspace/web/features/calendar/components/calendar/sidecards/time-weather-card"
+import type { CalendarEvent } from "@workspace/web/lib/calendar/types"
 
 interface CalendarClientProps {
   initialEvents: CalendarEvent[]

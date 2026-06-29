@@ -5,7 +5,7 @@ import type { UIMessage } from "ai"
 import { Check } from "lucide-react"
 import { useState } from "react"
 
-import { useCopilotLayout } from "@/features/copilot/copilot-layout-context"
+import { useCopilotLayout } from "@workspace/web/features/copilot/copilot-layout-context"
 import { Bubble, BubbleContent } from "@workspace/ui/components/bubble"
 import {
   Message,
@@ -19,7 +19,7 @@ import {
 import { Spinner } from "@workspace/ui/components/spinner"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { TaskFormCard } from "./task-form-card"
+import { TaskFormCard } from "@workspace/web/features/copilot/components/task-form-card"
 
 export interface AssistantMessageProps {
   message: UIMessage

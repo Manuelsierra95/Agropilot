@@ -9,8 +9,8 @@ import {
 } from "@workspace/ui/components/marker"
 import { Spinner } from "@workspace/ui/components/spinner"
 
-import { AssistantMessage } from "./assistant-message"
-import { type ChatTurn } from "./turn-utils"
+import { AssistantMessage } from "@workspace/web/features/copilot/components/assistant-message"
+import { type ChatTurn } from "@workspace/web/features/copilot/components/turn-utils"
 
 interface ActiveTurnPanelProps {
   turn: ChatTurn

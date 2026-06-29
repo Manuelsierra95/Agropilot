@@ -18,7 +18,7 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 import { ArrowRightIcon } from "lucide-react"
-import type { FinanceTransactionSnapshot } from "@/lib/finance/types"
+import type { FinanceTransactionSnapshot } from "@workspace/web/lib/finance/types"
 import Link from "next/link"
 
 type TransactionSnapshot = FinanceTransactionSnapshot & {

@@ -1,8 +1,8 @@
 import { ScrollArea, ScrollBar } from "@workspace/ui/components/scroll-area"
-import { useCalendarContext } from "../components/calendar/calendar-context"
-import CalendarBodyDay from "./day/calendar-body-day"
-import CalendarBodyWeek from "./week/calendar-body-week"
-import CalendarBodyMonth from "./month/calendar-body-month"
+import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
+import CalendarBodyDay from "@workspace/web/features/calendar/body/day/calendar-body-day"
+import CalendarBodyWeek from "@workspace/web/features/calendar/body/week/calendar-body-week"
+import CalendarBodyMonth from "@workspace/web/features/calendar/body/month/calendar-body-month"
 
 export default function CalendarBody() {
   const { mode } = useCalendarContext()

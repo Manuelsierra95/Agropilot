@@ -16,11 +16,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar"
-import { useSession } from "@/lib/auth-client"
+import { useSession } from "@workspace/web/lib/auth-client"
 import { parseAuthSession } from "@workspace/schemas"
-import { useDashboardScopeActions } from "@/hooks/use-dashboard-scope-actions"
-import { OrgSwitcherPlaceholder } from "@/components/dashboard-nav/components/switcher-placeholders"
-import { useDashboardListsStore } from "@/store/useDashboardListsStore"
+import { useDashboardScopeActions } from "@workspace/web/hooks/use-dashboard-scope-actions"
+import { OrgSwitcherPlaceholder } from "@workspace/web/components/dashboard-nav/components/switcher-placeholders"
+import { useDashboardListsStore } from "@workspace/web/store/useDashboardListsStore"
 
 export function OrgSwitcher() {
   const { data: session } = useSession()

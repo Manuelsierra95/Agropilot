@@ -2,14 +2,14 @@
 
 import { useQuery } from "@tanstack/react-query"
 
-import { api } from "@/lib/api"
+import { api } from "@workspace/web/lib/api"
 import {
   dailyQueryOptions,
   mutationQueryOptions,
-} from "@/lib/dashboard/cache-policy"
-import { dashboardQueryKeys } from "@/lib/dashboard/query-keys"
-import { buildDashboardScopeKey } from "@/lib/dashboard/scope-key"
-import { useDashboardScope } from "@/hooks/dashboard/use-dashboard-scope"
+} from "@workspace/web/lib/dashboard/cache-policy"
+import { dashboardQueryKeys } from "@workspace/web/lib/dashboard/query-keys"
+import { buildDashboardScopeKey } from "@workspace/web/lib/dashboard/scope-key"
+import { useDashboardScope } from "@workspace/web/hooks/dashboard/use-dashboard-scope"
 
 export function useParcelsFinanceComparison() {
   const scope = useDashboardScope()

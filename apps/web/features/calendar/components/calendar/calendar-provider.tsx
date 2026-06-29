@@ -1,9 +1,9 @@
-import { CalendarContext } from "./calendar-context"
-import type { CalendarEvent, Mode } from "./calendar-types"
-import type { ForecastDay } from "./sidecards/time-weather-card"
+import { CalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
+import type { CalendarEvent, Mode } from "@workspace/web/features/calendar/components/calendar/calendar-types"
+import type { ForecastDay } from "@workspace/web/features/calendar/components/calendar/sidecards/time-weather-card"
 import { useState } from "react"
-import CalendarNewEventDialog from "./dialog/calendar-new-event-dialog"
-import CalendarManageEventDialog from "./dialog/calendar-manage-event-dialog"
+import CalendarNewEventDialog from "@workspace/web/features/calendar/components/calendar/dialog/calendar-new-event-dialog"
+import CalendarManageEventDialog from "@workspace/web/features/calendar/components/calendar/dialog/calendar-manage-event-dialog"
 
 export default function CalendarProvider({
   events,

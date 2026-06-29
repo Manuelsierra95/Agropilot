@@ -12,19 +12,19 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 import { Separator } from "@workspace/ui/components/separator"
-import { client } from "@/lib/api/client"
-import { formatCurrency } from "@/features/finance/table/helpers"
+import { client } from "@workspace/web/lib/api/client"
+import { formatCurrency } from "@workspace/web/features/finance/table/helpers"
 import {
   CROP_TYPE_LABELS,
   IRRIGATION_TYPE_LABELS,
   type CropTypeValue,
-} from "./parcel/parcel-constants"
-import type { FieldFormData } from "./parcel"
+} from "@workspace/web/features/onboarding/components/parcel/parcel-constants"
+import type { FieldFormData } from "@workspace/web/features/onboarding/components/parcel"
 import {
   TEAM_ROLE_LABELS,
   type FinanceBulkRow,
   type TeamInviteDraft,
-} from "../mocks/onboarding-mocks"
+} from "@workspace/web/features/onboarding/mocks/onboarding-mocks"
 import { CheckCircle2, Euro, MapPin, Users } from "lucide-react"
 
 const ONBOARDING_COMPLETE_STEP = 4

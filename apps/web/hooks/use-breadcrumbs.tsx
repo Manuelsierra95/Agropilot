@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation"
 import { useMemo } from "react"
-import { navigationData } from "@/lib/navigation/navigation-data"
+import { navigationData } from "@workspace/web/lib/navigation/navigation-data"
 
 export type BreadcrumbItem = {
   title: string

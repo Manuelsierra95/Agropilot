@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { api } from "@/lib/api"
+import { api } from "@workspace/web/lib/api"
 import type {
   UpdateOrganizationInput,
   AuthOrganization,

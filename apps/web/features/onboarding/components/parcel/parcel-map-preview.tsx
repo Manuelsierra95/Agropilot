@@ -1,10 +1,10 @@
 "use client"
 
 import { useMemo } from "react"
-import { MapComponent } from "@/components/maps/map"
-import { fieldFormDraftsToMapParcels } from "./parcel-draft-utils"
-import type { FieldFormData } from "./parcel-form"
-import { ParcelLocationSummary } from "./parcel-location-summary"
+import { MapComponent } from "@workspace/web/components/maps/map"
+import { fieldFormDraftsToMapParcels } from "@workspace/web/features/onboarding/components/parcel/parcel-draft-utils"
+import type { FieldFormData } from "@workspace/web/features/onboarding/components/parcel/parcel-form"
+import { ParcelLocationSummary } from "@workspace/web/features/onboarding/components/parcel/parcel-location-summary"
 
 interface ParcelMapProps {
   parcels: FieldFormData[]

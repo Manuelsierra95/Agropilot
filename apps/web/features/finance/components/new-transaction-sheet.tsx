@@ -21,7 +21,7 @@ import {
   SheetTitle,
 } from "@workspace/ui/components/sheet"
 
-import { NewTransactionForm } from "./new-transaction-form"
+import { NewTransactionForm } from "@workspace/web/features/finance/components/new-transaction-form"
 
 export function NewTransactionSheet({
   open,

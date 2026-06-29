@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@workspace/ui/components/button"
-import { signIn } from "@/lib/auth-client"
+import { signIn } from "@workspace/web/lib/auth-client"
 import { toast } from "sonner"
 import { useTransition } from "react"
 

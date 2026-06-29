@@ -2,24 +2,24 @@
 
 import * as React from "react"
 
-import { PageContainer } from "@/components/ui/page-container"
-import { WidgetSkeleton } from "@/features/dashboard/dashboard-skeleton"
-import { useCropOverview } from "@/hooks/dashboard"
-import { useParcelAgroclimate, useParcelsWeatherComparison } from "@/hooks/parcel"
-import { useIsAllParcelsSelected } from "@/hooks/use-is-all-parcels-selected"
-import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
+import { PageContainer } from "@workspace/web/components/ui/page-container"
+import { WidgetSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
+import { useCropOverview } from "@workspace/web/hooks/dashboard"
+import { useParcelAgroclimate, useParcelsWeatherComparison } from "@workspace/web/hooks/parcel"
+import { useIsAllParcelsSelected } from "@workspace/web/hooks/use-is-all-parcels-selected"
+import { useDashboardScopeParams } from "@workspace/web/hooks/use-dashboard-scope-params"
 import {
   apiMetricsToWeatherMetrics,
   cropOverviewToAgroclimateMetrics,
   cropOverviewToYieldData,
   toParcelItem,
-} from "@/lib/parcel/mappers"
-import { useDashboardListsStore } from "@/store/useDashboardListsStore"
+} from "@workspace/web/lib/parcel/mappers"
+import { useDashboardListsStore } from "@workspace/web/store/useDashboardListsStore"
 
-import { ParcelAllView } from "./components/parcel-all-view"
-import { ParcelHero } from "./components/parcel-hero"
-import { ParcelSingleView } from "./components/parcel-single-view"
-import { EditParcelSheet } from "./components/edit-parcel-sheet"
+import { ParcelAllView } from "@workspace/web/features/parcel/components/parcel-all-view"
+import { ParcelHero } from "@workspace/web/features/parcel/components/parcel-hero"
+import { ParcelSingleView } from "@workspace/web/features/parcel/components/parcel-single-view"
+import { EditParcelSheet } from "@workspace/web/features/parcel/components/edit-parcel-sheet"
 
 export default function Parcel() {
   const [{ parcelId }] = useDashboardScopeParams()

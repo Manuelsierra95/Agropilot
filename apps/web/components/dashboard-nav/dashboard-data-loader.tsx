@@ -1,6 +1,6 @@
 "use client"
 
-import { useDashboardDataLoader } from "@/hooks/use-dashboard-data-loader"
+import { useDashboardDataLoader } from "@workspace/web/hooks/use-dashboard-data-loader"
 
 export function DashboardDataLoader() {
   useDashboardDataLoader()

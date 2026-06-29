@@ -1,11 +1,11 @@
-export { useDashboardScope } from "@/hooks/dashboard/use-dashboard-scope"
+export { useDashboardScope } from "@workspace/web/hooks/dashboard/use-dashboard-scope"
 export {
   useAllParcelsCropOverviews,
   useAllParcelsRecommendations,
   useAllParcelsRisks,
   useAllParcelsSellingWindows,
   useParcelsFinanceComparison,
-} from "@/hooks/dashboard/use-all-parcels-queries"
+} from "@workspace/web/hooks/dashboard/use-all-parcels-queries"
 export {
   useCampaignMargin,
   useCropOverview,
@@ -18,4 +18,4 @@ export {
   useRecentTransactions,
   useSellingWindow,
   useUpcomingWeekTasks,
-} from "@/hooks/dashboard/use-dashboard-queries"
+} from "@workspace/web/hooks/dashboard/use-dashboard-queries"

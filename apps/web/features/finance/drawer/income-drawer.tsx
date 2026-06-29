@@ -5,7 +5,7 @@ import {
   CategoryDrawer,
   type CategoryTransaction,
   type IconComponent,
-} from "./components/category-drawer"
+} from "@workspace/web/features/finance/drawer/components/category-drawer"
 
 export interface IncomeDrawerProps {
   open: boolean

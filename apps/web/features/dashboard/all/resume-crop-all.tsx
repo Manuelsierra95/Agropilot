@@ -12,7 +12,7 @@ import { ScrollArea } from "@workspace/ui/components/scroll-area"
 import { cn } from "@workspace/ui/lib/utils"
 import type { DashboardOlivar } from "@workspace/schemas"
 
-import { useDashboardScopeActions } from "@/hooks/use-dashboard-scope-actions"
+import { useDashboardScopeActions } from "@workspace/web/hooks/use-dashboard-scope-actions"
 
 export type ParcelCropOverviewItem = {
   parcelId: string

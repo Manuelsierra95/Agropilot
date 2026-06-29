@@ -5,7 +5,7 @@ import type {
   ParcelSearchResult,
   SearchParcelFn,
   SearchParcelInput,
-} from "./types"
+} from "@workspace/web/features/onboarding/components/parcel/parcel-search/types"
 
 export function useParcelSearch(searchParcel: SearchParcelFn) {
   const [isLoading, setIsLoading] = useState(false)

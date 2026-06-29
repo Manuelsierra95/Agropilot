@@ -8,9 +8,9 @@ import {
   SidebarRail,
   useSidebar,
 } from "@workspace/ui/components/sidebar"
-import { CopilotPanelShell } from "@/components/copilot/copilot-panel-shell"
-import { CopilotChatProvider } from "@/features/copilot/copilot-chat-provider"
-import { CopilotLayoutProvider, useCopilotLayout } from "@/features/copilot/copilot-layout-context"
+import { CopilotPanelShell } from "@workspace/web/components/copilot/copilot-panel-shell"
+import { CopilotChatProvider } from "@workspace/web/features/copilot/copilot-chat-provider"
+import { CopilotLayoutProvider, useCopilotLayout } from "@workspace/web/features/copilot/copilot-layout-context"
 
 function CopilotSurface() {
   const { open } = useSidebar()

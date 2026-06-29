@@ -34,8 +34,8 @@ import {
 } from "@workspace/ui/components/popover"
 import { Separator } from "@workspace/ui/components/separator"
 
-import { CATEGORIES, PAYMENT_METHOD_LABELS } from "../constants"
-import type { TransactionFilters } from "../hooks/use-transaction-filters"
+import { CATEGORIES, PAYMENT_METHOD_LABELS } from "@workspace/web/features/finance/table/constants"
+import type { TransactionFilters } from "@workspace/web/features/finance/table/hooks/use-transaction-filters"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

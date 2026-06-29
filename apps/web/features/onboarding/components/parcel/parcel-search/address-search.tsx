@@ -16,8 +16,8 @@ import {
   FieldError,
   FieldGroup,
 } from "@workspace/ui/components/field"
-import type { AddressQuery } from "./types"
-import { useAddressSearchForm } from "./use-address-search-form"
+import type { AddressQuery } from "@workspace/web/features/onboarding/components/parcel/parcel-search/types"
+import { useAddressSearchForm } from "@workspace/web/features/onboarding/components/parcel/parcel-search/use-address-search-form"
 
 interface AddressSearchProps {
   isActive?: boolean

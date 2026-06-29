@@ -2,23 +2,23 @@
 
 import { useCallback, useMemo, useState } from "react"
 import { Progress } from "@workspace/ui/components/progress"
-import { OnboardingHeader } from "./components/onboarding-header"
+import { OnboardingHeader } from "@workspace/web/features/onboarding/components/onboarding-header"
 import {
   OnboardingStep,
   type OnboardingStepRenderer,
-} from "./components/onboarding-step"
-import { CreateParcel, type FieldFormData } from "./components/parcel"
-import { createParcelDraft } from "./components/parcel/parcel-draft-utils"
+} from "@workspace/web/features/onboarding/components/onboarding-step"
+import { CreateParcel, type FieldFormData } from "@workspace/web/features/onboarding/components/parcel"
+import { createParcelDraft } from "@workspace/web/features/onboarding/components/parcel/parcel-draft-utils"
 import {
   toParcelCreateInput,
   toParcelUpdateInput,
-} from "./components/parcel/parcel-form"
-import { BulkFinance } from "./components/finance/bulk-finance"
-import { TeamInvites } from "./components/team"
-import { OnboardingSummary } from "./components/onboarding-summary"
-import type { FinanceBulkRow, TeamInviteDraft } from "./mocks/onboarding-mocks"
-import { parcelApi } from "@/lib/api/routes/parcel"
-import { userApi } from "@/lib/api/routes/user"
+} from "@workspace/web/features/onboarding/components/parcel/parcel-form"
+import { BulkFinance } from "@workspace/web/features/onboarding/components/finance/bulk-finance"
+import { TeamInvites } from "@workspace/web/features/onboarding/components/team"
+import { OnboardingSummary } from "@workspace/web/features/onboarding/components/onboarding-summary"
+import type { FinanceBulkRow, TeamInviteDraft } from "@workspace/web/features/onboarding/mocks/onboarding-mocks"
+import { parcelApi } from "@workspace/web/lib/api/routes/parcel"
+import { userApi } from "@workspace/web/lib/api/routes/user"
 
 const ONBOARDING_STEP_AFTER_PARCELS = 2
 

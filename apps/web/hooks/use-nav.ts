@@ -18,7 +18,7 @@
 
 import { useMemo } from "react"
 // import { useOrganization, useUser } from '@clerk/nextjs';
-import type { NavItem } from "@/types"
+import type { NavItem } from "@workspace/web/config/navigation/dashboard"
 
 /**
  * Hook to filter navigation items based on RBAC (fully client-side)

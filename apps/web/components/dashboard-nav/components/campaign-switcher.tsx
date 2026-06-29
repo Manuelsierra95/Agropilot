@@ -15,15 +15,15 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { useIsMobile } from "@workspace/ui/hooks/use-mobile"
 import type { CampaignListItem } from "@workspace/schemas"
-import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
-import { useDashboardScopeActions } from "@/hooks/use-dashboard-scope-actions"
-import { CampaignSwitcherPlaceholder } from "@/components/dashboard-nav/components/switcher-placeholders"
+import { useDashboardScopeParams } from "@workspace/web/hooks/use-dashboard-scope-params"
+import { useDashboardScopeActions } from "@workspace/web/hooks/use-dashboard-scope-actions"
+import { CampaignSwitcherPlaceholder } from "@workspace/web/components/dashboard-nav/components/switcher-placeholders"
 import {
   selectCampaignsForParcel,
   selectHasLoadedCampaignsForParcel,
   selectIsLoadingCampaigns,
   useDashboardListsStore,
-} from "@/store/useDashboardListsStore"
+} from "@workspace/web/store/useDashboardListsStore"
 
 function formatBalance(balance: number | null): string {
   if (balance === null) return "—"

@@ -1,5 +1,5 @@
-import { PreservedLink } from "@/components/preserved-link"
-import { SCOPE_KEYS } from "@/lib/navigation/scope"
+import { PreservedLink } from "@workspace/web/components/preserved-link"
+import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
 import { ChevronRightIcon, Lock } from "lucide-react"
 
 import {
@@ -15,8 +15,8 @@ import {
 import type {
   NavigationNavModulesItem,
   NavigationNavSubItem,
-} from "@/lib/navigation/navigation-data"
-import { ModuleStatusIcons } from "@/lib/navigation/navigation-data"
+} from "@workspace/web/lib/navigation/navigation-data"
+import { ModuleStatusIcons } from "@workspace/web/lib/navigation/navigation-data"
 import {
   Collapsible,
   CollapsibleTrigger,

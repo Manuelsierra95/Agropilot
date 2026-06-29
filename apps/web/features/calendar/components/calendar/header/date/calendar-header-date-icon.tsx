@@ -1,5 +1,5 @@
 import { format } from "date-fns"
-import { useCalendarContext } from "../../calendar-context"
+import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 export default function CalendarHeaderDateIcon() {
   const { calendarIconIsToday, date: calendarDate } = useCalendarContext()
   const date = calendarIconIsToday ? new Date() : calendarDate

@@ -2,8 +2,8 @@
 
 import type { ReactNode } from "react"
 
-import { DashboardSkeleton } from "@/features/dashboard/dashboard-skeleton"
-import { useDashboardScopeTransition } from "@/hooks/use-dashboard-scope-transition"
+import { DashboardSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
+import { useDashboardScopeTransition } from "@workspace/web/hooks/use-dashboard-scope-transition"
 import { cn } from "@workspace/ui/lib/utils"
 
 export function DashboardContentGate({ children }: { children: ReactNode }) {

@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic"
 
-import { OrgSwitcherPlaceholder } from "@/components/dashboard-nav/components/switcher-placeholders"
+import { OrgSwitcherPlaceholder } from "@workspace/web/components/dashboard-nav/components/switcher-placeholders"
 
 const OrgSwitcherClient = dynamic(
   () =>
-    import("@/components/dashboard-nav/components/org-switcher").then((mod) => ({
+    import("@workspace/web/components/dashboard-nav/components/org-switcher").then((mod) => ({
       default: mod.OrgSwitcher,
     })),
   {

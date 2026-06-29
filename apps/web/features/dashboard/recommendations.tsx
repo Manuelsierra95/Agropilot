@@ -8,9 +8,9 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
-import { LinkButton } from "@/components/ui/link-button"
-import { SCOPE_KEYS } from "@/lib/navigation/scope"
-import type { ParcelApiResponse } from "@/features/parcel/components/parcel-types"
+import { LinkButton } from "@workspace/web/components/ui/link-button"
+import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
+import type { ParcelApiResponse } from "@workspace/web/features/parcel/components/parcel-types"
 
 type RecommendationsProps = ComponentProps<typeof Card> & {
   data: {

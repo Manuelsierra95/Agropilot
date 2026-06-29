@@ -8,7 +8,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import {
   TEAM_ROLE_LABELS,
   type TeamInviteDraft,
-} from "../../mocks/onboarding-mocks"
+} from "@workspace/web/features/onboarding/mocks/onboarding-mocks"
 
 function emailInitial(email: string) {
   const trimmed = email.trim()

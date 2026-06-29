@@ -18,9 +18,9 @@ import {
 } from "@workspace/ui/components/chart"
 import { cn } from "@workspace/ui/lib/utils"
 
-import type { FinanceTransactionSnapshot } from "@/lib/finance/types"
+import type { FinanceTransactionSnapshot } from "@workspace/web/lib/finance/types"
 import { ArrowDown, ArrowUp } from "lucide-react"
-import { GradientSeparator } from "@/components/ui/gradient-separator"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
 
 type CashFlowTransaction = Pick<
   FinanceTransactionSnapshot,

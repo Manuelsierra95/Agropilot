@@ -26,9 +26,9 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 
-import { BulkActionsBar } from "./components/bulk-actions-bar"
-import { columns } from "./columns"
-import type { Transaction } from "./types"
+import { BulkActionsBar } from "@workspace/web/features/finance/table/components/bulk-actions-bar"
+import { columns } from "@workspace/web/features/finance/table/columns"
+import type { Transaction } from "@workspace/web/features/finance/table/types"
 
 type TransactionResultsTableProps = {
   table: TanStackTable<Transaction>

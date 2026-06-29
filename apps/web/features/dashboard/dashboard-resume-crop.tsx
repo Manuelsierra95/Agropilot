@@ -1,10 +1,10 @@
 "use client"
 
-import { GradientSeparator } from "@/components/ui/gradient-separator"
-import { ResumeCrop } from "@/features/dashboard/resume-crop"
-import { ResumeCropAll } from "@/features/dashboard/all/resume-crop-all"
-import { dashboardGridSlot } from "@/features/dashboard/dashboard-grid-layout"
-import { ResumeCropSkeleton } from "@/features/dashboard/dashboard-skeleton"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
+import { ResumeCrop } from "@workspace/web/features/dashboard/resume-crop"
+import { ResumeCropAll } from "@workspace/web/features/dashboard/all/resume-crop-all"
+import { dashboardGridSlot } from "@workspace/web/features/dashboard/dashboard-grid-layout"
+import { ResumeCropSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
 
 interface QueryState {
   isPending: boolean

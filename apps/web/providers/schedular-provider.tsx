@@ -17,8 +17,8 @@ import {
   Handlers,
   SchedulerContextType,
   startOfWeek,
-} from "@/types/calendar"
-import ModalProvider from "./modal-context"
+} from "@workspace/web/types/calendar"
+import ModalProvider from "@workspace/web/providers/modal-context"
 // Define event and state types
 
 interface SchedulerState {

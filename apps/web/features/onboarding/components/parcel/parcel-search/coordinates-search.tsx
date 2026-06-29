@@ -21,7 +21,7 @@ import {
   DialogTrigger,
 } from "@workspace/ui/components/dialog"
 
-import { MapPlaceSearch } from "./map-place-search"
+import { MapPlaceSearch } from "@workspace/web/features/onboarding/components/parcel/parcel-search/map-place-search"
 
 const MAP_MAX_ZOOM_IN = 19
 

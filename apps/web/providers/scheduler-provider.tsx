@@ -16,8 +16,8 @@ import {
   Handlers,
   SchedulerContextType,
   startOfWeek,
-} from "@/types/calendar"
-import ModalProvider from "./modal-context"
+} from "@workspace/web/types/calendar"
+import ModalProvider from "@workspace/web/providers/modal-context"
 import {
   getDaysInMonth,
   getDaysInWeek,
@@ -25,7 +25,7 @@ import {
   getEventsForDay,
   getDayName,
   handleEventStyling,
-} from "@/lib/calendar-utils"
+} from "@workspace/web/lib/calendar-utils"
 
 interface SchedulerState {
   events: Event[]

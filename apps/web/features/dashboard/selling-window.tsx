@@ -12,11 +12,11 @@ import {
 import { Input } from "@workspace/ui/components/input"
 import { TrendingUp, TrendingDown, Minus } from "lucide-react"
 
-import { useSellingWindowOverridesStore } from "@/store/useSellingWindowOverridesStore"
+import { useSellingWindowOverridesStore } from "@workspace/web/store/useSellingWindowOverridesStore"
 import {
   getSellingWindowSignal,
   SELLING_WINDOW_SIGNAL_CONFIG,
-} from "@/features/dashboard/selling-window-utils"
+} from "@workspace/web/features/dashboard/selling-window-utils"
 
 interface SellingWindowProps {
   className?: string

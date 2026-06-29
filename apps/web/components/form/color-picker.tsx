@@ -4,7 +4,7 @@ import {
   RadioGroupItem,
 } from "@workspace/ui/components/radio-group"
 import { cn } from "@workspace/ui/lib/utils"
-import { colorOptions } from "@/features/calendar/components/calendar/calendar-tailwind-classes"
+import { colorOptions } from "@workspace/web/features/calendar/components/calendar/calendar-tailwind-classes"
 
 interface ColorPickerProps {
   field: {

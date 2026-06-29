@@ -1,4 +1,4 @@
-import { useCalendarContext } from "../../components/calendar/calendar-context"
+import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 import {
   startOfMonth,
   endOfMonth,
@@ -12,7 +12,7 @@ import {
   differenceInDays,
 } from "date-fns"
 import { cn } from "@workspace/ui/lib/utils"
-import CalendarEvent from "../../components/calendar/calendar-event"
+import CalendarEvent from "@workspace/web/features/calendar/components/calendar/calendar-event"
 import { AnimatePresence, motion } from "motion/react"
 import { Cloud, CloudRain, CloudSnow, Sun, CloudSun } from "lucide-react"
 

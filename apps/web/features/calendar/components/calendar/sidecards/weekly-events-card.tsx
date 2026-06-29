@@ -13,8 +13,8 @@ import {
 } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
 import { cn } from "@workspace/ui/lib/utils"
-import type { CalendarEvent } from "@/types/calendar-types"
-import { eventTypeConfig } from "@/types/calendar-types"
+import type { CalendarEvent } from "@workspace/web/types/calendar-types"
+import { eventTypeConfig } from "@workspace/web/types/calendar-types"
 
 interface WeeklyEventsCardProps {
   events: CalendarEvent[]

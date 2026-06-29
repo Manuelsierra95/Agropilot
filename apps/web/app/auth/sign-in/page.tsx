@@ -1,5 +1,5 @@
 import { Metadata } from "next"
-import SignInViewPage from "@/features/auth"
+import SignInViewPage from "@workspace/web/features/auth"
 
 export const metadata: Metadata = {
   title: "Authentication | Sign In",

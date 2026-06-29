@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 
-import { searchPlaces } from "@/lib/geocoding/search-places"
-import type { PlaceSuggestion } from "@/lib/geocoding/types"
+import { searchPlaces } from "@workspace/web/lib/geocoding/search-places"
+import type { PlaceSuggestion } from "@workspace/web/lib/geocoding/types"
 
 const DEBOUNCE_MS = 300
 const MIN_QUERY_LENGTH = 2

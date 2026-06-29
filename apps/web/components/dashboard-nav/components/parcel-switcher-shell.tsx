@@ -5,11 +5,11 @@ import dynamic from "next/dynamic"
 import {
   ParcelSwitcherPlaceholder,
   type ParcelSwitcherPlaceholderProps,
-} from "@/components/dashboard-nav/components/switcher-placeholders"
+} from "@workspace/web/components/dashboard-nav/components/switcher-placeholders"
 
 const ParcelSwitcherClient = dynamic(
   () =>
-    import("@/components/dashboard-nav/components/parcel-switcher").then(
+    import("@workspace/web/components/dashboard-nav/components/parcel-switcher").then(
       (mod) => ({
         default: mod.ParcelSwitcher,
       })

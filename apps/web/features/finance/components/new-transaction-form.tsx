@@ -24,8 +24,8 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { Textarea } from "@workspace/ui/components/textarea"
-import { useParcels } from "@/hooks/parcel"
-import { api } from "@/lib/api"
+import { useParcels } from "@workspace/web/hooks/parcel"
+import { api } from "@workspace/web/lib/api"
 
 const formSchema = z.object({
   concept: z.string().min(1, "El concepto es obligatorio"),

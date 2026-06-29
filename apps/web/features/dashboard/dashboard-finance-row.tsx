@@ -1,11 +1,11 @@
 "use client"
 
-import { GradientSeparator } from "@/components/ui/gradient-separator"
-import { FinanceResume } from "@/features/dashboard/finance-resume"
-import { CampaignAccumulatedMargin } from "@/features/dashboard/campaign-accumulated-margin"
-import { ParcelsFinanceBars } from "@/features/dashboard/all/parcels-finance-bars"
-import { dashboardGridSlot } from "@/features/dashboard/dashboard-grid-layout"
-import { WidgetSkeleton } from "@/features/dashboard/dashboard-skeleton"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
+import { FinanceResume } from "@workspace/web/features/dashboard/finance-resume"
+import { CampaignAccumulatedMargin } from "@workspace/web/features/dashboard/campaign-accumulated-margin"
+import { ParcelsFinanceBars } from "@workspace/web/features/dashboard/all/parcels-finance-bars"
+import { dashboardGridSlot } from "@workspace/web/features/dashboard/dashboard-grid-layout"
+import { WidgetSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
 
 interface QueryState {
   isPending: boolean

@@ -1,13 +1,13 @@
 "use client"
 
-import { GradientSeparator } from "@/components/ui/gradient-separator"
-import { Recommendations } from "@/features/dashboard/recommendations"
-import { DashboardMap } from "@/features/dashboard/map"
-import { RiskRadar } from "@/features/dashboard/risk-radar"
-import { RecommendationsAll } from "@/features/dashboard/all/recommendations-all"
-import { RiskRadarMulti } from "@/features/dashboard/all/risk-radar-multi"
-import { dashboardGridSlot } from "@/features/dashboard/dashboard-grid-layout"
-import { MapSkeleton, WidgetSkeleton } from "@/features/dashboard/dashboard-skeleton"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
+import { Recommendations } from "@workspace/web/features/dashboard/recommendations"
+import { DashboardMap } from "@workspace/web/features/dashboard/map"
+import { RiskRadar } from "@workspace/web/features/dashboard/risk-radar"
+import { RecommendationsAll } from "@workspace/web/features/dashboard/all/recommendations-all"
+import { RiskRadarMulti } from "@workspace/web/features/dashboard/all/risk-radar-multi"
+import { dashboardGridSlot } from "@workspace/web/features/dashboard/dashboard-grid-layout"
+import { MapSkeleton, WidgetSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
 
 interface QueryState {
   isPending: boolean

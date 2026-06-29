@@ -1,5 +1,5 @@
-import UserAuthForm from "./components/user-auth-form"
-import { RippleBackground } from "../../components/ui/ripple-background"
+import UserAuthForm from "@workspace/web/features/auth/components/user-auth-form"
+import { RippleBackground } from "@workspace/web/components/ui/ripple-background"
 
 export default function SignInViewPage() {
   const company = "Agropilot"

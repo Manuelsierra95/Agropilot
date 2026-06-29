@@ -1,6 +1,6 @@
-import { DashboardProviders } from "@/components/dashboard-nav/dashboard-providers"
-import { NavigationWrapper } from "@/components/dashboard-nav/navigation-wrapper"
-import { Providers } from "@/providers/providers"
+import { DashboardProviders } from "@workspace/web/components/dashboard-nav/dashboard-providers"
+import { NavigationWrapper } from "@workspace/web/components/dashboard-nav/navigation-wrapper"
+import { Providers } from "@workspace/web/providers/providers"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import NextTopLoader from "nextjs-toploader"
 

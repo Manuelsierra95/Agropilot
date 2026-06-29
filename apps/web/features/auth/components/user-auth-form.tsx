@@ -1,7 +1,7 @@
 "use client"
 
-import GoogleSignInButton from "./google-auth-button"
-import GithubSignInButton from "./github-auth-button"
+import GoogleSignInButton from "@workspace/web/features/auth/components/google-auth-button"
+import GithubSignInButton from "@workspace/web/features/auth/components/github-auth-button"
 import Link from "next/link"
 import {
   Card,
@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
-import { env } from "@/lib/env"
+import { env } from "@workspace/web/lib/env"
 
 export interface UserAuthFormProps {
   company?: string

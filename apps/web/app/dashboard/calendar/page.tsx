@@ -1,4 +1,4 @@
-import Calendar from "@/features/calendar"
+import Calendar from "@workspace/web/features/calendar"
 
 export default function CalendarPage() {
   // const { userId } = await auth();

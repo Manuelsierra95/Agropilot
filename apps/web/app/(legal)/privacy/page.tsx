@@ -1,5 +1,5 @@
 import { Metadata } from "next"
-import { PrivacyDocument } from "@/features/legal/privacy"
+import { PrivacyDocument } from "@workspace/web/features/legal/privacy"
 
 export const metadata: Metadata = {
   title: "Politica de privacidad | AgroPilot",

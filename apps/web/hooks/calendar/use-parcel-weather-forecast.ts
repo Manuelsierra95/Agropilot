@@ -3,11 +3,11 @@
 import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 
-import { api } from "@/lib/api"
-import { dailyQueryOptions } from "@/lib/dashboard/cache-policy"
-import { dashboardQueryKeys } from "@/lib/dashboard/query-keys"
-import { weatherResponseToForecast } from "@/lib/calendar/mappers"
-import { useDashboardScope } from "@/hooks/dashboard/use-dashboard-scope"
+import { api } from "@workspace/web/lib/api"
+import { dailyQueryOptions } from "@workspace/web/lib/dashboard/cache-policy"
+import { dashboardQueryKeys } from "@workspace/web/lib/dashboard/query-keys"
+import { weatherResponseToForecast } from "@workspace/web/lib/calendar/mappers"
+import { useDashboardScope } from "@workspace/web/hooks/dashboard/use-dashboard-scope"
 
 function addDaysIso(isoDate: string, days: number): string {
   const date = new Date(`${isoDate}T12:00:00.000Z`)

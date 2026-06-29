@@ -1,4 +1,4 @@
-import { useCalendarContext } from "../../components/calendar/calendar-context"
+import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 import { isSameDay } from "date-fns"
 
 export default function CalendarBodyDayEvents() {

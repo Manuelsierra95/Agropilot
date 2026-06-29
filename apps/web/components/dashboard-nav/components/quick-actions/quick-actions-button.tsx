@@ -8,8 +8,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@workspace/ui/components/popover"
-import { QuickActionsGrid } from "./quick-actions-grid"
-import { FormContent } from "./form-content"
+import { QuickActionsGrid } from "@workspace/web/components/dashboard-nav/components/quick-actions/quick-actions-grid"
+import { FormContent } from "@workspace/web/components/dashboard-nav/components/quick-actions/form-content"
 import { useIsMobile } from "@workspace/ui/hooks/use-mobile"
 
 export function QuickActionsButton() {
@@ -65,6 +65,7 @@ export function QuickActionsButton() {
         ) : (
           <QuickActionsGrid
             onSelect={handleSelectItem}
+            onClose={() => setMenuOpen(false)}
             activeForm={activeForm}
           />
         )}

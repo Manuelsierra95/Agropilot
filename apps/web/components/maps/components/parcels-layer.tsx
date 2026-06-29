@@ -4,8 +4,8 @@ import { useEffect } from "react"
 
 import { useMap } from "@workspace/ui/components/map"
 
-import { getPolygonCenter } from "./parcel-utils"
-import type { Parcel, ParcelLngLat } from "./types"
+import { getPolygonCenter } from "@workspace/web/components/maps/components/parcel-utils"
+import type { Parcel, ParcelLngLat } from "@workspace/web/components/maps/components/types"
 
 type ParcelsLayerProps = {
   geojsonData: GeoJSON.FeatureCollection

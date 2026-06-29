@@ -1,8 +1,8 @@
-import { CopilotLayout } from "@/components/copilot/copilot-layout"
-import { DashboardContentGate } from "@/components/dashboard-nav/dashboard-content-gate"
-import NavDock from "@/components/dashboard-nav/nav-dock"
-import NavSidebar from "@/components/dashboard-nav/nav-sidebar"
-import { NavDockHeader } from "./nav-dock/nav-dock-header"
+import { CopilotLayout } from "@workspace/web/components/copilot/copilot-layout"
+import { DashboardContentGate } from "@workspace/web/components/dashboard-nav/dashboard-content-gate"
+import NavDock from "@workspace/web/components/dashboard-nav/nav-dock"
+import NavSidebar from "@workspace/web/components/dashboard-nav/nav-sidebar"
+import { NavDockHeader } from "@workspace/web/components/dashboard-nav/nav-dock/nav-dock-header"
 
 export async function NavigationWrapper({
   children,

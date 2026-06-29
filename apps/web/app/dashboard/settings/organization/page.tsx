@@ -1,5 +1,5 @@
-import { SettingsOrganizationSection } from "@/features/settings/organization"
-import { api } from "@/lib/api"
+import { SettingsOrganizationSection } from "@workspace/web/features/settings/organization"
+import { api } from "@workspace/web/lib/api"
 
 export default async function SettingsOrganizationPage() {
   const org = await api.organization.getMe()

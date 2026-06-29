@@ -13,11 +13,11 @@ import {
 import { ChevronsUpDownIcon, LayersIcon, PlusIcon } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { useIsMobile } from "@workspace/ui/hooks/use-mobile"
-import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
-import { useDashboardScopeActions } from "@/hooks/use-dashboard-scope-actions"
-import { useDashboardListsStore } from "@/store/useDashboardListsStore"
-import { ParcelSwitcherPlaceholder } from "@/components/dashboard-nav/components/switcher-placeholders"
-import { getParcelIcon } from "@/lib/navigation/parcel-icon"
+import { useDashboardScopeParams } from "@workspace/web/hooks/use-dashboard-scope-params"
+import { useDashboardScopeActions } from "@workspace/web/hooks/use-dashboard-scope-actions"
+import { useDashboardListsStore } from "@workspace/web/store/useDashboardListsStore"
+import { ParcelSwitcherPlaceholder } from "@workspace/web/components/dashboard-nav/components/switcher-placeholders"
+import { getParcelIcon } from "@workspace/web/lib/navigation/parcel-icon"
 
 interface ParcelSwitcherProps {
   variant?: "sidebar" | "dock"

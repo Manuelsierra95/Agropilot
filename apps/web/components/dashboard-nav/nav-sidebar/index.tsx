@@ -1,8 +1,8 @@
-import { AppSidebar } from "@/components/dashboard-nav/components/app-sidebar"
-import { CopilotLayout } from "@/components/copilot/copilot-layout"
-import { LeftSidebarBridge } from "@/components/dashboard-nav/nav-sidebar/left-sidebar-context"
-import { DashboardContentScroll } from "@/components/dashboard-nav/nav-sidebar/dashboard-content-scroll"
-import { NavSidebarHeader } from "@/components/dashboard-nav/nav-sidebar/nav-sidebar-header"
+import { AppSidebar } from "@workspace/web/components/dashboard-nav/components/app-sidebar"
+import { CopilotLayout } from "@workspace/web/components/copilot/copilot-layout"
+import { LeftSidebarBridge } from "@workspace/web/components/dashboard-nav/nav-sidebar/left-sidebar-context"
+import { DashboardContentScroll } from "@workspace/web/components/dashboard-nav/nav-sidebar/dashboard-content-scroll"
+import { NavSidebarHeader } from "@workspace/web/components/dashboard-nav/nav-sidebar/nav-sidebar-header"
 import {
   Sidebar,
   SidebarInset,

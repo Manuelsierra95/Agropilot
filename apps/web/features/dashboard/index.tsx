@@ -1,36 +1,36 @@
 "use client"
 
-import { GradientSeparator } from "@/components/ui/gradient-separator"
-import { toCalendarEvents } from "@/lib/calendar/mappers"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
+import { toCalendarEvents } from "@workspace/web/lib/calendar/mappers"
 
-import { OlivePrice } from "@/features/dashboard/olive-price"
-import { ResumeCrop } from "@/features/dashboard/resume-crop"
-import { FinanceResume } from "@/features/dashboard/finance-resume"
-import { CampaignAccumulatedMargin } from "@/features/dashboard/campaign-accumulated-margin"
-import { Recommendations } from "@/features/dashboard/recommendations"
-import { DashboardMap } from "@/features/dashboard/map"
-import { RiskRadar } from "@/features/dashboard/risk-radar"
-import { RecentEvents } from "@/features/dashboard/recent-events"
-import { RecentTransactions } from "@/features/dashboard/recent-transactions"
-import { SellingWindow } from "@/features/dashboard/selling-window"
-import { ProductionValue } from "@/features/dashboard/production-value"
-import { SellingWindowAll } from "@/features/dashboard/all/selling-window-all"
-import { ResumeCropAll } from "@/features/dashboard/all/resume-crop-all"
-import { ParcelsFinanceBars } from "@/features/dashboard/all/parcels-finance-bars"
-import { RecommendationsAll } from "@/features/dashboard/all/recommendations-all"
-import { RiskRadarMulti } from "@/features/dashboard/all/risk-radar-multi"
-import { ProductionValueAll } from "@/features/dashboard/all/production-value-all"
+import { OlivePrice } from "@workspace/web/features/dashboard/olive-price"
+import { ResumeCrop } from "@workspace/web/features/dashboard/resume-crop"
+import { FinanceResume } from "@workspace/web/features/dashboard/finance-resume"
+import { CampaignAccumulatedMargin } from "@workspace/web/features/dashboard/campaign-accumulated-margin"
+import { Recommendations } from "@workspace/web/features/dashboard/recommendations"
+import { DashboardMap } from "@workspace/web/features/dashboard/map"
+import { RiskRadar } from "@workspace/web/features/dashboard/risk-radar"
+import { RecentEvents } from "@workspace/web/features/dashboard/recent-events"
+import { RecentTransactions } from "@workspace/web/features/dashboard/recent-transactions"
+import { SellingWindow } from "@workspace/web/features/dashboard/selling-window"
+import { ProductionValue } from "@workspace/web/features/dashboard/production-value"
+import { SellingWindowAll } from "@workspace/web/features/dashboard/all/selling-window-all"
+import { ResumeCropAll } from "@workspace/web/features/dashboard/all/resume-crop-all"
+import { ParcelsFinanceBars } from "@workspace/web/features/dashboard/all/parcels-finance-bars"
+import { RecommendationsAll } from "@workspace/web/features/dashboard/all/recommendations-all"
+import { RiskRadarMulti } from "@workspace/web/features/dashboard/all/risk-radar-multi"
+import { ProductionValueAll } from "@workspace/web/features/dashboard/all/production-value-all"
 import {
   dashboardContainerClassName,
   dashboardGridSlot,
   dashboardMainClassName,
-} from "@/features/dashboard/dashboard-grid-layout"
+} from "@workspace/web/features/dashboard/dashboard-grid-layout"
 import {
   MapSkeleton,
   ProductionValueSkeleton,
   ResumeCropSkeleton,
   WidgetSkeleton,
-} from "@/features/dashboard/dashboard-skeleton"
+} from "@workspace/web/features/dashboard/dashboard-skeleton"
 import {
   useAllParcelsCropOverviews,
   useAllParcelsRecommendations,
@@ -48,8 +48,8 @@ import {
   useRecentTransactions,
   useSellingWindow,
   useUpcomingWeekTasks,
-} from "@/hooks/dashboard"
-import { useIsAllParcelsSelected } from "@/hooks/use-is-all-parcels-selected"
+} from "@workspace/web/hooks/dashboard"
+import { useIsAllParcelsSelected } from "@workspace/web/hooks/use-is-all-parcels-selected"
 
 export default function DashboardOverview() {
   const isAllParcels = useIsAllParcelsSelected()

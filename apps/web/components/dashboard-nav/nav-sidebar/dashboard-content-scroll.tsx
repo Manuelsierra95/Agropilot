@@ -2,7 +2,7 @@
 
 import { type ReactNode } from "react"
 
-import { DashboardContentGate } from "@/components/dashboard-nav/dashboard-content-gate"
+import { DashboardContentGate } from "@workspace/web/components/dashboard-nav/dashboard-content-gate"
 import { ScrollArea } from "@workspace/ui/components/scroll-area"
 
 export function DashboardContentScroll({ children }: { children: ReactNode }) {

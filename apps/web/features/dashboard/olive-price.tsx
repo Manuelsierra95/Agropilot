@@ -4,7 +4,7 @@ import { useMemo, useState } from "react"
 import { ArrowUp, ArrowDown } from "lucide-react"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { cn } from "@workspace/ui/lib/utils"
-import { GradientSeparator } from "@/components/ui/gradient-separator"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
 import {
   LineChart,
   Line,

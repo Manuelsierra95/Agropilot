@@ -1,5 +1,5 @@
 import { Button } from "@workspace/ui/components/button"
-import { useCalendarContext } from "../../calendar-context"
+import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import {
   format,

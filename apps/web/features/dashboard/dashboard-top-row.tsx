@@ -1,11 +1,11 @@
 "use client"
 
-import { GradientSeparator } from "@/components/ui/gradient-separator"
-import { OlivePrice } from "@/features/dashboard/olive-price"
-import { SellingWindow } from "@/features/dashboard/selling-window"
-import { SellingWindowAll } from "@/features/dashboard/all/selling-window-all"
-import { dashboardGridSlot } from "@/features/dashboard/dashboard-grid-layout"
-import { WidgetSkeleton } from "@/features/dashboard/dashboard-skeleton"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
+import { OlivePrice } from "@workspace/web/features/dashboard/olive-price"
+import { SellingWindow } from "@workspace/web/features/dashboard/selling-window"
+import { SellingWindowAll } from "@workspace/web/features/dashboard/all/selling-window-all"
+import { dashboardGridSlot } from "@workspace/web/features/dashboard/dashboard-grid-layout"
+import { WidgetSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
 
 interface QueryState {
   isPending: boolean

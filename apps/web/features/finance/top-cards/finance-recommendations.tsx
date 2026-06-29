@@ -1,6 +1,6 @@
 import { TrendingUp, AlertTriangle, Lightbulb, ShieldCheck } from "lucide-react"
-import type { FinanceTransactionSnapshot } from "@/lib/finance/types"
-import type { KpiItem } from "./kpi-card/price-kpi-card"
+import type { FinanceTransactionSnapshot } from "@workspace/web/lib/finance/types"
+import type { KpiItem } from "@workspace/web/features/finance/top-cards/kpi-card/price-kpi-card"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
 import { Progress } from "@workspace/ui/components/progress"

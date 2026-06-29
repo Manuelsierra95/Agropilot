@@ -1,5 +1,5 @@
-import { PreservedLink } from "@/components/preserved-link"
-import { SCOPE_KEYS } from "@/lib/navigation/scope"
+import { PreservedLink } from "@workspace/web/components/preserved-link"
+import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
 import type { LucideIcon } from "lucide-react"
 
 import {

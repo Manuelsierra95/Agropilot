@@ -2,8 +2,8 @@ import { buttonVariants } from "@workspace/ui/components/button"
 import { CardFooter } from "@workspace/ui/components/card"
 import { cn } from "@workspace/ui/lib/utils"
 import { ArrowRight } from "lucide-react"
-import { PreservedLink } from "@/components/preserved-link"
-import type { ScopeKey } from "@/lib/navigation/scope"
+import { PreservedLink } from "@workspace/web/components/preserved-link"
+import type { ScopeKey } from "@workspace/web/lib/navigation/scope"
 
 export const LinkButton = ({
   text,

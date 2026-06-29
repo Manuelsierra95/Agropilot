@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import ParcelOnboarding from "@/features/onboarding"
+import ParcelOnboarding from "@workspace/web/features/onboarding"
 
 export const metadata: Metadata = {
   title: "Onboarding | Agropilot",

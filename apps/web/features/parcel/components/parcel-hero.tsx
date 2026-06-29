@@ -15,9 +15,9 @@ import {
   Wheat,
   Pencil,
 } from "lucide-react"
-import { PreservedLink } from "@/components/preserved-link"
-import { SCOPE_KEYS } from "@/lib/navigation/scope"
-import type { ScopeKey } from "@/lib/navigation/scope"
+import { PreservedLink } from "@workspace/web/components/preserved-link"
+import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
+import type { ScopeKey } from "@workspace/web/lib/navigation/scope"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -26,7 +26,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
-import { GradientSeparator } from "@/components/ui/gradient-separator"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
 
 import type {
   AgroclimateMetrics,
@@ -34,8 +34,8 @@ import type {
   ParcelApiResponse,
   ParcelItem,
   YieldData,
-} from "./parcel-types"
-import { formatDateTime } from "./parcel-utils"
+} from "@workspace/web/features/parcel/components/parcel-types"
+import { formatDateTime } from "@workspace/web/features/parcel/components/parcel-utils"
 
 type TempTrend = AgroclimateMetrics["tempTrend"]
 

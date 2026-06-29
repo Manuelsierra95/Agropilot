@@ -8,21 +8,21 @@ import {
   FieldLabel,
 } from "@workspace/ui/components/field"
 import { ScrollArea } from "@workspace/ui/components/scroll-area"
-import { CropTypeSelector } from "./crop-type-selector"
-import { ParcelSearch } from "./parcel-search/parcel-search"
-import type { ParcelAddress } from "@/lib/cadastre/types"
-import type { ParcelSearchResult } from "./parcel-search/types"
-import type { SearchParcelFn } from "@/lib/cadastre/types"
+import { CropTypeSelector } from "@workspace/web/features/onboarding/components/parcel/crop-type-selector"
+import { ParcelSearch } from "@workspace/web/features/onboarding/components/parcel/parcel-search/parcel-search"
+import type { ParcelAddress } from "@workspace/web/lib/cadastre/types"
+import type { ParcelSearchResult } from "@workspace/web/features/onboarding/components/parcel/parcel-search/types"
+import type { SearchParcelFn } from "@workspace/web/lib/cadastre/types"
 import {
   type ParcelCreateInput,
   type ParcelUpdateInput,
 } from "@workspace/schemas"
-import { parsePolygonCoordinates } from "./parcel-draft-utils"
+import { parsePolygonCoordinates } from "@workspace/web/features/onboarding/components/parcel/parcel-draft-utils"
 import {
   draftCentroidFromCoordinates,
   toWktPolygon,
-} from "@/lib/cadastre/geometry"
-import { DEFAULT_CROP_TYPE, type CropTypeValue, type IrrigationType } from "./parcel-constants"
+} from "@workspace/web/lib/cadastre/geometry"
+import { DEFAULT_CROP_TYPE, type CropTypeValue, type IrrigationType } from "@workspace/web/features/onboarding/components/parcel/parcel-constants"
 
 export interface FieldFormData {
   id: string

@@ -1,6 +1,6 @@
 import { format, isSameDay, differenceInDays } from "date-fns"
 import { cn } from "@workspace/ui/lib/utils"
-import { useCalendarContext } from "../components/calendar/calendar-context"
+import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 import { Cloud, CloudRain, CloudSnow, Sun, CloudSun } from "lucide-react"
 
 const weatherIcons = {

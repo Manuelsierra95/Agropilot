@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@workspace/ui/lib/utils"
-import type { QuickActionsItem } from "./quick-actions-items"
+import type { QuickActionsItem } from "@workspace/web/components/dashboard-nav/components/quick-actions/quick-actions-items"
 import { Button } from "@workspace/ui/components/button"
 
 interface MenuItemButtonProps {

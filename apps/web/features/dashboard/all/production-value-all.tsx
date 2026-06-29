@@ -9,7 +9,7 @@ import {
   Grid,
   YAxis,
 } from "@workspace/ui/components/charts"
-import { buildParcelChartRows } from "@/features/dashboard/chart-parcel-categories"
+import { buildParcelChartRows } from "@workspace/web/features/dashboard/chart-parcel-categories"
 import {
   Card,
   CardContent,
@@ -24,9 +24,9 @@ import type {
   DashboardProductionValue,
 } from "@workspace/schemas"
 
-import type { ParcelCropOverviewItem } from "@/features/dashboard/all/resume-crop-all"
-import { ProductionValueKPIs } from "@/features/dashboard/production-value"
-import { useDashboardScopeActions } from "@/hooks/use-dashboard-scope-actions"
+import type { ParcelCropOverviewItem } from "@workspace/web/features/dashboard/all/resume-crop-all"
+import { ProductionValueKPIs } from "@workspace/web/features/dashboard/production-value"
+import { useDashboardScopeActions } from "@workspace/web/hooks/use-dashboard-scope-actions"
 
 type ProductionValueAllProps = DashboardProductionValue & {
   className?: string

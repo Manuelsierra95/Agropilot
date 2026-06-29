@@ -1,11 +1,11 @@
 "use client"
 
-import { GradientSeparator } from "@/components/ui/gradient-separator"
-import { toCalendarEvents } from "@/lib/calendar/mappers"
-import { RecentEvents } from "@/features/dashboard/recent-events"
-import { RecentTransactions } from "@/features/dashboard/recent-transactions"
-import { dashboardGridSlot } from "@/features/dashboard/dashboard-grid-layout"
-import { WidgetSkeleton } from "@/features/dashboard/dashboard-skeleton"
+import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
+import { toCalendarEvents } from "@workspace/web/lib/calendar/mappers"
+import { RecentEvents } from "@workspace/web/features/dashboard/recent-events"
+import { RecentTransactions } from "@workspace/web/features/dashboard/recent-transactions"
+import { dashboardGridSlot } from "@workspace/web/features/dashboard/dashboard-grid-layout"
+import { WidgetSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
 
 interface QueryState {
   isPending: boolean

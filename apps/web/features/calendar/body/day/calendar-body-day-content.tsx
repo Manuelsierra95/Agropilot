@@ -1,8 +1,8 @@
-import { useCalendarContext } from "../../components/calendar/calendar-context"
+import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 import { isSameDay } from "date-fns"
-import { hours } from "./calendar-body-margin-day-margin"
-import CalendarBodyHeader from "../calendar-body-header"
-import CalendarEvent from "../../components/calendar/calendar-event"
+import { hours } from "@workspace/web/features/calendar/body/day/calendar-body-margin-day-margin"
+import CalendarBodyHeader from "@workspace/web/features/calendar/body/calendar-body-header"
+import CalendarEvent from "@workspace/web/features/calendar/components/calendar/calendar-event"
 import { cn } from "@workspace/ui/lib/utils"
 
 export default function CalendarBodyDayContent({

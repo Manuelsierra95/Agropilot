@@ -2,15 +2,16 @@
 
 import type { ComponentType } from "react"
 
-import type { MiniFormProps } from "./mini-form-types"
-import { ExpenseMiniForm } from "./expense-mini-form"
-import { HarvestMiniForm } from "./harvest-mini-form"
-import { IncomeMiniForm } from "./income-mini-form"
-import { IrrigationMiniForm } from "./irrigation-mini-form"
-import { ParcelMiniForm } from "./parcel-mini-form"
-import { PestMiniForm } from "./pest-mini-form"
-import { TaskMiniForm } from "./task-mini-form"
-import { TreatmentMiniForm } from "./treatment-mini-form"
+import type { MiniFormProps } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-types"
+import { ExpenseMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/expense-mini-form"
+import { HarvestMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/harvest-mini-form"
+import { IncomeMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/income-mini-form"
+import { IrrigationMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/irrigation-mini-form"
+import { PestMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/pest-mini-form"
+import { TaskMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/task-mini-form"
+import { TreatmentMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/treatment-mini-form"
+import { ParcelDialogForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/parcel-dialog-form"
+import { BulkFinanceDialogForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/bulk-finance-dialog-form"
 
 export const formMap: Record<string, ComponentType<MiniFormProps>> = {
   irrigation: IrrigationMiniForm,
@@ -19,6 +20,7 @@ export const formMap: Record<string, ComponentType<MiniFormProps>> = {
   pest: PestMiniForm,
   expense: ExpenseMiniForm,
   income: IncomeMiniForm,
-  parcel: ParcelMiniForm,
   task: TaskMiniForm,
+  parcel: ParcelDialogForm,
+  bulkFinance: BulkFinanceDialogForm,
 }

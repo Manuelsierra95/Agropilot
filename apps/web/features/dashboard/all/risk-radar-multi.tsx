@@ -17,9 +17,9 @@ import {
 } from "@workspace/ui/components/tooltip"
 import type { DashboardRisks } from "@workspace/schemas"
 import { cn } from "@workspace/ui/lib/utils"
-import { LinkButton } from "@/components/ui/link-button"
+import { LinkButton } from "@workspace/web/components/ui/link-button"
 
-import { useDashboardScopeActions } from "@/hooks/use-dashboard-scope-actions"
+import { useDashboardScopeActions } from "@workspace/web/hooks/use-dashboard-scope-actions"
 
 const RISK_ENTRIES = [
   { key: "waterStress" as const, label: "Hídrico", shortLabel: "Híd." },

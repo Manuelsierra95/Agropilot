@@ -2,7 +2,7 @@
 
 import { cn } from "@workspace/ui/lib/utils"
 import { Check } from "lucide-react"
-import { CROP_OPTIONS, type CropTypeValue } from "./parcel-constants"
+import { CROP_OPTIONS, type CropTypeValue } from "@workspace/web/features/onboarding/components/parcel/parcel-constants"
 
 interface CropTypeSelectorProps {
   value: CropTypeValue

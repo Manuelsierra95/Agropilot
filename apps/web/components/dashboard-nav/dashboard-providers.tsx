@@ -2,8 +2,8 @@
 
 import type { ReactNode } from "react"
 
-import { DashboardDataLoader } from "@/components/dashboard-nav/dashboard-data-loader"
-import { DashboardScopeTransitionProvider } from "@/hooks/use-dashboard-scope-transition"
+import { DashboardDataLoader } from "@workspace/web/components/dashboard-nav/dashboard-data-loader"
+import { DashboardScopeTransitionProvider } from "@workspace/web/hooks/use-dashboard-scope-transition"
 
 export function DashboardProviders({ children }: { children: ReactNode }) {
   return (

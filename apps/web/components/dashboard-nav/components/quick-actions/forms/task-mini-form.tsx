@@ -4,6 +4,12 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { toast } from "sonner"
+import {
+  TASK_CATEGORY_LABELS,
+  taskCategorySchema,
+  type TaskCategory,
+} from "@workspace/schemas"
 import {
   Form,
   FormControl,
@@ -21,12 +27,14 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 
-import { MiniFormShell } from "./mini-form-shell"
-import { PARCELS_WITH_ALL } from "./mini-form-data"
-import type { MiniFormProps } from "./mini-form-types"
+import { MiniFormShell } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-shell"
+import { useParcels } from "@workspace/web/hooks/parcel"
+import { api } from "@workspace/web/lib/api"
+import type { MiniFormProps } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-types"
 
 const taskSchema = z.object({
   title: z.string().min(1),
+  category: z.string().min(1),
   parcelId: z.string().min(1),
   dueDate: z.string().min(1),
 })
@@ -34,22 +42,35 @@ const taskSchema = z.object({
 type TaskValues = z.infer<typeof taskSchema>
 
 export function TaskMiniForm({ onSuccess }: MiniFormProps) {
+  const { data: parcels = [], isLoading: loadingParcels } = useParcels()
   const form = useForm<TaskValues>({
     resolver: zodResolver(taskSchema),
-    defaultValues: { dueDate: new Date().toISOString().slice(0, 10) },
+    defaultValues: {
+      category: "inspection",
+      dueDate: new Date().toISOString().slice(0, 10),
+    },
   })
   const [loading, setLoading] = React.useState(false)
 
   async function onSubmit(values: TaskValues) {
     setLoading(true)
     try {
-      await new Promise((r) => setTimeout(r, 700))
-      console.log("Tarea:", values)
+      await api.tasks.createTask({
+        title: values.title,
+        category: values.category as TaskCategory,
+        startDate: values.dueDate,
+        parcelId: values.parcelId === "all" ? undefined : values.parcelId,
+      })
+      toast.success("Tarea creada")
       onSuccess()
+    } catch {
+      toast.error("Error al crear la tarea")
     } finally {
       setLoading(false)
     }
   }
+
+  const categories = taskCategorySchema.options
 
   return (
     <Form {...form}>
@@ -75,10 +96,10 @@ export function TaskMiniForm({ onSuccess }: MiniFormProps) {
 
           <FormField
             control={form.control}
-            name="parcelId"
+            name="category"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs">Parcela</FormLabel>
+                <FormLabel className="text-xs">Categoría</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
@@ -89,7 +110,42 @@ export function TaskMiniForm({ onSuccess }: MiniFormProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {PARCELS_WITH_ALL.map((p) => (
+                    {categories.map((cat) => (
+                      <SelectItem key={cat} value={cat} className="text-xs">
+                        {TASK_CATEGORY_LABELS[cat]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="parcelId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs">Parcela</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="h-7 text-xs">
+                      <SelectValue
+                        placeholder={
+                          loadingParcels ? "Cargando…" : "Selecciona"
+                        }
+                      />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="all" className="text-xs">
+                      Todas las parcelas
+                    </SelectItem>
+                    {parcels.map((p) => (
                       <SelectItem key={p.id} value={p.id} className="text-xs">
                         {p.name}
                       </SelectItem>

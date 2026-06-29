@@ -6,8 +6,8 @@ import {
   searchApi,
   searchQueryKeys,
   searchQueryOptions,
-} from "@/lib/api/routes/search"
-import type { AddressQuery } from "./types"
+} from "@workspace/web/lib/api/routes/search"
+import type { AddressQuery } from "@workspace/web/features/onboarding/components/parcel/parcel-search/types"
 
 type AddressFormData = Partial<AddressQuery>
 

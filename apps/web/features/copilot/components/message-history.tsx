@@ -11,8 +11,8 @@ import {
 } from "@workspace/ui/components/message"
 import { MessageScrollerItem } from "@workspace/ui/components/message-scroller"
 
-import { AssistantMessage } from "./assistant-message"
-import { type ChatTurn, getMessageText } from "./turn-utils"
+import { AssistantMessage } from "@workspace/web/features/copilot/components/assistant-message"
+import { type ChatTurn, getMessageText } from "@workspace/web/features/copilot/components/turn-utils"
 
 function HistoryUserBubble({ message }: { message: UIMessage }) {
   const text = getMessageText(message)

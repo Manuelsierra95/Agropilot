@@ -5,11 +5,11 @@ import { Loader2 } from "lucide-react"
 
 import { cn } from "@workspace/ui/lib/utils"
 
-import { api } from "@/lib/api"
+import { api } from "@workspace/web/lib/api"
 
-import { CopilotEmptyState } from "./copilot-empty-state"
-import { CopilotRecommendationsHeader } from "./copilot-recommendations-header"
-import { CopilotSuggestionButtons } from "./copilot-suggestion-buttons"
+import { CopilotEmptyState } from "@workspace/web/features/copilot/components/copilot-empty-state"
+import { CopilotRecommendationsHeader } from "@workspace/web/features/copilot/components/copilot-recommendations-header"
+import { CopilotSuggestionButtons } from "@workspace/web/features/copilot/components/copilot-suggestion-buttons"
 
 export function CopilotRecommendations({
   className,

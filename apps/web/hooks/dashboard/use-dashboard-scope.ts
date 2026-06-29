@@ -2,8 +2,8 @@
 
 import { useMemo } from "react"
 
-import type { DashboardScopeParams } from "@/lib/dashboard/scope-key"
-import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
+import type { DashboardScopeParams } from "@workspace/web/lib/dashboard/scope-key"
+import { useDashboardScopeParams } from "@workspace/web/hooks/use-dashboard-scope-params"
 
 export function useDashboardScope(): DashboardScopeParams {
   const [params] = useDashboardScopeParams()

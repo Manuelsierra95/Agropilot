@@ -7,8 +7,8 @@ import {
   FILTERS_BAR_FILTER_OPTIONS,
   FiltersBar,
   type FiltersBarFilterOption,
-} from "./components/filters-bar"
-import type { Transaction } from "./types"
+} from "@workspace/web/features/finance/table/components/filters-bar"
+import type { Transaction } from "@workspace/web/features/finance/table/types"
 
 type BaseFiltersBarProps = Omit<ComponentProps<typeof FiltersBar>, "columns">
 

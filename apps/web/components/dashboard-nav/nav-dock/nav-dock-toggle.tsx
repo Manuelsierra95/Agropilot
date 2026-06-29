@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import { Separator } from "@workspace/ui/components/separator"
-import { SearchMenu } from "@/components/dashboard-nav/components/search/search-menu"
-import { useNavigationSearchActions } from "@/lib/navigation/navigation-actions"
+import { SearchMenu } from "@workspace/web/components/dashboard-nav/components/search/search-menu"
+import { useNavigationSearchActions } from "@workspace/web/lib/navigation/navigation-actions"
 import { cn } from "@workspace/ui/lib/utils"
 
 export function NavDockToggle({ children }: { children: React.ReactNode }) {

@@ -1,5 +1,5 @@
-import type { ParcelApiResponse } from "./parcel-types"
-import type { WeatherMetrics } from "@/lib/parcel/types"
+import type { ParcelApiResponse } from "@workspace/web/features/parcel/components/parcel-types"
+import type { WeatherMetrics } from "@workspace/web/lib/parcel/types"
 
 import {
   Card,
@@ -9,8 +9,8 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 
-import type { AllModeSummary } from "./parcel-types"
-import { formatNumber } from "./parcel-utils"
+import type { AllModeSummary } from "@workspace/web/features/parcel/components/parcel-types"
+import { formatNumber } from "@workspace/web/features/parcel/components/parcel-utils"
 
 type ParcelKpiGridProps = {
   isAllSelected: boolean

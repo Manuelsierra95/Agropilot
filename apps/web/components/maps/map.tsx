@@ -9,11 +9,11 @@ import { cn } from "@workspace/ui/lib/utils"
 import { Layers } from "lucide-react"
 import { useTheme } from "next-themes"
 
-import { ParcelPopup } from "./components/parcel-popup"
-import { getPolygonCenter, toParcelFeature } from "./components/parcel-utils"
-import { ParcelsLayer } from "./components/parcels-layer"
-import { SatelliteLayer } from "./components/satellite-layer"
-import type { Parcel, ParcelLngLat } from "./components/types"
+import { ParcelPopup } from "@workspace/web/components/maps/components/parcel-popup"
+import { getPolygonCenter, toParcelFeature } from "@workspace/web/components/maps/components/parcel-utils"
+import { ParcelsLayer } from "@workspace/web/components/maps/components/parcels-layer"
+import { SatelliteLayer } from "@workspace/web/components/maps/components/satellite-layer"
+import type { Parcel, ParcelLngLat } from "@workspace/web/components/maps/components/types"
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 

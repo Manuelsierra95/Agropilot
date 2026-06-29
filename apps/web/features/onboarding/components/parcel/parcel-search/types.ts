@@ -4,6 +4,6 @@ export type {
   ParcelSearchResult,
   SearchParcelFn,
   SearchParcelInput,
-} from "@/lib/cadastre/types"
+} from "@workspace/web/lib/cadastre/types"
 
 export type ParcelSearchMode = "coords" | "refcat" | "address"

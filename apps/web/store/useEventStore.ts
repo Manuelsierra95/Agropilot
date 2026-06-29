@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { mockEvents, Event } from "@/store/mockEvents"
+import { mockEvents, Event } from "@workspace/web/store/mockEvents"
 
 interface TodayEventStore {
   events: Event[]

@@ -1,8 +1,8 @@
-import { useCalendarContext } from "../../calendar-context"
+import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 import { format } from "date-fns"
-import CalendarHeaderDateIcon from "./calendar-header-date-icon"
-import CalendarHeaderDateChevrons from "./calendar-header-date-chevrons"
-import CalendarHeaderDateBadge from "./calendar-header-date-badge"
+import CalendarHeaderDateIcon from "@workspace/web/features/calendar/components/calendar/header/date/calendar-header-date-icon"
+import CalendarHeaderDateChevrons from "@workspace/web/features/calendar/components/calendar/header/date/calendar-header-date-chevrons"
+import CalendarHeaderDateBadge from "@workspace/web/features/calendar/components/calendar/header/date/calendar-header-date-badge"
 
 export default function CalendarHeaderDate() {
   const { date } = useCalendarContext()

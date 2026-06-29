@@ -1,11 +1,11 @@
 "use client"
 
-import { CopilotButton } from "@/components/copilot/copilot-button"
-import { QuickActionsButton } from "@/components/dashboard-nav/components/quick-actions/quick-actions-button"
-import { SidebarTriggerWithSeparator } from "@/components/dashboard-nav/components/sidebar-trigger"
-import { CampaignSwitcher } from "@/components/dashboard-nav/components/campaign-switcher-shell"
-import { ParcelSwitcher } from "@/components/dashboard-nav/components/parcel-switcher-shell"
-import { Breadcrumbs } from "@/components/ui/breadcrumbs"
+import { CopilotButton } from "@workspace/web/components/copilot/copilot-button"
+import { QuickActionsButton } from "@workspace/web/components/dashboard-nav/components/quick-actions/quick-actions-button"
+import { SidebarTriggerWithSeparator } from "@workspace/web/components/dashboard-nav/components/sidebar-trigger"
+import { CampaignSwitcher } from "@workspace/web/components/dashboard-nav/components/campaign-switcher-shell"
+import { ParcelSwitcher } from "@workspace/web/components/dashboard-nav/components/parcel-switcher-shell"
+import { Breadcrumbs } from "@workspace/web/components/ui/breadcrumbs"
 
 export function NavSidebarHeader() {
   return (

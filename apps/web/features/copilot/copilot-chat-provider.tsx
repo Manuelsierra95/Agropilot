@@ -11,8 +11,8 @@ import {
   type ReactNode,
 } from "react"
 
-import { useDashboardScopeParams } from "@/hooks/use-dashboard-scope-params"
-import { apiBaseUrl } from "@/lib/env"
+import { useDashboardScopeParams } from "@workspace/web/hooks/use-dashboard-scope-params"
+import { apiBaseUrl } from "@workspace/web/lib/env"
 
 type CopilotChatContextValue = {
   input: string

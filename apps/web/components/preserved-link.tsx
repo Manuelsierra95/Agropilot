@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { usePreservedSearchParams } from "@/hooks/use-preserved-search-params"
-import type { ScopeKey } from "@/lib/navigation/scope"
+import { usePreservedSearchParams } from "@workspace/web/hooks/use-preserved-search-params"
+import type { ScopeKey } from "@workspace/web/lib/navigation/scope"
 
 export function PreservedLink({
   href,

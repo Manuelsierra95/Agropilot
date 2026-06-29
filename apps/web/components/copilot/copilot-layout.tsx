@@ -4,7 +4,7 @@ import { cookies } from "next/headers"
 import { SidebarProvider } from "@workspace/ui/components/sidebar"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { CopilotShell } from "@/components/copilot/copilot-shell"
+import { CopilotShell } from "@workspace/web/components/copilot/copilot-shell"
 
 const COPILOT_SIDEBAR_COOKIE = "copilot_sidebar_state"
 

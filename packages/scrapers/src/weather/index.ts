@@ -13,7 +13,7 @@ export {
   getWind,
   type StationCandidate,
   type StationSelection,
-} from "./helpers.js"
+} from "./helpers"
 
 export type {
   LastUpdate,
@@ -29,4 +29,4 @@ export type {
   regularID,
   metarID,
   deviceMapElement,
-} from "./types.js"
+} from "./types"

@@ -5,7 +5,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@workspace/ui/components/toggle-group"
-import type { IrrigationType } from "./parcel-constants"
+import type { IrrigationType } from "@workspace/web/features/onboarding/components/parcel/parcel-constants"
 
 interface IrrigationToggleProps {
   value: IrrigationType | undefined

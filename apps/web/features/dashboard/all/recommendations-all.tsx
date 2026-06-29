@@ -9,8 +9,8 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
-import { LinkButton } from "@/components/ui/link-button"
-import { SCOPE_KEYS } from "@/lib/navigation/scope"
+import { LinkButton } from "@workspace/web/components/ui/link-button"
+import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
 
 type RecommendationItem = {
   parcelId: string

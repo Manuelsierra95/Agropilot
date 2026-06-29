@@ -1,10 +1,10 @@
 "use client"
 
-import { CopilotButton } from "@/components/copilot/copilot-button"
-import { CampaignSwitcher } from "@/components/dashboard-nav/components/campaign-switcher-shell"
-import { ParcelSwitcher } from "@/components/dashboard-nav/components/parcel-switcher-shell"
-import { QuickActionsButton } from "@/components/dashboard-nav/components/quick-actions/quick-actions-button"
-import { NavDockBackButton } from "@/components/dashboard-nav/nav-dock/nav-dock-back-button"
+import { CopilotButton } from "@workspace/web/components/copilot/copilot-button"
+import { CampaignSwitcher } from "@workspace/web/components/dashboard-nav/components/campaign-switcher-shell"
+import { ParcelSwitcher } from "@workspace/web/components/dashboard-nav/components/parcel-switcher-shell"
+import { QuickActionsButton } from "@workspace/web/components/dashboard-nav/components/quick-actions/quick-actions-button"
+import { NavDockBackButton } from "@workspace/web/components/dashboard-nav/nav-dock/nav-dock-back-button"
 
 export function NavDockHeader() {
   return (

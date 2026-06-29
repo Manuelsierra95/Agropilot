@@ -1,12 +1,12 @@
-import type { Parcel } from "@/components/maps/components/types"
-import { parseWktPolygon } from "@/lib/cadastre/geometry"
+import type { Parcel } from "@workspace/web/components/maps/components/types"
+import { parseWktPolygon } from "@workspace/web/lib/cadastre/geometry"
 import {
   CROP_TYPE_LABELS,
   DEFAULT_CROP_TYPE,
   IRRIGATION_TYPE_LABELS,
   type CropTypeValue,
-} from "./parcel-constants"
-import type { FieldFormData } from "./parcel-form"
+} from "@workspace/web/features/onboarding/components/parcel/parcel-constants"
+import type { FieldFormData } from "@workspace/web/features/onboarding/components/parcel/parcel-form"
 
 const PARCEL_MAP_COLORS = [
   "#3b6d11",

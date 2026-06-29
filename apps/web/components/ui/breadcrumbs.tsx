@@ -10,7 +10,7 @@ import {
 } from "@workspace/ui/components/breadcrumb"
 import { IconSlash } from "@tabler/icons-react"
 import { Fragment } from "react"
-import { useBreadcrumbs } from "@/hooks/use-breadcrumbs"
+import { useBreadcrumbs } from "@workspace/web/hooks/use-breadcrumbs"
 
 function BreadcrumbsPlaceholder() {
   return (

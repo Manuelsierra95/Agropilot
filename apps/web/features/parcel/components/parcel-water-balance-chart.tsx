@@ -23,8 +23,8 @@ import {
   type ChartConfig,
 } from "@workspace/ui/components/chart"
 
-import type { DailySeriesPoint } from "./parcel-weather-types"
-import { formatLongDate, formatNumber, formatShortDate } from "./parcel-utils"
+import type { DailySeriesPoint } from "@workspace/web/features/parcel/components/parcel-weather-types"
+import { formatLongDate, formatNumber, formatShortDate } from "@workspace/web/features/parcel/components/parcel-utils"
 
 const waterBalanceChartConfig = {
   waterBalance: {

@@ -5,7 +5,7 @@ import { PanelLeftIcon } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Separator } from "@workspace/ui/components/separator"
 
-import { useLeftSidebar } from "@/components/dashboard-nav/nav-sidebar/left-sidebar-context"
+import { useLeftSidebar } from "@workspace/web/components/dashboard-nav/nav-sidebar/left-sidebar-context"
 import {
   Tooltip,
   TooltipContent,

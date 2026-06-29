@@ -14,14 +14,14 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { Mail, Plus } from "lucide-react"
-import { organizationApi } from "@/lib/api/routes/organization"
-import { OnboardingSplitLayout } from "../onboarding-split-layout"
-import { TeamInvitesPreview, TeamInvitesSendBar } from "./team-preview"
+import { organizationApi } from "@workspace/web/lib/api/routes/organization"
+import { OnboardingSplitLayout } from "@workspace/web/features/onboarding/components/onboarding-split-layout"
+import { TeamInvitesPreview, TeamInvitesSendBar } from "@workspace/web/features/onboarding/components/team/team-preview"
 import {
   TEAM_ROLE_LABELS,
   type TeamInviteDraft,
   type TeamInviteRole,
-} from "../../mocks/onboarding-mocks"
+} from "@workspace/web/features/onboarding/mocks/onboarding-mocks"
 
 function createInviteId() {
   return `invite-${crypto.randomUUID()}`

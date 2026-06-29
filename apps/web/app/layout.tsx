@@ -1,11 +1,11 @@
 import { Geist, Geist_Mono } from "next/font/google"
 
 import "@workspace/ui/globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { QueryProvider } from "@/providers/query-provider"
+import { ThemeProvider } from "@workspace/web/components/theme-provider"
+import { QueryProvider } from "@workspace/web/providers/query-provider"
 import { cn } from "@workspace/ui/lib/utils"
 import { TooltipProvider } from "@workspace/ui/components/tooltip"
-import { landingMetadata } from "@/config/seo/landing"
+import { landingMetadata } from "@workspace/web/config/seo/landing"
 
 const fontSans = Geist({
   subsets: ["latin"],
