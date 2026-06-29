@@ -1,5 +1,5 @@
-import type { Env } from "@env"
-import type { app } from "api/app"
+import type { Env } from "@workspace/api/env"
+import type { app } from "@workspace/api/app"
 
 export const testEnv: Env = {
   NODE_ENV: "test",

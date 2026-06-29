@@ -43,7 +43,7 @@ vi.mock("@workspace/scrapers", () => ({
   getBestStations: getBestStationsMock,
 }))
 
-import { getStations } from "@/services/weather"
+import { getStations } from "@workspace/api/services/weather"
 
 function mockParcelCentroid(lat: number | null, lng: number | null) {
   const chain = {

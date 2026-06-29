@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { app } from "api/app"
+import { app } from "@workspace/api/app"
 import { apiRequest } from "../helpers/request"
 
 describe("GET /healthz", () => {

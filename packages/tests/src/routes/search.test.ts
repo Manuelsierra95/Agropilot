@@ -10,9 +10,9 @@ const searchMocks = vi.hoisted(() => ({
   fetchPolygon: vi.fn(),
 }))
 
-vi.mock("@/services/search", () => searchMocks)
+vi.mock("@workspace/api/services/search", () => searchMocks)
 
-import { app } from "api/app"
+import { app } from "@workspace/api/app"
 import {
   mockAuthenticatedSession,
   mockUnauthenticated,

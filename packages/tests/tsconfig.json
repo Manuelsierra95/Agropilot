@@ -4,9 +4,8 @@
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["../../apps/api/src/*"],
-      "@env": ["../../apps/api/env.d.ts"],
-      "api/app": ["../../apps/api/src/app.ts"],
+      "@workspace/api/*": ["../../apps/api/src/*"],
+      "@workspace/api/env": ["../../apps/api/env.d.ts"],
       "@workspace/scrapers": ["../../packages/scrapers/src/index.ts"]
     }
   },

@@ -11,23 +11,20 @@ export default defineConfig({
     setupFiles: ["./src/setup.ts"],
   },
   resolve: {
-    alias: {
-      "@": path.resolve(apiRoot, "src"),
-      "@env": path.resolve(apiRoot, "env.d.ts"),
-      "api/app": path.resolve(apiRoot, "src/app.ts"),
-      "@workspace/db/schemas": path.resolve(
-        packagesRoot,
-        "db/src/schemas/index.ts"
-      ),
-      "@workspace/db": path.resolve(packagesRoot, "db/src/index.ts"),
-      "@workspace/auth/permissions": path.resolve(
-        packagesRoot,
-        "auth/src/permissions.ts"
-      ),
-      "@workspace/auth": path.resolve(packagesRoot, "auth/src/index.ts"),
-      "@workspace/schemas": path.resolve(packagesRoot, "schemas/src/index.ts"),
-      "@workspace/scrapers": path.resolve(packagesRoot, "scrapers/src/index.ts"),
-      "@workspace/copilot": path.resolve(packagesRoot, "copilot/src/index.ts"),
-    },
+    alias: [
+      { find: /^@workspace\/api\/(.+)$/, replacement: path.resolve(apiRoot, "src/$1") },
+      { find: "@workspace/api/env", replacement: path.resolve(apiRoot, "env.d.ts") },
+      { find: /^@workspace\/db\/(.+)$/, replacement: path.resolve(packagesRoot, "db/src/$1") },
+      { find: "@workspace/db", replacement: path.resolve(packagesRoot, "db/src/index.ts") },
+      { find: /^@workspace\/auth\/(.+)$/, replacement: path.resolve(packagesRoot, "auth/src/$1") },
+      { find: "@workspace/auth/permissions", replacement: path.resolve(packagesRoot, "auth/src/permissions.ts") },
+      { find: "@workspace/auth", replacement: path.resolve(packagesRoot, "auth/src/index.ts") },
+      { find: /^@workspace\/schemas\/(.+)$/, replacement: path.resolve(packagesRoot, "schemas/src/$1") },
+      { find: "@workspace/schemas", replacement: path.resolve(packagesRoot, "schemas/src/index.ts") },
+      { find: /^@workspace\/scrapers\/(.+)$/, replacement: path.resolve(packagesRoot, "scrapers/src/$1") },
+      { find: "@workspace/scrapers", replacement: path.resolve(packagesRoot, "scrapers/src/index.ts") },
+      { find: /^@workspace\/copilot\/(.+)$/, replacement: path.resolve(packagesRoot, "copilot/src/$1") },
+      { find: "@workspace/copilot", replacement: path.resolve(packagesRoot, "copilot/src/index.ts") },
+    ],
   },
 })

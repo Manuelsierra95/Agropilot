@@ -11,7 +11,7 @@ const orgMocks = vi.hoisted(() => ({
   cancelInvitation: vi.fn(),
 }))
 
-vi.mock("@/services/auth", () => ({
+vi.mock("@workspace/api/services/auth", () => ({
   getActiveOrganization: orgMocks.getActiveOrganization,
   getOrganizationMembers: orgMocks.getOrganizationMembers,
   getOrganizationMe: orgMocks.getOrganizationMe,
@@ -22,7 +22,7 @@ vi.mock("@/services/auth", () => ({
   cancelInvitation: orgMocks.cancelInvitation,
 }))
 
-import { app } from "api/app"
+import { app } from "@workspace/api/app"
 import {
   mockAuthenticatedSession,
   mockUnauthenticated,

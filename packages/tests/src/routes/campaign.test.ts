@@ -4,9 +4,9 @@ const campaignMocks = vi.hoisted(() => ({
   listCampaignsForSwitcher: vi.fn(),
 }))
 
-vi.mock("@/services/campaigns", () => campaignMocks)
+vi.mock("@workspace/api/services/campaigns", () => campaignMocks)
 
-import { app } from "api/app"
+import { app } from "@workspace/api/app"
 import {
   mockAuthenticatedSession,
   mockUnauthenticated,

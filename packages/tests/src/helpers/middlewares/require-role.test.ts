@@ -1,8 +1,8 @@
 import { Hono } from "hono"
 import { beforeEach, describe, expect, it } from "vitest"
 
-import { requireRole } from "@/middlewares/require-role"
-import { testMember } from "../helpers/fixtures"
+import { requireRole } from "@workspace/api/middlewares/require-role"
+import { testMember } from "../fixtures"
 
 const createApp = (role: string) =>
   new Hono()

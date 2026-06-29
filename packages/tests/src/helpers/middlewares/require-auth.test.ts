@@ -1,23 +1,21 @@
 import { Hono } from "hono"
 import { beforeEach, describe, expect, it } from "vitest"
 
-import { requireAuth } from "@/middlewares/require-auth"
+import { requireAuth } from "@workspace/api/middlewares/require-auth"
 import {
   mockAuthenticatedSession,
   mockSessionWithoutMembership,
   mockSessionWithoutOrg,
   mockUnauthenticated,
-} from "../helpers/mock-session"
+} from "../mock-session"
 
 const createApp = () =>
-  new Hono()
-    .use(requireAuth)
-    .get("/protected", (c) =>
-      c.json({
-        userId: c.get("user").id,
-        organizationId: c.get("organizationId"),
-      })
-    )
+  new Hono().use(requireAuth).get("/protected", (c) =>
+    c.json({
+      userId: c.get("user").id,
+      organizationId: c.get("organizationId"),
+    })
+  )
 
 describe("requireAuth", () => {
   beforeEach(() => {

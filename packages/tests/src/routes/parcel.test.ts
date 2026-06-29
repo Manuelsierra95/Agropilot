@@ -17,9 +17,9 @@ const parcelMocks = vi.hoisted(() => ({
   getParcelsWeatherComparisonForDashboard: vi.fn(),
 }))
 
-vi.mock("@/services/parcels", () => parcelMocks)
+vi.mock("@workspace/api/services/parcels", () => parcelMocks)
 
-import { app } from "api/app"
+import { app } from "@workspace/api/app"
 import {
   mockAuthenticatedSession,
   mockUnauthenticated,

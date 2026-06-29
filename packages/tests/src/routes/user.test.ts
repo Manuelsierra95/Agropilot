@@ -5,9 +5,9 @@ const userMocks = vi.hoisted(() => ({
   updateUserOnboarding: vi.fn(),
 }))
 
-vi.mock("@/services/auth", () => userMocks)
+vi.mock("@workspace/api/services/auth", () => userMocks)
 
-import { app } from "api/app"
+import { app } from "@workspace/api/app"
 import {
   mockAuthenticatedSession,
   mockUnauthenticated,

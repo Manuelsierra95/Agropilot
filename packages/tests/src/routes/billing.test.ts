@@ -6,16 +6,16 @@ const billingMocks = vi.hoisted(() => ({
   toggleModule: vi.fn(),
 }))
 
-vi.mock("@/services/auth", () => ({
+vi.mock("@workspace/api/services/auth", () => ({
   getActiveOrganization: billingMocks.getActiveOrganization,
 }))
 
-vi.mock("@/services/billing", () => ({
+vi.mock("@workspace/api/services/billing", () => ({
   getBillingMe: billingMocks.getBillingMe,
   toggleModule: billingMocks.toggleModule,
 }))
 
-import { app } from "api/app"
+import { app } from "@workspace/api/app"
 import { testMember } from "../helpers/fixtures"
 import {
   mockAuthenticatedSession,

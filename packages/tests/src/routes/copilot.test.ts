@@ -12,7 +12,7 @@ vi.mock("@workspace/copilot", () => ({
   streamCopilotResponse: copilotMocks.streamCopilotResponse,
 }))
 
-vi.mock("@/services/copilot", () => ({
+vi.mock("@workspace/api/services/copilot", () => ({
   resolveCopilotContext: contextMocks.resolveCopilotContext,
   executeCopilotQuery: vi.fn(),
   getLastUserText: vi.fn(),
@@ -23,7 +23,7 @@ vi.mock("@/services/copilot", () => ({
   ]),
 }))
 
-import { app } from "api/app"
+import { app } from "@workspace/api/app"
 import {
   mockAuthenticatedSession,
   mockUnauthenticated,

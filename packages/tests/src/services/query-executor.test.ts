@@ -10,21 +10,21 @@ const serviceMocks = vi.hoisted(() => ({
   queryTasks: vi.fn(),
 }))
 
-vi.mock("@/services/finance", () => ({
+vi.mock("@workspace/api/services/finance", () => ({
   queryTransactions: serviceMocks.queryTransactions,
   queryMarketPrices: serviceMocks.queryMarketPrices,
 }))
 
-vi.mock("@/services/parcels", () => ({
+vi.mock("@workspace/api/services/parcels", () => ({
   queryParcelCashflow: serviceMocks.queryParcelCashflow,
   queryParcelWeather: serviceMocks.queryParcelWeather,
 }))
 
-vi.mock("@/services/tasks", () => ({
+vi.mock("@workspace/api/services/tasks", () => ({
   queryTasks: serviceMocks.queryTasks,
 }))
 
-import { executeCopilotQuery } from "@/services/copilot"
+import { executeCopilotQuery } from "@workspace/api/services/copilot"
 
 const ctx = {
   organizationId: "org-test",

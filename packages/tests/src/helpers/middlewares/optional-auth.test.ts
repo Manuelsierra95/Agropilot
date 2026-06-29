@@ -1,22 +1,20 @@
 import { Hono } from "hono"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
-import { optionalAuth } from "@/middlewares/optional-auth"
+import { optionalAuth } from "@workspace/api/middlewares/optional-auth"
 import {
   authMocks,
   mockAuthenticatedSession,
   mockUnauthenticated,
-} from "../helpers/mock-session"
+} from "../mock-session"
 
 const createApp = () =>
-  new Hono()
-    .use(optionalAuth)
-    .get("/optional", (c) =>
-      c.json({
-        userId: c.get("user")?.id ?? null,
-        organizationId: c.get("organizationId"),
-      })
-    )
+  new Hono().use(optionalAuth).get("/optional", (c) =>
+    c.json({
+      userId: c.get("user")?.id ?? null,
+      organizationId: c.get("organizationId"),
+    })
+  )
 
 describe("optionalAuth", () => {
   beforeEach(() => {

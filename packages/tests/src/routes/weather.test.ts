@@ -4,9 +4,9 @@ const weatherMocks = vi.hoisted(() => ({
   getParcelWeatherForCalendar: vi.fn(),
 }))
 
-vi.mock("@/services/weather", () => weatherMocks)
+vi.mock("@workspace/api/services/weather", () => weatherMocks)
 
-import { app } from "api/app"
+import { app } from "@workspace/api/app"
 import {
   mockAuthenticatedSession,
   mockUnauthenticated,
@@ -21,12 +21,12 @@ describe("weather routes", () => {
     mockUnauthenticated()
   })
 
-  it("GET /weather/:parcelId returns 401 without auth", async () => {
-    const res = await apiRequest(app, `/api/v1/weather/${PARCEL_ID}`)
+  it("GET /weather returns 401 without auth", async () => {
+    const res = await apiRequest(app, "/api/v1/weather")
     expect(res.status).toBe(401)
   })
 
-  it("GET /weather/:parcelId returns weather data", async () => {
+  it("GET /weather returns weather data for parcel", async () => {
     mockAuthenticatedSession()
     weatherMocks.getParcelWeatherForCalendar.mockResolvedValue({
       parcelId: PARCEL_ID,
@@ -47,11 +47,12 @@ describe("weather routes", () => {
       ],
     })
 
-    const res = await apiRequest(app, `/api/v1/weather/${PARCEL_ID}`)
+    const res = await apiRequest(app, `/api/v1/weather?parcelId=${PARCEL_ID}`)
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.parcelName).toBe("La Mata")
-    expect(body.forecast).toHaveLength(1)
+    expect(body.meta.scope).toBe("parcel")
+    expect(body.data.weather.parcelName).toBe("La Mata")
+    expect(body.data.weather.forecast).toHaveLength(1)
     expect(weatherMocks.getParcelWeatherForCalendar).toHaveBeenCalledWith(
       expect.any(String),
       PARCEL_ID,
@@ -59,7 +60,16 @@ describe("weather routes", () => {
     )
   })
 
-  it("GET /weather/:parcelId returns empty forecast when no data", async () => {
+  it("GET /weather returns null when no parcelId", async () => {
+    mockAuthenticatedSession()
+
+    const res = await apiRequest(app, "/api/v1/weather")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.data.weather).toBeNull()
+  })
+
+  it("GET /weather returns empty forecast when no data", async () => {
     mockAuthenticatedSession()
     weatherMocks.getParcelWeatherForCalendar.mockResolvedValue({
       parcelId: PARCEL_ID,
@@ -68,31 +78,28 @@ describe("weather routes", () => {
       forecast: [],
     })
 
-    const res = await apiRequest(app, `/api/v1/weather/${PARCEL_ID}`)
+    const res = await apiRequest(app, `/api/v1/weather?parcelId=${PARCEL_ID}`)
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.current).toBeNull()
-    expect(body.forecast).toEqual([])
+    expect(body.data.weather.current).toBeNull()
+    expect(body.data.weather.forecast).toEqual([])
   })
 
-  it("GET /weather/:parcelId returns 404 for unknown parcel", async () => {
+  it("GET /weather returns 404 for unknown parcel", async () => {
     mockAuthenticatedSession()
     const { HTTPException } = await import("hono/http-exception")
     weatherMocks.getParcelWeatherForCalendar.mockRejectedValue(
       new HTTPException(404, { message: "Parcel not found" })
     )
 
-    const res = await apiRequest(app, `/api/v1/weather/${PARCEL_ID}`)
+    const res = await apiRequest(app, `/api/v1/weather?parcelId=${PARCEL_ID}`)
     expect(res.status).toBe(404)
   })
 
-  it("GET /weather/:parcelId returns 400 for invalid from date", async () => {
+  it("GET /weather returns 400 for invalid parcelId", async () => {
     mockAuthenticatedSession()
 
-    const res = await apiRequest(
-      app,
-      `/api/v1/weather/${PARCEL_ID}?from=not-a-date`
-    )
+    const res = await apiRequest(app, "/api/v1/weather?parcelId=not-a-uuid")
     expect(res.status).toBe(400)
     expect(weatherMocks.getParcelWeatherForCalendar).not.toHaveBeenCalled()
   })
