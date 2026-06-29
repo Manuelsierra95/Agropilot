@@ -15,7 +15,7 @@ vi.mock("@/services/finance", () => ({
   queryMarketPrices: serviceMocks.queryMarketPrices,
 }))
 
-vi.mock("@/services/parcel", () => ({
+vi.mock("@/services/parcels", () => ({
   queryParcelCashflow: serviceMocks.queryParcelCashflow,
   queryParcelWeather: serviceMocks.queryParcelWeather,
 }))
@@ -24,7 +24,7 @@ vi.mock("@/services/tasks", () => ({
   queryTasks: serviceMocks.queryTasks,
 }))
 
-import { executeCopilotQuery } from "@/services/copilot/query-executor"
+import { executeCopilotQuery } from "@/services/copilot"
 
 const ctx = {
   organizationId: "org-test",
@@ -107,8 +107,7 @@ describe("executeCopilotQuery", () => {
 
     expect(serviceMocks.queryParcelCashflow).toHaveBeenCalledWith(
       "org-test",
-      { from: "2026-01-01", to: "2026-01-31", parcelId: undefined },
-      undefined
+      { from: "2026-01-01", to: "2026-01-31", parcelId: undefined }
     )
     expect(result.rows).toEqual([
       {
@@ -146,8 +145,7 @@ describe("executeCopilotQuery", () => {
         to: "2026-01-31",
         parcelId: undefined,
         metric: "temperature",
-      },
-      undefined
+      }
     )
     expect(result.label).toBe("Temperatura — La Mata")
     expect(result.rows[0]).toMatchObject({

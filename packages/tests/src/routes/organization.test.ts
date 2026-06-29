@@ -11,14 +11,11 @@ const orgMocks = vi.hoisted(() => ({
   cancelInvitation: vi.fn(),
 }))
 
-vi.mock("@/services/organization", () => ({
+vi.mock("@/services/auth", () => ({
   getActiveOrganization: orgMocks.getActiveOrganization,
   getOrganizationMembers: orgMocks.getOrganizationMembers,
   getOrganizationMe: orgMocks.getOrganizationMe,
   updateOrganization: orgMocks.updateOrganization,
-}))
-
-vi.mock("@/services/invitations", () => ({
   listInvitations: orgMocks.listInvitations,
   createInvitation: orgMocks.createInvitation,
   bulkCreateInvitations: orgMocks.bulkCreateInvitations,
@@ -51,6 +48,9 @@ describe("organization routes", () => {
 
     const res = await apiRequest(app, "/api/v1/organization/active")
     expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.meta.scope).toBe("organization")
+    expect(body.data.organization.id).toBe("org-1")
   })
 
   it("GET /organization/members returns members", async () => {
@@ -59,6 +59,8 @@ describe("organization routes", () => {
 
     const res = await apiRequest(app, "/api/v1/organization/members")
     expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.data.members).toHaveLength(1)
   })
 
   it("PUT /organization/name returns 403 for non-admin", async () => {
@@ -84,6 +86,8 @@ describe("organization routes", () => {
     })
 
     expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.data.organization.name).toBe("Nueva finca")
   })
 
   it("POST /organization/invitations creates invitation for admin", async () => {
@@ -100,5 +104,7 @@ describe("organization routes", () => {
     })
 
     expect(res.status).toBe(201)
+    const body = await res.json()
+    expect(body.data.invitation.id).toBe("inv-1")
   })
 })

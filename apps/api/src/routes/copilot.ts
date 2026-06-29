@@ -7,10 +7,8 @@ import type { UIMessage } from "ai"
 
 import { requireAuth } from "@/middlewares/require-auth"
 import type { AuthVariables } from "@/types/variables"
-import { resolveCopilotContext } from "@/services/copilot/context"
-import { executeCopilotQuery } from "@/services/copilot/query-executor"
-import { getLastUserText } from "@/services/copilot/last-user-text"
-import { getCopilotSuggestions } from "@/services/copilot/suggestions"
+import { apiResponse } from "@/lib/api-response"
+import { resolveCopilotContext, executeCopilotQuery, getLastUserText, getCopilotSuggestions } from "@/services/copilot"
 
 export const copilotRoutes = new Hono<{
   Bindings: Env
@@ -19,7 +17,13 @@ export const copilotRoutes = new Hono<{
   .use(requireAuth)
   .get("/suggestions", async (c) => {
     const suggestions = await getCopilotSuggestions()
-    return c.json({ suggestions }, 200)
+    return c.json(
+      apiResponse({
+        data: { suggestions },
+        meta: { scope: "organization", mode: "full" },
+      }),
+      200
+    )
   })
   .post("/chat", zValidator("json", copilotChatRequestSchema), async (c) => {
     const body = c.req.valid("json")
@@ -31,16 +35,6 @@ export const copilotRoutes = new Hono<{
       c.get("user").id,
       body.parcelId
     )
-
-    console.log("[copilot/chat] request", {
-      organizationId,
-      parcelId: body.parcelId,
-      activeParcelId: ctx.activeParcelId,
-      organizationName: ctx.organizationName,
-      activeParcelName: ctx.activeParcelName,
-      messageCount: messages.length,
-      lastUserText: getLastUserText(body.messages),
-    })
 
     return await streamCopilotResponse(messages, {
       executeQuery: executeCopilotQuery,

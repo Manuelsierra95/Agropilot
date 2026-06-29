@@ -3,7 +3,8 @@ import type { Env } from "@env"
 import type { AuthVariables } from "@/types/variables"
 import { requireAuth } from "@/middlewares/require-auth"
 import { requireRole } from "@/middlewares/require-role"
-import { getActiveOrganization } from "@/services/organization"
+import { apiResponse } from "@/lib/api-response"
+import { getActiveOrganization } from "@/services/auth"
 import { getBillingMe, toggleModule } from "@/services/billing"
 import { HTTPException } from "hono/http-exception"
 import { zValidator } from "@hono/zod-validator"
@@ -25,20 +26,20 @@ export const billingRoutes = new Hono<{
 
     const data = await getBillingMe(member.organizationId, organization.plan)
 
-    return c.json(data)
+    return c.json(
+      apiResponse({
+        data,
+        meta: { scope: "organization", mode: "full" },
+      }),
+      200
+    )
   })
-  // Redirect al customer portal de Stripe
   .post("/portal", async (c) => {
-    // TODO: implementar cuando integres Stripe SDK
-    // const session = await stripe.billingPortal.sessions.create({...})
     throw new HTTPException(501, { message: "Stripe not configured yet" })
   })
-  // Cancelar suscripción
   .post("/cancel", async (c) => {
-    // TODO: stripe.subscriptions.update(id, { cancel_at_period_end: true })
     throw new HTTPException(501, { message: "Stripe not configured yet" })
   })
-  // Activar / desactivar módulo
   .patch(
     "/modules/:slug",
     zValidator(
@@ -53,6 +54,12 @@ export const billingRoutes = new Hono<{
       const slug = c.req.param("slug")
       const { active } = c.req.valid("json")
       await toggleModule(member.organizationId, slug, active)
-      return c.json({ success: true })
+      return c.json(
+        apiResponse({
+          data: { success: true },
+          meta: { scope: "organization", mode: "full" },
+        }),
+        200
+      )
     }
   )

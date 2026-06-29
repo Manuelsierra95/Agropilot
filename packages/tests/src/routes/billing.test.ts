@@ -6,7 +6,7 @@ const billingMocks = vi.hoisted(() => ({
   toggleModule: vi.fn(),
 }))
 
-vi.mock("@/services/organization", () => ({
+vi.mock("@/services/auth", () => ({
   getActiveOrganization: billingMocks.getActiveOrganization,
 }))
 
@@ -50,6 +50,8 @@ describe("billing routes", () => {
 
     const res = await apiRequest(app, "/api/v1/billing/me")
     expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.meta.scope).toBe("organization")
   })
 
   it("POST /billing/portal returns 501", async () => {
@@ -70,6 +72,6 @@ describe("billing routes", () => {
 
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.success).toBe(true)
+    expect(body.data.success).toBe(true)
   })
 })

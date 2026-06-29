@@ -3,18 +3,17 @@ import type { Env } from "@env"
 import type { AuthVariables } from "@/types/variables"
 import { zValidator } from "@hono/zod-validator"
 import { requireAuth } from "@/middlewares/require-auth"
+import { apiResponse } from "@/lib/api-response"
 import {
   getActiveOrganization,
   updateOrganization,
   getOrganizationMembers,
   getOrganizationMe,
-} from "@/services/organization"
-import {
   bulkCreateInvitations,
   cancelInvitation,
   createInvitation,
   listInvitations,
-} from "@/services/invitations"
+} from "@/services/auth"
 import {
   invitationBulkCreateSchema,
   invitationCreateSchema,
@@ -32,31 +31,61 @@ export const organizationRoutes = new Hono<{
       c.get("organizationId"),
       c.get("member")
     )
-    return c.json(data, 200)
+    return c.json(
+      apiResponse({
+        data,
+        meta: { scope: "organization", mode: "full" },
+      }),
+      200
+    )
   })
   .get("/members", async (c) => {
     const members = await getOrganizationMembers(c.get("organizationId"))
-    return c.json({ members }, 200)
+    return c.json(
+      apiResponse({
+        data: { members },
+        meta: { scope: "organization", mode: "full" },
+      }),
+      200
+    )
   })
   .get("/me", async (c) => {
     const user = c.get("user")
     const member = c.get("member")
     const data = await getOrganizationMe(user, member)
-    return c.json(data, 200)
+    return c.json(
+      apiResponse({
+        data,
+        meta: { scope: "organization", mode: "full" },
+      }),
+      200
+    )
   })
   .use(requireRole("admin"))
   .put("/name", zValidator("json", updateOrganizationSchema), async (c) => {
     const organizationId = c.get("organizationId")
     const data = c.req.valid("json")
     const organization = await updateOrganization(organizationId, data)
-    return c.json({ organization }, 200)
+    return c.json(
+      apiResponse({
+        data: { organization },
+        meta: { scope: "organization", mode: "full" },
+      }),
+      200
+    )
   })
   .get("/invitations", async (c) => {
     const invitations = await listInvitations(
       c.get("organizationId"),
       c.req.raw.headers
     )
-    return c.json({ invitations }, 200)
+    return c.json(
+      apiResponse({
+        data: { invitations },
+        meta: { scope: "organization", mode: "full" },
+      }),
+      200
+    )
   })
   .post(
     "/invitations/bulk",
@@ -68,7 +97,13 @@ export const organizationRoutes = new Hono<{
         items,
         c.req.raw.headers
       )
-      return c.json(result, 201)
+      return c.json(
+        apiResponse({
+          data: result,
+          meta: { scope: "organization", mode: "full" },
+        }),
+        201
+      )
     }
   )
   .post(
@@ -81,7 +116,13 @@ export const organizationRoutes = new Hono<{
         data,
         c.req.raw.headers
       )
-      return c.json({ invitation }, 201)
+      return c.json(
+        apiResponse({
+          data: { invitation },
+          meta: { scope: "organization", mode: "full" },
+        }),
+        201
+      )
     }
   )
   .delete("/invitations/:id", async (c) => {
@@ -90,5 +131,11 @@ export const organizationRoutes = new Hono<{
       c.get("organizationId"),
       c.req.raw.headers
     )
-    return c.json({ id: c.req.param("id") }, 200)
+    return c.json(
+      apiResponse({
+        data: { id: c.req.param("id") },
+        meta: { scope: "organization", mode: "full" },
+      }),
+      200
+    )
   })

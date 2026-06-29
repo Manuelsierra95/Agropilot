@@ -4,7 +4,7 @@ const campaignMocks = vi.hoisted(() => ({
   listCampaignsForSwitcher: vi.fn(),
 }))
 
-vi.mock("@/services/campaign", () => campaignMocks)
+vi.mock("@/services/campaigns", () => campaignMocks)
 
 import { app } from "api/app"
 import {
@@ -43,8 +43,9 @@ describe("campaign routes", () => {
     expect(res.status).toBe(200)
 
     const body = await res.json()
-    expect(body.campaigns).toHaveLength(1)
-    expect(body.campaigns[0].name).toBe("Campaña 2025–26")
+    expect(body.meta.scope).toBe("organization")
+    expect(body.data.campaigns).toHaveLength(1)
+    expect(body.data.campaigns[0].name).toBe("Campaña 2025–26")
     expect(campaignMocks.listCampaignsForSwitcher).toHaveBeenCalledWith(undefined)
   })
 

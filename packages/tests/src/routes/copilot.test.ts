@@ -12,8 +12,15 @@ vi.mock("@workspace/copilot", () => ({
   streamCopilotResponse: copilotMocks.streamCopilotResponse,
 }))
 
-vi.mock("@/services/copilot/context", () => ({
+vi.mock("@/services/copilot", () => ({
   resolveCopilotContext: contextMocks.resolveCopilotContext,
+  executeCopilotQuery: vi.fn(),
+  getLastUserText: vi.fn(),
+  getCopilotSuggestions: vi.fn().mockResolvedValue([
+    "Muéstrame ingresos y gastos del último trimestre",
+    "¿Cómo está el clima en mis parcelas?",
+    "Crea una tarea de riego para mañana",
+  ]),
 }))
 
 import { app } from "api/app"
@@ -59,13 +66,12 @@ describe("copilot routes", () => {
     const body = await res.json()
 
     expect(res.status).toBe(200)
-    expect(body).toEqual({
-      suggestions: [
-        "Muéstrame ingresos y gastos del último trimestre",
-        "¿Cómo está el clima en mis parcelas?",
-        "Crea una tarea de riego para mañana",
-      ],
-    })
+    expect(body.meta.scope).toBe("organization")
+    expect(body.data.suggestions).toEqual([
+      "Muéstrame ingresos y gastos del último trimestre",
+      "¿Cómo está el clima en mis parcelas?",
+      "Crea una tarea de riego para mañana",
+    ])
   })
 
   it("POST /copilot/chat returns 401 without auth", async () => {

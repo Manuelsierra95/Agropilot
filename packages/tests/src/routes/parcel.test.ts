@@ -17,7 +17,7 @@ const parcelMocks = vi.hoisted(() => ({
   getParcelsWeatherComparisonForDashboard: vi.fn(),
 }))
 
-vi.mock("@/services/parcel", () => parcelMocks)
+vi.mock("@/services/parcels", () => parcelMocks)
 
 import { app } from "api/app"
 import {
@@ -44,7 +44,8 @@ describe("parcel routes", () => {
     const res = await apiRequest(app, "/api/v1/parcel")
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.parcels).toHaveLength(1)
+    expect(body.meta.scope).toBe("organization")
+    expect(body.data.parcels).toHaveLength(1)
   })
 
   it("POST /parcel creates a parcel", async () => {
@@ -56,12 +57,15 @@ describe("parcel routes", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: "Nueva",
-        cropType: "olivo",
+        cropType: "olive",
         irrigationType: "dryland",
       }),
     })
 
     expect(res.status).toBe(201)
+    const body = await res.json()
+    expect(body.meta.mode).toBe("full")
+    expect(body.data.parcel.id).toBe("p-new")
   })
 
   it("POST /parcel returns 400 for invalid payload", async () => {
@@ -87,6 +91,8 @@ describe("parcel routes", () => {
     })
 
     expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.meta.parcelId).toBe("p-1")
   })
 
   it("DELETE /parcel/:id deletes a parcel", async () => {
@@ -95,6 +101,8 @@ describe("parcel routes", () => {
 
     const res = await apiRequest(app, "/api/v1/parcel/p-1", { method: "DELETE" })
     expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.data.id).toBe("p-1")
   })
 
   it("GET /parcel/map returns 401 without auth", async () => {
@@ -109,7 +117,7 @@ describe("parcel routes", () => {
     const res = await apiRequest(app, "/api/v1/parcel/map")
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.mapParcels).toHaveLength(1)
+    expect(body.data.mapParcels).toHaveLength(1)
   })
 
   it("GET /parcel/:id/recommendations returns recommendations", async () => {
@@ -119,22 +127,7 @@ describe("parcel routes", () => {
     const res = await apiRequest(app, "/api/v1/parcel/p-1/recommendations")
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.recommendations).toEqual([])
-  })
-
-  it("GET /parcel/:id/risks returns risks", async () => {
-    mockAuthenticatedSession()
-    parcelMocks.getParcelRisks.mockResolvedValue({
-      waterStress: { level: "low", score: 0.25, reasons: [] },
-      fungalRisk: { level: "low", score: 0.25, reasons: [] },
-      insectRisk: { level: "low", score: 0.25, reasons: [] },
-      thermalStress: { level: "low", score: 0.25, reasons: [] },
-    })
-
-    const res = await apiRequest(app, "/api/v1/parcel/p-1/risks")
-    expect(res.status).toBe(200)
-    const body = await res.json()
-    expect(body.risks.waterStress.level).toBe("low")
+    expect(body.data.recommendations).toEqual([])
   })
 
   it("GET /parcel/:id/crop-overview returns olivar data", async () => {
@@ -144,15 +137,10 @@ describe("parcel routes", () => {
     const res = await apiRequest(app, "/api/v1/parcel/p-1/crop-overview")
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.olivar.name).toBe("La Mata")
+    expect(body.data.olivar.name).toBe("La Mata")
   })
 
-  it("GET /parcel/crop-overviews returns 401 without auth", async () => {
-    const res = await apiRequest(app, "/api/v1/parcel/crop-overviews")
-    expect(res.status).toBe(401)
-  })
-
-  it("GET /parcel/crop-overviews returns bulk crop overviews", async () => {
+  it("GET /parcel/dashboard returns crop overviews via include", async () => {
     mockAuthenticatedSession()
     parcelMocks.getParcelsCropOverviewsForDashboard.mockResolvedValue({
       parcels: [
@@ -182,25 +170,26 @@ describe("parcel routes", () => {
       ],
     })
 
-    const res = await apiRequest(app, "/api/v1/parcel/crop-overviews")
+    const res = await apiRequest(app, "/api/v1/parcel/dashboard?include=cropOverviews")
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.cropOverviews.parcels).toHaveLength(1)
+    expect(body.meta.scope).toBe("organization")
+    expect(body.data.cropOverviews.parcels).toHaveLength(1)
   })
 
-  it("GET /parcel/parcels-recommendations returns bulk recommendations", async () => {
+  it("GET /parcel/dashboard returns recommendations via include", async () => {
     mockAuthenticatedSession()
     parcelMocks.getParcelsRecommendationsForDashboard.mockResolvedValue({
       parcels: [{ parcelId: "p-1", name: "La Mata", recommendations: [] }],
     })
 
-    const res = await apiRequest(app, "/api/v1/parcel/parcels-recommendations")
+    const res = await apiRequest(app, "/api/v1/parcel/dashboard?include=recommendations")
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.parcelsRecommendations.parcels).toHaveLength(1)
+    expect(body.data.recommendations.parcels).toHaveLength(1)
   })
 
-  it("GET /parcel/parcels-risks returns bulk risks", async () => {
+  it("GET /parcel/dashboard returns risks via include", async () => {
     mockAuthenticatedSession()
     parcelMocks.getParcelsRisksForDashboard.mockResolvedValue({
       parcels: [
@@ -217,10 +206,10 @@ describe("parcel routes", () => {
       ],
     })
 
-    const res = await apiRequest(app, "/api/v1/parcel/parcels-risks")
+    const res = await apiRequest(app, "/api/v1/parcel/dashboard?include=risks")
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.parcelsRisks.parcels).toHaveLength(1)
+    expect(body.data.risks.parcels).toHaveLength(1)
   })
 
   it("GET /parcel/:id/agroclimate returns 401 without auth", async () => {
@@ -326,7 +315,7 @@ describe("parcel routes", () => {
     const res = await apiRequest(app, "/api/v1/parcel/p-1/agroclimate")
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.agroclimate.request.parcelId).toBe("p-1")
+    expect(body.data.agroclimate.request.parcelId).toBe("p-1")
   })
 
   it("GET /parcel/:id/agroclimate returns 400 for invalid parcelId in scope", async () => {
@@ -339,12 +328,7 @@ describe("parcel routes", () => {
     expect(res.status).toBe(400)
   })
 
-  it("GET /parcel/weather-comparison returns 401 without auth", async () => {
-    const res = await apiRequest(app, "/api/v1/parcel/weather-comparison")
-    expect(res.status).toBe(401)
-  })
-
-  it("GET /parcel/weather-comparison returns comparison list", async () => {
+  it("GET /parcel/dashboard returns weather comparison via include", async () => {
     mockAuthenticatedSession()
     parcelMocks.getParcelsWeatherComparisonForDashboard.mockResolvedValue({
       parcels: [
@@ -361,9 +345,9 @@ describe("parcel routes", () => {
       ],
     })
 
-    const res = await apiRequest(app, "/api/v1/parcel/weather-comparison")
+    const res = await apiRequest(app, "/api/v1/parcel/dashboard?include=weatherComparison")
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.comparison.parcels).toHaveLength(1)
+    expect(body.data.weatherComparison.parcels).toHaveLength(1)
   })
 })

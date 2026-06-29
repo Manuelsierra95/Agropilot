@@ -5,7 +5,7 @@ const userMocks = vi.hoisted(() => ({
   updateUserOnboarding: vi.fn(),
 }))
 
-vi.mock("@/services/user", () => userMocks)
+vi.mock("@/services/auth", () => userMocks)
 
 import { app } from "api/app"
 import {
@@ -35,7 +35,7 @@ describe("user routes", () => {
     const res = await apiRequest(app, "/api/v1/user/me")
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.email).toBe("test@agropilot.dev")
+    expect(body.data.email).toBe("test@agropilot.dev")
   })
 
   it("PATCH /user/me updates onboarding", async () => {
@@ -52,6 +52,6 @@ describe("user routes", () => {
 
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.onboardingStep).toBe(2)
+    expect(body.data.onboardingStep).toBe(2)
   })
 })
