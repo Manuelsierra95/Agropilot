@@ -9,6 +9,7 @@ import { parcelApi } from "@workspace/web/lib/api/routes/parcel"
 import { campaignApi } from "@workspace/web/lib/api/routes/campaign"
 import { tasksApi } from "@workspace/web/lib/api/routes/tasks"
 import { weatherApi } from "@workspace/web/lib/api/routes/weather"
+import { dashboardApi } from "@workspace/web/lib/api/routes/dashboard"
 
 export const api = {
   example: exampleApi,
@@ -22,4 +23,5 @@ export const api = {
   campaign: campaignApi,
   tasks: tasksApi,
   weather: weatherApi,
+  dashboard: dashboardApi,
 }

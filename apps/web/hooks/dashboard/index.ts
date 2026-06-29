@@ -1,4 +1,5 @@
 export { useDashboardScope } from "@workspace/web/hooks/dashboard/use-dashboard-scope"
+export { useDashboardOverview } from "@workspace/web/hooks/dashboard/use-dashboard-overview"
 export {
   useAllParcelsCropOverviews,
   useAllParcelsRecommendations,

@@ -6,6 +6,12 @@ import {
 
 export const dashboardQueryKeys = {
   all: ["dashboard"] as const,
+  overview: (scope: DashboardScopeParams) =>
+    [
+      ...dashboardQueryKeys.all,
+      "overview",
+      buildDashboardScopeKey(scope),
+    ] as const,
   olivePrices: (dailyKey: string = getDashboardDailyKey()) =>
     [...dashboardQueryKeys.all, "olive-prices", dailyKey] as const,
   sellingWindow: (scope: DashboardScopeParams) =>

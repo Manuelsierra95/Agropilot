@@ -14,6 +14,7 @@ import { copilotRoutes } from "@workspace/api/routes/copilot"
 import { campaignRoutes } from "@workspace/api/routes/campaign"
 import { taskRoutes } from "@workspace/api/routes/tasks"
 import { weatherRoutes } from "@workspace/api/routes/weather"
+import { dashboardRoutes } from "@workspace/api/routes/dashboard"
 import { logger } from "hono/logger"
 
 export const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
@@ -37,6 +38,7 @@ export const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .route("/campaign", campaignRoutes)
   .route("/tasks", taskRoutes)
   .route("/weather", weatherRoutes)
+  .route("/dashboard", dashboardRoutes)
   // ruta para weather
 
 export type AppType = typeof app

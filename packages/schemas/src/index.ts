@@ -31,6 +31,7 @@ export * from "./read-models/parcel/parcel-weather"
 export * from "./read-models/finance/finance-dashboard"
 export * from "./read-models/tasks/tasks-dashboard"
 export * from "./read-models/weather/weather-dashboard"
+export * from "./read-models/dashboard/overview"
 
 export * from "./api/api-query"
 export * from "./api/api-response"

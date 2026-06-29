@@ -31,45 +31,31 @@ import {
   ResumeCropSkeleton,
   WidgetSkeleton,
 } from "@workspace/web/features/dashboard/dashboard-skeleton"
-import {
-  useAllParcelsCropOverviews,
-  useAllParcelsRecommendations,
-  useAllParcelsRisks,
-  useAllParcelsSellingWindows,
-  useCampaignMargin,
-  useCropOverview,
-  useFinanceResume,
-  useOlivePrices,
-  useParcelRecommendations,
-  useParcelRisks,
-  useParcelsFinanceComparison,
-  useParcelsMap,
-  useProductionValue,
-  useRecentTransactions,
-  useSellingWindow,
-  useUpcomingWeekTasks,
-} from "@workspace/web/hooks/dashboard"
+import { useDashboardOverview } from "@workspace/web/hooks/dashboard"
 import { useIsAllParcelsSelected } from "@workspace/web/hooks/use-is-all-parcels-selected"
+import type {
+  DashboardOverviewAll,
+  DashboardOverviewSingle,
+} from "@workspace/schemas"
 
 export default function DashboardOverview() {
   const isAllParcels = useIsAllParcelsSelected()
+  const overview = useDashboardOverview()
+  const data = overview.data
+  const isPending = overview.isPending && !data
 
-  const olivePrices = useOlivePrices()
-  const sellingWindow = useSellingWindow()
-  const allSellingWindows = useAllParcelsSellingWindows()
-  const cropOverview = useCropOverview()
-  const allCropOverviews = useAllParcelsCropOverviews()
-  const financeResume = useFinanceResume()
-  const campaignMargin = useCampaignMargin()
-  const parcelsFinanceComparison = useParcelsFinanceComparison()
-  const recommendations = useParcelRecommendations()
-  const allRecommendations = useAllParcelsRecommendations()
-  const parcelsMap = useParcelsMap()
-  const risks = useParcelRisks()
-  const allRisks = useAllParcelsRisks()
-  const upcomingWeek = useUpcomingWeekTasks()
-  const recentTransactions = useRecentTransactions()
-  const productionValue = useProductionValue()
+  const single = !isAllParcels
+    ? (data as DashboardOverviewSingle | undefined)
+    : undefined
+  const all = isAllParcels
+    ? (data as DashboardOverviewAll | undefined)
+    : undefined
+
+  const olivePrices = data?.market.olivePrices ?? []
+  const parcelsMap = data?.operations.parcelsMap ?? []
+  const upcomingWeek = data?.operations.upcomingWeek ?? []
+  const recentTransactions = data?.finance.recentTransactions ?? []
+  const productionValue = data?.crop.productionValue
 
   return (
     <div className={dashboardContainerClassName}>
@@ -80,7 +66,7 @@ export default function DashboardOverview() {
             className={dashboardGridSlot.horizSepMobile}
           />
           <div className={dashboardGridSlot.rowInner}>
-            {olivePrices.isPending && !olivePrices.data ? (
+            {isPending ? (
               <WidgetSkeleton
                 className="min-w-0 flex-2"
                 contentHeight="h-[140px]"
@@ -88,7 +74,7 @@ export default function DashboardOverview() {
             ) : (
               <OlivePrice
                 className="min-w-0 flex-2"
-                items={olivePrices.data ?? []}
+                items={olivePrices}
               />
             )}
             <GradientSeparator
@@ -96,7 +82,7 @@ export default function DashboardOverview() {
               className={dashboardGridSlot.verticalSepDesktop}
             />
             {isAllParcels ? (
-              allSellingWindows.isPending && !allSellingWindows.data?.length ? (
+              isPending && !all?.market.allSellingWindows?.length ? (
                 <WidgetSkeleton
                   className="min-w-0 flex-1"
                   contentHeight="h-[140px]"
@@ -104,19 +90,19 @@ export default function DashboardOverview() {
               ) : (
                 <SellingWindowAll
                   className="min-w-0 flex-1"
-                  items={allSellingWindows.data ?? []}
+                  items={all?.market.allSellingWindows ?? []}
                 />
               )
-            ) : sellingWindow.isPending && !sellingWindow.data ? (
+            ) : isPending && !single?.market.sellingWindow ? (
               <WidgetSkeleton
                 className="min-w-0 flex-1"
                 contentHeight="h-[140px]"
               />
-            ) : sellingWindow.data ? (
+            ) : single?.market.sellingWindow ? (
               <SellingWindow
                 className="min-w-0 flex-1"
-                scopeKey={sellingWindow.scopeKey}
-                {...sellingWindow.data}
+                scopeKey={overview.scopeKey}
+                {...single.market.sellingWindow}
               />
             ) : null}
           </div>
@@ -128,22 +114,22 @@ export default function DashboardOverview() {
             className={dashboardGridSlot.verticalSepDesktop}
           />
           {isAllParcels ? (
-            allCropOverviews.isPending && !allCropOverviews.data?.length ? (
+            isPending && !all?.crop.allOverviews?.length ? (
               <ResumeCropSkeleton className={dashboardGridSlot.resumeCrop} />
             ) : (
               <ResumeCropAll
                 className={dashboardGridSlot.resumeCrop}
-                items={allCropOverviews.data ?? []}
+                items={all?.crop.allOverviews ?? []}
               />
             )
-          ) : cropOverview.isPending && !cropOverview.data ? (
+          ) : isPending && !single?.crop.overview ? (
             <ResumeCropSkeleton className={dashboardGridSlot.resumeCrop} />
-          ) : cropOverview.data ? (
+          ) : single?.crop.overview ? (
             <ResumeCrop
               className={dashboardGridSlot.resumeCrop}
               data={{
-                ...cropOverview.data,
-                lastUpdate: new Date(cropOverview.data.lastUpdate),
+                ...single.crop.overview,
+                lastUpdate: new Date(single.crop.overview.lastUpdate),
               }}
             />
           ) : null}
@@ -153,17 +139,17 @@ export default function DashboardOverview() {
           <GradientSeparator orientation="horizontal" />
           <div className={dashboardGridSlot.rowInner}>
             {!isAllParcels &&
-              (financeResume.isPending && !financeResume.data ? (
+              (isPending && !single?.finance.resume ? (
                 <WidgetSkeleton
                   className="min-w-0 flex-1"
                   contentHeight="h-[200px]"
                 />
-              ) : financeResume.data ? (
+              ) : single?.finance.resume ? (
                 <FinanceResume
                   className="min-w-0 flex-1"
-                  transactions={financeResume.data.transactions}
-                  oils={olivePrices.data ?? []}
-                  previousCampaign={financeResume.data.previousCampaign}
+                  transactions={single.finance.resume.transactions}
+                  oils={olivePrices}
+                  previousCampaign={single.finance.resume.previousCampaign}
                 />
               ) : null)}
             {!isAllParcels && (
@@ -173,27 +159,26 @@ export default function DashboardOverview() {
               />
             )}
             {isAllParcels ? (
-              parcelsFinanceComparison.isPending &&
-              !parcelsFinanceComparison.data ? (
+              isPending && !all?.finance.comparison ? (
                 <WidgetSkeleton
                   className="min-w-0 w-full flex-1"
                   contentHeight="h-[200px]"
                 />
-              ) : parcelsFinanceComparison.data ? (
+              ) : all?.finance.comparison ? (
                 <ParcelsFinanceBars
                   className="min-w-0 w-full flex-1"
-                  parcels={parcelsFinanceComparison.data.parcels}
+                  parcels={all.finance.comparison.parcels}
                 />
               ) : null
-            ) : campaignMargin.isPending && !campaignMargin.data ? (
+            ) : isPending && !single?.finance.campaignMargin ? (
               <WidgetSkeleton
                 className="min-w-0 flex-2"
                 contentHeight="h-[200px]"
               />
-            ) : campaignMargin.data ? (
+            ) : single?.finance.campaignMargin ? (
               <CampaignAccumulatedMargin
                 className="min-w-0 flex-2"
-                data={campaignMargin.data}
+                data={single.finance.campaignMargin}
               />
             ) : null}
           </div>
@@ -203,8 +188,7 @@ export default function DashboardOverview() {
           <GradientSeparator orientation="horizontal" />
           <div className={dashboardGridSlot.rowInner}>
             {isAllParcels ? (
-              allRecommendations.isPending &&
-              allRecommendations.data === undefined ? (
+              isPending && !all?.intelligence.allRecommendations?.length ? (
                 <WidgetSkeleton
                   className="min-w-0 flex-1"
                   contentHeight="h-[240px]"
@@ -212,10 +196,10 @@ export default function DashboardOverview() {
               ) : (
                 <RecommendationsAll
                   className="min-w-0 flex-1"
-                  items={allRecommendations.data ?? []}
+                  items={all?.intelligence.allRecommendations ?? []}
                 />
               )
-            ) : recommendations.isPending && !recommendations.data ? (
+            ) : isPending && !single?.intelligence.recommendations?.length ? (
               <WidgetSkeleton
                 className="min-w-0 flex-1"
                 contentHeight="h-[240px]"
@@ -223,19 +207,21 @@ export default function DashboardOverview() {
             ) : (
               <Recommendations
                 className="min-w-0 flex-1"
-                data={{ recommendations: recommendations.data ?? [] }}
+                data={{
+                  recommendations: single?.intelligence.recommendations ?? [],
+                }}
               />
             )}
             <GradientSeparator
               orientation="vertical"
               className={dashboardGridSlot.verticalSepDesktop}
             />
-            {parcelsMap.isPending && !parcelsMap.data ? (
+            {isPending && !parcelsMap.length ? (
               <MapSkeleton className="min-w-0 flex-2" />
             ) : (
               <DashboardMap
                 className="min-w-0 flex-2"
-                parcels={parcelsMap.data ?? []}
+                parcels={parcelsMap}
               />
             )}
             <GradientSeparator
@@ -243,7 +229,7 @@ export default function DashboardOverview() {
               className={dashboardGridSlot.verticalSepDesktop}
             />
             {isAllParcels ? (
-              allRisks.isPending && !allRisks.data?.length ? (
+              isPending && !all?.intelligence.allRisks?.length ? (
                 <WidgetSkeleton
                   className="min-w-0 flex-[1.5]"
                   contentHeight="h-[240px]"
@@ -251,18 +237,18 @@ export default function DashboardOverview() {
               ) : (
                 <RiskRadarMulti
                   className="min-w-0 flex-[1.5]"
-                  items={allRisks.data ?? []}
+                  items={all?.intelligence.allRisks ?? []}
                 />
               )
-            ) : risks.isPending && !risks.data ? (
+            ) : isPending && !single?.intelligence.risks ? (
               <WidgetSkeleton
                 className="min-w-0 flex-[1.5]"
                 contentHeight="h-[240px]"
               />
-            ) : risks.data ? (
+            ) : single?.intelligence.risks ? (
               <RiskRadar
                 className="min-w-0 flex-[1.5]"
-                risks={risks.data}
+                risks={single.intelligence.risks}
               />
             ) : null}
           </div>
@@ -271,7 +257,7 @@ export default function DashboardOverview() {
         <div className={dashboardGridSlot.tablesRow}>
           <GradientSeparator orientation="horizontal" />
           <div className={dashboardGridSlot.rowInner}>
-            {upcomingWeek.isPending && !upcomingWeek.data ? (
+            {isPending && !upcomingWeek.length ? (
               <WidgetSkeleton
                 className="min-w-0 flex-1"
                 contentHeight="h-[220px]"
@@ -279,14 +265,14 @@ export default function DashboardOverview() {
             ) : (
               <RecentEvents
                 className="min-w-0 flex-1"
-                data={toCalendarEvents(upcomingWeek.data ?? [])}
+                data={toCalendarEvents(upcomingWeek)}
               />
             )}
             <GradientSeparator
               orientation="vertical"
               className={dashboardGridSlot.verticalSepDesktop}
             />
-            {recentTransactions.isPending && !recentTransactions.data ? (
+            {isPending && !recentTransactions.length ? (
               <WidgetSkeleton
                 className="min-w-0 flex-1"
                 contentHeight="h-[220px]"
@@ -294,7 +280,7 @@ export default function DashboardOverview() {
             ) : (
               <RecentTransactions
                 className="min-w-0 flex-1"
-                data={recentTransactions.data ?? []}
+                data={recentTransactions}
                 showParcelColumn={isAllParcels}
               />
             )}
@@ -303,21 +289,21 @@ export default function DashboardOverview() {
 
         <div className={dashboardGridSlot.productionValueRow}>
           <GradientSeparator orientation="horizontal" />
-          {productionValue.isPending && !productionValue.data ? (
+          {isPending && !productionValue ? (
             <ProductionValueSkeleton
               className={dashboardGridSlot.productionValue}
             />
-          ) : productionValue.data ? (
+          ) : productionValue ? (
             isAllParcels ? (
               <ProductionValueAll
-                {...productionValue.data}
-                parcels={parcelsFinanceComparison.data?.parcels ?? []}
-                cropOverviews={allCropOverviews.data ?? []}
+                {...productionValue}
+                parcels={all?.finance.comparison?.parcels ?? []}
+                cropOverviews={all?.crop.allOverviews ?? []}
                 className={dashboardGridSlot.productionValue}
               />
             ) : (
               <ProductionValue
-                {...productionValue.data}
+                {...productionValue}
                 className={dashboardGridSlot.productionValue}
               />
             )
