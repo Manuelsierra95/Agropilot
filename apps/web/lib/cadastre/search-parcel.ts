@@ -1,6 +1,6 @@
-import { searchApi } from "@/lib/api/routes/search"
-import { applyParcelSearchResponse } from "./apply-search-response"
-import type { ParcelSearchResult, SearchParcelFn, SearchParcelInput } from "./types"
+import { searchApi } from "@workspace/web/lib/api/routes/search"
+import { applyParcelSearchResponse } from "@workspace/web/lib/cadastre/apply-search-response"
+import type { ParcelSearchResult, SearchParcelFn, SearchParcelInput } from "@workspace/web/lib/cadastre/types"
 
 function toParcelSearchResult(
   data: Awaited<ReturnType<typeof searchApi.searchByAddress>>,

@@ -7,14 +7,14 @@ import type {
   ParcelWeatherResponse,
 } from "@workspace/schemas"
 
-import type { ActiveAlert } from "@/features/calendar/components/active-alerts-card"
-import type { ForecastDay } from "@/features/calendar/components/calendar/sidecards/time-weather-card"
-import type { Recommendation } from "@/features/calendar/components/recommendations-card"
+import type { ActiveAlert } from "@workspace/web/features/calendar/components/active-alerts-card"
+import type { ForecastDay } from "@workspace/web/features/calendar/components/calendar/sidecards/time-weather-card"
+import type { Recommendation } from "@workspace/web/features/calendar/components/recommendations-card"
 import type {
   CalendarEvent,
   CampaignTimelineData,
   CampaignTimelineTask,
-} from "@/lib/calendar/types"
+} from "@workspace/web/lib/calendar/types"
 
 export function toCalendarEvents(
   events: DashboardCalendarEvent[]

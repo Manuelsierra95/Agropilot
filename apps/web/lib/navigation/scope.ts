@@ -1,4 +1,4 @@
-import { dashboardScopeParsers } from "@/hooks/use-dashboard-scope-params"
+import { dashboardScopeParsers } from "@workspace/web/hooks/use-dashboard-scope-params"
 
 export type ScopeKey = keyof typeof dashboardScopeParsers
 

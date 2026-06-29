@@ -1,4 +1,4 @@
-import { getPolygonCenter } from "@/components/maps/components/parcel-utils"
+import { getPolygonCenter } from "@workspace/web/components/maps/components/parcel-utils"
 
 export function draftPolygonFromCoordinates(
   coordinates: number[][][]

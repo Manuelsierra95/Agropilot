@@ -1,4 +1,4 @@
-import { client } from "@/lib/api/client"
+import { client } from "@workspace/web/lib/api/client"
 import type { CampaignListItem } from "@workspace/schemas"
 
 const listCampaigns = (parcelId?: string): Promise<CampaignListItem[]> =>
@@ -7,7 +7,7 @@ const listCampaigns = (parcelId?: string): Promise<CampaignListItem[]> =>
       query: parcelId ? { parcelId } : {},
     })
     .then((res) => res.json())
-    .then((data) => data.campaigns)
+    .then((data) => data.data.campaigns)
 
 export const campaignApi = {
   list: listCampaigns,

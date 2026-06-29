@@ -1,6 +1,6 @@
 import type { DashboardScopeQuery } from "@workspace/schemas"
 
-import type { DashboardScopeParams } from "@/lib/dashboard/scope-key"
+import type { DashboardScopeParams } from "@workspace/web/lib/dashboard/scope-key"
 
 export function toScopeQuery(
   scope: DashboardScopeParams

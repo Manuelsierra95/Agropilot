@@ -3,8 +3,8 @@ import type { QueryClient } from "@tanstack/react-query"
 import {
   dashboardQueryKeys,
   type DashboardCacheFamily,
-} from "@/lib/dashboard/query-keys"
-import type { DashboardScopeParams } from "@/lib/dashboard/scope-key"
+} from "@workspace/web/lib/dashboard/query-keys"
+import type { DashboardScopeParams } from "@workspace/web/lib/dashboard/scope-key"
 
 /** Queries que no dependen del scope parcela/campaña. */
 const GLOBAL_KEY_SEGMENTS = new Set(["olive-prices", "parcels-map"])

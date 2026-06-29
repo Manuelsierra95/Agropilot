@@ -1,5 +1,5 @@
-import { api } from "@/lib/api"
-import { pickDefaultCampaignId } from "@/lib/dashboard/pick-default-campaign"
+import { api } from "@workspace/web/lib/api"
+import { pickDefaultCampaignId } from "@workspace/web/lib/dashboard/pick-default-campaign"
 
 type SearchParams = Record<string, string | string[] | undefined>
 

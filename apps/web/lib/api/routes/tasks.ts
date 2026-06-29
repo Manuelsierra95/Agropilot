@@ -1,7 +1,7 @@
-import { client } from "@/lib/api/client"
-import { notifyDashboardMutation } from "@/lib/dashboard/notify-dashboard-mutation"
-import type { DashboardScopeParams } from "@/lib/dashboard/scope-key"
-import { toScopeQuery } from "@/lib/dashboard/scope-query"
+import { client } from "@workspace/web/lib/api/client"
+import { notifyDashboardMutation } from "@workspace/web/lib/dashboard/notify-dashboard-mutation"
+import type { DashboardScopeParams } from "@workspace/web/lib/dashboard/scope-key"
+import { toScopeQuery } from "@workspace/web/lib/dashboard/scope-query"
 import type {
   DashboardCalendarEvent,
   TaskCreateInput,
@@ -15,38 +15,38 @@ const createTask = (data: TaskCreateInput): Promise<TaskSelect> =>
       if (!res.ok) {
         throw new Error("Failed to create task")
       }
-      return res.json()
+      return res.json() as Promise<{ data: { task: TaskSelect } }>
     })
     .then((body) => {
       notifyDashboardMutation(["events"], { parcelId: data.parcelId })
-      return body.task
+      return body.data.task
     })
 
 const getCalendarEvents = (
   scope: DashboardScopeParams
 ): Promise<DashboardCalendarEvent[]> =>
-  client.api.v1.tasks["calendar-events"]
-    .$get({ query: toScopeQuery(scope) })
+  client.api.v1.tasks.calendar
+    .$get({ query: { ...toScopeQuery(scope), include: "events" } })
     .then((res) => {
       if (!res.ok) {
         throw new Error("Failed to fetch calendar events")
       }
-      return res.json()
+      return res.json() as Promise<{ data: { events: DashboardCalendarEvent[] } }>
     })
-    .then((body) => body.events)
+    .then((body) => body.data.events)
 
 const getUpcomingWeek = (
   scope: DashboardScopeParams
 ): Promise<DashboardCalendarEvent[]> =>
-  client.api.v1.tasks["upcoming-week"]
-    .$get({ query: toScopeQuery(scope) })
+  client.api.v1.tasks.calendar
+    .$get({ query: { ...toScopeQuery(scope), include: "upcomingWeek" } })
     .then((res) => {
       if (!res.ok) {
         throw new Error("Failed to fetch upcoming week tasks")
       }
-      return res.json()
+      return res.json() as Promise<{ data: { upcomingWeek: DashboardCalendarEvent[] } }>
     })
-    .then((body) => body.events)
+    .then((body) => body.data.upcomingWeek)
 
 export const tasksApi = {
   createTask,

@@ -1,4 +1,4 @@
-import { client } from "@/lib/api/client"
+import { client } from "@workspace/web/lib/api/client"
 import type {
   AddressSearchQuery,
   Municipality,

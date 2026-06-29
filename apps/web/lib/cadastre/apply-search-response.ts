@@ -1,10 +1,10 @@
 import type { ParcelSearchResponse } from "@workspace/schemas"
-import type { ParcelAddress, ParcelSearchResult } from "./types"
+import type { ParcelAddress, ParcelSearchResult } from "@workspace/web/lib/cadastre/types"
 import {
   draftCentroidFromCoordinates,
   draftPolygonFromCoordinates,
   toWktPoint,
-} from "./geometry"
+} from "@workspace/web/lib/cadastre/geometry"
 
 export type ParcelSearchDraftUpdate = {
   polygon: string

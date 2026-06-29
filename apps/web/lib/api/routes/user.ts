@@ -1,11 +1,13 @@
-import { client } from "@/lib/api/client"
-import { parseResponse } from "@/lib/api/types"
-import { UserMeResponse } from "@workspace/schemas"
+import { client } from "@workspace/web/lib/api/client"
+import type { UserMeResponse } from "@workspace/schemas"
 import { cache } from "react"
 
 const getUserMe = cache(
   (): Promise<UserMeResponse> =>
-    client.api.v1.user.me.$get().then((response) => response.json())
+    client.api.v1.user.me
+      .$get()
+      .then((response) => response.json() as Promise<{ data: UserMeResponse }>)
+      .then((body) => body.data)
 )
 
 const updateUserOnboarding = async (
@@ -14,7 +16,8 @@ const updateUserOnboarding = async (
   const response = await client.api.v1.user.me.$patch({
     json: { onboardingStep },
   })
-  return parseResponse<UserMeResponse>(response)
+  const body = await response.json() as { data: UserMeResponse }
+  return body.data
 }
 
 export const userApi = {

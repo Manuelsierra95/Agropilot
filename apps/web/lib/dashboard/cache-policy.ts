@@ -1,4 +1,4 @@
-import { getDailyStaleTimeMs } from "@/lib/dashboard/daily-key"
+import { getDailyStaleTimeMs } from "@workspace/web/lib/dashboard/daily-key"
 
 export const mutationQueryOptions = {
   staleTime: Number.POSITIVE_INFINITY,

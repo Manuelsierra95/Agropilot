@@ -1,4 +1,4 @@
-import { client } from "@/lib/api/client"
+import { client } from "@workspace/web/lib/api/client"
 
 export const exampleApi = {
   public: () => client.api.v1.example.public!.$get({}),

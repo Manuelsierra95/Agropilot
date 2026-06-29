@@ -1,8 +1,8 @@
 import { createAuthClient } from "better-auth/react"
 import { organizationClient } from "better-auth/client/plugins"
-import { versionedApiUrl } from "@/lib/env"
+import { versionedApiUrl } from "@workspace/web/lib/env"
 
-export const authClient: ReturnType<typeof createAuthClient> = createAuthClient(
+export const authClient = createAuthClient(
   {
     baseURL: `${versionedApiUrl}/auth`,
     plugins: [

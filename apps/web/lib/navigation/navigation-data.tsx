@@ -1,5 +1,5 @@
 import { Euro, LucideIcon, TriangleAlert } from "lucide-react"
-import type { ScopeKey } from "@/lib/navigation/scope"
+import type { ScopeKey } from "@workspace/web/lib/navigation/scope"
 import {
   Cpu,
   BookOpen,

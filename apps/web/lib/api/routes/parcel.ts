@@ -1,7 +1,7 @@
-import { client } from "@/lib/api/client"
-import { notifyDashboardMutation } from "@/lib/dashboard/notify-dashboard-mutation"
-import type { DashboardScopeParams } from "@/lib/dashboard/scope-key"
-import { toScopeQuery } from "@/lib/dashboard/scope-query"
+import { client } from "@workspace/web/lib/api/client"
+import { notifyDashboardMutation } from "@workspace/web/lib/dashboard/notify-dashboard-mutation"
+import type { DashboardScopeParams } from "@workspace/web/lib/dashboard/scope-key"
+import { toScopeQuery } from "@workspace/web/lib/dashboard/scope-query"
 import {
   ParcelSelect,
   ParcelCreateInput,

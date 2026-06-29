@@ -1,4 +1,4 @@
-import type { Event, startOfWeek } from "@/types/calendar"
+import type { Event, startOfWeek } from "@workspace/web/types/calendar"
 
 export function getDaysInMonth(month: number, year: number) {
   return Array.from(

@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import type { PlaceSuggestion, SearchPlacesOptions } from "./types"
+import type { PlaceSuggestion, SearchPlacesOptions } from "@workspace/web/lib/geocoding/types"
 
 const PHOTON_API = "https://photon.komoot.io/api/"
 

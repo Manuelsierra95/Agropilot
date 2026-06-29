@@ -4,7 +4,7 @@ import type {
   FinanceCategoryTransaction,
   FinanceTransaction,
   FinanceTransactionSnapshot,
-} from "./types"
+} from "@workspace/web/lib/finance/types"
 
 export function toFinanceTransaction(
   row: DashboardFinanceTransaction

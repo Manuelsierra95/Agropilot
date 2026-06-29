@@ -1,8 +1,8 @@
-import { getDashboardDailyKey } from "@/lib/dashboard/daily-key"
+import { getDashboardDailyKey } from "@workspace/web/lib/dashboard/daily-key"
 import {
   buildDashboardScopeKey,
   type DashboardScopeParams,
-} from "@/lib/dashboard/scope-key"
+} from "@workspace/web/lib/dashboard/scope-key"
 
 export const dashboardQueryKeys = {
   all: ["dashboard"] as const,

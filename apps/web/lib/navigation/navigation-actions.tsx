@@ -1,9 +1,9 @@
 import {
   navigationData,
   NavigationData,
-} from "@/lib/navigation/navigation-data"
-import { SearchAction } from "@/components/dashboard-nav/components/search/search-menu"
-import type { ScopeKey } from "./scope"
+} from "@workspace/web/lib/navigation/navigation-data"
+import { SearchAction } from "@workspace/web/components/dashboard-nav/components/search/search-menu"
+import type { ScopeKey } from "@workspace/web/lib/navigation/scope"
 
 export function navigationToSearchActions(
   data: NavigationData,
@@ -89,8 +89,8 @@ export function navigationToSearchActions(
 import { useCallback, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import * as React from "react"
-import { usePreservedSearchParams } from "@/hooks/use-preserved-search-params"
-import { SCOPE_KEYS } from "./scope"
+import { usePreservedSearchParams } from "@workspace/web/hooks/use-preserved-search-params"
+import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
 
 export function useNavigationSearchActions(): SearchAction[] {
   const router = useRouter()

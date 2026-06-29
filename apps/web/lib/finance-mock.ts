@@ -4,7 +4,7 @@ import type {
   MarketPrice,
   Transaction,
   DonutSlice,
-} from "@/types/finances"
+} from "@workspace/web/types/finances"
 
 export const OIL_SUMMARIES: OilSummary[] = [
   {

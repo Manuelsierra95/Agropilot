@@ -14,7 +14,7 @@ import type {
   ParcelItem,
   WeatherMetrics,
   YieldData,
-} from "./types"
+} from "@workspace/web/lib/parcel/types"
 
 export function toParcelItem(parcel: ParcelSelect): ParcelItem {
   return {

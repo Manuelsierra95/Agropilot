@@ -2,8 +2,8 @@
 
 import { useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { usePreservedSearchParams } from "@/hooks/use-preserved-search-params"
-import type { ScopeKey } from "./scope"
+import { usePreservedSearchParams } from "@workspace/web/hooks/use-preserved-search-params"
+import type { ScopeKey } from "@workspace/web/lib/navigation/scope"
 
 export function useNavigateWithScope() {
   const router = useRouter()
