@@ -20,13 +20,13 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@workspace/ui/components/chart"
-import type { ParcelApiResponse } from "@/features/parcel/components/parcel-types"
+import type { DashboardRisks } from "@workspace/schemas"
 import { cn } from "@workspace/ui/lib/utils"
 import { TrendingUp } from "lucide-react"
 import { LinkButton } from "@/components/ui/link-button"
 
 type RiskRadarProps = {
-  apiResponse?: Pick<ParcelApiResponse, "risks">
+  risks?: DashboardRisks
   redirectButton?: boolean
   className?: string
 }
@@ -39,35 +39,34 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function RiskRadar({
-  apiResponse,
+  risks,
   redirectButton = true,
   className,
 }: RiskRadarProps) {
-  const chartData = apiResponse
+  const chartData = risks
     ? [
         {
           risk: "Hídrico",
           score: Math.round(
-            Math.max(0, Math.min(apiResponse.risks.waterStress.score, 1)) * 100
+            Math.max(0, Math.min(risks.waterStress.score, 1)) * 100
           ),
         },
         {
           risk: "Fúngico",
           score: Math.round(
-            Math.max(0, Math.min(apiResponse.risks.fungalRisk.score, 1)) * 100
+            Math.max(0, Math.min(risks.fungalRisk.score, 1)) * 100
           ),
         },
         {
           risk: "Insectos",
           score: Math.round(
-            Math.max(0, Math.min(apiResponse.risks.insectRisk.score, 1)) * 100
+            Math.max(0, Math.min(risks.insectRisk.score, 1)) * 100
           ),
         },
         {
           risk: "Térmico",
           score: Math.round(
-            Math.max(0, Math.min(apiResponse.risks.thermalStress.score, 1)) *
-              100
+            Math.max(0, Math.min(risks.thermalStress.score, 1)) * 100
           ),
         },
       ]
@@ -78,12 +77,12 @@ export function RiskRadar({
         { risk: "Térmico", score: 0 },
       ]
 
-  const riskScore = apiResponse
+  const riskScore = risks
     ? Math.round(
-        ((apiResponse.risks.waterStress.score +
-          apiResponse.risks.fungalRisk.score +
-          apiResponse.risks.insectRisk.score +
-          apiResponse.risks.thermalStress.score) /
+        ((risks.waterStress.score +
+          risks.fungalRisk.score +
+          risks.insectRisk.score +
+          risks.thermalStress.score) /
           4) *
           100
       )

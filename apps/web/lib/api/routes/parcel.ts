@@ -21,8 +21,8 @@ import { cache } from "react"
 const getListParcels = (): Promise<ParcelSelect[]> =>
   client.api.v1.parcel
     .$get()
-    .then((res) => res.json())
-    .then((res) => res.parcels)
+    .then((res) => res.json() as Promise<{ data: { parcels: ParcelSelect[] } }>)
+    .then((res) => res.data.parcels)
 
 const getParcelById = cache(
   (id: string): Promise<ParcelSelect> =>
@@ -32,8 +32,8 @@ const getParcelById = cache(
           id,
         },
       })
-      .then((res) => res.json())
-      .then((res) => res.parcel)
+      .then((res) => res.json() as Promise<{ data: { parcel: ParcelSelect } }>)
+      .then((res) => res.data.parcel)
 )
 
 const createParcel = (data: ParcelCreateInput) =>
@@ -41,10 +41,10 @@ const createParcel = (data: ParcelCreateInput) =>
     .$post({
       json: data,
     })
-    .then((res) => res.json())
+    .then((res) => res.json() as Promise<{ data: { parcel: ParcelSelect } }>)
     .then((res) => {
       notifyDashboardMutation(["parcels", "daily", "production"])
-      return res.parcel
+      return res.data.parcel
     })
 
 const updateParcel = (id: string, data: ParcelUpdateInput) =>
@@ -55,12 +55,12 @@ const updateParcel = (id: string, data: ParcelUpdateInput) =>
       },
       json: data,
     })
-    .then((res) => res.json())
+    .then((res) => res.json() as Promise<{ data: { parcel: ParcelSelect } }>)
     .then((res) => {
       notifyDashboardMutation(["parcels", "daily", "production"], {
         parcelId: id,
       })
-      return res.parcel
+      return res.data.parcel
     })
 
 const deleteParcel = (id: string) =>
@@ -70,33 +70,33 @@ const deleteParcel = (id: string) =>
         id,
       },
     })
-    .then((res) => res.json())
+    .then((res) => res.json() as Promise<{ data: { id: string } }>)
     .then((res) => {
       notifyDashboardMutation(["parcels", "daily", "production"], {
         parcelId: id,
       })
-      return res.id
+      return res.data.id
     })
 
 const getParcelsMap = (): Promise<DashboardMapParcel[]> =>
   client.api.v1.parcel.map
     .$get()
-    .then((res) => res.json())
-    .then((res) => res.mapParcels)
+    .then((res) => res.json() as Promise<{ data: { mapParcels: DashboardMapParcel[] } }>)
+    .then((res) => res.data.mapParcels)
 
 const getParcelRecommendations = (
   parcelId: string
 ): Promise<DashboardRecommendation[]> =>
   client.api.v1.parcel[":id"].recommendations
     .$get({ param: { id: parcelId } })
-    .then((res) => res.json())
-    .then((res) => res.recommendations)
+    .then((res) => res.json() as Promise<{ data: { recommendations: DashboardRecommendation[] } }>)
+    .then((res) => res.data.recommendations)
 
 const getParcelRisks = (parcelId: string): Promise<DashboardRisks> =>
-  client.api.v1.parcel[":id"].risks
+  client.api.v1.parcel[":id"].weather
     .$get({ param: { id: parcelId } })
-    .then((res) => res.json())
-    .then((res) => res.risks)
+    .then((res) => res.json() as Promise<{ data: { weather: { data: { risks: DashboardRisks } } } }>)
+    .then((res) => res.data.weather.data.risks)
 
 const getParcelCropOverview = (
   parcelId: string,
@@ -107,29 +107,29 @@ const getParcelCropOverview = (
       param: { id: parcelId },
       query: toScopeQuery(scope),
     })
-    .then((res) => res.json())
-    .then((res) => res.olivar)
+    .then((res) => res.json() as Promise<{ data: { olivar: DashboardOlivar } }>)
+    .then((res) => res.data.olivar)
 
 const getParcelsCropOverviews = (
   scope: DashboardScopeParams
 ): Promise<DashboardParcelsCropOverviews> =>
-  client.api.v1.parcel["crop-overviews"]
-    .$get({ query: toScopeQuery(scope) })
-    .then((res) => res.json())
-    .then((res) => res.cropOverviews)
+  client.api.v1.parcel.dashboard
+    .$get({ query: { ...toScopeQuery(scope), include: "cropOverviews" } })
+    .then((res) => res.json() as Promise<{ data: { cropOverviews: DashboardParcelsCropOverviews } }>)
+    .then((res) => res.data.cropOverviews)
 
 const getParcelsRecommendations =
   (): Promise<DashboardParcelsRecommendations> =>
-    client.api.v1.parcel["parcels-recommendations"]
-      .$get()
-      .then((res) => res.json())
-      .then((res) => res.parcelsRecommendations)
+    client.api.v1.parcel.dashboard
+      .$get({ query: { include: "recommendations" } })
+      .then((res) => res.json() as Promise<{ data: { recommendations: DashboardParcelsRecommendations } }>)
+      .then((res) => res.data.recommendations)
 
 const getParcelsRisks = (): Promise<DashboardParcelsRisks> =>
-  client.api.v1.parcel["parcels-risks"]
-    .$get()
-    .then((res) => res.json())
-    .then((res) => res.parcelsRisks)
+  client.api.v1.parcel.dashboard
+    .$get({ query: { include: "risks" } })
+    .then((res) => res.json() as Promise<{ data: { risks: DashboardParcelsRisks } }>)
+    .then((res) => res.data.risks)
 
 const getParcelAgroclimate = (
   parcelId: string,
@@ -140,16 +140,16 @@ const getParcelAgroclimate = (
       param: { id: parcelId },
       query: toScopeQuery(scope),
     })
-    .then((res) => res.json())
-    .then((res) => res.agroclimate)
+    .then((res) => res.json() as Promise<{ data: { agroclimate: DashboardParcelAgroclimate } }>)
+    .then((res) => res.data.agroclimate)
 
 const getParcelsWeatherComparison = (
   scope: DashboardScopeParams
 ): Promise<DashboardParcelsWeatherComparison> =>
-  client.api.v1.parcel["weather-comparison"]
-    .$get({ query: toScopeQuery(scope) })
-    .then((res) => res.json())
-    .then((res) => res.comparison)
+  client.api.v1.parcel.dashboard
+    .$get({ query: { ...toScopeQuery(scope), include: "weatherComparison" } })
+    .then((res) => res.json() as Promise<{ data: { weatherComparison: DashboardParcelsWeatherComparison } }>)
+    .then((res) => res.data.weatherComparison)
 
 export const parcelApi = {
   getListParcels: getListParcels,

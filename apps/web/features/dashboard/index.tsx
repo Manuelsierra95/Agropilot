@@ -262,7 +262,7 @@ export default function DashboardOverview() {
             ) : risks.data ? (
               <RiskRadar
                 className="min-w-0 flex-[1.5]"
-                apiResponse={{ risks: risks.data }}
+                risks={risks.data}
               />
             ) : null}
           </div>
