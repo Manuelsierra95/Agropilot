@@ -51,7 +51,7 @@ export async function updateUserOnboarding(
   const status =
     step === 0
       ? "in_progress"
-      : step === ONBOARDING_TOTAL_STEPS
+      : step > ONBOARDING_TOTAL_STEPS
         ? "completed"
         : "in_progress"
 

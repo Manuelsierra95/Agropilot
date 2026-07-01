@@ -13,7 +13,7 @@ export const corsMiddleware: MiddlewareHandler<{ Bindings: Env }> = (
 
   return cors({
     origin: env.NODE_ENV === "production" ? ORIGINS : DEVORIGINS,
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: [
       "Content-Type",
       "Authorization",
