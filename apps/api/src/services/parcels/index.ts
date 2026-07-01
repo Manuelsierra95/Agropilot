@@ -3,17 +3,20 @@ export type {
   ParcelCashflowRow,
   ParcelWeatherQueryFilters,
   ParcelWeatherDailyRow,
-} from "@workspace/api/services/parcels/queries/get-parcel-queries"
+} from "@workspace/api/services/parcels/queries/get-parcel-cashflow-weather"
 
 export {
   getParcelNameForOrg,
   resolveParcelIdForOrg,
   listParcels,
   getParcelById,
+} from "@workspace/api/services/parcels/queries/list-parcels"
+
+export {
   queryParcelCashflow,
   queryParcelWeather,
   getParcelWeather,
-} from "@workspace/api/services/parcels/queries/get-parcel-queries"
+} from "@workspace/api/services/parcels/queries/get-parcel-cashflow-weather"
 
 export {
   getParcelsForMap,

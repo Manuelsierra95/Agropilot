@@ -1,10 +1,12 @@
-import { db, schema, eq, and, gte, lte } from "@workspace/db"
+import { db, schema, eq, and, asc, gte, lte } from "@workspace/db"
 import { z } from "zod"
+import { HTTPException } from "hono/http-exception"
 import {
   parcelWeatherDataSchema,
   type ParcelWeatherMetric,
 } from "@workspace/schemas"
 import type { RiskRecommendation } from "@workspace/api/services/weather/domain/weathercloud"
+import { mapDbRisksToDashboard } from "@workspace/api/services/parcels/mappers/parcel-dashboard.mapper"
 
 export type ParcelCashflowQueryFilters = {
   parcelId?: string
@@ -33,6 +35,16 @@ export type ParcelWeatherDailyRow = {
   parcelName: string
 }
 
+type WeatherRiskDetail = {
+  level?: string
+  score?: number
+  reasons?: string[]
+}
+
+type WeatherRiskWithRecommendations = WeatherRiskDetail & {
+  recommendations: RiskRecommendation[]
+}
+
 function weatherMetricValue(
   entry: z.infer<typeof parcelWeatherDataSchema>["daily"][number],
   metric: ParcelWeatherMetric
@@ -45,6 +57,52 @@ function weatherMetricValue(
     case "temperature":
       return entry.temperature
   }
+}
+
+function isRiskObject(value: unknown): value is WeatherRiskDetail {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+}
+
+function nestRecommendationsIntoRisks(
+  risks: Record<string, unknown>,
+  recommendations: RiskRecommendation[] | null
+): Record<string, WeatherRiskWithRecommendations | string | undefined> {
+  const recMap = new Map<string, RiskRecommendation[]>()
+
+  if (recommendations) {
+    for (const rec of recommendations) {
+      const existing = recMap.get(rec.riskType)
+      if (existing) {
+        existing.push(rec)
+      } else {
+        recMap.set(rec.riskType, [rec])
+      }
+    }
+  }
+
+  const result: Record<
+    string,
+    WeatherRiskWithRecommendations | string | undefined
+  > = {}
+
+  for (const [key, risk] of Object.entries(risks)) {
+    if (!risk) {
+      result[key] = undefined
+      continue
+    }
+
+    if (!isRiskObject(risk)) {
+      result[key] = risk as string
+      continue
+    }
+
+    result[key] = {
+      ...risk,
+      recommendations: recMap.get(key) ?? [],
+    }
+  }
+
+  return result
 }
 
 export async function queryParcelCashflow(
@@ -73,7 +131,7 @@ export async function queryParcelCashflow(
       gte(schema.parcelCashflowDaily.date, filters.from),
       lte(schema.parcelCashflowDaily.date, filters.to)
     ),
-    orderBy: [],
+    orderBy: [asc(schema.parcelCashflowDaily.date)],
     columns: {
       date: true,
       income: true,
@@ -127,4 +185,39 @@ export async function queryParcelWeather(
       parcelId: parcel.id,
       parcelName: parcel.name,
     }))
+}
+
+export async function getParcelWeather(
+  organizationId: string,
+  parcelId: string
+) {
+  const parcel = await db.query.parcels.findFirst({
+    where: and(
+      eq(schema.parcels.organizationId, organizationId),
+      eq(schema.parcels.id, parcelId)
+    ),
+    columns: { id: true },
+  })
+
+  if (!parcel) throw new HTTPException(404, { message: "Parcel not found" })
+
+  const weather = await db.query.parcelWeather.findFirst({
+    where: eq(schema.parcelWeather.parcelId, parcelId),
+  })
+
+  if (!weather) throw new HTTPException(404, { message: "Weather not found" })
+
+  const risksWithRecommendations = nestRecommendationsIntoRisks(
+    weather.risks as Record<string, unknown>,
+    weather.recommendations as RiskRecommendation[] | null
+  )
+
+  const { recommendations: _recs, ...weatherWithoutRecs } = weather
+
+  return {
+    data: {
+      ...weatherWithoutRecs,
+      risks: mapDbRisksToDashboard(risksWithRecommendations),
+    },
+  }
 }
