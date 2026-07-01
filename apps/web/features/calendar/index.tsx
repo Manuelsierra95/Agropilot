@@ -4,7 +4,7 @@ import { useMemo } from "react"
 
 import { PageContainer } from "@workspace/web/components/ui/page-container"
 import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
-import { WidgetSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
+import { WidgetSkeleton } from "@workspace/web/components/widget-skeleton"
 import { CalendarClient } from "@workspace/web/features/calendar/components/calendar/calendar-client"
 import { ActiveAlertsCard } from "@workspace/web/features/calendar/components/active-alerts-card"
 import { CampaignTimeline } from "@workspace/web/features/calendar/components/campaign-timeline"

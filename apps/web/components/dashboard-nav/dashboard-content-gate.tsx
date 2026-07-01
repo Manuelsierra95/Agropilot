@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react"
 
-import { DashboardSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
+import { DashboardSkeleton } from "@workspace/web/features/dashboard/components/dashboard-skeleton"
 import { useDashboardScopeTransition } from "@workspace/web/hooks/use-dashboard-scope-transition"
 import { cn } from "@workspace/ui/lib/utils"
 

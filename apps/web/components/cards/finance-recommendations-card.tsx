@@ -10,7 +10,7 @@ import {
 } from "lucide-react"
 
 import type { FinanceTransactionSnapshot } from "@workspace/web/lib/finance/types"
-import type { KpiItem } from "@workspace/web/features/dashboard/olive-price"
+import type { Item as KpiItem } from "@workspace/web/features/dashboard/components/olive-price"
 import { Gauge } from "@workspace/ui/components/charts"
 import { Badge } from "@workspace/ui/components/badge"
 import {
