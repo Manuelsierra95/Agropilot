@@ -21,7 +21,7 @@ import { ArrowRightIcon } from "lucide-react"
 import type { FinanceTransactionSnapshot } from "@workspace/web/lib/finance/types"
 import Link from "next/link"
 
-type TransactionSnapshot = FinanceTransactionSnapshot & {
+export type TransactionSnapshot = Omit<FinanceTransactionSnapshot, "date"> & {
   date: string | Date
 }
 

@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import type { FinanceTransactionSnapshot } from "@workspace/web/lib/finance/types"
-import type { Item } from "@workspace/web/features/dashboard/olive-price"
+import type { Item } from "@workspace/web/features/dashboard/components/olive-price"
 import { Gauge } from "@workspace/ui/components/charts"
 import { Card, CardHeader } from "@workspace/ui/components/card"
 import { cn } from "@workspace/ui/lib/utils"

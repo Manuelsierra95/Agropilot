@@ -10,7 +10,7 @@ import {
 import { Badge } from "@workspace/ui/components/badge"
 import { LinkButton } from "@workspace/web/components/ui/link-button"
 import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
-import type { ParcelApiResponse } from "@workspace/web/features/parcel/components/parcel-types"
+import type { ParcelApiResponse } from "@workspace/web/lib/parcel/types"
 
 type RecommendationsProps = ComponentProps<typeof Card> & {
   data: {

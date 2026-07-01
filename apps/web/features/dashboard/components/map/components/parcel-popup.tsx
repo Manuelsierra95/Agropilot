@@ -2,7 +2,7 @@
 
 import { MapPopup } from "@workspace/ui/components/map"
 
-import type { Parcel, ParcelLngLat } from "@workspace/web/features/dashboard/map/components/types"
+import type { Parcel, ParcelLngLat } from "@workspace/web/features/dashboard/components/map/components/types"
 import { GridIcon, SunIcon } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 

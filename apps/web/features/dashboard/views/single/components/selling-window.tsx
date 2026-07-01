@@ -16,7 +16,7 @@ import { useSellingWindowOverridesStore } from "@workspace/web/store/useSellingW
 import {
   getSellingWindowSignal,
   SELLING_WINDOW_SIGNAL_CONFIG,
-} from "@workspace/web/features/dashboard/selling-window-utils"
+} from "@workspace/web/features/dashboard/components/selling-window-utils"
 
 interface SellingWindowProps {
   className?: string
