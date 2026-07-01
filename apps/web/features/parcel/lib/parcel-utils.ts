@@ -1,6 +1,6 @@
 import { cn } from "@workspace/ui/lib/utils"
 
-import type { WeatherRiskLevel } from "@workspace/web/features/parcel/components/parcel-types"
+import type { WeatherRiskLevel } from "./parcel-types"
 
 export function formatNumber(value: number, maximumFractionDigits = 1) {
   return new Intl.NumberFormat("es-ES", {

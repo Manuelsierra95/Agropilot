@@ -34,8 +34,8 @@ import type {
   ParcelApiResponse,
   ParcelItem,
   YieldData,
-} from "@workspace/web/features/parcel/components/parcel-types"
-import { formatDateTime } from "@workspace/web/features/parcel/components/parcel-utils"
+} from "@workspace/web/features/parcel/lib/parcel-types"
+import { formatDateTime } from "@workspace/web/features/parcel/lib/parcel-utils"
 
 type TempTrend = AgroclimateMetrics["tempTrend"]
 
@@ -195,7 +195,7 @@ type ParcelHeroProps = {
   isAllSelected: boolean
   activeParcel?: ParcelItem
   parcelCount?: number
-  allModeSummary: AllModeSummary
+  allModeSummary?: AllModeSummary
   apiResponse?: ParcelApiResponse
   income?: number
   trend?: TempTrend

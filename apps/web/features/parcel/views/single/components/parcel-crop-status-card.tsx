@@ -19,8 +19,8 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { WeatherMetrics } from "@workspace/web/lib/parcel/types"
 
-import type { ParcelApiResponse, ParcelItem } from "@workspace/web/features/parcel/components/parcel-types"
-import { formatLongDate, formatNumber } from "@workspace/web/features/parcel/components/parcel-utils"
+import type { ParcelApiResponse, ParcelItem } from "@workspace/web/features/parcel/lib/parcel-types"
+import { formatLongDate, formatNumber } from "@workspace/web/features/parcel/lib/parcel-utils"
 
 const temperatureSparklineConfig = {
   temperatureAverage: {

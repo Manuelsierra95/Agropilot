@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import { PageContainer } from "@workspace/web/components/ui/page-container"
-import { WidgetSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
+import { WidgetSkeleton } from "@workspace/web/components/widget-skeleton"
 import { useCropOverview } from "@workspace/web/hooks/dashboard"
 import {
   useParcelAgroclimate,
@@ -19,17 +19,15 @@ import {
 } from "@workspace/web/lib/parcel/mappers"
 import { useDashboardListsStore } from "@workspace/web/store/useDashboardListsStore"
 
-import { ParcelAllView } from "@workspace/web/features/parcel/components/parcel-all-view"
-import { ParcelHero } from "@workspace/web/features/parcel/components/parcel-hero"
-import { ParcelSingleView } from "@workspace/web/features/parcel/components/parcel-single-view"
-import { EditParcel } from "@workspace/web/features/parcel/components/edit-parcel"
+import { ParcelAllView } from "@workspace/web/features/parcel/views/all"
+import { ParcelSingleView } from "@workspace/web/features/parcel/views/single"
 
 export default function Parcel() {
   const [scopeParams, setScopeParams] = useDashboardScopeParams()
   const { parcelId } = scopeParams
   const isAllParcels = useIsAllParcelsSelected()
   const parcels = useDashboardListsStore((s) => s.parcels)
-  const [editSheetOpen, setEditSheetOpen] = React.useState(false)
+  const isLoadingParcels = useDashboardListsStore((s) => s.isLoadingParcels)
 
   const activeParcel = React.useMemo(() => {
     if (isAllParcels || !parcelId) return undefined
@@ -64,6 +62,15 @@ export default function Parcel() {
 
   const isLoadingAll =
     isAllParcels && weatherComparison.isPending && !weatherComparison.data
+
+  if (isLoadingParcels) {
+    return (
+      <PageContainer className="gap-4">
+        <WidgetSkeleton contentHeight="h-[220px]" />
+        <WidgetSkeleton contentHeight="h-[420px]" />
+      </PageContainer>
+    )
+  }
 
   if (parcels.length === 0) {
     return (
@@ -111,43 +118,26 @@ export default function Parcel() {
 
   return (
     <PageContainer className="gap-4">
-      <ParcelHero
-        isAllSelected={isAllParcels}
-        activeParcel={activeParcel}
-        parcelCount={parcels.length}
-        allModeSummary={allModeSummary}
-        apiResponse={apiResponse}
-        agroclimate={heroAgroclimate}
-        income={cropOverview.data?.estimatedProfitability}
-        employeeCount={cropOverview.data?.participants}
-        tasksPending={cropOverview.data?.pendingTasks}
-        yieldData={yieldData}
-        onEditParcel={() => setEditSheetOpen(true)}
-      />
-
-        {activeParcel && (
-          <EditParcel
-            open={editSheetOpen}
-            onOpenChange={setEditSheetOpen}
-            parcel={activeParcel}
-            apiResponse={apiResponse}
-            onDeleteSuccess={() => {
-              void setScopeParams({ parcelId: null }, { history: "replace" })
-            }}
-          />
-        )}
-
-      {!isAllParcels && activeParcel && daily && metrics && apiResponse ? (
-        <ParcelSingleView
-          activeParcel={activeParcel}
-          daily={daily}
-          metrics={metrics}
-          apiResponse={apiResponse}
-        />
-      ) : (
+      {isAllParcels ? (
         <ParcelAllView
           parcelComparisonData={parcelComparisonData}
           allModeSummary={allModeSummary}
+          parcelCount={parcels.length}
+        />
+      ) : (
+        <ParcelSingleView
+          activeParcel={activeParcel!}
+          daily={daily!}
+          metrics={metrics!}
+          apiResponse={apiResponse}
+          agroclimate={heroAgroclimate}
+          income={cropOverview.data?.estimatedProfitability}
+          employeeCount={cropOverview.data?.participants}
+          tasksPending={cropOverview.data?.pendingTasks}
+          yieldData={yieldData}
+          onDeleteSuccess={() => {
+            void setScopeParams({ parcelId: null }, { history: "replace" })
+          }}
         />
       )}
     </PageContainer>
