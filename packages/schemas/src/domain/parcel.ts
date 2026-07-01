@@ -20,6 +20,24 @@ const parcelLocationFieldShape = {
   postalCode: z.string().nullish(),
 }
 
+export const oliveCropTypeSchema = z.enum([
+  "intensive",
+  "superintensive",
+  "traditional",
+])
+
+export const parcelCropDataSchema = z.object({
+  oliveCropType: oliveCropTypeSchema.optional(),
+})
+
+const parcelCropFieldShape = {
+  variety: z.string().nullish(),
+  soilType: z.string().nullish(),
+  plantingDate: z.string().datetime().optional().nullish(),
+  plantCount: z.coerce.number().int().positive().optional().nullish(),
+  data: parcelCropDataSchema.nullish(),
+}
+
 export const parcelCreateSchema = z.object({
   name: z.string().trim().min(1),
   cropType: z.enum(["olive"]),
@@ -28,6 +46,7 @@ export const parcelCreateSchema = z.object({
   centroid: z.string().nullish(),
   polygon: z.string().nullish(),
   ...parcelLocationFieldShape,
+  ...parcelCropFieldShape,
 })
 
 export const parcelUpdateInputSchema = z
@@ -39,6 +58,7 @@ export const parcelUpdateInputSchema = z
     centroid: z.string().nullish(),
     polygon: z.string().nullish(),
     ...parcelLocationFieldShape,
+    ...parcelCropFieldShape,
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: "At least one field must be provided",
@@ -59,6 +79,22 @@ export type ParcelUpdateInput = z.infer<typeof parcelUpdateInputSchema>
 export type ParcelCreateOutput = z.infer<typeof parcelCreateSchema> & GeoPoint
 export type ParcelUpdateOutput = z.infer<typeof parcelUpdateInputSchema> &
   GeoPoint
+
+export type ParcelCropData = z.infer<typeof parcelCropDataSchema>
+
+export type ParcelCrop = {
+  id: string
+  parcelId: string
+  variety: string | null
+  soilType: string | null
+  plantingDate: Date | null
+  plantCount: number | null
+  data: ParcelCropData
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type ParcelSelectWithCrop = ParcelSelect & { crop: ParcelCrop | null }
 
 export const parseParcelSelect = (value: unknown): ParcelSelect | null => {
   const parsed = parcelSelectSchema.safeParse(value)
