@@ -5,7 +5,10 @@ import * as React from "react"
 import { PageContainer } from "@workspace/web/components/ui/page-container"
 import { WidgetSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
 import { useCropOverview } from "@workspace/web/hooks/dashboard"
-import { useParcelAgroclimate, useParcelsWeatherComparison } from "@workspace/web/hooks/parcel"
+import {
+  useParcelAgroclimate,
+  useParcelsWeatherComparison,
+} from "@workspace/web/hooks/parcel"
 import { useIsAllParcelsSelected } from "@workspace/web/hooks/use-is-all-parcels-selected"
 import { useDashboardScopeParams } from "@workspace/web/hooks/use-dashboard-scope-params"
 import {
@@ -19,10 +22,11 @@ import { useDashboardListsStore } from "@workspace/web/store/useDashboardListsSt
 import { ParcelAllView } from "@workspace/web/features/parcel/components/parcel-all-view"
 import { ParcelHero } from "@workspace/web/features/parcel/components/parcel-hero"
 import { ParcelSingleView } from "@workspace/web/features/parcel/components/parcel-single-view"
-import { EditParcelSheet } from "@workspace/web/features/parcel/components/edit-parcel-sheet"
+import { EditParcel } from "@workspace/web/features/parcel/components/edit-parcel"
 
 export default function Parcel() {
-  const [{ parcelId }] = useDashboardScopeParams()
+  const [scopeParams, setScopeParams] = useDashboardScopeParams()
+  const { parcelId } = scopeParams
   const isAllParcels = useIsAllParcelsSelected()
   const parcels = useDashboardListsStore((s) => s.parcels)
   const [editSheetOpen, setEditSheetOpen] = React.useState(false)
@@ -39,13 +43,12 @@ export default function Parcel() {
 
   const apiResponse = agroclimate.data
   const parcelComparisonData = weatherComparison.data?.items ?? []
-  const allModeSummary =
-    weatherComparison.data?.summary ?? {
-      totalArea: 0,
-      avgRain30d: 0,
-      avgTemp: 0,
-      highWaterStressCount: 0,
-    }
+  const allModeSummary = weatherComparison.data?.summary ?? {
+    totalArea: 0,
+    avgRain30d: 0,
+    avgTemp: 0,
+    highWaterStressCount: 0,
+  }
 
   const heroAgroclimate = cropOverview.data
     ? cropOverviewToAgroclimateMetrics(cropOverview.data)
@@ -60,9 +63,7 @@ export default function Parcel() {
       (cropOverview.isPending && !cropOverview.data))
 
   const isLoadingAll =
-    isAllParcels &&
-    weatherComparison.isPending &&
-    !weatherComparison.data
+    isAllParcels && weatherComparison.isPending && !weatherComparison.data
 
   if (parcels.length === 0) {
     return (
@@ -124,14 +125,17 @@ export default function Parcel() {
         onEditParcel={() => setEditSheetOpen(true)}
       />
 
-      {activeParcel && (
-        <EditParcelSheet
-          open={editSheetOpen}
-          onOpenChange={setEditSheetOpen}
-          parcel={activeParcel}
-          apiResponse={apiResponse}
-        />
-      )}
+        {activeParcel && (
+          <EditParcel
+            open={editSheetOpen}
+            onOpenChange={setEditSheetOpen}
+            parcel={activeParcel}
+            apiResponse={apiResponse}
+            onDeleteSuccess={() => {
+              void setScopeParams({ parcelId: null }, { history: "replace" })
+            }}
+          />
+        )}
 
       {!isAllParcels && activeParcel && daily && metrics && apiResponse ? (
         <ParcelSingleView

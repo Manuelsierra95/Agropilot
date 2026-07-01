@@ -2,3 +2,4 @@ export { useParcelAgroclimate } from "@workspace/web/hooks/parcel/use-parcel-agr
 export { useParcels } from "@workspace/web/hooks/parcel/use-parcels"
 export { useParcelsWeatherComparison } from "@workspace/web/hooks/parcel/use-parcels-weather-comparison"
 export { useUpdateParcel } from "@workspace/web/hooks/parcel/use-update-parcel"
+export { useDeleteParcel } from "@workspace/web/hooks/parcel/use-delete-parcel"

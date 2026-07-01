@@ -6,6 +6,7 @@ import {
   ParcelSelect,
   ParcelCreateInput,
   ParcelUpdateInput,
+  type ParcelSelectWithCrop,
   type DashboardMapParcel,
   type DashboardOlivar,
   type DashboardParcelAgroclimate,
@@ -18,21 +19,31 @@ import {
 } from "@workspace/schemas"
 import { cache } from "react"
 
-const getListParcels = (): Promise<ParcelSelect[]> =>
+const getListParcels = (): Promise<ParcelSelectWithCrop[]> =>
   client.api.v1.parcel
     .$get()
-    .then((res) => res.json() as Promise<{ data: { parcels: ParcelSelect[] } }>)
+    .then(
+      (res) =>
+        res.json() as unknown as Promise<{
+          data: { parcels: ParcelSelectWithCrop[] }
+        }>
+    )
     .then((res) => res.data.parcels)
 
 const getParcelById = cache(
-  (id: string): Promise<ParcelSelect> =>
+  (id: string): Promise<ParcelSelectWithCrop> =>
     client.api.v1.parcel[":id"]
       .$get({
         param: {
           id,
         },
       })
-      .then((res) => res.json() as Promise<{ data: { parcel: ParcelSelect } }>)
+      .then(
+        (res) =>
+          res.json() as unknown as Promise<{
+            data: { parcel: ParcelSelectWithCrop }
+          }>
+      )
       .then((res) => res.data.parcel)
 )
 

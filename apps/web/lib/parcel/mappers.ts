@@ -2,7 +2,7 @@ import type {
   DashboardOlivar,
   DashboardParcelAgroclimate,
   DashboardParcelsWeatherComparison,
-  ParcelSelect,
+  ParcelSelectWithCrop,
 } from "@workspace/schemas"
 import { squareMetersToHectares } from "@workspace/schemas"
 
@@ -16,13 +16,26 @@ import type {
   YieldData,
 } from "@workspace/web/lib/parcel/types"
 
-export function toParcelItem(parcel: ParcelSelect): ParcelItem {
+export function toParcelItem(parcel: ParcelSelectWithCrop): ParcelItem {
   return {
     id: parcel.id,
     name: parcel.name,
     area: parcel.areaM2 ? squareMetersToHectares(parcel.areaM2) : 0,
     type: parcel.cropType,
-    irrigationType: parcel.irrigationType,
+    irrigationType: parcel.irrigationType ?? "",
+    crop: parcel.crop
+      ? {
+          variety: parcel.crop.variety,
+          soilType: parcel.crop.soilType,
+          plantingDate: parcel.crop.plantingDate
+            ? typeof parcel.crop.plantingDate === "string"
+              ? parcel.crop.plantingDate
+              : parcel.crop.plantingDate.toISOString()
+            : null,
+          plantCount: parcel.crop.plantCount,
+          data: parcel.crop.data,
+        }
+      : null,
   }
 }
 

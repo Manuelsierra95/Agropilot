@@ -8,6 +8,15 @@ export type ParcelItem = {
   area: number
   type: string
   irrigationType: string
+  crop?: {
+    variety: string | null
+    soilType: string | null
+    plantingDate: string | null
+    plantCount: number | null
+    data: {
+      oliveCropType?: "intensive" | "superintensive" | "traditional"
+    } | null
+  } | null
 }
 
 export type ParcelApiDailyItem = {
