@@ -16,7 +16,10 @@ import {
 import { Mail, Plus } from "lucide-react"
 import { organizationApi } from "@workspace/web/lib/api/routes/organization"
 import { OnboardingSplitLayout } from "@workspace/web/features/onboarding/components/onboarding-split-layout"
-import { TeamInvitesPreview, TeamInvitesSendBar } from "@workspace/web/features/onboarding/components/team/team-preview"
+import {
+  TeamInvitesPreview,
+  TeamInvitesSendBar,
+} from "@workspace/web/features/onboarding/components/team/team-preview"
 import {
   TEAM_ROLE_LABELS,
   type TeamInviteDraft,
@@ -38,6 +41,7 @@ const inviteEmailSchema = z
 interface TeamInvitesProps {
   invites: TeamInviteDraft[]
   onInvitesChange: (invites: TeamInviteDraft[]) => void
+  initialSent?: boolean
   onContinue?: () => void
   onSkip?: () => void
 }
@@ -45,10 +49,11 @@ interface TeamInvitesProps {
 export function TeamInvites({
   invites,
   onInvitesChange,
+  initialSent = false,
   onContinue,
   onSkip,
 }: TeamInvitesProps) {
-  const [sent, setSent] = useState(false)
+  const [sent, setSent] = useState(initialSent)
   const [isSending, setIsSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
   const [draftEmail, setDraftEmail] = useState("")

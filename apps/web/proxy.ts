@@ -13,18 +13,20 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/auth/sign-in", request.url))
   }
 
-  const { onboardingStatus } = session.user
+  const { onboardingStatus, onboardingStep } = session.user
   const needsOnboarding =
     onboardingStatus === "not_started" || onboardingStatus === "in_progress"
 
-  // TODO: Descomentar
-  // if (needsOnboarding && pathname.startsWith("/dashboard")) {
-  //   return NextResponse.redirect(new URL("/onboarding", request.url))
-  // }
+  if (needsOnboarding && pathname.startsWith("/dashboard")) {
+    const step = onboardingStep ?? 1
+    return NextResponse.redirect(
+      new URL(`/onboarding?step=${step}`, request.url)
+    )
+  }
 
-  // if (!needsOnboarding && pathname.startsWith("/onboarding")) {
-  //   return NextResponse.redirect(new URL("/dashboard", request.url))
-  // }
+  if (!needsOnboarding && pathname.startsWith("/onboarding")) {
+    return NextResponse.redirect(new URL("/dashboard", request.url))
+  }
 
   return NextResponse.next()
 }

@@ -1,7 +1,6 @@
 "use client"
 
 import { useMemo, useTransition } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@workspace/ui/components/button"
 import { Badge } from "@workspace/ui/components/badge"
 import {
@@ -12,7 +11,6 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 import { Separator } from "@workspace/ui/components/separator"
-import { client } from "@workspace/web/lib/api/client"
 import { formatCurrency } from "@workspace/web/features/finance/table/helpers"
 import {
   CROP_TYPE_LABELS,
@@ -27,13 +25,12 @@ import {
 } from "@workspace/web/features/onboarding/mocks/onboarding-mocks"
 import { CheckCircle2, Euro, MapPin, Users } from "lucide-react"
 
-const ONBOARDING_COMPLETE_STEP = 4
-
 interface OnboardingSummaryProps {
   parcels: FieldFormData[]
   financeRows: FinanceBulkRow[]
   teamInvites: TeamInviteDraft[]
   onEditParcels?: () => void
+  onFinish?: () => void
 }
 
 export function OnboardingSummary({
@@ -41,8 +38,8 @@ export function OnboardingSummary({
   financeRows,
   teamInvites,
   onEditParcels,
+  onFinish,
 }: OnboardingSummaryProps) {
-  const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
   const validInvites = useMemo(
@@ -65,14 +62,7 @@ export function OnboardingSummary({
 
   const handleFinish = () => {
     startTransition(async () => {
-      try {
-        await client.api.v1.user.me.$patch({
-          json: { onboardingStep: ONBOARDING_COMPLETE_STEP },
-        })
-      } catch {
-        // Redirigimos igual: el proxy volverá a onboarding si el estado no se guardó
-      }
-      router.push("/dashboard")
+      await onFinish?.()
     })
   }
 

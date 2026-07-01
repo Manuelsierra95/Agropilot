@@ -1,13 +1,17 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Progress } from "@workspace/ui/components/progress"
 import { OnboardingHeader } from "@workspace/web/features/onboarding/components/onboarding-header"
 import {
   OnboardingStep,
   type OnboardingStepRenderer,
 } from "@workspace/web/features/onboarding/components/onboarding-step"
-import { CreateParcel, type FieldFormData } from "@workspace/web/features/onboarding/components/parcel"
+import {
+  CreateParcel,
+  type FieldFormData,
+} from "@workspace/web/features/onboarding/components/parcel"
 import { createParcelDraft } from "@workspace/web/features/onboarding/components/parcel/parcel-draft-utils"
 import {
   toParcelCreateInput,
@@ -16,21 +20,88 @@ import {
 import { BulkFinance } from "@workspace/web/features/onboarding/components/finance/bulk-finance"
 import { TeamInvites } from "@workspace/web/features/onboarding/components/team"
 import { OnboardingSummary } from "@workspace/web/features/onboarding/components/onboarding-summary"
-import type { FinanceBulkRow, TeamInviteDraft } from "@workspace/web/features/onboarding/mocks/onboarding-mocks"
+import type {
+  FinanceBulkRow,
+  TeamInviteDraft,
+} from "@workspace/web/features/onboarding/mocks/onboarding-mocks"
+import { useOnboardingResume } from "@workspace/web/features/onboarding/use-onboarding-resume"
 import { parcelApi } from "@workspace/web/lib/api/routes/parcel"
 import { userApi } from "@workspace/web/lib/api/routes/user"
 
-const ONBOARDING_STEP_AFTER_PARCELS = 2
+const TOTAL_STEPS = 4
+const COMPLETED_STEP = TOTAL_STEPS + 1
 
-function createInitialParcelState() {
+interface OnboardingFlowProps {
+  initialStep: number
+}
+
+function createInitialParcelState(parcels: FieldFormData[] = []): {
+  parcels: FieldFormData[]
+  activeParcelId: string
+} {
+  if (parcels.length > 0) {
+    return { parcels, activeParcelId: parcels[0]!.id }
+  }
   const draft = createParcelDraft()
   return { parcels: [draft], activeParcelId: draft.id }
 }
 
-export default function OnboardingFlow() {
-  const [currentStep, setCurrentStep] = useState(1)
-  const [parcelState, setParcelState] = useState(createInitialParcelState)
+export default function OnboardingFlow({ initialStep }: OnboardingFlowProps) {
+  const router = useRouter()
+  const [currentStep, setCurrentStep] = useState(initialStep)
+  const [parcelState, setParcelState] = useState(() =>
+    createInitialParcelState()
+  )
   const { parcels, activeParcelId } = parcelState
+  const [financeRows, setFinanceRows] = useState<FinanceBulkRow[]>([])
+  const [teamInvites, setTeamInvites] = useState<TeamInviteDraft[]>([])
+  const [financeImported, setFinanceImported] = useState(false)
+  const [teamSent, setTeamSent] = useState(false)
+
+  const {
+    parcels: resumedParcels,
+    financeRows: resumedFinanceRows,
+    teamInvites: resumedTeamInvites,
+    isLoading,
+  } = useOnboardingResume(initialStep)
+
+  useEffect(() => {
+    router.replace(`/onboarding?step=${currentStep}`, { scroll: false })
+  }, [currentStep, router])
+
+  useEffect(() => {
+    if (isLoading) return
+
+    setParcelState((prev) => {
+      if (resumedParcels.length > 0) {
+        return {
+          parcels: resumedParcels,
+          activeParcelId: resumedParcels[0]!.id,
+        }
+      }
+      if (initialStep >= 2 && prev.parcels.length === 0) {
+        const draft = createParcelDraft()
+        return { parcels: [draft], activeParcelId: draft.id }
+      }
+      return prev
+    })
+
+    if (resumedFinanceRows.length > 0) {
+      setFinanceRows(resumedFinanceRows)
+      setFinanceImported(true)
+    }
+
+    if (resumedTeamInvites.length > 0) {
+      setTeamInvites(resumedTeamInvites)
+      setTeamSent(true)
+    }
+  }, [
+    resumedParcels,
+    resumedFinanceRows,
+    resumedTeamInvites,
+    isLoading,
+    initialStep,
+  ])
 
   const setParcels = useCallback(
     (
@@ -47,23 +118,43 @@ export default function OnboardingFlow() {
   const setActiveParcelId = useCallback((id: string) => {
     setParcelState((state) => ({ ...state, activeParcelId: id }))
   }, [])
-  const [financeRows, setFinanceRows] = useState<FinanceBulkRow[]>([])
-  const [teamInvites, setTeamInvites] = useState<TeamInviteDraft[]>([])
 
-  const totalSteps = 4
-  const progress = (currentStep / totalSteps) * 100
-
-  const goNext = useCallback(() => {
-    setCurrentStep((step) => Math.min(step + 1, totalSteps))
+  const saveStep = useCallback(async (step: number) => {
+    await userApi.updateOnboarding(step).catch(() => undefined)
   }, [])
 
-  const goBack = useCallback(() => {
-    setCurrentStep((step) => Math.max(step - 1, 1))
-  }, [])
+  const updateStep = useCallback(
+    async (step: number) => {
+      const validStep = Math.min(Math.max(step, 1), TOTAL_STEPS)
+      setCurrentStep(validStep)
+      await saveStep(validStep)
+    },
+    [saveStep]
+  )
 
-  const goToStep = useCallback((step: number) => {
-    setCurrentStep(Math.min(Math.max(step, 1), totalSteps))
-  }, [])
+  const goNext = useCallback(async () => {
+    await updateStep(currentStep + 1)
+  }, [currentStep, updateStep])
+
+  const goBack = useCallback(async () => {
+    await updateStep(currentStep - 1)
+  }, [currentStep, updateStep])
+
+  const goToStep = useCallback(
+    async (step: number) => {
+      await updateStep(step)
+    },
+    [updateStep]
+  )
+
+  const handleFinish = useCallback(async () => {
+    try {
+      await userApi.updateOnboarding(COMPLETED_STEP)
+      router.push("/dashboard")
+    } catch {
+      // Si falla el guardado, permanecemos en el resumen para que el usuario reintente
+    }
+  }, [router])
 
   const handleAddParcel = useCallback(() => {
     const draft = createParcelDraft()
@@ -144,13 +235,7 @@ export default function OnboardingFlow() {
     [parcels]
   )
 
-  const handleContinueFromParcels = useCallback(async () => {
-    await userApi
-      .updateOnboarding(ONBOARDING_STEP_AFTER_PARCELS)
-      .catch(() => undefined)
-
-    goNext()
-  }, [goNext])
+  const progress = (currentStep / TOTAL_STEPS) * 100
 
   const steps = useMemo<OnboardingStepRenderer[]>(
     () => [
@@ -165,7 +250,7 @@ export default function OnboardingFlow() {
           onPolygonChange={handlePolygonChange}
           onCentroidChange={handleCentroidChange}
           onSaveParcel={handleSaveParcel}
-          onContinue={handleContinueFromParcels}
+          onContinue={goNext}
         />
       ),
       ({ onContinue, onSkip }) => (
@@ -173,6 +258,7 @@ export default function OnboardingFlow() {
           parcels={parcels}
           rows={financeRows}
           onRowsChange={setFinanceRows}
+          initialImported={financeImported}
           onContinue={onContinue}
           onSkip={onSkip}
         />
@@ -181,6 +267,7 @@ export default function OnboardingFlow() {
         <TeamInvites
           invites={teamInvites}
           onInvitesChange={setTeamInvites}
+          initialSent={teamSent}
           onContinue={onContinue}
           onSkip={onSkip}
         />
@@ -191,6 +278,7 @@ export default function OnboardingFlow() {
           financeRows={financeRows}
           teamInvites={teamInvites}
           onEditParcels={() => goToStep(1)}
+          onFinish={handleFinish}
         />
       ),
     ],
@@ -198,25 +286,36 @@ export default function OnboardingFlow() {
       parcels,
       activeParcelId,
       financeRows,
+      financeImported,
       teamInvites,
+      teamSent,
       handleAddParcel,
       handleRemoveParcel,
       handlePolygonChange,
       handleCentroidChange,
       handleSaveParcel,
-      handleContinueFromParcels,
+      goNext,
       goToStep,
+      handleFinish,
       setParcels,
       setActiveParcelId,
     ]
   )
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center bg-background">
+        <p className="text-muted-foreground">Cargando onboarding…</p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex h-screen flex-col bg-background">
       <Progress value={progress} className="h-1 rounded-none" />
       <OnboardingHeader
         currentStep={currentStep}
-        totalSteps={totalSteps}
+        totalSteps={TOTAL_STEPS}
         onBack={currentStep > 1 ? goBack : undefined}
       />
 

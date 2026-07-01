@@ -100,6 +100,7 @@ interface BulkFinanceProps {
   parcels: FieldFormData[]
   rows: TransactionBulkRow[]
   onRowsChange: (rows: TransactionBulkRow[]) => void
+  initialImported?: boolean
   onContinue?: () => void
   onSkip?: () => void
 }
@@ -108,16 +109,26 @@ export function BulkFinance({
   parcels,
   rows,
   onRowsChange,
+  initialImported = false,
   onContinue,
   onSkip,
 }: BulkFinanceProps) {
   const [pasteValue, setPasteValue] = useState("")
   const [parseError, setParseError] = useState<string | null>(null)
   const [rowsAreExample, setRowsAreExample] = useState(false)
-  const [imported, setImported] = useState(false)
+  const [imported, setImported] = useState(initialImported)
   const [isImporting, setIsImporting] = useState(false)
   const [importError, setImportError] = useState<string | null>(null)
   const [selectedParcelId, setSelectedParcelId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (initialImported && rows.length > 0) {
+      const firstParcelId = rows.find((row) => row.parcelId)?.parcelId
+      if (firstParcelId) {
+        setSelectedParcelId(firstParcelId)
+      }
+    }
+  }, [initialImported, rows])
 
   const savedParcels = useMemo(
     () => parcels.filter((parcel) => Boolean(parcel.serverId)),
@@ -131,7 +142,10 @@ export function BulkFinance({
     }
 
     setSelectedParcelId((current) => {
-      if (current && savedParcels.some((parcel) => parcel.serverId === current)) {
+      if (
+        current &&
+        savedParcels.some((parcel) => parcel.serverId === current)
+      ) {
         return current
       }
       return null
@@ -401,8 +415,8 @@ export function BulkFinance({
           <Label htmlFor="finance-parcel">Parcela</Label>
           {!hasSavedParcels ? (
             <p className="text-sm text-destructive">
-              Guarda al menos una parcela en el paso anterior para poder importar
-              movimientos.
+              Guarda al menos una parcela en el paso anterior para poder
+              importar movimientos.
             </p>
           ) : savedParcels.length === 1 ? (
             <p className="text-sm text-muted-foreground">
