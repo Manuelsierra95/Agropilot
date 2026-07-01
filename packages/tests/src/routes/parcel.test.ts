@@ -68,6 +68,30 @@ describe("parcel routes", () => {
     expect(body.data.parcel.id).toBe("p-new")
   })
 
+  it("POST /parcel accepts crop fields", async () => {
+    mockAuthenticatedSession()
+    parcelMocks.createParcel.mockResolvedValue({ id: "p-new", name: "Nueva" })
+
+    const res = await apiRequest(app, "/api/v1/parcel", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Nueva",
+        cropType: "olive",
+        irrigationType: "dryland",
+        variety: "Picual",
+        soilType: "Arcilloso",
+        plantingDate: "2020-03-15T00:00:00.000Z",
+        plantCount: 1200,
+        data: { oliveCropType: "superintensive" },
+      }),
+    })
+
+    expect(res.status).toBe(201)
+    const body = await res.json()
+    expect(body.data.parcel.id).toBe("p-new")
+  })
+
   it("POST /parcel returns 400 for invalid payload", async () => {
     mockAuthenticatedSession()
 
@@ -88,6 +112,28 @@ describe("parcel routes", () => {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "Actualizada" }),
+    })
+
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.meta.parcelId).toBe("p-1")
+  })
+
+  it("PUT /parcel/:id accepts crop fields", async () => {
+    mockAuthenticatedSession()
+    parcelMocks.updateParcel.mockResolvedValue({ id: "p-1" })
+
+    const res = await apiRequest(app, "/api/v1/parcel/p-1", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Actualizada",
+        variety: "Picual",
+        soilType: "Arcilloso",
+        plantingDate: "2020-03-15T00:00:00.000Z",
+        plantCount: 1200,
+        data: { oliveCropType: "intensive" },
+      }),
     })
 
     expect(res.status).toBe(200)
