@@ -23,7 +23,13 @@ export function useDashboardOverview() {
 
   const query = useQuery({
     queryKey: dashboardQueryKeys.overview(scope),
-    queryFn: () => api.dashboard.getDashboardOverview(scope),
+    queryFn: async () => {
+      const data = await api.dashboard.getDashboardOverview(scope)
+      if (data === undefined) {
+        throw new Error("Dashboard overview returned undefined")
+      }
+      return data
+    },
     placeholderData: keepPreviousData,
     ...mutationQueryOptions,
   })

@@ -48,7 +48,7 @@ export function ResumeCropAll({ className, items }: ResumeCropAllProps) {
           </p>
         ) : (
           <ScrollArea className="max-h-[180px] @min-[1100px]/main:max-h-[220px]">
-            <ul className="divide-y divide-border/40 pr-3">
+            <ul className="w-full divide-y divide-border/40 pr-3">
               {items.map((item) => {
                 const yieldPerTree =
                   item.totalTrees > 0 ? item.totalYieldKg / item.totalTrees : 0
