@@ -144,7 +144,13 @@ type MetricCellProps = {
   }
 }
 
-function MetricCell({ value, label, tooltip, href, linkProps }: MetricCellProps) {
+function MetricCell({
+  value,
+  label,
+  tooltip,
+  href,
+  linkProps,
+}: MetricCellProps) {
   const inner = (
     <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 px-4 py-4 transition-colors hover:bg-muted/40">
       <div className="text-xl leading-none font-semibold tabular-nums">
@@ -404,15 +410,11 @@ export function ParcelHero({
               </span>
               <GradientSeparator orientation="vertical" />
               <span className="text-sm text-muted-foreground">
-                Estación: {apiResponse.summary.stationId}
-              </span>
-              <GradientSeparator orientation="vertical" />
-              <span className="text-sm text-muted-foreground">
                 {activeParcel.type}
               </span>
               <GradientSeparator orientation="vertical" />
               <span className="text-sm text-muted-foreground">
-                {activeParcel.area} ha
+                {activeParcel.area} m²
               </span>
               <GradientSeparator orientation="vertical" />
               <span className="flex items-center gap-2 text-sm text-muted-foreground">
