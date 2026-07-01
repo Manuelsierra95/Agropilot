@@ -5,7 +5,10 @@ import { HTTPException } from "hono/http-exception"
 export async function listParcels(organizationId: string): Promise<ParcelSelect[]> {
   return db.query.parcels.findMany({
     where: eq(schema.parcels.organizationId, organizationId),
-  })
+    with: {
+      crop: true,
+    },
+  }) as Promise<ParcelSelect[]>
 }
 
 export async function getParcelById(
@@ -17,13 +20,16 @@ export async function getParcelById(
       eq(schema.parcels.organizationId, organizationId),
       eq(schema.parcels.id, parcelId)
     ),
+    with: {
+      crop: true,
+    },
   })
 
   if (!parcel) {
     throw new HTTPException(404, { message: "Parcel not found" })
   }
 
-  return parcel
+  return parcel as ParcelSelect
 }
 
 export async function getParcelNameForOrg(

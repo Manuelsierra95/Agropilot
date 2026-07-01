@@ -5,6 +5,7 @@ import type {
   ParcelUpdateOutput,
   ParcelCreateInput,
   ParcelUpdateInput,
+  ParcelCropData,
 } from "@workspace/schemas"
 import { getStations } from "@workspace/api/services/weather"
 import { geoService } from "@workspace/api/services/shared/geometry-utils"
@@ -84,6 +85,22 @@ function splitLocationInput<
   }
 }
 
+function extractCropFields(data: {
+  variety?: string | null
+  soilType?: string | null
+  plantingDate?: string | null
+  plantCount?: number | null
+  data?: ParcelCropData | null
+}): ParcelCropValues {
+  return {
+    variety: data.variety ?? null,
+    soilType: data.soilType ?? null,
+    plantingDate: data.plantingDate ? new Date(data.plantingDate) : null,
+    plantCount: data.plantCount ?? null,
+    data: data.data ?? {},
+  }
+}
+
 async function upsertParcelLocation(
   tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
   parcelId: string,
@@ -107,11 +124,61 @@ async function upsertParcelLocation(
   })
 }
 
+type ParcelCropValues = {
+  variety: string | null
+  soilType: string | null
+  plantingDate: Date | null
+  plantCount: number | null
+  data: ParcelCropData
+}
+
+function hasCropValues(values: Partial<ParcelCropValues>): boolean {
+  return (
+    values.variety !== undefined ||
+    values.soilType !== undefined ||
+    values.plantingDate !== undefined ||
+    values.plantCount !== undefined ||
+    values.data !== undefined
+  )
+}
+
+async function upsertParcelCrop(
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+  parcelId: string,
+  crop: ParcelCropValues
+) {
+  const existing = await tx.query.parcelCrops.findFirst({
+    where: eq(schema.parcelCrops.parcelId, parcelId),
+  })
+
+  const values = {
+    variety: crop.variety ?? null,
+    soilType: crop.soilType ?? null,
+    plantingDate: crop.plantingDate,
+    plantCount: crop.plantCount ?? null,
+    data: crop.data ?? {},
+  }
+
+  if (existing) {
+    await tx
+      .update(schema.parcelCrops)
+      .set(values)
+      .where(eq(schema.parcelCrops.parcelId, parcelId))
+    return
+  }
+
+  await tx.insert(schema.parcelCrops).values({
+    parcelId,
+    ...values,
+  })
+}
+
 export async function createParcel(
   organizationId: string,
   data: ParcelCreateInput
 ): Promise<ParcelCreateOutput> {
   const { parcelData, location, hasLocation } = splitLocationInput(data)
+  const crop = extractCropFields(data)
   const fallbackAreaM2 = resolveParcelAreaM2(parcelData.areaM2)
 
   const computedAreaM2 = parcelData.polygon
@@ -152,6 +219,10 @@ export async function createParcel(
       })
     }
 
+    if (hasCropValues(crop)) {
+      await upsertParcelCrop(tx, created.id, crop)
+    }
+
     // opcional side-effect
     if (created.lat && created.lng) {
       queueMicrotask(() => {
@@ -169,6 +240,7 @@ export async function updateParcel(
   data: ParcelUpdateInput
 ): Promise<ParcelUpdateOutput> {
   const { parcelData, location } = splitLocationInput(data)
+  const crop = extractCropFields(data)
   const { areaM2, ...restParcelData } = parcelData
 
   const fallbackAreaM2 =
@@ -215,6 +287,10 @@ export async function updateParcel(
     }
 
     await upsertParcelLocation(tx, updated.id, location)
+
+    if (hasCropValues(crop)) {
+      await upsertParcelCrop(tx, updated.id, crop)
+    }
 
     if (shouldReassignStations && updated.lat && updated.lng) {
       queueMicrotask(() => {
