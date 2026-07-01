@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react"
 import { Button } from "@workspace/ui/components/button"
 import { ArrowRight } from "lucide-react"
-import { AnimatedSphere } from "@workspace/web/features/landing/animated-sphere"
+import { SeamlessVideo } from "./seamless-video"
 
-const words = ["create", "build", "scale", "ship"]
+const words = ["decidir", "gestionar", "anticipar", "rentabilizar"]
 
 export function HeroSection() {
   const [isVisible, setIsVisible] = useState(false)
@@ -24,10 +24,15 @@ export function HeroSection() {
 
   return (
     <section className="relative flex min-h-screen flex-col justify-center overflow-hidden">
-      {/* Animated sphere background */}
-      <div className="pointer-events-none absolute top-1/2 right-0 h-[600px] w-[600px] -translate-y-1/2 opacity-40 lg:h-[800px] lg:w-[800px]">
-        <AnimatedSphere />
-      </div>
+      <SeamlessVideo
+        src="/ascii-flower.webm"
+        fadeSeconds={1}
+        visible={isVisible}
+        maxOpacity={0.4}
+        appearDuration={1000}
+        bottomFade
+        className="pointer-events-none absolute top-1/2 right-0 h-[600px] w-[600px] -translate-y-1/2 opacity-40 lg:h-[800px] lg:w-[800px]"
+      />
 
       {/* Subtle grid lines */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-30">
@@ -64,7 +69,7 @@ export function HeroSection() {
         >
           <span className="inline-flex items-center gap-3 font-mono text-sm text-muted-foreground">
             <span className="h-px w-8 bg-foreground/30" />
-            The platform for modern teams
+            La plataforma para el cultivo moderno
           </span>
         </div>
 
@@ -77,9 +82,9 @@ export function HeroSection() {
                 : "translate-y-8 opacity-0"
             }`}
           >
-            <span className="block">The platform</span>
+            <span className="block">La plataforma</span>
             <span className="block">
-              to{" "}
+              para{" "}
               <span className="relative inline-block">
                 <span key={wordIndex} className="inline-flex">
                   {words[wordIndex].split("").map((char, i) => (
@@ -109,8 +114,9 @@ export function HeroSection() {
                 : "translate-y-4 opacity-0"
             }`}
           >
-            Your toolkit to stop configuring and start innovating. Securely
-            build, deploy, and scale the best experiences.
+            Controla tus parcelas, anticipa riesgos y maximiza tu margen. Datos
+            meteorológicos, precios del aceite e inteligencia artificial en un
+            solo lugar.
           </p>
 
           {/* CTAs */}
@@ -125,7 +131,7 @@ export function HeroSection() {
               size="lg"
               className="group h-14 rounded-full bg-foreground px-8 text-base text-background hover:bg-foreground/90"
             >
-              Start free trial
+              Empieza gratis
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
             <Button
@@ -133,7 +139,7 @@ export function HeroSection() {
               variant="outline"
               className="h-14 rounded-full border-foreground/20 px-8 text-base hover:bg-foreground/5"
             >
-              Watch demo
+              Ver demo
             </Button>
           </div>
         </div>
@@ -150,17 +156,25 @@ export function HeroSection() {
             <div key={i} className="flex gap-16">
               {[
                 {
-                  value: "20 days",
-                  label: "saved on builds",
-                  company: "NETFLIX",
+                  value: "30%",
+                  label: "menos agua utilizada",
+                  company: "Cooperativa del Campo",
                 },
-                { value: "98%", label: "faster deployment", company: "STRIPE" },
                 {
-                  value: "300%",
-                  label: "throughput increase",
-                  company: "LINEAR",
+                  value: "15%",
+                  label: "más margen por campaña",
+                  company: "Finca La Esperanza",
                 },
-                { value: "6x", label: "faster to ship", company: "NOTION" },
+                {
+                  value: "48h",
+                  label: "antes alerta de fungicidad",
+                  company: "Olivar del Sur",
+                },
+                {
+                  value: "2.847",
+                  label: "olivares gestionados",
+                  company: "Agropilot",
+                },
               ].map((stat) => (
                 <div
                   key={`${stat.company}-${i}`}

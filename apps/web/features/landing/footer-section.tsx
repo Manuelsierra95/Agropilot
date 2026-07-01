@@ -4,28 +4,28 @@ import { ArrowUpRight } from "lucide-react";
 import { AnimatedWave } from "@workspace/web/features/landing/animated-wave";
 
 const footerLinks = {
-  Product: [
-    { name: "Features", href: "#features" },
-    { name: "How it works", href: "#how-it-works" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "Integrations", href: "#integrations" },
+  Producto: [
+    { name: "Funcionalidades", href: "#features" },
+    { name: "Cómo funciona", href: "#how-it-works" },
+    { name: "Precios", href: "#pricing" },
+    { name: "Precios del aceite", href: "#" },
   ],
-  Developers: [
-    { name: "Documentation", href: "#developers" },
-    { name: "API Reference", href: "#" },
-    { name: "SDK", href: "#developers" },
-    { name: "Status", href: "#" },
+  Agricultores: [
+    { name: "Tu parcela en tiempo real", href: "#agricultores" },
+    { name: "Riesgos y alertas", href: "#agricultores" },
+    { name: "Recomendaciones IA", href: "#agricultores" },
+    { name: "Resumen de campaña", href: "#agricultores" },
   ],
-  Company: [
-    { name: "About", href: "#" },
+  Empresa: [
+    { name: "Sobre nosotros", href: "#" },
     { name: "Blog", href: "#" },
-    { name: "Careers", href: "#", badge: "Hiring" },
-    { name: "Contact", href: "#" },
+    { name: "Contacto", href: "#" },
+    { name: "Soporte", href: "#" },
   ],
   Legal: [
-    { name: "Privacy", href: "#" },
-    { name: "Terms", href: "#" },
-    { name: "Security", href: "#security" },
+    { name: "Privacidad", href: "#" },
+    { name: "Términos", href: "#" },
+    { name: "Seguridad", href: "#security" },
   ],
 };
 
@@ -50,12 +50,12 @@ export function FooterSection() {
             {/* Brand Column */}
             <div className="col-span-2">
               <a href="#" className="inline-flex items-center gap-2 mb-6">
-                <span className="text-2xl font-display">Optimus</span>
+                <span className="text-2xl font-display">Agropilot</span>
                 <span className="text-xs text-muted-foreground font-mono">TM</span>
               </a>
 
               <p className="text-muted-foreground leading-relaxed mb-8 max-w-xs">
-                The platform for teams who ship. Build, deploy, and scale with unprecedented velocity.
+                La plataforma inteligente para el olivar moderno. Monitoriza, anticipa y optimiza cada aspecto de tu explotación.
               </p>
 
               {/* Social Links */}
@@ -102,13 +102,13 @@ export function FooterSection() {
         {/* Bottom Bar */}
         <div className="py-8 border-t border-foreground/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            2025 Optimus. All rights reserved.
+            2025 Agropilot. Todos los derechos reservados.
           </p>
 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-500" />
-              All systems operational
+              Todos los sistemas operativos
             </span>
           </div>
         </div>

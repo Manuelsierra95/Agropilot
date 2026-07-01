@@ -4,32 +4,32 @@ import { useEffect, useState } from "react";
 
 const testimonials = [
   {
-    quote: "Optimus transformed our deployment pipeline. What used to take hours now happens in seconds.",
-    author: "Sarah Chen",
-    role: "CTO",
-    company: "Meridian Labs",
-    metric: "10x faster deployments",
+    quote: "Dejamos de regar a ciegas. Agropilot nos dice exactamente cuándo y cuánto regar en cada parcela.",
+    author: "Antonio Ruiz",
+    role: "Gerente",
+    company: "Olivar del Sur",
+    metric: "25% menos agua",
   },
   {
-    quote: "The developer experience is unmatched. Our team's productivity has never been higher.",
-    author: "Marcus Webb",
-    role: "Engineering Lead",
-    company: "Flux Systems",
-    metric: "40% more features shipped",
+    quote: "El copilot nos ahorra horas de análisis cada semana. Ahora tomamos decisiones mucho más rápido.",
+    author: "María López",
+    role: "Técnico agrónomo",
+    company: "Cooperativa San Juan",
+    metric: "3h ahorradas al día",
   },
   {
-    quote: "Finally, infrastructure that scales with our ambition. Zero downtime since we switched.",
-    author: "Elena Rodriguez",
-    role: "VP Engineering",
-    company: "Beacon AI",
-    metric: "99.99% uptime",
+    quote: "Sabía que perdía dinero en una parcela. Agropilot me lo confirmó con datos y pude corregirlo.",
+    author: "Carlos Herrera",
+    role: "Propietario",
+    company: "Finca La Esperanza",
+    metric: "18% más margen",
   },
   {
-    quote: "The integrations are seamless. We connected our entire stack in a single afternoon.",
-    author: "James Liu",
-    role: "Founder",
-    company: "Prism Analytics",
-    metric: "50+ integrations used",
+    quote: "Los precios del aceite en tiempo real nos ayudaron a vender en el momento justo de la campaña.",
+    author: "Lucía Martín",
+    role: "Directora",
+    company: "Almazara El Pilar",
+    metric: "+12% precio medio venta",
   },
 ];
 
@@ -56,7 +56,7 @@ export function TestimonialsSection() {
         {/* Section Label */}
         <div className="flex items-center gap-4 mb-16">
           <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-            What people say
+            Lo que dicen nuestros usuarios
           </span>
           <div className="flex-1 h-px bg-foreground/10" />
           <span className="font-mono text-xs text-muted-foreground">
@@ -105,7 +105,7 @@ export function TestimonialsSection() {
               }`}
             >
               <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase block mb-4">
-                Key Result
+                Resultado clave
               </span>
               <p className="font-display text-3xl md:text-4xl text-foreground">
                 {activeTestimonial.metric}
@@ -138,7 +138,7 @@ export function TestimonialsSection() {
         {/* Company Logos Marquee Label */}
         <div className="mt-24 pt-12 border-t border-foreground/10">
           <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase mb-8 text-center">
-            Trusted by forward-thinking teams
+            Confían en nosotros
           </p>
         </div>
       </div>
@@ -148,7 +148,7 @@ export function TestimonialsSection() {
         <div className="flex gap-16 items-center marquee">
           {[...Array(2)].map((_, setIdx) => (
             <div key={setIdx} className="flex gap-16 items-center shrink-0">
-              {["Meridian Labs", "Flux Systems", "Beacon AI", "Prism Analytics", "Nova Tech", "Quantum Corp", "Atlas Digital", "Vertex Labs"].map(
+              {["Olivar del Sur", "Cooperativa San Juan", "Finca La Esperanza", "Almazara El Pilar", "Campo Verde", "La Viñuela", "Sierra Morena", "Vega del Guadalquivir"].map(
                 (company) => (
                   <span
                     key={`${setIdx}-${company}`}

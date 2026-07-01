@@ -5,26 +5,26 @@ import { useEffect, useRef, useState } from "react";
 const features = [
   {
     number: "01",
-    title: "Instant Deployment",
-    description: "Push to production in seconds. Our edge network ensures your applications load instantly, anywhere in the world.",
-    visual: "deploy",
+    title: "Monitorización inteligente",
+    description: "Datos meteorológicos, estado del cultivo y riesgos en tiempo real para cada una de tus parcelas de olivar.",
+    visual: "monitor",
   },
   {
     number: "02",
-    title: "AI-Native Workflows",
-    description: "Build intelligent applications with built-in AI capabilities. From inference to training, everything scales automatically.",
+    title: "Copilot agrícola",
+    description: "Pregunta lo que necesites en lenguaje natural. Tu asistente IA conoce cada rincón de tu finca y te guía en cada decisión.",
     visual: "ai",
   },
   {
     number: "03",
-    title: "Real-time Collaboration",
-    description: "Work together seamlessly. Live preview, instant feedback, and version control that actually makes sense.",
-    visual: "collab",
+    title: "Gestión financiera completa",
+    description: "Controla ingresos, gastos y márgenes por parcela y campaña. Sabe exactamente cuánto ganas con tu aceite.",
+    visual: "finance",
   },
   {
     number: "04",
-    title: "Enterprise Security",
-    description: "Bank-grade encryption, SOC 2 compliance, and granular access controls. Your data stays yours.",
+    title: "Alertas tempranas",
+    description: "Anticipa riesgos fúngicos, hídricos y térmicos antes de que afecten a tu cosecha de olivas.",
     visual: "security",
   },
 ];
@@ -230,11 +230,11 @@ function SecurityVisual() {
 
 function AnimatedVisual({ type }: { type: string }) {
   switch (type) {
-    case "deploy":
+    case "monitor":
       return <DeployVisual />;
     case "ai":
       return <AIVisual />;
-    case "collab":
+    case "finance":
       return <CollabVisual />;
     case "security":
       return <SecurityVisual />;
@@ -323,16 +323,16 @@ export function FeaturesSection() {
         <div className="mb-16 lg:mb-24">
           <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-6">
             <span className="w-8 h-px bg-foreground/30" />
-            Capabilities
+            Funcionalidades
           </span>
           <h2
             className={`text-4xl lg:text-6xl font-display tracking-tight transition-all duration-700 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            Everything you need.
+            Todo lo que necesitas.
             <br />
-            <span className="text-muted-foreground">Nothing you don&apos;t.</span>
+            <span className="text-muted-foreground">Nada que sobre.</span>
           </h2>
         </div>
 

@@ -5,50 +5,50 @@ import { ArrowRight, Check } from "lucide-react";
 
 const plans = [
   {
-    name: "Starter",
-    description: "For individuals and small projects",
+    name: "Gratis",
+    description: "Para olivicultores que empiezan",
     price: { monthly: 0, annual: 0 },
     features: [
-      "Up to 3 projects",
-      "1GB storage",
-      "Community support",
-      "Basic analytics",
-      "SSL certificates",
+      "Hasta 2 parcelas",
+      "Datos meteorológicos básicos",
+      "Precio del aceite en tiempo real",
+      "1 usuario",
+      "Soporte por comunidad",
     ],
-    cta: "Start free",
+    cta: "Empieza gratis",
     popular: false,
   },
   {
     name: "Pro",
-    description: "For growing teams and businesses",
+    description: "Para olivares en crecimiento",
     price: { monthly: 29, annual: 24 },
     features: [
-      "Unlimited projects",
-      "100GB storage",
-      "Priority support",
-      "Advanced analytics",
-      "Custom domains",
-      "Team collaboration",
-      "API access",
+      "Parcelas ilimitadas",
+      "Copilot IA agrícola",
+      "Alertas de riesgo avanzadas",
+      "Gestión financiera completa",
+      "Informe de campaña",
+      "Hasta 5 usuarios",
+      "Soporte prioritario",
     ],
-    cta: "Start trial",
+    cta: "Empieza la prueba",
     popular: true,
   },
   {
-    name: "Enterprise",
-    description: "For large-scale operations",
+    name: "Empresa",
+    description: "Para cooperativas y grandes explotaciones",
     price: { monthly: null, annual: null },
     features: [
-      "Everything in Pro",
-      "Unlimited storage",
-      "24/7 dedicated support",
-      "Custom integrations",
-      "SLA guarantee",
-      "On-premise option",
-      "Security audit",
-      "Custom contracts",
+      "Todo lo incluido en Pro",
+      "Multi-explotación",
+      "API personalizada",
+      "Integración con cooperativas",
+      "Usuarios ilimitados",
+      "SLA garantizado",
+      "Formación incluida",
+      "Soporte dedicado",
     ],
-    cta: "Contact sales",
+    cta: "Contactar",
     popular: false,
   },
 ];
@@ -62,15 +62,15 @@ export function PricingSection() {
         {/* Header */}
         <div className="max-w-3xl mb-20">
           <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase block mb-6">
-            Pricing
+            Precios
           </span>
           <h2 className="font-display text-5xl md:text-6xl lg:text-7xl tracking-tight text-foreground mb-6">
-            Simple, transparent
+            Simples y transparentes
             <br />
-            <span className="text-stroke">pricing</span>
+            <span className="text-stroke">para tu olivar</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-xl">
-            Start free and scale as you grow. No hidden fees, no surprises.
+            Empieza gratis y escala según crezca tu explotación. Sin sorpresas.
           </p>
         </div>
 
@@ -81,7 +81,7 @@ export function PricingSection() {
               !isAnnual ? "text-foreground" : "text-muted-foreground"
             }`}
           >
-            Monthly
+            Mensual
           </span>
           <button
             onClick={() => setIsAnnual(!isAnnual)}
@@ -98,7 +98,7 @@ export function PricingSection() {
               isAnnual ? "text-foreground" : "text-muted-foreground"
             }`}
           >
-            Annual
+            Anual
           </span>
           {isAnnual && (
             <span className="ml-2 px-2 py-1 bg-foreground text-primary-foreground text-xs font-mono">
@@ -118,7 +118,7 @@ export function PricingSection() {
             >
               {plan.popular && (
                 <span className="absolute -top-3 left-8 px-3 py-1 bg-foreground text-primary-foreground text-xs font-mono uppercase tracking-widest">
-                  Most Popular
+                  Más popular
                 </span>
               )}
 
@@ -172,9 +172,9 @@ export function PricingSection() {
 
         {/* Bottom Note */}
         <p className="mt-12 text-center text-sm text-muted-foreground">
-          All plans include automatic updates, HTTPS, and DDoS protection.{" "}
+          Todos los planes incluyen datos meteorológicos, precios de mercado y actualizaciones automáticas.{" "}
           <a href="#" className="underline underline-offset-4 hover:text-foreground transition-colors">
-            Compare all features
+            Comparar todas las funcionalidades
           </a>
         </p>
       </div>

@@ -55,14 +55,14 @@ export function CtaSection() {
               {/* Left content */}
               <div className="flex-1">
                 <h2 className="font-display mb-8 text-4xl leading-[0.95] tracking-tight lg:text-7xl">
-                  Ready to build
+                  ¿Listo para
                   <br />
-                  something great?
+                  optimizar tu olivar?
                 </h2>
 
                 <p className="mb-12 max-w-xl text-xl leading-relaxed text-muted-foreground">
-                  Join thousands of teams shipping faster with Optimus. Start
-                  free, scale infinitely.
+                  Únete a los olivicultores que ya usan datos para tomar mejores
+                  decisiones. Empieza gratis, sin compromiso.
                 </p>
 
                 <div className="flex flex-col items-start gap-4 sm:flex-row">
@@ -70,7 +70,7 @@ export function CtaSection() {
                     size="lg"
                     className="group h-14 rounded-full bg-foreground px-8 text-base text-background hover:bg-foreground/90"
                   >
-                    Start building free
+                    Empieza gratis
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Button>
                   <Button
@@ -78,12 +78,12 @@ export function CtaSection() {
                     variant="outline"
                     className="h-14 rounded-full border-foreground/20 px-8 text-base hover:bg-foreground/5"
                   >
-                    Talk to sales
+                    Hablar con el equipo
                   </Button>
                 </div>
 
                 <p className="mt-8 font-mono text-sm text-muted-foreground">
-                  No credit card required
+                  Sin tarjeta de crédito
                 </p>
               </div>
 
