@@ -6,10 +6,7 @@ import {
   type ResolvedDateRange,
 } from "@workspace/api/services/campaigns/domain/campaign"
 import { resolveCampaignById } from "@workspace/api/services/campaigns/queries/get-campaign-by-id"
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10)
-}
+import { todayIso } from "@workspace/api/services/shared/date-utils"
 
 export async function resolveActiveCampaign() {
   const active = await db.query.campaigns.findFirst({

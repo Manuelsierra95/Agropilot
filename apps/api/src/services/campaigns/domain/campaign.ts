@@ -1,4 +1,5 @@
 import { HTTPException } from "hono/http-exception"
+import { todayIso } from "@workspace/api/services/shared/date-utils"
 
 export type CampaignPeriod = {
   name: string
@@ -73,8 +74,4 @@ export function resolveScopeDateRange(
 
   const period = getCampaignPeriodForDate(todayIso())
   return { from: period.startDate, to: period.endDate }
-}
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10)
 }

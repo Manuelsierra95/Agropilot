@@ -27,6 +27,7 @@ import {
 } from "@workspace/api/services/campaigns"
 import { getCachedMarketPricesByGrade } from "@workspace/api/services/finance/queries/market-prices-cache"
 import { listParcels } from "@workspace/api/services/parcels/queries/list-parcels"
+import { todayIso, daysAgoIso } from "@workspace/api/services/shared/date-utils"
 
 const MARKET_HISTORY_DAYS = 90
 const RECENT_TRANSACTION_LIMIT = 50
@@ -37,16 +38,6 @@ const OLIVE_PRICE_DISPLAY_NAMES: Record<OilGrade, string> = {
   virgen_extra: "Virgen Extra",
   virgen: "Virgen",
   lampante: "Lampante",
-}
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10)
-}
-
-function daysAgoIso(days: number): string {
-  const date = new Date()
-  date.setDate(date.getDate() - days)
-  return date.toISOString().slice(0, 10)
 }
 
 type MarketPriceRow = { date: string; price: string }

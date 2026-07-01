@@ -9,6 +9,7 @@ import {
   getOlivePhenology,
   type ParcelApiRiskDetail,
 } from "@workspace/api/services/weather/domain/weathercloud"
+import { todayIso } from "@workspace/api/services/shared/date-utils"
 
 export type ParcelRisksResponse = {
   parcelId: string
@@ -19,10 +20,6 @@ export type ParcelRisksResponse = {
     insectRisk?: ParcelApiRiskDetail
     thermalStress?: ParcelApiRiskDetail
   }
-}
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10)
 }
 
 async function fetchWeatherWithFallback(

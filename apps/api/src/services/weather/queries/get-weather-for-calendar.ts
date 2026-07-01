@@ -7,10 +7,7 @@ import {
   type WeatherCondition,
   type WeatherForecastDay,
 } from "@workspace/schemas"
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10)
-}
+import { todayIso } from "@workspace/api/services/shared/date-utils"
 
 function deriveCondition(
   temperature: number,
