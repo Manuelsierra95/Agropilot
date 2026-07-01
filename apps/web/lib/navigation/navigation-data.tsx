@@ -1,4 +1,4 @@
-import { Euro, LucideIcon, TriangleAlert } from "lucide-react"
+import { Euro, LucideIcon, ClipboardList } from "lucide-react"
 import type { ScopeKey } from "@workspace/web/lib/navigation/scope"
 import {
   Cpu,
@@ -80,12 +80,6 @@ export const navigationData: NavigationData = {
       scope: ["campaignId", "parcelId"],
     },
     {
-      title: "Calendar",
-      url: "/dashboard/calendar",
-      icon: Calendar,
-      scope: ["campaignId", "parcelId"],
-    },
-    {
       title: "Finance",
       url: "/dashboard/finance",
       icon: Euro,
@@ -98,9 +92,15 @@ export const navigationData: NavigationData = {
       scope: ["campaignId", "parcelId"],
     },
     {
-      title: "Notifications",
-      url: "/dashboard/notifications",
-      icon: TriangleAlert,
+      title: "Calendar",
+      url: "/dashboard/calendar",
+      icon: Calendar,
+      scope: ["campaignId", "parcelId"],
+    },
+    {
+      title: "Tasks",
+      url: "/dashboard/tasks",
+      icon: ClipboardList,
     },
   ],
   modules: [

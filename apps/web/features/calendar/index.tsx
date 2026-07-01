@@ -83,7 +83,8 @@ export default function Calendar() {
     }
     if (!parcelRisks.data) return []
     const parcelName =
-      events.find((event) => event.parcelId === parcelId)?.parcelName ?? "Parcela"
+      events.find((event) => event.parcelId === parcelId)?.parcelName ??
+      "Parcela"
     return risksToActiveAlerts(parcelRisks.data, parcelName)
   }, [allRisks.data, events, isAllParcels, parcelId, parcelRisks.data])
 
@@ -92,7 +93,8 @@ export default function Calendar() {
       return allParcelsRecommendationsToCardItems(allRecommendations.data ?? [])
     }
     const parcelName =
-      events.find((event) => event.parcelId === parcelId)?.parcelName ?? "Parcela"
+      events.find((event) => event.parcelId === parcelId)?.parcelName ??
+      "Parcela"
     return parcelRecommendationsToCardItems(
       parcelRecommendations.data ?? [],
       parcelName
@@ -110,21 +112,17 @@ export default function Calendar() {
   return (
     <PageContainer className="grid grid-cols-[1fr_auto_1fr_auto_1fr] grid-rows-[minmax(0,300px)_auto_minmax(0,1120px)_auto_auto] gap-4">
       <div className="col-start-1 row-start-1">
-        {isAllParcels
-          ? allRisks.isPending && !allRisks.data?.length
-            ? (
-                <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
-              )
-            : (
-                <ActiveAlertsCard alerts={alerts} />
-              )
-          : parcelRisks.isPending && !parcelRisks.data
-            ? (
-                <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
-              )
-            : (
-                <ActiveAlertsCard alerts={alerts} />
-              )}
+        {isAllParcels ? (
+          allRisks.isPending && !allRisks.data?.length ? (
+            <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
+          ) : (
+            <ActiveAlertsCard alerts={alerts} />
+          )
+        ) : parcelRisks.isPending && !parcelRisks.data ? (
+          <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
+        ) : (
+          <ActiveAlertsCard alerts={alerts} />
+        )}
       </div>
 
       <GradientSeparator
@@ -133,22 +131,18 @@ export default function Calendar() {
       />
 
       <div className="col-start-3 row-start-1">
-        {isAllParcels
-          ? allRecommendations.isPending &&
-            allRecommendations.data === undefined
-            ? (
-                <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
-              )
-            : (
-                <RecommendationsCard recommendations={recommendations} />
-              )
-          : parcelRecommendations.isPending && !parcelRecommendations.data
-            ? (
-                <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
-              )
-            : (
-                <RecommendationsCard recommendations={recommendations} />
-              )}
+        {isAllParcels ? (
+          allRecommendations.isPending &&
+          allRecommendations.data === undefined ? (
+            <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
+          ) : (
+            <RecommendationsCard recommendations={recommendations} />
+          )
+        ) : parcelRecommendations.isPending && !parcelRecommendations.data ? (
+          <WidgetSkeleton className="h-full" contentHeight="h-[220px]" />
+        ) : (
+          <RecommendationsCard recommendations={recommendations} />
+        )}
       </div>
 
       <GradientSeparator
@@ -169,42 +163,14 @@ export default function Calendar() {
         className="col-span-5 col-start-1 row-start-2"
       />
 
-      <div className="col-span-3 row-start-3 overflow-auto">
+      <div className="col-span-5 row-start-3 overflow-auto">
         {calendarEvents.isPending && !calendarEvents.data ? (
-          <WidgetSkeleton className="h-full min-h-[480px]" contentHeight="h-full" />
+          <WidgetSkeleton
+            className="h-full min-h-[480px]"
+            contentHeight="h-full"
+          />
         ) : (
           <CalendarClient initialEvents={events} forecast={forecast} />
-        )}
-      </div>
-
-      <GradientSeparator
-        orientation="vertical"
-        className="col-start-4 row-start-3"
-      />
-
-      <div className="col-start-5 row-start-3">
-        {calendarEvents.isPending && !calendarEvents.data ? (
-          <WidgetSkeleton className="h-full min-h-[480px]" contentHeight="h-full" />
-        ) : (
-          <Kanban events={events} />
-        )}
-      </div>
-
-      <GradientSeparator
-        orientation="horizontal"
-        className="col-span-5 col-start-1 row-start-4"
-      />
-
-      <div className="col-span-5 col-start-1 row-start-5">
-        {!timelineData ? (
-          <WidgetSkeleton className="h-[280px]" contentHeight="h-[240px]" />
-        ) : (
-          <CampaignTimeline
-            tasks={timelineData.tasks}
-            days={timelineData.days}
-            todayIndex={timelineData.todayIndex}
-            title={timelineData.title}
-          />
         )}
       </div>
     </PageContainer>

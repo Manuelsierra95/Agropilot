@@ -97,7 +97,7 @@ export function NavUser({
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <BellIcon />
-                Notifications
+                Tasks
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
