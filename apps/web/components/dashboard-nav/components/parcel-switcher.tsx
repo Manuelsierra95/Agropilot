@@ -18,6 +18,7 @@ import { useDashboardScopeActions } from "@workspace/web/hooks/use-dashboard-sco
 import { useDashboardListsStore } from "@workspace/web/store/useDashboardListsStore"
 import { ParcelSwitcherPlaceholder } from "@workspace/web/components/dashboard-nav/components/switcher-placeholders"
 import { getParcelIcon } from "@workspace/web/lib/navigation/parcel-icon"
+import { CreateParcelDialog } from "@workspace/web/components/parcel/create-parcel-dialog"
 
 interface ParcelSwitcherProps {
   variant?: "sidebar" | "dock"
@@ -31,6 +32,7 @@ export function ParcelSwitcher({ variant = "sidebar" }: ParcelSwitcherProps) {
   const { selectAllParcels, selectParcel } = useDashboardScopeActions()
   const parcels = useDashboardListsStore((state) => state.parcels)
   const isLoading = useDashboardListsStore((state) => state.isLoadingParcels)
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
 
   const isAllSelected = !parcelId
   const activeParcel = parcelId
@@ -123,13 +125,23 @@ export function ParcelSwitcher({ variant = "sidebar" }: ParcelSwitcherProps) {
           )
         })}
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="gap-2 p-2">
+        <DropdownMenuItem
+          className="gap-2 p-2"
+          onClick={() => setIsCreateDialogOpen(true)}
+        >
           <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
             <PlusIcon className="size-4" />
           </div>
-          <span className="font-medium text-muted-foreground">Add parcel</span>
+          <span className="font-medium text-muted-foreground">
+            Crear parcela
+          </span>
         </DropdownMenuItem>
       </DropdownMenuContent>
+
+      <CreateParcelDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+      />
     </DropdownMenu>
   )
 }
