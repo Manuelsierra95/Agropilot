@@ -3,9 +3,9 @@
 import * as React from "react"
 import { type ChartConfig } from "@workspace/ui/components/chart"
 import type { FinanceTransaction } from "@workspace/web/lib/finance/types"
-import { IncomeDrawer } from "@workspace/web/features/finance/drawer/income-drawer"
-import type { CategoryTransaction } from "@workspace/web/features/finance/drawer/components/category-drawer"
-import { FinancePieChart, type PieChartDataItem } from "@workspace/web/features/finance/chart/components/pie-chart"
+import { IncomeDrawer } from "@workspace/web/features/finance/components/drawer/income-drawer"
+import type { CategoryTransaction } from "@workspace/web/features/finance/components/drawer/components/category-drawer"
+import { FinancePieChart, type PieChartDataItem } from "@workspace/web/features/finance/components/chart/components/pie-chart"
 
 const chartConfig = {
   venta: { label: "Venta de cosecha", color: "var(--pie-income-1)" },

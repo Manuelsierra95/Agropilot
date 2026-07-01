@@ -33,11 +33,11 @@ import {
 } from "@workspace/ui/components/sheet"
 import { Textarea } from "@workspace/ui/components/textarea"
 
-import type { Transaction } from "@workspace/web/features/finance/table/types"
-import { CATEGORIES, PAYMENT_METHOD_LABELS } from "@workspace/web/features/finance/table/constants"
-import { formatCurrency, formatDate, toSafeDate } from "@workspace/web/features/finance/table/helpers"
-import { TypeBadge } from "@workspace/web/features/finance/table/components/type-badge"
-import { InvoiceViewer } from "@workspace/web/features/finance/table/components/invoice-viewer"
+import type { Transaction } from "@workspace/web/features/finance/components/table/types"
+import { CATEGORIES, PAYMENT_METHOD_LABELS } from "@workspace/web/features/finance/components/table/constants"
+import { formatCurrency, formatDate, toSafeDate } from "@workspace/web/features/finance/components/table/helpers"
+import { TypeBadge } from "@workspace/web/features/finance/components/table/components/type-badge"
+import { InvoiceViewer } from "@workspace/web/features/finance/components/table/components/invoice-viewer"
 
 export function TableCellViewer({ item }: { item: Transaction }) {
   const isMobile = useIsMobile()

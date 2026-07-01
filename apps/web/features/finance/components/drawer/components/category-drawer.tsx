@@ -13,8 +13,8 @@ import {
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
 import { ScrollArea } from "@workspace/ui/components/scroll-area"
-import { TransactionTable } from "@workspace/web/features/finance/table"
-import type { Transaction as TableTransaction } from "@workspace/web/features/finance/table/types"
+import { TransactionTable } from "@workspace/web/features/finance/components/table"
+import type { Transaction as TableTransaction } from "@workspace/web/features/finance/components/table/types"
 import {
   ChartContainer,
   ChartTooltip,

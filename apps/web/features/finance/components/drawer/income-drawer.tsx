@@ -1,21 +1,13 @@
 "use client"
 
-import {
-  IconDroplet,
-  IconFlame,
-  IconLeaf,
-  IconSettings,
-  IconTractor,
-  IconUsers,
-  IconWind,
-} from "@tabler/icons-react"
+import { IconCoin, IconPlant2, IconSettings } from "@tabler/icons-react"
 import {
   CategoryDrawer,
   type CategoryTransaction,
   type IconComponent,
-} from "@workspace/web/features/finance/drawer/components/category-drawer"
+} from "@workspace/web/features/finance/components/drawer/components/category-drawer"
 
-export interface ExpensesDrawerProps {
+export interface IncomeDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   category: string
@@ -26,17 +18,12 @@ export interface ExpensesDrawerProps {
 }
 
 const CATEGORY_ICONS: Record<string, IconComponent> = {
-  Riego: IconDroplet,
-  Fertilización: IconLeaf,
-  Tratamiento: IconWind,
-  Combustible: IconFlame,
-  "Mano de obra": IconUsers,
-  Maquinaria: IconTractor,
-  Cosecha: IconLeaf,
+  "Venta de cosecha": IconPlant2,
+  Subvenciones: IconCoin,
   Otros: IconSettings,
 }
 
-export function ExpensesDrawer({
+export function IncomeDrawer({
   open,
   onOpenChange,
   category,
@@ -44,7 +31,7 @@ export function ExpensesDrawer({
   percentage,
   color,
   transactions = [],
-}: ExpensesDrawerProps) {
+}: IncomeDrawerProps) {
   return (
     <CategoryDrawer
       open={open}
@@ -53,7 +40,7 @@ export function ExpensesDrawer({
       amount={amount}
       percentage={percentage}
       color={color}
-      variant="expenses"
+      variant="income"
       categoryIcons={CATEGORY_ICONS}
       transactions={transactions}
     />

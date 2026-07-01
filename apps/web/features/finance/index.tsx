@@ -2,16 +2,8 @@
 
 import { useMemo, useState } from "react"
 
-import { PageContainer } from "@workspace/web/components/ui/page-container"
-import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
-import { CashFlowSummaryCard } from "@workspace/web/components/cards/cash-flow-summary-card"
-import { FinanceRecommendationsCard } from "@workspace/web/components/cards/finance-recommendations-card"
-import { ParcelsFinanceBars } from "@workspace/web/features/dashboard/all/parcels-finance-bars"
-import { WidgetSkeleton } from "@workspace/web/features/dashboard/dashboard-skeleton"
-import { ExpensesPieChart } from "@workspace/web/features/finance/chart/expenses-pie-chart"
-import { IncomePieChart } from "@workspace/web/features/finance/chart/income-pie-chart"
-import { TransactionTable } from "@workspace/web/features/finance/table"
-import { NewTransactionSheet } from "@workspace/web/features/finance/components/new-transaction-sheet"
+import { FinanceAllView } from "@workspace/web/features/finance/views/all"
+import { FinanceSingleView } from "@workspace/web/features/finance/views/single"
 import {
   useOlivePrices,
   useParcelsFinanceComparison,
@@ -28,96 +20,29 @@ export default function Finance() {
   const olivePrices = useOlivePrices()
   const parcelsComparison = useParcelsFinanceComparison()
 
-  const rows = transactionsQuery.data ?? []
+  const rows = useMemo(
+    () => transactionsQuery.data ?? [],
+    [transactionsQuery.data]
+  )
   const snapshots = useMemo(() => toTransactionSnapshots(rows), [rows])
 
   const isLoadingCharts =
     transactionsQuery.isPending && transactionsQuery.data === undefined
 
-  return (
-    <PageContainer className="grid grid-cols-[1fr_auto_1fr] grid-rows-[auto] gap-4">
-      <div className="col-span-1 row-span-2">
-        {isLoadingCharts ? (
-          <WidgetSkeleton contentHeight="h-[280px]" />
-        ) : (
-          <IncomePieChart data={rows} />
-        )}
-      </div>
+  const viewProps = {
+    rows,
+    snapshots,
+    olivePrices,
+    parcelsComparison,
+    isLoadingCharts,
+    newTransactionOpen,
+    onNewTransactionOpenChange: setNewTransactionOpen,
+    onTransactionSuccess: () => transactionsQuery.refetch(),
+  }
 
-      <GradientSeparator
-        orientation="vertical"
-        className="col-span-1 row-span-5"
-      />
-
-      <div className="col-span-1 col-start-3 row-span-3 row-start-1 flex flex-col gap-4">
-        {isAllParcels &&
-        parcelsComparison.isPending &&
-        !parcelsComparison.data ? (
-          <WidgetSkeleton contentHeight="h-[140px]" />
-        ) : isAllParcels && parcelsComparison.data?.parcels.length ? (
-          <ParcelsFinanceBars parcels={parcelsComparison.data.parcels} />
-        ) : null}
-
-        {isLoadingCharts || (olivePrices.isPending && !olivePrices.data) ? (
-          <WidgetSkeleton contentHeight="h-[280px]" />
-        ) : (
-          <FinanceRecommendationsCard
-            className="flex-1"
-            transactions={snapshots}
-            oils={olivePrices.data ?? []}
-            redirectButton={false}
-          />
-        )}
-      </div>
-
-      <GradientSeparator
-        orientation="horizontal"
-        className="col-span-1 row-start-3"
-      />
-
-      <div className="col-span-1 row-span-2 row-start-4">
-        {isLoadingCharts ? (
-          <WidgetSkeleton contentHeight="h-[280px]" />
-        ) : (
-          <ExpensesPieChart data={rows} />
-        )}
-      </div>
-
-      <GradientSeparator
-        orientation="horizontal"
-        className="col-span-1 col-start-3 row-start-4"
-      />
-
-      <div className="col-span-1 col-start-3 row-start-5">
-        {isLoadingCharts ? (
-          <WidgetSkeleton contentHeight="h-[200px]" />
-        ) : (
-          <CashFlowSummaryCard transactions={snapshots} />
-        )}
-      </div>
-
-      <GradientSeparator
-        orientation="horizontal"
-        className="col-span-3 row-start-6"
-      />
-
-      <div className="col-span-3 row-start-7">
-        {isLoadingCharts ? (
-          <WidgetSkeleton contentHeight="h-[320px]" />
-        ) : (
-          <TransactionTable
-            data={rows}
-            showParcelColumn={isAllParcels}
-            onNewTransaction={() => setNewTransactionOpen(true)}
-          />
-        )}
-      </div>
-
-      <NewTransactionSheet
-        open={newTransactionOpen}
-        onOpenChange={setNewTransactionOpen}
-        onSuccess={() => transactionsQuery.refetch()}
-      />
-    </PageContainer>
+  return isAllParcels ? (
+    <FinanceAllView {...viewProps} />
+  ) : (
+    <FinanceSingleView {...viewProps} />
   )
 }

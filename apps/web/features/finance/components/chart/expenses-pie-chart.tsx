@@ -3,9 +3,9 @@
 import * as React from "react"
 import { type ChartConfig } from "@workspace/ui/components/chart"
 import type { FinanceTransaction } from "@workspace/web/lib/finance/types"
-import { ExpensesDrawer } from "@workspace/web/features/finance/drawer/expenses-drawer"
-import type { CategoryTransaction } from "@workspace/web/features/finance/drawer/components/category-drawer"
-import { FinancePieChart, type PieChartDataItem } from "@workspace/web/features/finance/chart/components/pie-chart"
+import { ExpensesDrawer } from "@workspace/web/features/finance/components/drawer/expenses-drawer"
+import type { CategoryTransaction } from "@workspace/web/features/finance/components/drawer/components/category-drawer"
+import { FinancePieChart, type PieChartDataItem } from "@workspace/web/features/finance/components/chart/components/pie-chart"
 
 const chartConfig = {
   riego: { label: "Riego", color: "var(--pie-expense-1)" },

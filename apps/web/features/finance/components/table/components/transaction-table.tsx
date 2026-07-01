@@ -68,7 +68,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs"
-import { InvoiceDrawer } from "@workspace/web/features/finance/drawer/invoice-drawer"
+import { InvoiceDrawer } from "@workspace/web/features/finance/components/drawer/invoice-drawer"
 
 export const schema = z.object({
   id: z.number(),
