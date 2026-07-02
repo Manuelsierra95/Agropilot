@@ -16,7 +16,7 @@ export default function CalendarBodyDayContent({
   const { tasks, mode } = useCalendarContext()
 
   const dayTasks = tasks.filter((task) => isSameDay(task.start, date))
-  const useHourlyDropZones = mode === "day"
+  const useHourlyDropZones = mode === "day" || mode === "week"
 
   return (
     <div
