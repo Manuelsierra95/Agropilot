@@ -8,13 +8,19 @@ import z from "zod"
 
 export const taskTypeSchema = z.enum(["manual", "recommended", "automated"])
 
-export const taskCategorySchema = z.enum([
+export const PRESET_CATEGORIES = [
   "irrigation",
   "fertilization",
   "treatment",
   "harvest",
   "inspection",
-])
+] as const
+
+export type PresetCategory = (typeof PRESET_CATEGORIES)[number]
+export type TaskCategory = string
+
+export const presetCategorySchema = z.enum(PRESET_CATEGORIES)
+export const taskCategorySchema = z.string().min(1)
 
 export const taskStatusSchema = z.enum([
   "pending",
@@ -47,23 +53,43 @@ export const taskCreateInputSchema = z.object({
   priority: z.number().int().min(0).max(3).optional(),
 })
 
+export const taskUpdateInputSchema = z.object({
+  title: z.string().min(1).optional(),
+  category: taskCategorySchema.optional(),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  description: z.string().nullable().optional(),
+  parcelId: z.string().nullable().optional(),
+  priority: z.number().int().min(0).max(3).optional(),
+  status: taskStatusSchema.optional(),
+})
+
 export type TaskCreateInput = z.infer<typeof taskCreateInputSchema>
+export type TaskUpdateInput = z.infer<typeof taskUpdateInputSchema>
 
 export type TaskType = z.infer<typeof taskTypeSchema>
-export type TaskCategory = z.infer<typeof taskCategorySchema>
 export type TaskStatus = z.infer<typeof taskStatusSchema>
 export type TaskSource = z.infer<typeof taskSourceSchema>
 export type TaskSelect = ReturnType<typeof taskSelectSchema.parse>
 export type TaskInsert = ReturnType<typeof taskInsertSchema.parse>
 export type TaskUpdate = ReturnType<typeof taskUpdateSchema.parse>
 
-export const TASK_CATEGORY_LABELS: Record<TaskCategory, string> = {
+const PRESET_CATEGORY_LABELS: Record<PresetCategory, string> = {
   irrigation: "Riego",
   fertilization: "Fertilización",
   treatment: "Tratamiento",
   harvest: "Cosecha",
   inspection: "Inspección",
 }
+
+export function getCategoryLabel(category: string): string {
+  return PRESET_CATEGORY_LABELS[category as PresetCategory] ?? category
+}
+
+// Deprecated: prefer `getCategoryLabel()` for runtime labels.
+// Kept for backwards compatibility in places that expect a static map.
+export const TASK_CATEGORY_LABELS: Record<PresetCategory, string> =
+  PRESET_CATEGORY_LABELS
 
 export const TASK_STATUS_LABELS: Record<TaskStatus, string> = {
   pending: "Pendiente",

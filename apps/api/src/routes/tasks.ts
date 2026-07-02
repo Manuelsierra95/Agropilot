@@ -1,7 +1,11 @@
 import type { Env } from "@env"
 import { Hono } from "hono"
 import { zValidator } from "@hono/zod-validator"
-import { apiQuerySchema, taskCreateInputSchema } from "@workspace/schemas"
+import {
+  apiQuerySchema,
+  taskCreateInputSchema,
+  taskUpdateInputSchema,
+} from "@workspace/schemas"
 
 import { requireAuth } from "@workspace/api/middlewares/require-auth"
 import type { AuthVariables } from "@workspace/api/types/variables"
@@ -9,8 +13,11 @@ import { parseInclude } from "@workspace/api/lib/parse-include"
 import { apiResponse } from "@workspace/api/lib/api-response"
 import {
   createTask,
+  deleteTask,
+  getTaskById,
   listCalendarTasks,
   listUpcomingWeekTasks,
+  updateTask,
 } from "@workspace/api/services/tasks"
 
 export const taskRoutes = new Hono<{
@@ -61,4 +68,68 @@ export const taskRoutes = new Hono<{
       }),
       201
     )
+  })
+
+  .get("/:taskId", async (c) => {
+    const taskId = c.req.param("taskId")
+    const task = await getTaskById(c.get("organizationId"), taskId)
+
+    if (!task) {
+      return c.json(
+        apiResponse({
+          data: null,
+          meta: { scope: "parcel", mode: "full" },
+        }),
+        404
+      )
+    }
+
+    return c.json(
+      apiResponse({
+        data: { task },
+        meta: { scope: "parcel", mode: "full" },
+      }),
+      200
+    )
+  })
+
+  .put("/:taskId", zValidator("json", taskUpdateInputSchema), async (c) => {
+    const taskId = c.req.param("taskId")
+    const data = c.req.valid("json")
+    const task = await updateTask(c.get("organizationId"), taskId, data)
+
+    if (!task) {
+      return c.json(
+        apiResponse({
+          data: null,
+          meta: { scope: "parcel", mode: "full" },
+        }),
+        404
+      )
+    }
+
+    return c.json(
+      apiResponse({
+        data: { task },
+        meta: { scope: "parcel", mode: "full" },
+      }),
+      200
+    )
+  })
+
+  .delete("/:taskId", async (c) => {
+    const taskId = c.req.param("taskId")
+    const deleted = await deleteTask(c.get("organizationId"), taskId)
+
+    if (!deleted) {
+      return c.json(
+        apiResponse({
+          data: null,
+          meta: { scope: "parcel", mode: "full" },
+        }),
+        404
+      )
+    }
+
+    return c.body(null, 204)
   })

@@ -4,6 +4,9 @@ const taskMocks = vi.hoisted(() => ({
   createTask: vi.fn(),
   listCalendarTasks: vi.fn(),
   listUpcomingWeekTasks: vi.fn(),
+  getTaskById: vi.fn(),
+  updateTask: vi.fn(),
+  deleteTask: vi.fn(),
 }))
 
 vi.mock("@workspace/api/services/tasks", () => taskMocks)
@@ -143,5 +146,126 @@ describe("tasks routes", () => {
     )
     expect(res.status).toBe(400)
     expect(taskMocks.listCalendarTasks).not.toHaveBeenCalled()
+  })
+
+  it("GET /tasks/:taskId returns 401 without auth", async () => {
+    const res = await apiRequest(app, "/api/v1/tasks/task-1")
+    expect(res.status).toBe(401)
+  })
+
+  it("GET /tasks/:taskId returns 200 when task exists", async () => {
+    mockAuthenticatedSession()
+    taskMocks.getTaskById.mockResolvedValue({
+      id: "task-1",
+      title: "Podar olivos",
+      category: "treatment",
+      status: "pending",
+    })
+
+    const res = await apiRequest(app, "/api/v1/tasks/task-1")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.data.task.id).toBe("task-1")
+    expect(taskMocks.getTaskById).toHaveBeenCalledWith(TEST_ORG_ID, "task-1")
+  })
+
+  it("GET /tasks/:taskId returns 404 when task not found", async () => {
+    mockAuthenticatedSession()
+    taskMocks.getTaskById.mockResolvedValue(null)
+
+    const res = await apiRequest(app, "/api/v1/tasks/task-missing")
+    expect(res.status).toBe(404)
+  })
+
+  it("PUT /tasks/:taskId returns 401 without auth", async () => {
+    const res = await apiRequest(app, "/api/v1/tasks/task-1", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Updated" }),
+    })
+    expect(res.status).toBe(401)
+  })
+
+  it("PUT /tasks/:taskId updates a task when authenticated", async () => {
+    mockAuthenticatedSession()
+    taskMocks.updateTask.mockResolvedValue({
+      id: "task-1",
+      title: "Podar olivos actualizado",
+      category: "treatment",
+      status: "pending",
+    })
+
+    const res = await apiRequest(app, "/api/v1/tasks/task-1", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Podar olivos actualizado" }),
+    })
+
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.data.task.title).toBe("Podar olivos actualizado")
+    expect(taskMocks.updateTask).toHaveBeenCalledWith(
+      TEST_ORG_ID,
+      "task-1",
+      expect.objectContaining({
+        title: "Podar olivos actualizado",
+      })
+    )
+  })
+
+  it("PUT /tasks/:taskId returns 400 for invalid payload", async () => {
+    mockAuthenticatedSession()
+
+    const res = await apiRequest(app, "/api/v1/tasks/task-1", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "" }),
+    })
+
+    expect(res.status).toBe(400)
+    expect(taskMocks.updateTask).not.toHaveBeenCalled()
+  })
+
+  it("PUT /tasks/:taskId returns 404 when task not found", async () => {
+    mockAuthenticatedSession()
+    taskMocks.updateTask.mockResolvedValue(null)
+
+    const res = await apiRequest(app, "/api/v1/tasks/task-missing", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Updated" }),
+    })
+
+    expect(res.status).toBe(404)
+  })
+
+  it("DELETE /tasks/:taskId returns 401 without auth", async () => {
+    const res = await apiRequest(app, "/api/v1/tasks/task-1", {
+      method: "DELETE",
+    })
+    expect(res.status).toBe(401)
+  })
+
+  it("DELETE /tasks/:taskId deletes a task when authenticated", async () => {
+    mockAuthenticatedSession()
+    taskMocks.deleteTask.mockResolvedValue(true)
+
+    const res = await apiRequest(app, "/api/v1/tasks/task-1", {
+      method: "DELETE",
+    })
+
+    expect(res.status).toBe(204)
+    expect(taskMocks.deleteTask).toHaveBeenCalledWith(TEST_ORG_ID, "task-1")
+  })
+
+  it("DELETE /tasks/:taskId returns 404 when task not found", async () => {
+    mockAuthenticatedSession()
+    taskMocks.deleteTask.mockResolvedValue(false)
+
+    const res = await apiRequest(app, "/api/v1/tasks/task-missing", {
+      method: "DELETE",
+    })
+
+    expect(res.status).toBe(404)
   })
 })

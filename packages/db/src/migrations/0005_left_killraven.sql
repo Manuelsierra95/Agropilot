@@ -1,0 +1,1 @@
+ALTER TABLE "parcel_weather" DROP COLUMN "meta";

@@ -337,7 +337,7 @@ export function generateTasks(parcelIds: string[]) {
     organizationId: string
     parcelId: string
     taskType: "recommended" | "manual"
-    category: (typeof categories)[number]
+    category: string
     title: string
     description: string
     startDate: Date

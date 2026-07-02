@@ -1,11 +1,10 @@
 import z from "zod"
 import { dashboardScopeQuerySchema } from "../../scope/dashboard-scope"
-import { taskCategorySchema } from "../../domain/tasks"
 
 export const dashboardCalendarEventSchema = z.object({
   id: z.string(),
   title: z.string(),
-  type: taskCategorySchema,
+  type: z.string(),
   parcelId: z.string(),
   parcelName: z.string(),
   color: z.string(),

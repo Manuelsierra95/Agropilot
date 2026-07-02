@@ -3,9 +3,9 @@ import type {
   DashboardCalendarEvent,
   DashboardCalendarEventsQuery,
   DashboardUpcomingWeekQuery,
-  TaskCategory,
   TaskCreateInput,
   TaskStatus,
+  TaskUpdateInput,
 } from "@workspace/schemas"
 import {
   resolveActiveCampaign,
@@ -14,18 +14,18 @@ import {
 } from "@workspace/api/services/campaigns"
 import { listParcels } from "@workspace/api/services/parcels/queries/list-parcels"
 
-export type { TaskCategory, TaskStatus } from "@workspace/schemas"
+export type { TaskStatus } from "@workspace/schemas"
 
 export type TasksQueryFilters = {
   from: string
   to: string
   status?: TaskStatus
-  category?: TaskCategory
+  category?: string
 }
 
 export type TaskQueryRow = {
   startDate: Date
-  category: TaskCategory
+  category: string
   status: TaskStatus
 }
 
@@ -58,12 +58,16 @@ export async function queryTasks(
   })
 }
 
-const TASK_CATEGORY_COLORS: Record<TaskCategory, string> = {
+const PRESET_CATEGORY_COLORS: Record<string, string> = {
   irrigation: "blue",
   fertilization: "green",
   treatment: "red",
   harvest: "yellow",
   inspection: "purple",
+}
+
+export function getTaskColor(category: string): string {
+  return PRESET_CATEGORY_COLORS[category] ?? "gray"
 }
 
 const TASK_STATUS_TO_CALENDAR: Record<
@@ -100,7 +104,7 @@ function mapTaskToCalendarEvent(
   task: {
     id: string
     title: string
-    category: TaskCategory
+    category: string
     parcelId: string | null
     startDate: Date
     endDate: Date | null
@@ -117,7 +121,7 @@ function mapTaskToCalendarEvent(
     type: task.category,
     parcelId: task.parcelId ?? "",
     parcelName,
-    color: TASK_CATEGORY_COLORS[task.category],
+    color: getTaskColor(task.category),
     status: TASK_STATUS_TO_CALENDAR[task.status],
     start: task.startDate.toISOString(),
     end: end.toISOString(),
@@ -221,4 +225,61 @@ export async function createTask(
     .returning()
 
   return task
+}
+
+export async function getTaskById(organizationId: string, taskId: string) {
+  const task = await db.query.tasks.findFirst({
+    where: and(
+      eq(schema.tasks.id, taskId),
+      eq(schema.tasks.organizationId, organizationId)
+    ),
+  })
+
+  return task ?? null
+}
+
+export async function updateTask(
+  organizationId: string,
+  taskId: string,
+  data: TaskUpdateInput
+) {
+  const values: Partial<typeof schema.tasks.$inferInsert> = {}
+
+  if (data.title !== undefined) values.title = data.title
+  if (data.category !== undefined) values.category = data.category
+  if (data.description !== undefined) values.description = data.description
+  if (data.parcelId !== undefined) values.parcelId = data.parcelId
+  if (data.priority !== undefined) values.priority = data.priority
+  if (data.status !== undefined) values.status = data.status
+
+  if (data.startDate !== undefined) {
+    values.startDate = new Date(`${data.startDate}T00:00:00.000Z`)
+  }
+
+  if (data.endDate !== undefined) {
+    values.endDate = data.endDate
+      ? new Date(`${data.endDate}T23:59:59.999Z`)
+      : null
+  }
+
+  const [task] = await db
+    .update(schema.tasks)
+    .set(values)
+    .where(
+      and(eq(schema.tasks.id, taskId), eq(schema.tasks.organizationId, organizationId))
+    )
+    .returning()
+
+  return task ?? null
+}
+
+export async function deleteTask(organizationId: string, taskId: string) {
+  const result = await db
+    .delete(schema.tasks)
+    .where(
+      and(eq(schema.tasks.id, taskId), eq(schema.tasks.organizationId, organizationId))
+    )
+    .returning({ id: schema.tasks.id })
+
+  return result.length > 0
 }
