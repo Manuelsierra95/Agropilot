@@ -63,6 +63,9 @@ export default function CalendarProvider({
         open={taskDetailSheetOpen}
         onOpenChange={setTaskDetailSheetOpen}
         taskId={selectedTaskId}
+        onTaskDeleted={(deletedTaskId) => {
+          setTasks(tasks.filter((task) => task.id !== deletedTaskId))
+        }}
       />
       <CalendarDndProvider>{children}</CalendarDndProvider>
     </CalendarContext.Provider>

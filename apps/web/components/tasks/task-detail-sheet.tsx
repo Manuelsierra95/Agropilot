@@ -93,6 +93,7 @@ interface TaskDetailSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   taskId: string | null
+  onTaskDeleted?: (taskId: string) => void
 }
 
 function formatDateInput(date: Date | null): string {
@@ -104,6 +105,7 @@ export function TaskDetailSheet({
   open,
   onOpenChange,
   taskId,
+  onTaskDeleted,
 }: TaskDetailSheetProps) {
   const isMobile = useIsMobile()
   const { data: parcels = [], isLoading: loadingParcels } = useParcels()
@@ -193,6 +195,7 @@ export function TaskDetailSheet({
     setIsDeleting(true)
     try {
       await api.tasks.deleteTask(taskId)
+      onTaskDeleted?.(taskId)
       toast.success("Tarea eliminada correctamente")
       onOpenChange(false)
     } catch {
