@@ -16,7 +16,6 @@ import {
 } from "@workspace/api/services/campaigns"
 import { getParcelById, listParcels } from "@workspace/api/services/parcels/queries/list-parcels"
 import {
-  mapDbRecommendationsToDashboard,
   mapDbRisksToDashboard,
 } from "@workspace/api/services/parcels/mappers/parcel-dashboard.mapper"
 import { parseWktPoint } from "@workspace/api/services/shared/geometry-utils"
@@ -151,7 +150,8 @@ function buildCropOverview(
         totalKg: string | null
       }
     | undefined,
-  taskCounts: { pending: number; done: number }
+  taskCounts: { pending: number; done: number },
+  aiInsight = ""
 ): DashboardOlivar {
   const coords = parseWktPoint(parcel.centroid ?? null) ?? {
     lat: 38,
@@ -168,9 +168,6 @@ function buildCropOverview(
     daily?: { temperature?: number }[]
   }
   const latestDailyTemp = dailyData.daily?.at(-1)?.temperature
-  const recommendationsList = mapDbRecommendationsToDashboard(
-    weather?.recommendations
-  )
 
   return {
     ...emptyOlivarOverview(parcel, coords),
@@ -192,7 +189,7 @@ function buildCropOverview(
     pendingTasks: taskCounts.pending,
     completedTasks: taskCounts.done,
     totalYieldKg: primarySummary?.totalKg ? Number(primarySummary.totalKg) : 0,
-    aiInsight: recommendationsList[0]?.message ?? "",
+    aiInsight,
   }
 }
 
@@ -220,8 +217,13 @@ export async function getParcelRecommendations(
   parcelId: string
 ): Promise<DashboardRecommendation[]> {
   await getParcelById(organizationId, parcelId)
-  const weather = await loadParcelWeather(parcelId)
-  return mapDbRecommendationsToDashboard(weather?.recommendations)
+  const { listRecommendationsAsDashboard } = await import(
+    "@workspace/api/services/recommendations"
+  )
+  return listRecommendationsAsDashboard(organizationId, {
+    parcelId,
+    status: "pending",
+  })
 }
 
 export async function getParcelCropOverview(
@@ -232,7 +234,7 @@ export async function getParcelCropOverview(
   const parcel = await getParcelById(organizationId, parcelId)
   const campaignId = await resolveCampaignIdForFilters(filters)
 
-  const [weather, station, financialSummaries, taskCountRows] =
+  const [weather, station, financialSummaries, taskCountRows, recommendations] =
     await Promise.all([
       loadParcelWeather(parcelId),
       db.query.parcelStation.findFirst({
@@ -260,6 +262,7 @@ export async function getParcelCropOverview(
           )
         )
         .groupBy(schema.tasks.parcelId, schema.tasks.status),
+      getParcelRecommendations(organizationId, parcelId),
     ])
 
   const taskCounts = groupTaskCountsByParcel(taskCountRows).get(parcelId) ?? {
@@ -272,7 +275,8 @@ export async function getParcelCropOverview(
     weather,
     station,
     financialSummaries[0],
-    taskCounts
+    taskCounts,
+    recommendations[0]?.message ?? ""
   )
 }
 
@@ -286,8 +290,11 @@ export async function getParcelsCropOverviewsForDashboard(
   ])
 
   const parcelIds = parcels.map((parcel) => parcel.id)
+  const { listActiveRecommendations } = await import(
+    "@workspace/api/services/recommendations"
+  )
 
-  const [weatherRows, stationRows, financialSummaries, taskCountRows] =
+  const [weatherRows, stationRows, financialSummaries, taskCountRows, activeRecs] =
     await Promise.all([
       loadParcelWeatherBatch(parcelIds),
       parcelIds.length > 0
@@ -309,6 +316,7 @@ export async function getParcelsCropOverviewsForDashboard(
         .from(schema.tasks)
         .where(eq(schema.tasks.organizationId, organizationId))
         .groupBy(schema.tasks.parcelId, schema.tasks.status),
+      listActiveRecommendations(organizationId, { status: "pending" }),
     ])
 
   const weatherByParcelId = new Map(
@@ -321,6 +329,12 @@ export async function getParcelsCropOverviewsForDashboard(
     financialSummaries.map((row) => [row.parcelId, row])
   )
   const taskCountsByParcelId = groupTaskCountsByParcel(taskCountRows)
+  const insightByParcelId = new Map<string, string>()
+  for (const rec of activeRecs) {
+    if (rec.parcelId && !insightByParcelId.has(rec.parcelId)) {
+      insightByParcelId.set(rec.parcelId, rec.title)
+    }
+  }
 
   return {
     parcels: parcels.map((parcel) => ({
@@ -330,7 +344,8 @@ export async function getParcelsCropOverviewsForDashboard(
         weatherByParcelId.get(parcel.id),
         stationByParcelId.get(parcel.id),
         summaryByParcelId.get(parcel.id),
-        taskCountsByParcelId.get(parcel.id) ?? { pending: 0, done: 0 }
+        taskCountsByParcelId.get(parcel.id) ?? { pending: 0, done: 0 },
+        insightByParcelId.get(parcel.id) ?? ""
       ),
     })),
   }
@@ -339,20 +354,16 @@ export async function getParcelsCropOverviewsForDashboard(
 export async function getParcelsRecommendationsForDashboard(
   organizationId: string
 ): Promise<DashboardParcelsRecommendations> {
-  const parcels = await listParcels(organizationId)
-  const parcelIds = parcels.map((parcel) => parcel.id)
-  const weatherRows = await loadParcelWeatherBatch(parcelIds)
-  const weatherByParcelId = new Map(
-    weatherRows.map((row) => [row.parcelId, row])
+  const { listAllParcelsRecommendationsAsDashboard } = await import(
+    "@workspace/api/services/recommendations"
   )
+  const parcels = await listAllParcelsRecommendationsAsDashboard(organizationId)
 
   return {
     parcels: parcels.map((parcel) => ({
-      parcelId: parcel.id,
-      name: parcel.name,
-      recommendations: mapDbRecommendationsToDashboard(
-        weatherByParcelId.get(parcel.id)?.recommendations
-      ),
+      parcelId: parcel.parcelId,
+      name: parcel.parcelName,
+      recommendations: parcel.recommendations,
     })),
   }
 }

@@ -56,6 +56,7 @@ export const dashboardRisksSchema = z.object({
 })
 
 export const dashboardRecommendationSchema = z.object({
+  id: z.string().uuid(),
   type: z.string(),
   priority: z.enum(["low", "medium", "high"]),
   message: z.string(),

@@ -97,7 +97,13 @@ describe("dashboard routes", () => {
       lastUpdate: new Date("2026-06-01T00:00:00Z").toISOString(),
     })
     parcelMocks.getParcelRecommendations.mockResolvedValue([
-      { type: "irrigation", priority: "high", message: "m", details: "d" },
+      {
+        id: "rec-00000000-0000-4000-8000-000000000001",
+        type: "irrigation",
+        priority: "high",
+        message: "m",
+        details: "d",
+      },
     ])
     parcelMocks.getParcelWeather.mockResolvedValue({
       data: { risks: RISKS },
@@ -172,8 +178,20 @@ describe("dashboard routes", () => {
           parcelId: PARCEL_ID,
           name: "P1",
           recommendations: [
-            { type: "t", priority: "low", message: "low-rec", details: "d" },
-            { type: "t2", priority: "high", message: "high-rec", details: "d" },
+            {
+              id: "rec-00000000-0000-4000-8000-000000000002",
+              type: "t",
+              priority: "low",
+              message: "low-rec",
+              details: "d",
+            },
+            {
+              id: "rec-00000000-0000-4000-8000-000000000003",
+              type: "t2",
+              priority: "high",
+              message: "high-rec",
+              details: "d",
+            },
           ],
         },
       ],

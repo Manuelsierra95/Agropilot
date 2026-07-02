@@ -111,7 +111,6 @@ export const parcelWeather = pgTable("parcel_weather", {
   data: jsonb("data").notNull().default({}),
   metrics: jsonb("metrics").notNull(),
   risks: jsonb("risks").notNull(),
-  recommendations: jsonb("recommendations"),
   computedAt: timestamp("computed_at").defaultNow().notNull(),
   algorithmVersion: text("algorithm_version").notNull(),
 })

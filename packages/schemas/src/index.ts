@@ -15,6 +15,7 @@ export * from "./domain/campaign"
 export * from "./domain/finance"
 export * from "./domain/market"
 export * from "./domain/tasks"
+export * from "./domain/recommendations"
 export * from "./domain/weather"
 
 export * from "./scope/dashboard-scope"

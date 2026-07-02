@@ -352,6 +352,9 @@ importers:
       '@workspace/scrapers':
         specifier: workspace:*
         version: link:../scrapers
+      api:
+        specifier: workspace:*
+        version: link:../../apps/api
 
   packages/schemas:
     dependencies:

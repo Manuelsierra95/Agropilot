@@ -207,16 +207,50 @@ export async function getParcelWeather(
 
   if (!weather) throw new HTTPException(404, { message: "Weather not found" })
 
-  const risksWithRecommendations = nestRecommendationsIntoRisks(
-    weather.risks as Record<string, unknown>,
-    weather.recommendations as RiskRecommendation[] | null
+  const { listActiveRecommendations } = await import(
+    "@workspace/api/services/recommendations"
+  )
+  const tableRecommendations = await listActiveRecommendations(
+    organizationId,
+    { parcelId, status: "pending" }
   )
 
-  const { recommendations: _recs, ...weatherWithoutRecs } = weather
+  const riskRecommendations: RiskRecommendation[] = []
+
+  for (const rec of tableRecommendations) {
+    const meta = rec.meta as {
+      riskType?: RiskRecommendation["riskType"]
+      window?: string
+      actions?: RiskRecommendation["actions"]
+    } | null
+
+    if (!meta?.riskType) continue
+
+    const urgency =
+      rec.priority === "high"
+        ? "high"
+        : rec.priority === "medium"
+          ? "medium"
+          : "low"
+
+    riskRecommendations.push({
+      riskType: meta.riskType,
+      title: rec.title,
+      description: rec.details,
+      urgency,
+      window: meta.window,
+      actions: meta.actions ?? [],
+    })
+  }
+
+  const risksWithRecommendations = nestRecommendationsIntoRisks(
+    weather.risks as Record<string, unknown>,
+    riskRecommendations
+  )
 
   return {
     data: {
-      ...weatherWithoutRecs,
+      ...weather,
       risks: mapDbRisksToDashboard(risksWithRecommendations),
     },
   }

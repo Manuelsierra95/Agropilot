@@ -317,7 +317,6 @@ export function generateParcelWeatherData(parcelIds: string[]) {
         drought: "medium",
         pest: "low",
       },
-      recommendations: ["Revisar riego en parcelas de secano"],
       algorithmVersion: "seed-v1",
     }
   })

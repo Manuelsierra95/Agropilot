@@ -138,13 +138,14 @@ export function parcelRecommendationsToCardItems(
   parcelName: string,
   parcelId: string
 ): Recommendation[] {
-  return recommendations.map((rec, index) =>
-    apiRecommendationToCardItem(rec, parcelName, parcelId, `rec-${index}`)
+  return recommendations.map((rec) =>
+    apiRecommendationToCardItem(rec, parcelName, parcelId, rec.id)
   )
 }
 
 export function allParcelsRecommendationsToCardItems(
   items: Array<{
+    id: string
     parcelId: string
     parcelName: string
     type: string
@@ -153,9 +154,10 @@ export function allParcelsRecommendationsToCardItems(
     details: string
   }>
 ): Recommendation[] {
-  return items.map((item, index) =>
+  return items.map((item) =>
     apiRecommendationToCardItem(
       {
+        id: item.id,
         type: item.type,
         priority: item.priority,
         message: item.message,
@@ -163,7 +165,7 @@ export function allParcelsRecommendationsToCardItems(
       },
       item.parcelName,
       item.parcelId,
-      `rec-all-${item.parcelId}-${index}`
+      item.id
     )
   )
 }

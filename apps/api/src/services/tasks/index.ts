@@ -218,6 +218,22 @@ export async function createTask(
   organizationId: string,
   data: TaskCreateInput
 ) {
+  if (data.recommendationId) {
+    const { acceptRecommendation } = await import(
+      "@workspace/api/services/recommendations"
+    )
+    const { task } = await acceptRecommendation(
+      organizationId,
+      data.recommendationId,
+      {
+        startDate: data.startDate,
+        priority: data.priority,
+        description: data.description,
+      }
+    )
+    return task
+  }
+
   const [task] = await db
     .insert(schema.tasks)
     .values({

@@ -8,6 +8,7 @@ import {
 } from "drizzle-orm/pg-core"
 import { organizations } from "./auth"
 import { parcels } from "./parcel"
+import { recommendations } from "./recommendation"
 import { relations } from "drizzle-orm"
 import { primaryKeyField } from "../helper"
 
@@ -37,6 +38,10 @@ export const tasks = pgTable(
       enum: ["manual", "weather", "risk_engine", "market", "sensor"],
     }).notNull(),
     sourceId: text("source_id"), // ID from the source system (e.g., weather event ID, risk engine alert ID)
+    recommendationId: text("recommendation_id").references(
+      () => recommendations.id,
+      { onDelete: "set null" }
+    ),
 
     // Additional metadata for extensibility (e.g., weather conditions at the time of task creation, risk scores, etc.)
     meta: jsonb("meta"),
@@ -64,5 +69,10 @@ export const taskRelations = relations(tasks, ({ one }) => ({
   parcel: one(parcels, {
     fields: [tasks.parcelId],
     references: [parcels.id],
+  }),
+
+  recommendation: one(recommendations, {
+    fields: [tasks.recommendationId],
+    references: [recommendations.id],
   }),
 }))

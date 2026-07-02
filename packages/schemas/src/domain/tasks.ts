@@ -59,6 +59,7 @@ export const taskCreateInputSchema = z.object({
   description: z.string().optional(),
   parcelId: z.string().optional(),
   priority: z.number().int().min(0).max(3).optional(),
+  recommendationId: z.string().uuid().optional(),
 })
 
 export const taskUpdateInputSchema = z.object({

@@ -101,6 +101,7 @@ export function mapDbRecommendationsToDashboard(
     return recommendations.map((item, index) => {
       if (typeof item === "string") {
         return {
+          id: crypto.randomUUID(),
           type: "general",
           priority: index === 0 ? "high" : "medium",
           message: item,
@@ -109,6 +110,7 @@ export function mapDbRecommendationsToDashboard(
       }
 
       const rec = item as {
+        id?: string
         type?: string
         priority?: "low" | "medium" | "high"
         message?: string
@@ -116,6 +118,7 @@ export function mapDbRecommendationsToDashboard(
       }
 
       return {
+        id: rec.id ?? crypto.randomUUID(),
         type: rec.type ?? "general",
         priority: rec.priority ?? "medium",
         message: rec.message ?? "",

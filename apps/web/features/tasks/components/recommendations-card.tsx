@@ -10,6 +10,7 @@ import {
   CalendarPlus,
   Plus,
   Loader2,
+  X,
 } from "lucide-react"
 
 // ── types ────────────────────────────────────────────────────────────────────
@@ -51,13 +52,15 @@ const URGENCY_CONFIG: Record<
 interface RecommendationsCardProps {
   recommendations: Recommendation[]
   onAddToTasks?: (recommendation: Recommendation) => void
-  addingRecommendationId?: string | null
+  onDismiss?: (recommendation: Recommendation) => void
+  processingRecommendationId?: string | null
 }
 
 export function RecommendationsCard({
   recommendations,
   onAddToTasks,
-  addingRecommendationId,
+  onDismiss,
+  processingRecommendationId,
 }: RecommendationsCardProps) {
   const urgent = recommendations.filter((r) => r.urgency === "now").length
 
@@ -96,7 +99,7 @@ export function RecommendationsCard({
               {recommendations.map((rec) => {
                 const { Icon } = ACTION_CONFIG[rec.action]
                 const urg = URGENCY_CONFIG[rec.urgency]
-                const isPending = addingRecommendationId === rec.id
+                const isPending = processingRecommendationId === rec.id
 
                 return (
                   <div
@@ -131,26 +134,36 @@ export function RecommendationsCard({
                       </p>
                     </div>
 
-                    {/* Add to tasks */}
-                    <Button
-                      size="xs"
-                      variant="outline"
-                      className="mt-px shrink-0"
-                      disabled={isPending}
-                      onClick={() => onAddToTasks?.(rec)}
-                    >
-                      {isPending ? (
-                        <>
-                          <Loader2 className="size-3 animate-spin" />
-                          Añadiendo
-                        </>
-                      ) : (
-                        <>
-                          <Plus className="size-3" />
-                          Añadir
-                        </>
-                      )}
-                    </Button>
+                    <div className="mt-px flex shrink-0 items-center gap-1">
+                      <Button
+                        size="icon-xs"
+                        variant="ghost"
+                        className="text-muted-foreground"
+                        disabled={isPending}
+                        aria-label="Descartar recomendación"
+                        onClick={() => onDismiss?.(rec)}
+                      >
+                        <X className="size-3" />
+                      </Button>
+                      <Button
+                        size="xs"
+                        variant="outline"
+                        disabled={isPending}
+                        onClick={() => onAddToTasks?.(rec)}
+                      >
+                        {isPending ? (
+                          <>
+                            <Loader2 className="size-3 animate-spin" />
+                            Añadiendo
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="size-3" />
+                            Añadir
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 )
               })}

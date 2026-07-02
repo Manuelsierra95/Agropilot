@@ -1,38 +1,15 @@
 "use client"
 
-import { useMemo, useRef } from "react"
+import { useMemo } from "react"
 
-import { useParcelRecommendations } from "@workspace/web/hooks/dashboard/use-dashboard-queries"
-import { useAllParcelsRecommendations } from "@workspace/web/hooks/dashboard/use-all-parcels-queries"
 import { useDashboardScope } from "@workspace/web/hooks/dashboard/use-dashboard-scope"
 import { useIsAllParcelsSelected } from "@workspace/web/hooks/use-is-all-parcels-selected"
-import { useDashboardListsStore } from "@workspace/web/store/useDashboardListsStore"
+import { useRecommendations } from "@workspace/web/features/tasks/hooks/use-recommendations-mutations"
 import type { DashboardRecommendation } from "@workspace/schemas"
 import type {
   Recommendation,
   RecommendationAction,
 } from "@workspace/web/features/tasks/components/recommendations-card"
-
-function recommendationKey(
-  rec: DashboardRecommendation,
-  parcelId: string
-): string {
-  return `${parcelId}:${rec.type}:${rec.priority}:${rec.message}:${rec.details}`
-}
-
-function useStableRecommendationIds() {
-  const idsRef = useRef<Map<string, string>>(new Map())
-
-  return (rec: DashboardRecommendation, parcelId: string): string => {
-    const key = recommendationKey(rec, parcelId)
-    let id = idsRef.current.get(key)
-    if (!id) {
-      id = crypto.randomUUID()
-      idsRef.current.set(key, id)
-    }
-    return id
-  }
-}
 
 function mapTypeToAction(type: string): RecommendationAction {
   switch (type.toLowerCase()) {
@@ -62,17 +39,17 @@ function mapPriorityToUrgency(
 }
 
 function normalizeRecommendation(
-  rec: DashboardRecommendation,
-  parcelId: string,
-  parcelName: string,
-  getId: (rec: DashboardRecommendation, parcelId: string) => string
+  rec: DashboardRecommendation & {
+    parcelId?: string | null
+    parcelName?: string | null
+  }
 ): Recommendation {
   const urgency = mapPriorityToUrgency(rec.priority)
 
   return {
-    id: getId(rec, parcelId),
-    parcelId,
-    parcelName,
+    id: rec.id,
+    parcelId: rec.parcelId ?? "",
+    parcelName: rec.parcelName ?? "—",
     title: rec.message,
     reason: rec.details,
     action: mapTypeToAction(rec.type),
@@ -91,44 +68,16 @@ export function useTaskRecommendations() {
   const scope = useDashboardScope()
   const parcelId = scope.parcelId ?? ""
 
-  const allParcelsQuery = useAllParcelsRecommendations()
-  const singleParcelQuery = useParcelRecommendations()
+  const allQuery = useRecommendations()
+  const singleQuery = useRecommendations(isAllParcels ? undefined : parcelId)
 
-  const parcelName = useDashboardListsStore(
-    (state) => state.parcels.find((parcel) => parcel.id === parcelId)?.name
+  const query = isAllParcels ? allQuery : singleQuery
+
+  return useMemo(
+    () => ({
+      ...query,
+      recommendations: (query.data ?? []).map(normalizeRecommendation),
+    }),
+    [query]
   )
-
-  const getStableId = useStableRecommendationIds()
-
-  return useMemo(() => {
-    if (isAllParcels) {
-      const items = allParcelsQuery.data ?? []
-      return {
-        ...allParcelsQuery,
-        recommendations: items.map((item) =>
-          normalizeRecommendation(
-            item,
-            item.parcelId,
-            item.parcelName,
-            getStableId
-          )
-        ),
-      }
-    }
-
-    const items = singleParcelQuery.data ?? []
-    return {
-      ...singleParcelQuery,
-      recommendations: items.map((rec) =>
-        normalizeRecommendation(rec, parcelId, parcelName ?? "—", getStableId)
-      ),
-    }
-  }, [
-    isAllParcels,
-    allParcelsQuery,
-    singleParcelQuery,
-    parcelId,
-    parcelName,
-    getStableId,
-  ])
 }

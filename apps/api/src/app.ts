@@ -13,6 +13,7 @@ import { financeRoutes } from "@workspace/api/routes/finance"
 import { copilotRoutes } from "@workspace/api/routes/copilot"
 import { campaignRoutes } from "@workspace/api/routes/campaign"
 import { taskRoutes } from "@workspace/api/routes/tasks"
+import { recommendationRoutes } from "@workspace/api/routes/recommendations"
 import { weatherRoutes } from "@workspace/api/routes/weather"
 import { dashboardRoutes } from "@workspace/api/routes/dashboard"
 import { logger } from "hono/logger"
@@ -37,6 +38,7 @@ export const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .route("/copilot", copilotRoutes)
   .route("/campaign", campaignRoutes)
   .route("/tasks", taskRoutes)
+  .route("/recommendations", recommendationRoutes)
   .route("/weather", weatherRoutes)
   .route("/dashboard", dashboardRoutes)
   // ruta para weather

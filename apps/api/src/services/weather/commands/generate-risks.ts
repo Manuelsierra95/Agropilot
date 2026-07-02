@@ -162,7 +162,6 @@ export async function generateParcelRisks(
       computed: weather.computed,
     },
     risks,
-    recommendations,
     computedAt: new Date(),
     algorithmVersion: "v1",
   }
@@ -174,6 +173,19 @@ export async function generateParcelRisks(
       target: schema.parcelWeather.parcelId,
       set: weatherRow,
     })
+
+  const { upsertGeneratedRecommendations } = await import(
+    "@workspace/api/services/recommendations"
+  )
+  const { mapRiskRecommendationsToGenerated } = await import(
+    "@workspace/api/services/recommendations/map-risk-recommendations"
+  )
+
+  await upsertGeneratedRecommendations(
+    organizationId,
+    parcelId,
+    mapRiskRecommendationsToGenerated(parcelId, today, recommendations)
+  )
 
   const recMap = new Map(recommendations.map((r) => [r.riskType, r]))
 

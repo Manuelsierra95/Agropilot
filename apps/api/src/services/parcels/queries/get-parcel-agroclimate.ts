@@ -11,7 +11,6 @@ import {
 } from "@workspace/api/services/campaigns"
 import { getParcelById, listParcels } from "@workspace/api/services/parcels/queries/list-parcels"
 import {
-  mapDbRecommendationsToDashboard,
   mapDbRisksToDashboard,
 } from "@workspace/api/services/parcels/mappers/parcel-dashboard.mapper"
 import { parseWktPoint } from "@workspace/api/services/shared/geometry-utils"
@@ -328,6 +327,14 @@ export async function getParcelAgroclimateForDashboard(
   const metricsDb = (weather.metrics ?? {}) as Record<string, unknown>
   const cropMetrics = (metricsDb.crop ?? {}) as Record<string, number | string>
 
+  const { listRecommendationsAsDashboard } = await import(
+    "@workspace/api/services/recommendations"
+  )
+  const recommendations = await listRecommendationsAsDashboard(organizationId, {
+    parcelId,
+    status: "pending",
+  })
+
   const coords = parseWktPoint(parcel.centroid ?? null) ?? {
     lat: 38,
     lng: -3.37,
@@ -359,7 +366,7 @@ export async function getParcelAgroclimateForDashboard(
     }),
     risks: mapDbRisksToDashboard(weather.risks),
     units: AGROCLIMATE_UNITS,
-    recommendations: mapDbRecommendationsToDashboard(weather.recommendations),
+    recommendations,
   }
 }
 
