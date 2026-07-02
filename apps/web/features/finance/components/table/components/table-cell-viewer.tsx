@@ -34,8 +34,15 @@ import {
 import { Textarea } from "@workspace/ui/components/textarea"
 
 import type { Transaction } from "@workspace/web/features/finance/components/table/types"
-import { CATEGORIES, PAYMENT_METHOD_LABELS } from "@workspace/web/features/finance/components/table/constants"
-import { formatCurrency, formatDate, toSafeDate } from "@workspace/web/features/finance/components/table/helpers"
+import {
+  CATEGORIES,
+  PAYMENT_METHOD_LABELS,
+} from "@workspace/web/features/finance/components/table/constants"
+import {
+  formatCurrency,
+  formatDate,
+  toSafeDate,
+} from "@workspace/web/features/finance/components/table/helpers"
 import { TypeBadge } from "@workspace/web/features/finance/components/table/components/type-badge"
 import { InvoiceViewer } from "@workspace/web/features/finance/components/table/components/invoice-viewer"
 
@@ -216,14 +223,11 @@ export function TableCellViewer({ item }: { item: Transaction }) {
     <>
       <Button
         onClick={() =>
-          toast.promise(
-            new Promise((resolve) => setTimeout(resolve, 1000)),
-            {
-              loading: "Guardando cambios…",
-              success: "Transacción actualizada",
-              error: "Error al guardar",
-            }
-          )
+          toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
+            loading: "Guardando cambios…",
+            success: "Transacción actualizada",
+            error: "Error al guardar",
+          })
         }
       >
         Guardar cambios
@@ -238,11 +242,14 @@ export function TableCellViewer({ item }: { item: Transaction }) {
         <DrawerContent className="min-w-fit">
           <DrawerHeader className="gap-1">
             <div className="flex items-start justify-between gap-2">
-              <DrawerTitle className="leading-tight">{item.concept}</DrawerTitle>
+              <DrawerTitle className="leading-tight">
+                {item.concept}
+              </DrawerTitle>
               <TypeBadge type={item.type} />
             </div>
             <DrawerDescription>
-              {item.category} · Parcela #{item.parcelId} · {formatDate(item.date)}
+              {item.category} · Parcela #{item.parcelId} ·{" "}
+              {formatDate(item.date)}
             </DrawerDescription>
           </DrawerHeader>
           {body}

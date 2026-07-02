@@ -12,7 +12,10 @@ import {
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { RiskRecommendation } from "@workspace/web/features/parcel/lib/parcel-types"
-import { riskToBadgeClass, riskToLabel } from "@workspace/web/features/parcel/lib/parcel-utils"
+import {
+  riskToBadgeClass,
+  riskToLabel,
+} from "@workspace/web/features/parcel/lib/parcel-utils"
 
 type ParcelWeatherRiskCardProps = {
   label: string

@@ -1,4 +1,7 @@
-import { LegalDocument, type LegalSection } from "@workspace/web/features/legal/components/legal-document"
+import {
+  LegalDocument,
+  type LegalSection,
+} from "@workspace/web/features/legal/components/legal-document"
 
 const sections: LegalSection[] = [
   {

@@ -1,7 +1,10 @@
 "use client"
 
 import { MapPopup } from "@workspace/ui/components/map"
-import type { Parcel, ParcelLngLat } from "@workspace/web/components/maps/components/types"
+import type {
+  Parcel,
+  ParcelLngLat,
+} from "@workspace/web/components/maps/components/types"
 import { formatAreaHa } from "@workspace/schemas"
 
 type ParcelPopupProps = {

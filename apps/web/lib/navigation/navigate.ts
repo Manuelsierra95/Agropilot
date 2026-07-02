@@ -15,10 +15,10 @@ export function useNavigateWithScope() {
       options?: {
         include?: ScopeKey[]
         override?: Partial<Record<ScopeKey, string | null>>
-      },
+      }
     ) => {
       router.push(buildUrl(url, options))
     },
-    [router, buildUrl],
+    [router, buildUrl]
   )
 }

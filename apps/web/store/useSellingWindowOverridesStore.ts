@@ -12,8 +12,8 @@ type SellingWindowOverridesState = {
   clearScope: (scopeKey: string) => void
 }
 
-export const useSellingWindowOverridesStore = create<SellingWindowOverridesState>(
-  (set) => ({
+export const useSellingWindowOverridesStore =
+  create<SellingWindowOverridesState>((set) => ({
     overridesByScopeKey: {},
     setEstimatedKg: (scopeKey, estimatedKg) =>
       set((state) => ({
@@ -40,5 +40,4 @@ export const useSellingWindowOverridesStore = create<SellingWindowOverridesState
         const { [scopeKey]: _, ...rest } = state.overridesByScopeKey
         return { overridesByScopeKey: rest }
       }),
-  })
-)
+  }))

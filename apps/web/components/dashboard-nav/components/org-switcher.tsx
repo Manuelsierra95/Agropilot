@@ -74,9 +74,7 @@ export function OrgSwitcher() {
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
                   {activeOrg.name}{" "}
-                  <span className="text-foreground/40">
-                    ({activeOrg.plan})
-                  </span>
+                  <span className="text-foreground/40">({activeOrg.plan})</span>
                 </span>
               </div>
               <ChevronsUpDownIcon className="ml-auto" />

@@ -38,7 +38,9 @@ export function useDashboardOverview() {
     if (!query.data) return undefined
     const overview = query.data as
       | (DashboardOverviewSingle & {
-          market: { sellingWindow: DashboardOverviewSingle["market"]["sellingWindow"] }
+          market: {
+            sellingWindow: DashboardOverviewSingle["market"]["sellingWindow"]
+          }
         })
       | DashboardOverviewAll
 

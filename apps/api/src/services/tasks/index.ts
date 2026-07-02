@@ -84,6 +84,16 @@ function formatDateIso(date: Date): string {
   return date.toISOString().slice(0, 10)
 }
 
+function parseTaskScheduleDate(value: string, endOfDay = false): Date {
+  if (value.includes("T")) {
+    return new Date(value)
+  }
+
+  return new Date(
+    endOfDay ? `${value}T23:59:59.999Z` : `${value}T00:00:00.000Z`
+  )
+}
+
 function getWeekRange(weekStart?: string): { from: string; to: string } {
   const reference = weekStart
     ? new Date(`${weekStart}T12:00:00.000Z`)
@@ -253,12 +263,12 @@ export async function updateTask(
   if (data.status !== undefined) values.status = data.status
 
   if (data.startDate !== undefined) {
-    values.startDate = new Date(`${data.startDate}T00:00:00.000Z`)
+    values.startDate = parseTaskScheduleDate(data.startDate)
   }
 
   if (data.endDate !== undefined) {
     values.endDate = data.endDate
-      ? new Date(`${data.endDate}T23:59:59.999Z`)
+      ? parseTaskScheduleDate(data.endDate, true)
       : null
   }
 

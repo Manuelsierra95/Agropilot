@@ -174,7 +174,8 @@ export function BulkFinanceDialog({
   }
 
   const handleImport = async (): Promise<boolean> => {
-    if (!canImport || imported || isImporting || !selectedParcelId) return imported
+    if (!canImport || imported || isImporting || !selectedParcelId)
+      return imported
 
     setIsImporting(true)
     setImportError(null)
@@ -315,7 +316,11 @@ export function BulkFinanceDialog({
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button type="button" onClick={handleParse} disabled={isImporting}>
+              <Button
+                type="button"
+                onClick={handleParse}
+                disabled={isImporting}
+              >
                 Procesar datos
               </Button>
               <Button

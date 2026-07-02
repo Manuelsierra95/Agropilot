@@ -70,7 +70,11 @@ export function ParcelAllView({
 }: ParcelAllViewProps) {
   return (
     <>
-      <ParcelHero isAllSelected parcelCount={parcelCount} allModeSummary={allModeSummary} />
+      <ParcelHero
+        isAllSelected
+        parcelCount={parcelCount}
+        allModeSummary={allModeSummary}
+      />
 
       <div className="grid gap-4">
         <section className="grid gap-4 xl:grid-cols-3">
@@ -121,9 +125,13 @@ export function ParcelAllView({
             <CardContent className="space-y-3 text-sm">
               <div className="rounded-lg border px-3 py-2">
                 <p className="text-muted-foreground">Mayor déficit 30d</p>
-                <p className="font-semibold">{allModeSummary.maxDeficit?.name}</p>
+                <p className="font-semibold">
+                  {allModeSummary.maxDeficit?.name}
+                </p>
                 <p className="text-xs text-muted-foreground">
-                  {formatNumber(allModeSummary.maxDeficit?.waterDeficit30d ?? 0)}{" "}
+                  {formatNumber(
+                    allModeSummary.maxDeficit?.waterDeficit30d ?? 0
+                  )}{" "}
                   mm
                 </p>
               </div>

@@ -95,8 +95,9 @@ export function fieldFormDraftsToMapParcels(
 
     const isActive = draft.id === activeParcelId
     const cropLabel =
-      CROP_TYPE_LABELS[(draft.cropType || DEFAULT_CROP_TYPE) as CropTypeValue] ??
-      draft.cropType
+      CROP_TYPE_LABELS[
+        (draft.cropType || DEFAULT_CROP_TYPE) as CropTypeValue
+      ] ?? draft.cropType
 
     return [
       {

@@ -311,7 +311,7 @@ export function ProductionValueAreaChart({
   areaData: CampaignMonthPoint[]
 }) {
   return (
-    <div className={cn("flex min-w-0 w-full flex-col gap-2", className)}>
+    <div className={cn("flex w-full min-w-0 flex-col gap-2", className)}>
       <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span
@@ -334,7 +334,7 @@ export function ProductionValueAreaChart({
       </div>
 
       <AreaChart
-        className="min-w-0 max-w-full"
+        className="max-w-full min-w-0"
         aspectRatio="4 / 2"
         data={areaData}
         xDataKey="date"
@@ -400,7 +400,7 @@ function ProductionValueBarChart({
   prevCampaignLabel: string
 }) {
   return (
-    <div className={cn("flex min-w-0 w-full flex-col gap-2", className)}>
+    <div className={cn("flex w-full min-w-0 flex-col gap-2", className)}>
       <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span
@@ -420,7 +420,7 @@ function ProductionValueBarChart({
       </div>
 
       <BarChart
-        className="min-w-0 max-w-full"
+        className="max-w-full min-w-0"
         data={barData}
         xDataKey="month"
         orientation="horizontal"
@@ -552,7 +552,10 @@ export function ProductionValue({
 
   return (
     <Card
-      className={cn("@container/production min-w-0 bg-background ring-0", className)}
+      className={cn(
+        "@container/production min-w-0 bg-background ring-0",
+        className
+      )}
     >
       <CardHeader className="pb-2">
         <CardTitle>Producción y valor estimado</CardTitle>

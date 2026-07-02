@@ -55,9 +55,7 @@ export function usePlaceSearch() {
           if (err instanceof DOMException && err.name === "AbortError") return
           setSuggestions([])
           setError(
-            err instanceof Error
-              ? err.message
-              : "Error al buscar ubicaciones"
+            err instanceof Error ? err.message : "Error al buscar ubicaciones"
           )
         })
         .finally(() => {

@@ -10,10 +10,16 @@ import { Layers } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import { ParcelPopup } from "@workspace/web/components/maps/components/parcel-popup"
-import { getPolygonCenter, toParcelFeature } from "@workspace/web/components/maps/components/parcel-utils"
+import {
+  getPolygonCenter,
+  toParcelFeature,
+} from "@workspace/web/components/maps/components/parcel-utils"
 import { ParcelsLayer } from "@workspace/web/components/maps/components/parcels-layer"
 import { SatelliteLayer } from "@workspace/web/components/maps/components/satellite-layer"
-import type { Parcel, ParcelLngLat } from "@workspace/web/components/maps/components/types"
+import type {
+  Parcel,
+  ParcelLngLat,
+} from "@workspace/web/components/maps/components/types"
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -278,63 +284,63 @@ export function MapComponent({
       ref={containerRef}
       className={cn("relative h-full min-h-0 w-full", className)}
     >
-    <Card className="relative h-full w-full overflow-hidden p-px ring-0">
-      {/* Satellite toggle */}
-      <div className="absolute top-3 right-3 z-9">
-        <Button
-          type="button"
-          variant="default"
-          size="sm"
-          className="border-border bg-card/90 text-foreground backdrop-blur-sm hover:bg-accent"
-          onClick={() => {
-            setIsSatellite((v) => !v)
-            setPopupInfo(null)
-          }}
+      <Card className="relative h-full w-full overflow-hidden p-px ring-0">
+        {/* Satellite toggle */}
+        <div className="absolute top-3 right-3 z-9">
+          <Button
+            type="button"
+            variant="default"
+            size="sm"
+            className="border-border bg-card/90 text-foreground backdrop-blur-sm hover:bg-accent"
+            onClick={() => {
+              setIsSatellite((v) => !v)
+              setPopupInfo(null)
+            }}
+          >
+            <Layers />
+            Satélite
+          </Button>
+        </div>
+
+        {/* Map */}
+        <Map
+          ref={mapRef}
+          center={mapCenter}
+          zoom={zoom}
+          className="h-full w-full"
+          theme={mapTheme}
         >
-          <Layers />
-          Satélite
-        </Button>
-      </div>
-
-      {/* Map */}
-      <Map
-        ref={mapRef}
-        center={mapCenter}
-        zoom={zoom}
-        className="h-full w-full"
-        theme={mapTheme}
-      >
-        {showControls && (
-          <MapControls
-            position="bottom-right"
-            showZoom
-            showLocate={showLocate}
-            showFullscreen
+          {showControls && (
+            <MapControls
+              position="bottom-right"
+              showZoom
+              showLocate={showLocate}
+              showFullscreen
+            />
+          )}
+          <ParcelsLayer
+            geojsonData={geojsonData}
+            parcels={parcels}
+            isSatellite={isSatellite}
+            onParcelClick={handleParcelClick}
           />
-        )}
-        <ParcelsLayer
-          geojsonData={geojsonData}
-          parcels={parcels}
-          isSatellite={isSatellite}
-          onParcelClick={handleParcelClick}
-        />
-        <SatelliteLayer isSatellite={isSatellite} />
-        {popupInfo && showPopup && (
-          <ParcelPopup
-            parcel={popupInfo.parcel}
-            lngLat={popupInfo.lngLat}
-            onClose={() => setPopupInfo(null)}
-          />
-        )}
-      </Map>
+          <SatelliteLayer isSatellite={isSatellite} />
+          {popupInfo && showPopup && (
+            <ParcelPopup
+              parcel={popupInfo.parcel}
+              lngLat={popupInfo.lngLat}
+              onClose={() => setPopupInfo(null)}
+            />
+          )}
+        </Map>
 
-      {/* Footer hint */}
-      <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-9 bg-linear-to-t from-black/20 to-transparent px-4 py-3">
-        <span className="text-[11px] text-muted-foreground drop-shadow">
-          {hint}
-        </span>
-      </footer>
-    </Card>
+        {/* Footer hint */}
+        <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-9 bg-linear-to-t from-black/20 to-transparent px-4 py-3">
+          <span className="text-[11px] text-muted-foreground drop-shadow">
+            {hint}
+          </span>
+        </footer>
+      </Card>
     </div>
   )
 }

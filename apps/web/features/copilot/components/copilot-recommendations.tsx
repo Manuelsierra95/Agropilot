@@ -11,11 +11,7 @@ import { CopilotEmptyState } from "@workspace/web/features/copilot/components/co
 import { CopilotRecommendationsHeader } from "@workspace/web/features/copilot/components/copilot-recommendations-header"
 import { CopilotSuggestionButtons } from "@workspace/web/features/copilot/components/copilot-suggestion-buttons"
 
-export function CopilotRecommendations({
-  className,
-}: {
-  className?: string
-}) {
+export function CopilotRecommendations({ className }: { className?: string }) {
   const { data: suggestions, isLoading } = useQuery({
     queryKey: ["copilot", "suggestions"],
     queryFn: () => api.copilot.fetchSuggestions(),

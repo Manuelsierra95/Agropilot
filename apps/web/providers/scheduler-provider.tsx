@@ -88,10 +88,9 @@ export const SchedulerProvider = ({
   children: ReactNode
   initialState?: Event[]
 }) => {
-  const [state, dispatch] = useReducer(
-    schedulerReducer,
-    { events: initialState ?? [] }
-  )
+  const [state, dispatch] = useReducer(schedulerReducer, {
+    events: initialState ?? [],
+  })
 
   useEffect(() => {
     if (initialState) {

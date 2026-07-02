@@ -22,7 +22,10 @@ import {
 } from "@workspace/ui/components/select"
 
 import { MiniFormShell } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-shell"
-import { DESTINATIONS, PARCELS } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-data"
+import {
+  DESTINATIONS,
+  PARCELS,
+} from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-data"
 import type { MiniFormProps } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-types"
 
 const harvestSchema = z.object({

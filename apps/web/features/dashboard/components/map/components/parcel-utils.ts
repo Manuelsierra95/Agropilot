@@ -1,4 +1,7 @@
-import type { Parcel, ParcelLngLat } from "@workspace/web/features/dashboard/components/map/components/types"
+import type {
+  Parcel,
+  ParcelLngLat,
+} from "@workspace/web/features/dashboard/components/map/components/types"
 
 export const mapCenter: [number, number] = [-4.7794, 37.8882]
 

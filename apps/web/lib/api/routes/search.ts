@@ -62,8 +62,7 @@ async function parseParcelSearchResponse(
     | { error: string }
 
   if (!response.ok) {
-    const message =
-      "error" in body && body.error ? body.error : fallbackError
+    const message = "error" in body && body.error ? body.error : fallbackError
     throw new Error(message)
   }
 

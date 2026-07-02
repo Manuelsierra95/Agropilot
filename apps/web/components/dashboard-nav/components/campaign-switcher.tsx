@@ -68,8 +68,7 @@ export function CampaignSwitcher() {
   const hasLoadedCampaigns = useDashboardListsStore((state) =>
     selectHasLoadedCampaignsForParcel(state, parcelId)
   )
-  const isPendingCampaigns =
-    !hasLoadedCampaigns && !from && !to
+  const isPendingCampaigns = !hasLoadedCampaigns && !from && !to
 
   const [customFrom, setCustomFrom] = React.useState(from ?? "")
   const [customTo, setCustomTo] = React.useState(to ?? "")

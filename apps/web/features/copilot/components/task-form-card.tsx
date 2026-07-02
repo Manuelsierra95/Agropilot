@@ -1,12 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-  TASK_CATEGORY_LABELS,
-  taskCategorySchema,
-  taskCreateInputSchema,
-  type TaskCreateInput,
-} from "@workspace/schemas"
+import { taskCreateInputSchema, type TaskCreateInput } from "@workspace/schemas"
 import { Button } from "@workspace/ui/components/button"
 import {
   Form,
@@ -17,17 +12,11 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form"
 import { Input } from "@workspace/ui/components/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select"
 import { Textarea } from "@workspace/ui/components/textarea"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 
+import { CategorySelector } from "@workspace/web/components/tasks/category-selector"
 import { api } from "@workspace/web/lib/api"
 
 const taskFormSchema = taskCreateInputSchema
@@ -40,7 +29,11 @@ export interface TaskFormCardProps {
   onError: () => void
 }
 
-export function TaskFormCard({ defaults, onSuccess, onError }: TaskFormCardProps) {
+export function TaskFormCard({
+  defaults,
+  onSuccess,
+  onError,
+}: TaskFormCardProps) {
   const [submitting, setSubmitting] = useState(false)
 
   const form = useForm<TaskFormValues>({
@@ -59,8 +52,6 @@ export function TaskFormCard({ defaults, onSuccess, onError }: TaskFormCardProps
       setSubmitting(false)
     }
   }
-
-  const categories = taskCategorySchema.options
 
   return (
     <Form {...form}>
@@ -103,20 +94,12 @@ export function TaskFormCard({ defaults, onSuccess, onError }: TaskFormCardProps
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Categoría</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona categoría" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {TASK_CATEGORY_LABELS[category]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <CategorySelector
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

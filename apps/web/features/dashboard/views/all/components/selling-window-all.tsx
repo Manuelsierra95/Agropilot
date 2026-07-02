@@ -38,10 +38,12 @@ export function SellingWindowAll({ className, items }: SellingWindowAllProps) {
       </CardHeader>
       <CardContent className="pb-4">
         {items.length === 0 ? (
-          <p className="text-xs text-muted-foreground">Sin datos de parcelas.</p>
+          <p className="text-xs text-muted-foreground">
+            Sin datos de parcelas.
+          </p>
         ) : (
           <ScrollArea className="max-h-[200px]">
-            <ul className="divide-y divide-border/40 pb-1 pr-3">
+            <ul className="divide-y divide-border/40 pr-3 pb-1">
               {items.map((item) => {
                 const margin = item.lonjaPrice - item.costPerKg
                 const signal = getSellingWindowSignal(margin)

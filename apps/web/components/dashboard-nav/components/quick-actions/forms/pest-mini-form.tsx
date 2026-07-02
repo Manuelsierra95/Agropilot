@@ -26,7 +26,10 @@ import {
 } from "@workspace/ui/components/toggle-group"
 
 import { MiniFormShell } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-shell"
-import { PARCELS, PEST_TYPES } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-data"
+import {
+  PARCELS,
+  PEST_TYPES,
+} from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-data"
 import type { MiniFormProps } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-types"
 
 const pestSchema = z.object({

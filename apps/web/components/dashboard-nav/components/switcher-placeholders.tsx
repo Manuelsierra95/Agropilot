@@ -11,7 +11,7 @@ export function OrgSwitcherPlaceholder() {
     >
       <div className="flex h-7 w-full items-center gap-2 rounded-md p-2">
         <div className={cn(pulseBlock, "size-6 shrink-0")} />
-        <div className={cn(pulseBlock, "h-3.5 min-w-0 flex-1 max-w-[8rem]")} />
+        <div className={cn(pulseBlock, "h-3.5 max-w-[8rem] min-w-0 flex-1")} />
         <div className={cn(pulseBlock, "ml-auto size-4 shrink-0")} />
       </div>
     </div>

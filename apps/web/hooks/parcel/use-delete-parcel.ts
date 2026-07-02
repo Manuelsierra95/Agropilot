@@ -18,10 +18,13 @@ export function useDeleteParcel() {
 
       queryClient.invalidateQueries({ queryKey: ["parcels"] })
       queryClient.invalidateQueries({ queryKey: ["dashboard", "parcelsList"] })
-      invalidateDashboard(
-        queryClient,
-        ["finance", "production", "events", "parcels", "daily"]
-      )
+      invalidateDashboard(queryClient, [
+        "finance",
+        "production",
+        "events",
+        "parcels",
+        "daily",
+      ])
     },
     onError: () => {
       toast.error("Error al eliminar la parcela")

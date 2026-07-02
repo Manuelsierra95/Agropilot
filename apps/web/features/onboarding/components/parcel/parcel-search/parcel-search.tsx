@@ -15,7 +15,10 @@ import {
   searchQueryKeys,
   searchQueryOptions,
 } from "@workspace/web/lib/api/routes/search"
-import type { ParcelSearchResult, SearchParcelFn } from "@workspace/web/features/onboarding/components/parcel/parcel-search/types"
+import type {
+  ParcelSearchResult,
+  SearchParcelFn,
+} from "@workspace/web/features/onboarding/components/parcel/parcel-search/types"
 import { useParcelSearch } from "@workspace/web/features/onboarding/components/parcel/parcel-search/use-parcel-search"
 import { CoordinatesSearch } from "@workspace/web/features/onboarding/components/parcel/parcel-search/coordinates-search"
 import { RefcatSearch } from "@workspace/web/features/onboarding/components/parcel/parcel-search/refcat-search"
@@ -43,9 +46,7 @@ export function ParcelSearch({
     "coords"
   )
 
-  const handleFound = async (
-    input: Parameters<SearchParcelFn>[0]
-  ) => {
+  const handleFound = async (input: Parameters<SearchParcelFn>[0]) => {
     const result = await search(input)
     if (result) {
       onFound(result)

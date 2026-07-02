@@ -36,7 +36,10 @@ import {
 import { Separator } from "@workspace/ui/components/separator"
 
 import { BulkFinanceDialog } from "@workspace/web/components/finance/bulk-finance-dialog"
-import { CATEGORIES, PAYMENT_METHOD_LABELS } from "@workspace/web/features/finance/components/table/constants"
+import {
+  CATEGORIES,
+  PAYMENT_METHOD_LABELS,
+} from "@workspace/web/features/finance/components/table/constants"
 import type { TransactionFilters } from "@workspace/web/features/finance/components/table/hooks/use-transaction-filters"
 
 // ─── Types ────────────────────────────────────────────────────────────────────

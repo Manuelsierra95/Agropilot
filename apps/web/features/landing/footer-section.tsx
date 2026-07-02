@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import { ArrowUpRight } from "lucide-react";
-import { AnimatedWave } from "@workspace/web/features/landing/animated-wave";
+import { ArrowUpRight } from "lucide-react"
+import { AnimatedWave } from "@workspace/web/features/landing/animated-wave"
 
 const footerLinks = {
   Producto: [
@@ -27,35 +27,38 @@ const footerLinks = {
     { name: "Términos", href: "#" },
     { name: "Seguridad", href: "#security" },
   ],
-};
+}
 
 const socialLinks = [
   { name: "Twitter", href: "#" },
   { name: "GitHub", href: "#" },
   { name: "LinkedIn", href: "#" },
-];
+]
 
 export function FooterSection() {
   return (
     <footer className="relative border-t border-foreground/10">
       {/* Animated wave background */}
-      <div className="absolute inset-0 h-64 opacity-20 pointer-events-none overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 h-64 overflow-hidden opacity-20">
         <AnimatedWave />
       </div>
-      
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
+
+      <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
         {/* Main Footer */}
         <div className="py-16 lg:py-24">
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-12 lg:gap-8">
+          <div className="grid grid-cols-2 gap-12 md:grid-cols-6 lg:gap-8">
             {/* Brand Column */}
             <div className="col-span-2">
-              <a href="#" className="inline-flex items-center gap-2 mb-6">
-                <span className="text-2xl font-display">Agropilot</span>
-                <span className="text-xs text-muted-foreground font-mono">TM</span>
+              <a href="#" className="mb-6 inline-flex items-center gap-2">
+                <span className="font-display text-2xl">Agropilot</span>
+                <span className="font-mono text-xs text-muted-foreground">
+                  TM
+                </span>
               </a>
 
-              <p className="text-muted-foreground leading-relaxed mb-8 max-w-xs">
-                La plataforma inteligente para el olivar moderno. Monitoriza, anticipa y optimiza cada aspecto de tu explotación.
+              <p className="mb-8 max-w-xs leading-relaxed text-muted-foreground">
+                La plataforma inteligente para el olivar moderno. Monitoriza,
+                anticipa y optimiza cada aspecto de tu explotación.
               </p>
 
               {/* Social Links */}
@@ -64,10 +67,10 @@ export function FooterSection() {
                   <a
                     key={link.name}
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 group"
+                    className="group flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {link.name}
-                    <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    <ArrowUpRight className="h-3 w-3 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
                   </a>
                 ))}
               </div>
@@ -76,17 +79,17 @@ export function FooterSection() {
             {/* Link Columns */}
             {Object.entries(footerLinks).map(([title, links]) => (
               <div key={title}>
-                <h3 className="text-sm font-medium mb-6">{title}</h3>
+                <h3 className="mb-6 text-sm font-medium">{title}</h3>
                 <ul className="space-y-4">
                   {links.map((link) => (
                     <li key={link.name}>
                       <a
                         href={link.href}
-                        className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-2"
+                        className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
                       >
                         {link.name}
                         {"badge" in link && link.badge && (
-                          <span className="text-xs px-2 py-0.5 bg-foreground text-background rounded-full">
+                          <span className="rounded-full bg-foreground px-2 py-0.5 text-xs text-background">
                             {link.badge}
                           </span>
                         )}
@@ -100,19 +103,19 @@ export function FooterSection() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="py-8 border-t border-foreground/10 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-foreground/10 py-8 md:flex-row">
           <p className="text-sm text-muted-foreground">
             2025 Agropilot. Todos los derechos reservados.
           </p>
 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
+              <span className="h-2 w-2 rounded-full bg-green-500" />
               Todos los sistemas operativos
             </span>
           </div>
         </div>
       </div>
     </footer>
-  );
+  )
 }

@@ -32,7 +32,9 @@ export class DashboardErrorBoundary extends Component<Props, State> {
         this.props.fallback || (
           <div className="flex h-[400px] items-center justify-center rounded-lg border border-dashed p-8">
             <div className="text-center">
-              <h3 className="text-lg font-semibold">Error al cargar el dashboard</h3>
+              <h3 className="text-lg font-semibold">
+                Error al cargar el dashboard
+              </h3>
               <p className="mt-2 text-sm text-muted-foreground">
                 {this.state.error?.message || "Ha ocurrido un error inesperado"}
               </p>

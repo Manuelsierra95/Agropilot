@@ -8,6 +8,7 @@ import type {
 import type { ForecastDay } from "@workspace/web/features/calendar/components/calendar/sidecards/time-weather-card"
 import { CreateTaskDialog } from "@workspace/web/components/tasks/create-task-dialog"
 import { TaskDetailSheet } from "@workspace/web/components/tasks/task-detail-sheet"
+import { CalendarDndProvider } from "@workspace/web/features/calendar/components/calendar/calendar-dnd-provider"
 
 export default function CalendarProvider({
   tasks,
@@ -63,7 +64,7 @@ export default function CalendarProvider({
         onOpenChange={setTaskDetailSheetOpen}
         taskId={selectedTaskId}
       />
-      {children}
+      <CalendarDndProvider>{children}</CalendarDndProvider>
     </CalendarContext.Provider>
   )
 }

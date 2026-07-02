@@ -16,7 +16,7 @@ const updateUserOnboarding = async (
   const response = await client.api.v1.user.me.$patch({
     json: { onboardingStep },
   })
-  const body = await response.json() as { data: UserMeResponse }
+  const body = (await response.json()) as { data: UserMeResponse }
   return body.data
 }
 

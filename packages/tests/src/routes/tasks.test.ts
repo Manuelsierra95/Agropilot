@@ -213,6 +213,35 @@ describe("tasks routes", () => {
     )
   })
 
+  it("PUT /tasks/:taskId accepts ISO datetime startDate for calendar reschedule", async () => {
+    mockAuthenticatedSession()
+    taskMocks.updateTask.mockResolvedValue({
+      id: "task-1",
+      title: "Riego",
+      category: "irrigation",
+      status: "pending",
+    })
+
+    const res = await apiRequest(app, "/api/v1/tasks/task-1", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        startDate: "2026-07-02T14:00:00.000Z",
+        endDate: "2026-07-02T16:00:00.000Z",
+      }),
+    })
+
+    expect(res.status).toBe(200)
+    expect(taskMocks.updateTask).toHaveBeenCalledWith(
+      TEST_ORG_ID,
+      "task-1",
+      expect.objectContaining({
+        startDate: "2026-07-02T14:00:00.000Z",
+        endDate: "2026-07-02T16:00:00.000Z",
+      })
+    )
+  })
+
   it("PUT /tasks/:taskId returns 400 for invalid payload", async () => {
     mockAuthenticatedSession()
 

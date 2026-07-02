@@ -31,7 +31,8 @@ export function useAddressSearchForm(isActive: boolean) {
 
   const provinceCode = useMemo(
     () =>
-      provincias.find((item) => item.Denominacion === formData.provincia)?.Codigo,
+      provincias.find((item) => item.Denominacion === formData.provincia)
+        ?.Codigo,
     [provincias, formData.provincia]
   )
 
@@ -46,7 +47,8 @@ export function useAddressSearchForm(isActive: boolean) {
 
   const municipalityCode = useMemo(
     () =>
-      municipios.find((item) => item.Denominacion === formData.municipio)?.Codigo,
+      municipios.find((item) => item.Denominacion === formData.municipio)
+        ?.Codigo,
     [municipios, formData.municipio]
   )
 
@@ -75,10 +77,15 @@ export function useAddressSearchForm(isActive: boolean) {
 
   const queryApiError = useMemo(() => {
     if (provincesQuery.isError) return "No se pudieron cargar las provincias."
-    if (municipalitiesQuery.isError) return "No se pudieron cargar los municipios."
+    if (municipalitiesQuery.isError)
+      return "No se pudieron cargar los municipios."
     if (streetsQuery.isError) return "No se pudieron cargar las vías."
     return null
-  }, [provincesQuery.isError, municipalitiesQuery.isError, streetsQuery.isError])
+  }, [
+    provincesQuery.isError,
+    municipalitiesQuery.isError,
+    streetsQuery.isError,
+  ])
 
   const displayApiError = apiError ?? queryApiError
 

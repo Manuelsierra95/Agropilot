@@ -451,7 +451,7 @@ export function EditParcel({
                   Cancelar
                 </AlertDialogCancel>
                 <AlertDialogAction
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
                   onClick={handleDelete}
                   disabled={deleteParcel.isPending}
                 >

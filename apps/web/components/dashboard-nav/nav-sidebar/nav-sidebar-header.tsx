@@ -15,7 +15,7 @@ export function NavSidebarHeader() {
         <ParcelSwitcher />
       </div>
 
-      <div className="flex min-w-0 max-w-[min(100vw-12rem,28rem)] items-center justify-center overflow-hidden px-2">
+      <div className="flex max-w-[min(100vw-12rem,28rem)] min-w-0 items-center justify-center overflow-hidden px-2">
         <Breadcrumbs />
       </div>
 

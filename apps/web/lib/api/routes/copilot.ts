@@ -7,7 +7,10 @@ async function fetchSuggestions(): Promise<string[]> {
   if (!res.ok) {
     throw new Error("Failed to fetch copilot suggestions")
   }
-  const body = (await res.json()) as { meta: unknown; data: { suggestions: string[] } }
+  const body = (await res.json()) as {
+    meta: unknown
+    data: { suggestions: string[] }
+  }
   return body.data.suggestions
 }
 

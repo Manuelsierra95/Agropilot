@@ -7,10 +7,7 @@ import { useState } from "react"
 
 import { useCopilotLayout } from "@workspace/web/features/copilot/copilot-layout-context"
 import { Bubble, BubbleContent } from "@workspace/ui/components/bubble"
-import {
-  Message,
-  MessageContent,
-} from "@workspace/ui/components/message"
+import { Message, MessageContent } from "@workspace/ui/components/message"
 import {
   Marker,
   MarkerContent,
@@ -86,7 +83,9 @@ export function AssistantMessage({
   )
 
   const textContent = message.parts
-    .filter((part): part is { type: "text"; text: string } => part.type === "text")
+    .filter(
+      (part): part is { type: "text"; text: string } => part.type === "text"
+    )
     .map((part) => part.text)
     .join("")
 

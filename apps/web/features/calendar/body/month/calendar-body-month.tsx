@@ -12,7 +12,9 @@ import {
   differenceInDays,
 } from "date-fns"
 import { cn } from "@workspace/ui/lib/utils"
-import CalendarTask from "@workspace/web/features/calendar/components/calendar/calendar-task"
+import { CalendarDropZone } from "@workspace/web/features/calendar/components/calendar/calendar-drop-zone"
+import { useCalendarDnd } from "@workspace/web/features/calendar/components/calendar/calendar-dnd-provider"
+import { DraggableCalendarTask } from "@workspace/web/features/calendar/components/calendar/draggable-calendar-task"
 import { AnimatePresence, motion } from "motion/react"
 import { Cloud, CloudRain, CloudSnow, Sun, CloudSun } from "lucide-react"
 
@@ -32,6 +34,7 @@ export default function CalendarBodyMonth({
   maxVisibleEvents = 5,
 }: CalendarBodyMonthProps) {
   const { date, tasks, setDate, setMode, forecast } = useCalendarContext()
+  const { didDragRecently } = useCalendarDnd()
 
   // Get the first day of the month
   const monthStart = startOfMonth(date)
@@ -115,8 +118,10 @@ export default function CalendarBodyMonth({
             const isLastRow = calendarDays.indexOf(day) >= totalDays - 7
 
             return (
-              <div
+              <CalendarDropZone
                 key={day.toISOString()}
+                type="day"
+                date={day}
                 className={cn(
                   "relative flex cursor-pointer flex-col border-r border-b border-border/30 p-2",
                   minHeightClass,
@@ -126,6 +131,7 @@ export default function CalendarBodyMonth({
                 )}
                 onClick={(e) => {
                   e.stopPropagation()
+                  if (didDragRecently()) return
                   setDate(day)
                   setMode("day")
                 }}
@@ -155,7 +161,7 @@ export default function CalendarBodyMonth({
                 <AnimatePresence mode="wait">
                   <div className="mt-1 flex flex-col gap-1">
                     {dayTasks.slice(0, maxVisibleEvents).map((task) => (
-                      <CalendarTask
+                      <DraggableCalendarTask
                         key={task.id}
                         task={task}
                         className="relative h-auto"
@@ -183,7 +189,7 @@ export default function CalendarBodyMonth({
                     )}
                   </div>
                 </AnimatePresence>
-              </div>
+              </CalendarDropZone>
             )
           })}
         </motion.div>

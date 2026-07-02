@@ -1,8 +1,6 @@
 import { getPolygonCenter } from "@workspace/web/components/maps/components/parcel-utils"
 
-export function draftPolygonFromCoordinates(
-  coordinates: number[][][]
-): string {
+export function draftPolygonFromCoordinates(coordinates: number[][][]): string {
   return JSON.stringify(coordinates)
 }
 
@@ -24,9 +22,7 @@ export function toWktPolygon(coordinates: number[][][]): string {
   }
 
   const closedRing = closeRing(ring)
-  const pairs = closedRing
-    .map(([lng, lat]) => `${lng} ${lat}`)
-    .join(", ")
+  const pairs = closedRing.map(([lng, lat]) => `${lng} ${lat}`).join(", ")
 
   return `POLYGON((${pairs}))`
 }
@@ -34,12 +30,7 @@ export function toWktPolygon(coordinates: number[][][]): string {
 function closeRing(ring: number[][]): number[][] {
   const first = ring[0]
   const last = ring[ring.length - 1]
-  if (
-    first &&
-    last &&
-    first[0] === last[0] &&
-    first[1] === last[1]
-  ) {
+  if (first && last && first[0] === last[0] && first[1] === last[1]) {
     return ring
   }
   return first ? [...ring, first] : ring
@@ -54,7 +45,9 @@ export function parseWktPolygon(wkt: string): number[][][] | null {
     return [lng, lat] as [number, number]
   })
 
-  if (pairs.some(([lng, lat]) => !Number.isFinite(lng) || !Number.isFinite(lat))) {
+  if (
+    pairs.some(([lng, lat]) => !Number.isFinite(lng) || !Number.isFinite(lat))
+  ) {
     return null
   }
 

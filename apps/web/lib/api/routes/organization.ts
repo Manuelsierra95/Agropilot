@@ -15,7 +15,10 @@ const getActiveOrganization = cache(
   (): Promise<ActiveOrganizationData> =>
     client.api.v1.organization.active
       .$get()
-      .then((response) => response.json() as Promise<{ data: ActiveOrganizationData }>)
+      .then(
+        (response) =>
+          response.json() as Promise<{ data: ActiveOrganizationData }>
+      )
       .then((body) => body.data)
 )
 
@@ -23,7 +26,12 @@ const getOrganizationMembers = cache(
   (): Promise<OrganizationMember[]> =>
     client.api.v1.organization.members
       .$get()
-      .then((response) => response.json() as Promise<{ data: { members: OrganizationMember[] } }>)
+      .then(
+        (response) =>
+          response.json() as Promise<{
+            data: { members: OrganizationMember[] }
+          }>
+      )
       .then((body) => body.data.members)
 )
 
@@ -31,7 +39,10 @@ const getOrganizationMe = cache(
   (): Promise<OrganizationMeResponse> =>
     client.api.v1.organization.me
       .$get()
-      .then((response) => response.json() as Promise<{ data: OrganizationMeResponse }>)
+      .then(
+        (response) =>
+          response.json() as Promise<{ data: OrganizationMeResponse }>
+      )
       .then((body) => body.data)
 )
 
@@ -44,13 +55,23 @@ const updateOrganization = (data: UpdateOrganizationInput) =>
 const listInvitations = (): Promise<InvitationSelect[]> =>
   client.api.v1.organization.invitations
     .$get()
-    .then((response) => response.json() as Promise<{ data: { invitations: InvitationSelect[] } }>)
+    .then(
+      (response) =>
+        response.json() as Promise<{
+          data: { invitations: InvitationSelect[] }
+        }>
+    )
     .then((body) => body.data.invitations)
 
-const createInvitation = (data: InvitationCreateInput): Promise<InvitationSelect> =>
+const createInvitation = (
+  data: InvitationCreateInput
+): Promise<InvitationSelect> =>
   client.api.v1.organization.invitations
     .$post({ json: data })
-    .then((response) => response.json() as Promise<{ data: { invitation: InvitationSelect } }>)
+    .then(
+      (response) =>
+        response.json() as Promise<{ data: { invitation: InvitationSelect } }>
+    )
     .then((body) => body.data.invitation)
 
 const bulkCreateInvitations = (
@@ -58,7 +79,10 @@ const bulkCreateInvitations = (
 ): Promise<InvitationBulkCreateResult> =>
   client.api.v1.organization.invitations.bulk
     .$post({ json: data })
-    .then((response) => response.json() as Promise<{ data: InvitationBulkCreateResult }>)
+    .then(
+      (response) =>
+        response.json() as Promise<{ data: InvitationBulkCreateResult }>
+    )
     .then((body) => body.data)
 
 const cancelInvitation = (id: string): Promise<string> =>

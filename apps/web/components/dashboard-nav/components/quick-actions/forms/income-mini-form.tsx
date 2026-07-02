@@ -59,7 +59,8 @@ export function IncomeMiniForm({ onSuccess }: MiniFormProps) {
       await api.finance.createTransaction({
         concept: values.concept,
         flow: "income",
-        category: (CONCEPT_MAP[values.concept] ?? "other") as TransactionCategory,
+        category: (CONCEPT_MAP[values.concept] ??
+          "other") as TransactionCategory,
         amount: values.amount,
         date: values.date,
         parcelId: values.parcelId === "all" ? undefined : values.parcelId,

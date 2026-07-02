@@ -16,8 +16,7 @@ export async function CopilotLayout({
   className?: string
 }) {
   const cookieStore = await cookies()
-  const defaultOpen =
-    cookieStore.get(COPILOT_SIDEBAR_COOKIE)?.value !== "false"
+  const defaultOpen = cookieStore.get(COPILOT_SIDEBAR_COOKIE)?.value !== "false"
 
   return (
     <SidebarProvider

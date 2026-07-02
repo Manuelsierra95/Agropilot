@@ -25,7 +25,7 @@ function getOverlappingTasks(
   })
 }
 
-function calculateTaskPosition(
+export function calculateTaskPosition(
   task: CalendarTaskType,
   allTasks: CalendarTaskType[]
 ): TaskPosition {
@@ -64,14 +64,18 @@ export default function CalendarTask({
   task,
   month = false,
   className,
+  disableLayoutAnimation = false,
+  embedded = false,
 }: {
   task: CalendarTaskType
   month?: boolean
   className?: string
+  disableLayoutAnimation?: boolean
+  embedded?: boolean
 }) {
   const { tasks, setSelectedTaskId, setTaskDetailSheetOpen, date } =
     useCalendarContext()
-  const style = month ? {} : calculateTaskPosition(task, tasks)
+  const style = month || embedded ? {} : calculateTaskPosition(task, tasks)
 
   const isTaskInCurrentMonth = isSameMonth(task.start, date)
   const animationKey = `${task.id}-${
@@ -84,7 +88,8 @@ export default function CalendarTask({
         <motion.div
           className={cn(
             `cursor-pointer truncate rounded-md px-3 py-1.5 transition-all duration-300 bg-${task.color}-500/10 hover:bg-${task.color}-500/20 border border-${task.color}-500`,
-            !month && "absolute",
+            !month && !embedded && "absolute",
+            embedded && "h-full",
             className
           )}
           style={style}
@@ -123,7 +128,11 @@ export default function CalendarTask({
               ease: "easeOut",
             },
           }}
-          layoutId={`task-${animationKey}-${month ? "month" : "day"}`}
+          layoutId={
+            disableLayoutAnimation
+              ? undefined
+              : `task-${animationKey}-${month ? "month" : "day"}`
+          }
         >
           <motion.div
             className={cn(

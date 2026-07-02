@@ -5,11 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
-import {
-  TASK_CATEGORY_LABELS,
-  taskCategorySchema,
-  type TaskCategory,
-} from "@workspace/schemas"
+import { type TaskCreateInput } from "@workspace/schemas"
 import {
   Form,
   FormControl,
@@ -27,6 +23,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 
+import { CategorySelector } from "@workspace/web/components/tasks/category-selector"
 import { MiniFormShell } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-shell"
 import { useParcels } from "@workspace/web/hooks/parcel"
 import { api } from "@workspace/web/lib/api"
@@ -57,10 +54,10 @@ export function TaskMiniForm({ onSuccess }: MiniFormProps) {
     try {
       await api.tasks.createTask({
         title: values.title,
-        category: values.category as TaskCategory,
+        category: values.category,
         startDate: values.dueDate,
         parcelId: values.parcelId === "all" ? undefined : values.parcelId,
-      })
+      } as TaskCreateInput)
       toast.success("Tarea creada")
       onSuccess()
     } catch {
@@ -69,8 +66,6 @@ export function TaskMiniForm({ onSuccess }: MiniFormProps) {
       setLoading(false)
     }
   }
-
-  const categories = taskCategorySchema.options
 
   return (
     <Form {...form}>
@@ -100,23 +95,12 @@ export function TaskMiniForm({ onSuccess }: MiniFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs">Categoría</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger className="h-7 text-xs">
-                      <SelectValue placeholder="Selecciona" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat} value={cat} className="text-xs">
-                        {TASK_CATEGORY_LABELS[cat]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <CategorySelector
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

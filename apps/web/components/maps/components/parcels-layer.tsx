@@ -5,7 +5,10 @@ import { useEffect } from "react"
 import { useMap } from "@workspace/ui/components/map"
 
 import { getPolygonCenter } from "@workspace/web/components/maps/components/parcel-utils"
-import type { Parcel, ParcelLngLat } from "@workspace/web/components/maps/components/types"
+import type {
+  Parcel,
+  ParcelLngLat,
+} from "@workspace/web/components/maps/components/types"
 
 type ParcelsLayerProps = {
   geojsonData: GeoJSON.FeatureCollection
@@ -25,7 +28,9 @@ export function ParcelsLayer({
   useEffect(() => {
     if (!map || !isLoaded || !map.isStyleLoaded()) return
 
-    const source = map.getSource("parcels") as maplibregl.GeoJSONSource | undefined
+    const source = map.getSource("parcels") as
+      | maplibregl.GeoJSONSource
+      | undefined
     if (source) {
       source.setData(geojsonData)
     }

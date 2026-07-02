@@ -25,7 +25,10 @@ import {
 } from "@workspace/web/features/onboarding/components/parcel/parcel-form"
 import { ParcelList } from "@workspace/web/features/onboarding/components/parcel/parcel-list"
 import { ParcelMap } from "@workspace/web/features/onboarding/components/parcel/parcel-map-preview"
-import { createParcelDraft, clearParcelDraftData } from "@workspace/web/features/onboarding/components/parcel/parcel-draft-utils"
+import {
+  createParcelDraft,
+  clearParcelDraftData,
+} from "@workspace/web/features/onboarding/components/parcel/parcel-draft-utils"
 import {
   CROP_TYPE_LABELS,
   DEFAULT_CROP_TYPE,
@@ -390,7 +393,7 @@ export function CreateParcelDialog({
             <div className="shrink-0 border-b border-sidebar-border px-6 py-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground text-sm font-semibold">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground">
                     {initial}
                   </div>
                   <div>
@@ -409,7 +412,8 @@ export function CreateParcelDialog({
                   {getSaveStatusBadge(activeSaveStatus)}
                   <Badge variant="secondary">
                     {CROP_TYPE_LABELS[
-                      (activeParcel.cropType || DEFAULT_CROP_TYPE) as CropTypeValue
+                      (activeParcel.cropType ||
+                        DEFAULT_CROP_TYPE) as CropTypeValue
                     ] ?? activeParcel.cropType}
                   </Badge>
                   {activeParcel.irrigationType ? (
@@ -423,10 +427,7 @@ export function CreateParcelDialog({
               </div>
             </div>
             <div className="min-h-0 flex-1 overflow-hidden">
-              <ParcelMap
-                parcels={parcels}
-                activeParcelId={activeParcelId}
-              />
+              <ParcelMap parcels={parcels} activeParcelId={activeParcelId} />
             </div>
           </div>
         </div>

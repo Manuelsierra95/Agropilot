@@ -8,7 +8,10 @@ import type {
   ParcelItem,
   YieldData,
 } from "@workspace/web/features/parcel/lib/parcel-types"
-import type { WeatherDaily, WeatherMetrics } from "@workspace/web/lib/parcel/types"
+import type {
+  WeatherDaily,
+  WeatherMetrics,
+} from "@workspace/web/lib/parcel/types"
 import { ParcelHero } from "@workspace/web/features/parcel/components/parcel-hero"
 import { ParcelWeatherDashboard } from "@workspace/web/features/parcel/views/single/components/parcel-weather-dashboard"
 import { EditParcel } from "@workspace/web/features/parcel/views/single/components/edit-parcel"

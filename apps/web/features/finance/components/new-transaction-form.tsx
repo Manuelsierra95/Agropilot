@@ -58,11 +58,7 @@ const INCOME_CATEGORIES: { label: string; value: TransactionCategory }[] = [
   { label: "Otros", value: "other" },
 ]
 
-export function NewTransactionForm({
-  onSuccess,
-}: {
-  onSuccess: () => void
-}) {
+export function NewTransactionForm({ onSuccess }: { onSuccess: () => void }) {
   const { data: parcels = [], isLoading: loadingParcels } = useParcels()
   const [loading, setLoading] = React.useState(false)
 
@@ -124,7 +120,10 @@ export function NewTransactionForm({
             <FormItem>
               <FormLabel>Concepto</FormLabel>
               <FormControl>
-                <Input placeholder="Ej: Fertilización parcela norte" {...field} />
+                <Input
+                  placeholder="Ej: Fertilización parcela norte"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -138,7 +137,10 @@ export function NewTransactionForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Tipo</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue />
@@ -160,7 +162,10 @@ export function NewTransactionForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Categoría</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar" />
@@ -253,7 +258,10 @@ export function NewTransactionForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Método de pago</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar" />

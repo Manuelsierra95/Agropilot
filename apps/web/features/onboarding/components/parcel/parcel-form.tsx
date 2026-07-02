@@ -22,7 +22,11 @@ import {
   draftCentroidFromCoordinates,
   toWktPolygon,
 } from "@workspace/web/lib/cadastre/geometry"
-import { DEFAULT_CROP_TYPE, type CropTypeValue, type IrrigationType } from "@workspace/web/features/onboarding/components/parcel/parcel-constants"
+import {
+  DEFAULT_CROP_TYPE,
+  type CropTypeValue,
+  type IrrigationType,
+} from "@workspace/web/features/onboarding/components/parcel/parcel-constants"
 
 export interface FieldFormData {
   id: string
@@ -267,7 +271,6 @@ export function ParcelForm({
               }
             />
           </Field>
-
         </FieldGroup>
       </div>
     </ScrollArea>

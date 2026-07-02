@@ -45,7 +45,9 @@ export function CopilotLayoutProvider({ children }: { children: ReactNode }) {
 export function useCopilotLayout() {
   const context = useContext(CopilotLayoutContext)
   if (!context) {
-    throw new Error("useCopilotLayout must be used within CopilotLayoutProvider")
+    throw new Error(
+      "useCopilotLayout must be used within CopilotLayoutProvider"
+    )
   }
   return context
 }

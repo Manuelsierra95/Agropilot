@@ -27,7 +27,7 @@ export function usePreservedSearchParams() {
     options?: {
       include?: ScopeKey[]
       override?: Partial<Record<ScopeKey, string | null>>
-    },
+    }
   ) => {
     const searchParams = new URLSearchParams(baseParams)
     const include = options?.include

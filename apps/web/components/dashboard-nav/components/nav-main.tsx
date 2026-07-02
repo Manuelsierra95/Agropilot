@@ -16,7 +16,10 @@ export function NavMain({ items }: { items: NavigationNavItem[] }) {
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
-              <PreservedLink href={item.url} include={item.scope ?? SCOPE_KEYS.global}>
+              <PreservedLink
+                href={item.url}
+                include={item.scope ?? SCOPE_KEYS.global}
+              >
                 <item.icon className="size-4" />
                 <span>{item.title}</span>
               </PreservedLink>

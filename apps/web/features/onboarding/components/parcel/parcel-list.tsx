@@ -3,7 +3,10 @@
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { Check, Plus, X } from "lucide-react"
-import type { FieldFormData, ParcelSaveStatus } from "@workspace/web/features/onboarding/components/parcel/parcel-form"
+import type {
+  FieldFormData,
+  ParcelSaveStatus,
+} from "@workspace/web/features/onboarding/components/parcel/parcel-form"
 
 interface ParcelListProps {
   parcels: FieldFormData[]
@@ -39,7 +42,7 @@ export function ParcelList({
   saveStatusByParcelId,
 }: ParcelListProps) {
   return (
-    <div className="shrink-0 -mx-6 flex flex-col gap-2 border-b border-sidebar-border bg-sidebar px-6 pb-3">
+    <div className="-mx-6 flex shrink-0 flex-col gap-2 border-b border-sidebar-border bg-sidebar px-6 pb-3">
       <div className="flex flex-wrap gap-2">
         {parcels.map((parcel, index) => {
           const isActive = parcel.id === activeParcelId

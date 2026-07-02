@@ -92,7 +92,10 @@ const deleteParcel = (id: string) =>
 const getParcelsMap = (): Promise<DashboardMapParcel[]> =>
   client.api.v1.parcel.map
     .$get()
-    .then((res) => res.json() as Promise<{ data: { mapParcels: DashboardMapParcel[] } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{ data: { mapParcels: DashboardMapParcel[] } }>
+    )
     .then((res) => res.data.mapParcels)
 
 const getParcelRecommendations = (
@@ -100,13 +103,23 @@ const getParcelRecommendations = (
 ): Promise<DashboardRecommendation[]> =>
   client.api.v1.parcel[":id"].recommendations
     .$get({ param: { id: parcelId } })
-    .then((res) => res.json() as Promise<{ data: { recommendations: DashboardRecommendation[] } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { recommendations: DashboardRecommendation[] }
+        }>
+    )
     .then((res) => res.data.recommendations)
 
 const getParcelRisks = (parcelId: string): Promise<DashboardRisks> =>
   client.api.v1.parcel[":id"].weather
     .$get({ param: { id: parcelId } })
-    .then((res) => res.json() as Promise<{ data: { weather: { data: { risks: DashboardRisks } } } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { weather: { data: { risks: DashboardRisks } } }
+        }>
+    )
     .then((res) => res.data.weather.data.risks)
 
 const getParcelCropOverview = (
@@ -126,20 +139,32 @@ const getParcelsCropOverviews = (
 ): Promise<DashboardParcelsCropOverviews> =>
   client.api.v1.parcel.dashboard
     .$get({ query: { ...toScopeQuery(scope), include: "cropOverviews" } })
-    .then((res) => res.json() as Promise<{ data: { cropOverviews: DashboardParcelsCropOverviews } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { cropOverviews: DashboardParcelsCropOverviews }
+        }>
+    )
     .then((res) => res.data.cropOverviews)
 
 const getParcelsRecommendations =
   (): Promise<DashboardParcelsRecommendations> =>
     client.api.v1.parcel.dashboard
       .$get({ query: { include: "recommendations" } })
-      .then((res) => res.json() as Promise<{ data: { recommendations: DashboardParcelsRecommendations } }>)
+      .then(
+        (res) =>
+          res.json() as Promise<{
+            data: { recommendations: DashboardParcelsRecommendations }
+          }>
+      )
       .then((res) => res.data.recommendations)
 
 const getParcelsRisks = (): Promise<DashboardParcelsRisks> =>
   client.api.v1.parcel.dashboard
     .$get({ query: { include: "risks" } })
-    .then((res) => res.json() as Promise<{ data: { risks: DashboardParcelsRisks } }>)
+    .then(
+      (res) => res.json() as Promise<{ data: { risks: DashboardParcelsRisks } }>
+    )
     .then((res) => res.data.risks)
 
 const getParcelAgroclimate = (
@@ -151,7 +176,12 @@ const getParcelAgroclimate = (
       param: { id: parcelId },
       query: toScopeQuery(scope),
     })
-    .then((res) => res.json() as Promise<{ data: { agroclimate: DashboardParcelAgroclimate } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { agroclimate: DashboardParcelAgroclimate }
+        }>
+    )
     .then((res) => res.data.agroclimate)
 
 const getParcelsWeatherComparison = (
@@ -159,7 +189,12 @@ const getParcelsWeatherComparison = (
 ): Promise<DashboardParcelsWeatherComparison> =>
   client.api.v1.parcel.dashboard
     .$get({ query: { ...toScopeQuery(scope), include: "weatherComparison" } })
-    .then((res) => res.json() as Promise<{ data: { weatherComparison: DashboardParcelsWeatherComparison } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { weatherComparison: DashboardParcelsWeatherComparison }
+        }>
+    )
     .then((res) => res.data.weatherComparison)
 
 export const parcelApi = {

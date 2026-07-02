@@ -30,12 +30,7 @@ export type FinanceTransaction = z.infer<typeof financeTransactionSchema>
 
 export type FinanceTransactionSnapshot = Pick<
   FinanceTransaction,
-  | "type"
-  | "category"
-  | "amount"
-  | "paymentMethod"
-  | "invoiceNumber"
-  | "date"
+  "type" | "category" | "amount" | "paymentMethod" | "invoiceNumber" | "date"
 > & {
   parcelName?: string
 }

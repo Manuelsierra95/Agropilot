@@ -112,7 +112,11 @@ export function RecommendationsAll({
           </ul>
         )}
       </CardContent>
-      <LinkButton text="Ver detalle" href="/dashboard/parcel" include={SCOPE_KEYS.parcel} />
+      <LinkButton
+        text="Ver detalle"
+        href="/dashboard/parcel"
+        include={SCOPE_KEYS.parcel}
+      />
     </Card>
   )
 }

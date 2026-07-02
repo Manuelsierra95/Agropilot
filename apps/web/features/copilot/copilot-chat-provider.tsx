@@ -46,11 +46,10 @@ export function CopilotChatProvider({ children }: { children: ReactNode }) {
     [parcelId]
   )
 
-  const { messages, setMessages, sendMessage, status, stop } = useChat<UIMessage>(
-    {
+  const { messages, setMessages, sendMessage, status, stop } =
+    useChat<UIMessage>({
       transport,
-    }
-  )
+    })
 
   const isLoading = status === "streaming" || status === "submitted"
   const hasMessages = messages.length > 0

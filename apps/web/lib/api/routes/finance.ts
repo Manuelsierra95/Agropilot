@@ -23,7 +23,10 @@ const listTransactions = cache(
   (): Promise<TransactionSelect[]> =>
     client.api.v1.finance
       .$get()
-      .then((res) => res.json() as Promise<{ data: { transactions: TransactionSelect[] } }>)
+      .then(
+        (res) =>
+          res.json() as Promise<{ data: { transactions: TransactionSelect[] } }>
+      )
       .then((res) => res.data.transactions)
 )
 
@@ -33,7 +36,10 @@ const getTransactionById = cache(
       .$get({
         param: { id },
       })
-      .then((res) => res.json() as Promise<{ data: { transaction: TransactionSelect } }>)
+      .then(
+        (res) =>
+          res.json() as Promise<{ data: { transaction: TransactionSelect } }>
+      )
       .then((res) => res.data.transaction)
 )
 
@@ -42,7 +48,10 @@ const createTransaction = (data: TransactionCreateInput) =>
     .$post({
       json: data,
     })
-    .then((res) => res.json() as Promise<{ data: { transaction: TransactionSelect } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{ data: { transaction: TransactionSelect } }>
+    )
     .then((res) => {
       notifyDashboardMutation(["finance", "production"])
       return res.data.transaction
@@ -53,7 +62,10 @@ const bulkCreateTransactions = (data: TransactionBulkCreateInput) =>
     .$post({
       json: data,
     })
-    .then((res) => res.json() as Promise<{ data: { transactions: TransactionSelect[] } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{ data: { transactions: TransactionSelect[] } }>
+    )
     .then((res) => {
       notifyDashboardMutation(["finance", "production"])
       return res.data.transactions
@@ -65,7 +77,10 @@ const updateTransaction = (id: string, data: TransactionUpdateInput) =>
       param: { id },
       json: data,
     })
-    .then((res) => res.json() as Promise<{ data: { transaction: TransactionSelect } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{ data: { transaction: TransactionSelect } }>
+    )
     .then((res) => {
       notifyDashboardMutation(["finance", "production"])
       return res.data.transaction
@@ -85,7 +100,12 @@ const deleteTransaction = (id: string) =>
 const getOlivePrices = (): Promise<DashboardOlivePriceItem[]> =>
   client.api.v1.finance["olive-prices"]
     .$get()
-    .then((res) => res.json() as Promise<{ data: { olivePrices: DashboardOlivePriceItem[] } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { olivePrices: DashboardOlivePriceItem[] }
+        }>
+    )
     .then((res) => res.data.olivePrices)
 
 const getSellingWindow = (
@@ -93,7 +113,12 @@ const getSellingWindow = (
 ): Promise<DashboardSellingWindow> =>
   client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "sellingWindow" } })
-    .then((res) => res.json() as Promise<{ data: { sellingWindow: DashboardSellingWindow } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { sellingWindow: DashboardSellingWindow }
+        }>
+    )
     .then((res) => res.data.sellingWindow)
 
 const getParcelsSellingWindows = (
@@ -101,7 +126,12 @@ const getParcelsSellingWindows = (
 ): Promise<DashboardParcelsSellingWindows> =>
   client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "sellingWindows" } })
-    .then((res) => res.json() as Promise<{ data: { sellingWindows: DashboardParcelsSellingWindows } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { sellingWindows: DashboardParcelsSellingWindows }
+        }>
+    )
     .then((res) => res.data.sellingWindows)
 
 const getFinanceResume = (
@@ -109,7 +139,10 @@ const getFinanceResume = (
 ): Promise<DashboardFinanceResume> =>
   client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "resume" } })
-    .then((res) => res.json() as Promise<{ data: { resume: DashboardFinanceResume } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{ data: { resume: DashboardFinanceResume } }>
+    )
     .then((res) => res.data.resume)
 
 const getCampaignMargin = (
@@ -117,7 +150,12 @@ const getCampaignMargin = (
 ): Promise<DashboardCampaignMargin> =>
   client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "campaignMargin" } })
-    .then((res) => res.json() as Promise<{ data: { campaignMargin: DashboardCampaignMargin } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { campaignMargin: DashboardCampaignMargin }
+        }>
+    )
     .then((res) => res.data.campaignMargin)
 
 const getRecentTransactions = (
@@ -125,7 +163,12 @@ const getRecentTransactions = (
 ): Promise<DashboardTransactionSnapshot[]> =>
   client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "recentTransactions" } })
-    .then((res) => res.json() as Promise<{ data: { recentTransactions: DashboardTransactionSnapshot[] } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { recentTransactions: DashboardTransactionSnapshot[] }
+        }>
+    )
     .then((res) => res.data.recentTransactions)
 
 const getScopedTransactions = (
@@ -133,7 +176,12 @@ const getScopedTransactions = (
 ): Promise<DashboardFinanceTransaction[]> =>
   client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "transactions" } })
-    .then((res) => res.json() as Promise<{ data: { transactions: DashboardFinanceTransaction[] } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { transactions: DashboardFinanceTransaction[] }
+        }>
+    )
     .then((res) => res.data.transactions)
 
 const getProductionValue = (
@@ -141,7 +189,12 @@ const getProductionValue = (
 ): Promise<DashboardProductionValue> =>
   client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "productionValue" } })
-    .then((res) => res.json() as Promise<{ data: { productionValue: DashboardProductionValue } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { productionValue: DashboardProductionValue }
+        }>
+    )
     .then((res) => res.data.productionValue)
 
 const getParcelsFinanceComparison = (
@@ -149,7 +202,12 @@ const getParcelsFinanceComparison = (
 ): Promise<DashboardParcelsFinanceComparison> =>
   client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "parcelsComparison" } })
-    .then((res) => res.json() as Promise<{ data: { parcelsComparison: DashboardParcelsFinanceComparison } }>)
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { parcelsComparison: DashboardParcelsFinanceComparison }
+        }>
+    )
     .then((res) => res.data.parcelsComparison)
 
 export const financeApi = {

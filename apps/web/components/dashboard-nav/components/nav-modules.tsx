@@ -79,7 +79,10 @@ export function NavModules({ items }: { items: NavigationNavModulesItem[] }) {
                     {item.items?.map((subItem: NavigationNavSubItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <PreservedLink href={subItem.url} include={SCOPE_KEYS.global}>
+                          <PreservedLink
+                            href={subItem.url}
+                            include={SCOPE_KEYS.global}
+                          >
                             <span>{subItem.title}</span>
                           </PreservedLink>
                         </SidebarMenuSubButton>

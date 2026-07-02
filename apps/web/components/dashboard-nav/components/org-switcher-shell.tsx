@@ -6,9 +6,11 @@ import { OrgSwitcherPlaceholder } from "@workspace/web/components/dashboard-nav/
 
 const OrgSwitcherClient = dynamic(
   () =>
-    import("@workspace/web/components/dashboard-nav/components/org-switcher").then((mod) => ({
-      default: mod.OrgSwitcher,
-    })),
+    import("@workspace/web/components/dashboard-nav/components/org-switcher").then(
+      (mod) => ({
+        default: mod.OrgSwitcher,
+      })
+    ),
   {
     loading: () => <OrgSwitcherPlaceholder />,
     ssr: false,

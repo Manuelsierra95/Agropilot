@@ -69,15 +69,11 @@ export function MapPlaceSearch() {
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault()
-        setActiveIndex((prev) =>
-          prev < suggestions.length - 1 ? prev + 1 : 0
-        )
+        setActiveIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0))
         break
       case "ArrowUp":
         event.preventDefault()
-        setActiveIndex((prev) =>
-          prev > 0 ? prev - 1 : suggestions.length - 1
-        )
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1))
         break
       case "Enter":
         event.preventDefault()
@@ -95,7 +91,9 @@ export function MapPlaceSearch() {
 
   useEffect(() => {
     if (activeIndex < 0 || !listRef.current) return
-    const item = listRef.current.children[activeIndex] as HTMLElement | undefined
+    const item = listRef.current.children[activeIndex] as
+      | HTMLElement
+      | undefined
     item?.scrollIntoView({ block: "nearest" })
   }, [activeIndex])
 
@@ -103,7 +101,7 @@ export function MapPlaceSearch() {
     isOpen && (suggestions.length > 0 || isSearching || Boolean(error))
 
   return (
-    <div className="pointer-events-none absolute top-3 left-3 right-3 z-10 mx-auto max-w-md">
+    <div className="pointer-events-none absolute top-3 right-3 left-3 z-10 mx-auto max-w-md">
       <div className="pointer-events-auto space-y-1">
         <InputGroup className="h-10 bg-card/95 shadow-md backdrop-blur-sm">
           <InputGroupAddon align="inline-start">
@@ -177,7 +175,11 @@ export function MapPlaceSearch() {
             ) : null}
 
             {suggestions.map((place, index) => (
-              <li key={place.id} role="option" aria-selected={index === activeIndex}>
+              <li
+                key={place.id}
+                role="option"
+                aria-selected={index === activeIndex}
+              >
                 <button
                   type="button"
                   className={cn(

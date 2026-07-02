@@ -100,7 +100,12 @@ export function SeamlessVideo({
     const handleTimeUpdate = (event: Event) => {
       const target = event.target as HTMLVideoElement
       const index = target === v1 ? 0 : target === v2 ? 1 : -1
-      if (index === -1 || frontRef.current !== index || fadingToRef.current !== null) return
+      if (
+        index === -1 ||
+        frontRef.current !== index ||
+        fadingToRef.current !== null
+      )
+        return
 
       const duration = target.duration
       if (!Number.isFinite(duration)) return
@@ -207,10 +212,7 @@ export function SeamlessVideo({
           <source src={mp4Src} type="video/mp4" />
         </video>
         {bottomFade && (
-          <div
-            aria-hidden="true"
-            className={bottomFadeClassName}
-          />
+          <div aria-hidden="true" className={bottomFadeClassName} />
         )}
       </div>
     </div>

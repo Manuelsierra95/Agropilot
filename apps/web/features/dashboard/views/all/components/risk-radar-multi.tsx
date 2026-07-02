@@ -63,8 +63,7 @@ type RiskRadarMultiProps = {
   className?: string
 }
 
-const GRID_COLS =
-  "grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(2.5rem,1fr))]"
+const GRID_COLS = "grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(2.5rem,1fr))]"
 
 function riskScorePct(score: number): number {
   return Math.round(Math.max(0, Math.min(score, 1)) * 100)
@@ -245,7 +244,7 @@ export function RiskRadarMulti({ items, className }: RiskRadarMultiProps) {
                     role="row"
                     tabIndex={0}
                     className={cn(
-                      "col-span-full grid cursor-pointer gap-1 rounded-sm transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      "col-span-full grid cursor-pointer gap-1 rounded-sm transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
                       GRID_COLS
                     )}
                     onClick={() => void selectParcel(row.parcelId)}

@@ -2,7 +2,10 @@
 
 import * as React from "react"
 
-import type { WeatherDaily, WeatherMetrics } from "@workspace/web/lib/parcel/types"
+import type {
+  WeatherDaily,
+  WeatherMetrics,
+} from "@workspace/web/lib/parcel/types"
 
 import { ParcelCropStatusCard } from "@workspace/web/features/parcel/views/single/components/parcel-crop-status-card"
 import { ParcelDeficitChart } from "@workspace/web/features/parcel/views/single/components/parcel-deficit-chart"
@@ -10,7 +13,10 @@ import { ParcelRainBalanceChart } from "@workspace/web/features/parcel/views/sin
 import { ParcelTemperatureChart } from "@workspace/web/features/parcel/views/single/components/parcel-temperature-chart"
 import { ParcelWaterBalanceChart } from "@workspace/web/features/parcel/views/single/components/parcel-water-balance-chart"
 import { ParcelWeatherRiskCard } from "@workspace/web/features/parcel/views/single/components/parcel-weather-risk-card"
-import type { ParcelApiResponse, ParcelItem } from "@workspace/web/features/parcel/lib/parcel-types"
+import type {
+  ParcelApiResponse,
+  ParcelItem,
+} from "@workspace/web/features/parcel/lib/parcel-types"
 import type { DailySeriesPoint } from "@workspace/web/features/parcel/lib/parcel-weather-types"
 
 type ParcelWeatherDashboardProps = {

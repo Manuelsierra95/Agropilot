@@ -87,7 +87,9 @@ export function TeamInvitesPreview({
   sent,
   onRemove,
 }: TeamInvitesPreviewProps) {
-  const listedInvites = invites.filter((invite) => invite.email.trim().length > 0)
+  const listedInvites = invites.filter(
+    (invite) => invite.email.trim().length > 0
+  )
 
   return (
     <div className="flex h-full min-h-0 flex-col">

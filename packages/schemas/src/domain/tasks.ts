@@ -41,13 +41,21 @@ export const taskSelectSchema = createSelectSchema(tasks)
 export const taskInsertSchema = createInsertSchema(tasks)
 export const taskUpdateSchema = createUpdateSchema(tasks)
 
+const taskDateOnlySchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .describe("Fecha ISO YYYY-MM-DD")
+
+/** YYYY-MM-DD or ISO datetime (for calendar drag with time). */
+export const taskScheduleInputSchema = z.union([
+  taskDateOnlySchema,
+  z.string().datetime(),
+])
+
 export const taskCreateInputSchema = z.object({
   title: z.string().min(1),
   category: taskCategorySchema,
-  startDate: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .describe("Fecha de inicio ISO YYYY-MM-DD"),
+  startDate: taskDateOnlySchema.describe("Fecha de inicio ISO YYYY-MM-DD"),
   description: z.string().optional(),
   parcelId: z.string().optional(),
   priority: z.number().int().min(0).max(3).optional(),
@@ -56,8 +64,8 @@ export const taskCreateInputSchema = z.object({
 export const taskUpdateInputSchema = z.object({
   title: z.string().min(1).optional(),
   category: taskCategorySchema.optional(),
-  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  startDate: taskScheduleInputSchema.optional(),
+  endDate: taskScheduleInputSchema.nullable().optional(),
   description: z.string().nullable().optional(),
   parcelId: z.string().nullable().optional(),
   priority: z.number().int().min(0).max(3).optional(),
