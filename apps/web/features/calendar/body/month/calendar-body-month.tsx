@@ -12,7 +12,7 @@ import {
   differenceInDays,
 } from "date-fns"
 import { cn } from "@workspace/ui/lib/utils"
-import CalendarEvent from "@workspace/web/features/calendar/components/calendar/calendar-event"
+import CalendarTask from "@workspace/web/features/calendar/components/calendar/calendar-task"
 import { AnimatePresence, motion } from "motion/react"
 import { Cloud, CloudRain, CloudSnow, Sun, CloudSun } from "lucide-react"
 
@@ -31,7 +31,7 @@ type CalendarBodyMonthProps = {
 export default function CalendarBodyMonth({
   maxVisibleEvents = 5,
 }: CalendarBodyMonthProps) {
-  const { date, events, setDate, setMode, forecast } = useCalendarContext()
+  const { date, tasks, setDate, setMode, forecast } = useCalendarContext()
 
   // Get the first day of the month
   const monthStart = startOfMonth(date)
@@ -51,14 +51,14 @@ export default function CalendarBodyMonth({
 
   const today = new Date()
 
-  // Filter events to only show those within the current month view
-  const visibleEvents = events.filter(
-    (event) =>
-      isWithinInterval(event.start, {
+  // Filter tasks to only show those within the current month view
+  const visibleTasks = tasks.filter(
+    (task) =>
+      isWithinInterval(task.start, {
         start: calendarStart,
         end: calendarEnd,
       }) ||
-      isWithinInterval(event.end, { start: calendarStart, end: calendarEnd })
+      isWithinInterval(task.end, { start: calendarStart, end: calendarEnd })
   )
 
   return (
@@ -87,8 +87,8 @@ export default function CalendarBodyMonth({
           }}
         >
           {calendarDays.map((day) => {
-            const dayEvents = visibleEvents.filter((event) =>
-              isSameDay(event.start, day)
+            const dayTasks = visibleTasks.filter((task) =>
+              isSameDay(task.start, day)
             )
             const isToday = isSameDay(day, today)
             const isCurrentMonth = isSameMonth(day, date)
@@ -103,12 +103,12 @@ export default function CalendarBodyMonth({
               ? weatherIcons[forecastForDay.condition]
               : null
 
-            // Calculate dynamic height based on number of events
-            const eventCount = dayEvents.length
+            // Calculate dynamic height based on number of tasks
+            const taskCount = dayTasks.length
             let minHeightClass = "min-h-20"
-            if (eventCount > 0) minHeightClass = "min-h-28"
-            if (eventCount > 2) minHeightClass = "min-h-36"
-            if (eventCount > 4) minHeightClass = "min-h-44"
+            if (taskCount > 0) minHeightClass = "min-h-28"
+            if (taskCount > 2) minHeightClass = "min-h-36"
+            if (taskCount > 4) minHeightClass = "min-h-44"
 
             const isLastColumn = calendarDays.indexOf(day) % 7 === 6
             const totalDays = calendarDays.length
@@ -154,15 +154,15 @@ export default function CalendarBodyMonth({
 
                 <AnimatePresence mode="wait">
                   <div className="mt-1 flex flex-col gap-1">
-                    {dayEvents.slice(0, maxVisibleEvents).map((event) => (
-                      <CalendarEvent
-                        key={event.id}
-                        event={event}
+                    {dayTasks.slice(0, maxVisibleEvents).map((task) => (
+                      <CalendarTask
+                        key={task.id}
+                        task={task}
                         className="relative h-auto"
                         month
                       />
                     ))}
-                    {dayEvents.length > maxVisibleEvents && (
+                    {dayTasks.length > maxVisibleEvents && (
                       <motion.button
                         key={`more-${day.toISOString()}`}
                         initial={{ opacity: 0 }}
@@ -178,7 +178,7 @@ export default function CalendarBodyMonth({
                           setMode("day")
                         }}
                       >
-                        +{dayEvents.length - maxVisibleEvents} ver todos
+                        +{dayTasks.length - maxVisibleEvents} ver todos
                       </motion.button>
                     )}
                   </div>

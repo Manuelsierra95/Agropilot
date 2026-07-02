@@ -17,7 +17,10 @@ export type Action =
   | { type: "SET_EVENTS"; payload: Event[] }
 
 export interface Getters {
-  getDaysInMonth: (month: number, year: number) => Array<{ day: number; events: Event[] }>
+  getDaysInMonth: (
+    month: number,
+    year: number
+  ) => Array<{ day: number; events: Event[] }>
   getEventsForDay: (day: number, currentDate: Date) => Event[]
   getDaysInWeek: (week: number, year: number) => Date[]
   getWeekNumber: (date: Date) => number

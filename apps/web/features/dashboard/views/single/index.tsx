@@ -1,7 +1,7 @@
 "use client"
 
 import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
-import { toCalendarEvents } from "@workspace/web/lib/calendar/mappers"
+import { toCalendarTasks } from "@workspace/web/lib/calendar/mappers"
 import type { DashboardOverviewSingle } from "@workspace/schemas"
 import type { FinanceTransactionSnapshot } from "@workspace/web/lib/finance/types"
 
@@ -17,9 +17,7 @@ import { RecentTransactions } from "@workspace/web/features/dashboard/components
 import type { TransactionSnapshot } from "@workspace/web/features/dashboard/components/recent-transactions"
 import { SellingWindow } from "@workspace/web/features/dashboard/views/single/components/selling-window"
 import { ProductionValue } from "@workspace/web/features/dashboard/components/production-value"
-import {
-  dashboardGridSlot,
-} from "@workspace/web/features/dashboard/lib/dashboard-grid-layout"
+import { dashboardGridSlot } from "@workspace/web/features/dashboard/lib/dashboard-grid-layout"
 import { WidgetSkeleton } from "@workspace/web/components/widget-skeleton"
 import {
   MapSkeleton,
@@ -62,10 +60,7 @@ export function DashboardSingleView({
               contentHeight="h-[140px]"
             />
           ) : (
-            <OlivePrice
-              className="min-w-0 flex-2"
-              items={olivePrices}
-            />
+            <OlivePrice className="min-w-0 flex-2" items={olivePrices} />
           )}
           <GradientSeparator
             orientation="vertical"
@@ -115,7 +110,10 @@ export function DashboardSingleView({
           ) : data?.finance?.resume ? (
             <FinanceResume
               className="min-w-0 flex-1"
-              transactions={data.finance?.resume?.transactions as unknown as FinanceTransactionSnapshot[]}
+              transactions={
+                data.finance?.resume
+                  ?.transactions as unknown as FinanceTransactionSnapshot[]
+              }
               oils={olivePrices}
               previousCampaign={data.finance?.resume?.previousCampaign}
             />
@@ -161,10 +159,7 @@ export function DashboardSingleView({
           {isPending && !parcelsMap.length ? (
             <MapSkeleton className="min-w-0 flex-2" />
           ) : (
-            <DashboardMap
-              className="min-w-0 flex-2"
-              parcels={parcelsMap}
-            />
+            <DashboardMap className="min-w-0 flex-2" parcels={parcelsMap} />
           )}
           <GradientSeparator
             orientation="vertical"
@@ -195,7 +190,7 @@ export function DashboardSingleView({
           ) : (
             <RecentEvents
               className="min-w-0 flex-1"
-              data={toCalendarEvents(upcomingWeek)}
+              data={toCalendarTasks(upcomingWeek)}
             />
           )}
           <GradientSeparator

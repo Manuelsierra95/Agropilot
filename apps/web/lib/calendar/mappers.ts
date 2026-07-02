@@ -1,4 +1,4 @@
-import { differenceInCalendarDays, format, parseISO } from "date-fns"
+import { format, parseISO } from "date-fns"
 import { es } from "date-fns/locale"
 import type {
   DashboardCalendarEvent,
@@ -7,23 +7,29 @@ import type {
   ParcelWeatherResponse,
 } from "@workspace/schemas"
 
-import type { ActiveAlert } from "@workspace/web/features/calendar/components/active-alerts-card"
 import type { ForecastDay } from "@workspace/web/features/calendar/components/calendar/sidecards/time-weather-card"
-import type { Recommendation } from "@workspace/web/features/calendar/components/recommendations-card"
-import type {
-  CalendarEvent,
-  CampaignTimelineData,
-  CampaignTimelineTask,
-} from "@workspace/web/lib/calendar/types"
+import type { Recommendation } from "@workspace/web/features/tasks/components/recommendations-card"
+import type { CalendarTask } from "@workspace/web/lib/calendar/types"
 
-export function toCalendarEvents(
+export function toCalendarTasks(
   events: DashboardCalendarEvent[]
-): CalendarEvent[] {
+): CalendarTask[] {
   return events.map((event) => ({
     ...event,
+    category: event.type,
     start: new Date(event.start),
     end: new Date(event.end),
   }))
+}
+
+type ActiveAlert = {
+  id: string
+  title: string
+  description: string
+  severity: "critical" | "warning"
+  parcelName: string
+  type: "rain" | "disease" | "pest" | "heat"
+  since: string
 }
 
 const RISK_LABELS: Record<keyof DashboardRisks, string> = {
@@ -33,10 +39,7 @@ const RISK_LABELS: Record<keyof DashboardRisks, string> = {
   thermalStress: "Estrés térmico",
 }
 
-const RISK_TYPES: Record<
-  keyof DashboardRisks,
-  ActiveAlert["type"]
-> = {
+const RISK_TYPES: Record<keyof DashboardRisks, ActiveAlert["type"]> = {
   waterStress: "rain",
   fungalRisk: "disease",
   insectRisk: "pest",
@@ -92,9 +95,7 @@ export function risksToActiveAlertsAll(
   )
 }
 
-function recommendationAction(
-  type: string
-): Recommendation["action"] {
+function recommendationAction(type: string): Recommendation["action"] {
   if (type.includes("irrig") || type === "irrigation") return "irrigate"
   if (type.includes("treat")) return "treat"
   if (type.includes("inspect")) return "inspect"
@@ -112,10 +113,13 @@ function priorityToUrgency(
 export function apiRecommendationToCardItem(
   rec: DashboardRecommendation,
   parcelName: string,
+  parcelId: string,
   id: string
 ): Recommendation {
   return {
     id,
+    parcelId,
+    parcelName,
     title: rec.message,
     reason: rec.details,
     action: recommendationAction(rec.type),
@@ -125,17 +129,17 @@ export function apiRecommendationToCardItem(
         : rec.priority === "medium"
           ? "Próximos días"
           : "Planificar",
-    parcelName,
     urgency: priorityToUrgency(rec.priority),
   }
 }
 
 export function parcelRecommendationsToCardItems(
   recommendations: DashboardRecommendation[],
-  parcelName: string
+  parcelName: string,
+  parcelId: string
 ): Recommendation[] {
   return recommendations.map((rec, index) =>
-    apiRecommendationToCardItem(rec, parcelName, `rec-${index}`)
+    apiRecommendationToCardItem(rec, parcelName, parcelId, `rec-${index}`)
   )
 }
 
@@ -158,6 +162,7 @@ export function allParcelsRecommendationsToCardItems(
         details: item.details,
       },
       item.parcelName,
+      item.parcelId,
       `rec-all-${item.parcelId}-${index}`
     )
   )
@@ -173,9 +178,7 @@ export function weatherResponseToForecast(
   weather: ParcelWeatherResponse,
   fromDate = new Date().toISOString().slice(0, 10)
 ): ForecastDay[] {
-  const byDate = new Map(
-    weather.forecast.map((entry) => [entry.date, entry])
-  )
+  const byDate = new Map(weather.forecast.map((entry) => [entry.date, entry]))
 
   return Array.from({ length: 5 }, (_, index) => {
     const date = addDaysIso(fromDate, index)
@@ -200,55 +203,4 @@ export function weatherResponseToForecast(
       humidity: entry.humidity,
     }
   })
-}
-
-function mapEventStatus(
-  status: CalendarEvent["status"]
-): CampaignTimelineTask["status"] {
-  return status
-}
-
-export function eventsToCampaignTimeline(
-  events: CalendarEvent[],
-  campaignStart: string,
-  campaignEnd: string,
-  title: string
-): CampaignTimelineData {
-  const start = parseISO(campaignStart)
-  const end = parseISO(campaignEnd)
-  const totalDays = Math.max(1, differenceInCalendarDays(end, start) + 1)
-  const today = new Date()
-  const todayIndex = Math.min(
-    Math.max(0, differenceInCalendarDays(today, start)),
-    totalDays - 1
-  )
-
-  const days = Array.from({ length: totalDays }, (_, index) => {
-    const day = new Date(start)
-    day.setUTCDate(start.getUTCDate() + index)
-    return format(day, "EEE d", { locale: es })
-  })
-
-  const tasks: CampaignTimelineTask[] = events.map((event) => {
-    const startDay = Math.max(
-      0,
-      differenceInCalendarDays(event.start, start)
-    )
-    const endDay = Math.max(
-      startDay,
-      differenceInCalendarDays(event.end, start)
-    )
-    const durationDays = Math.max(1, endDay - startDay + 1)
-
-    return {
-      id: event.id,
-      name: event.title,
-      status: mapEventStatus(event.status),
-      startDay: Math.min(startDay, totalDays - 1),
-      durationDays: Math.min(durationDays, totalDays - startDay),
-      note: event.parcelName,
-    }
-  })
-
-  return { tasks, days, todayIndex, title }
 }

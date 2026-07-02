@@ -1,49 +1,49 @@
-import { CalendarEvent as CalendarEventType } from "@workspace/web/features/calendar/components/calendar/calendar-types"
+import { CalendarTask as CalendarTaskType } from "@workspace/web/features/calendar/components/calendar/calendar-types"
 import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 import { format, isSameDay, isSameMonth } from "date-fns"
 import { cn } from "@workspace/ui/lib/utils"
 import { motion, MotionConfig, AnimatePresence } from "motion/react"
 
-interface EventPosition {
+interface TaskPosition {
   left: string
   width: string
   top: string
   height: string
 }
 
-function getOverlappingEvents(
-  currentEvent: CalendarEventType,
-  events: CalendarEventType[]
-): CalendarEventType[] {
-  return events.filter((event) => {
-    if (event.id === currentEvent.id) return false
+function getOverlappingTasks(
+  currentTask: CalendarTaskType,
+  tasks: CalendarTaskType[]
+): CalendarTaskType[] {
+  return tasks.filter((task) => {
+    if (task.id === currentTask.id) return false
     return (
-      currentEvent.start < event.end &&
-      currentEvent.end > event.start &&
-      isSameDay(currentEvent.start, event.start)
+      currentTask.start < task.end &&
+      currentTask.end > task.start &&
+      isSameDay(currentTask.start, task.start)
     )
   })
 }
 
-function calculateEventPosition(
-  event: CalendarEventType,
-  allEvents: CalendarEventType[]
-): EventPosition {
-  const overlappingEvents = getOverlappingEvents(event, allEvents)
-  const group = [event, ...overlappingEvents].sort(
+function calculateTaskPosition(
+  task: CalendarTaskType,
+  allTasks: CalendarTaskType[]
+): TaskPosition {
+  const overlappingTasks = getOverlappingTasks(task, allTasks)
+  const group = [task, ...overlappingTasks].sort(
     (a, b) => a.start.getTime() - b.start.getTime()
   )
-  const position = group.indexOf(event)
-  const width = `${100 / (overlappingEvents.length + 1)}%`
-  const left = `${(position * 100) / (overlappingEvents.length + 1)}%`
+  const position = group.indexOf(task)
+  const width = `${100 / (overlappingTasks.length + 1)}%`
+  const left = `${(position * 100) / (overlappingTasks.length + 1)}%`
 
-  const startHour = event.start.getHours()
-  const startMinutes = event.start.getMinutes()
+  const startHour = task.start.getHours()
+  const startMinutes = task.start.getMinutes()
 
-  let endHour = event.end.getHours()
-  let endMinutes = event.end.getMinutes()
+  let endHour = task.end.getHours()
+  let endMinutes = task.end.getMinutes()
 
-  if (!isSameDay(event.start, event.end)) {
+  if (!isSameDay(task.start, task.end)) {
     endHour = 23
     endMinutes = 59
   }
@@ -60,23 +60,22 @@ function calculateEventPosition(
   }
 }
 
-export default function CalendarEvent({
-  event,
+export default function CalendarTask({
+  task,
   month = false,
   className,
 }: {
-  event: CalendarEventType
+  task: CalendarTaskType
   month?: boolean
   className?: string
 }) {
-  const { events, setSelectedEvent, setManageEventDialogOpen, date } =
+  const { tasks, setSelectedTaskId, setTaskDetailSheetOpen, date } =
     useCalendarContext()
-  const style = month ? {} : calculateEventPosition(event, events)
+  const style = month ? {} : calculateTaskPosition(task, tasks)
 
-  // Generate a unique key that includes the current month to prevent animation conflicts
-  const isEventInCurrentMonth = isSameMonth(event.start, date)
-  const animationKey = `${event.id}-${
-    isEventInCurrentMonth ? "current" : "adjacent"
+  const isTaskInCurrentMonth = isSameMonth(task.start, date)
+  const animationKey = `${task.id}-${
+    isTaskInCurrentMonth ? "current" : "adjacent"
   }`
 
   return (
@@ -84,15 +83,15 @@ export default function CalendarEvent({
       <AnimatePresence mode="wait">
         <motion.div
           className={cn(
-            `cursor-pointer truncate rounded-md px-3 py-1.5 transition-all duration-300 bg-${event.color}-500/10 hover:bg-${event.color}-500/20 border border-${event.color}-500`,
+            `cursor-pointer truncate rounded-md px-3 py-1.5 transition-all duration-300 bg-${task.color}-500/10 hover:bg-${task.color}-500/20 border border-${task.color}-500`,
             !month && "absolute",
             className
           )}
           style={style}
           onClick={(e) => {
             e.stopPropagation()
-            setSelectedEvent(event)
-            setManageEventDialogOpen(true)
+            setSelectedTaskId(task.id)
+            setTaskDetailSheetOpen(true)
           }}
           initial={{
             opacity: 0,
@@ -124,23 +123,23 @@ export default function CalendarEvent({
               ease: "easeOut",
             },
           }}
-          layoutId={`event-${animationKey}-${month ? "month" : "day"}`}
+          layoutId={`task-${animationKey}-${month ? "month" : "day"}`}
         >
           <motion.div
             className={cn(
-              `flex w-full flex-col text-${event.color}-500`,
+              `flex w-full flex-col text-${task.color}-500`,
               month && "flex-row items-center justify-between"
             )}
             layout="position"
           >
             <p className={cn("truncate font-bold", month && "text-xs")}>
-              {event.title}
+              {task.title}
             </p>
             <p className={cn("text-sm", month && "text-xs")}>
-              <span>{format(event.start, "h:mm a")}</span>
+              <span>{format(task.start, "h:mm a")}</span>
               <span className={cn("mx-1", month && "hidden")}>-</span>
               <span className={cn(month && "hidden")}>
-                {format(event.end, "h:mm a")}
+                {format(task.end, "h:mm a")}
               </span>
             </p>
           </motion.div>

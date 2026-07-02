@@ -2,7 +2,7 @@ import { useCalendarContext } from "@workspace/web/features/calendar/components/
 import { isSameDay } from "date-fns"
 import { hours } from "@workspace/web/features/calendar/body/day/calendar-body-margin-day-margin"
 import CalendarBodyHeader from "@workspace/web/features/calendar/body/calendar-body-header"
-import CalendarEvent from "@workspace/web/features/calendar/components/calendar/calendar-event"
+import CalendarTask from "@workspace/web/features/calendar/components/calendar/calendar-task"
 import { cn } from "@workspace/ui/lib/utils"
 
 export default function CalendarBodyDayContent({
@@ -12,9 +12,9 @@ export default function CalendarBodyDayContent({
   date: Date
   hideBorderLeft?: boolean
 }) {
-  const { events } = useCalendarContext()
+  const { tasks } = useCalendarContext()
 
-  const dayEvents = events.filter((event) => isSameDay(event.start, date))
+  const dayTasks = tasks.filter((task) => isSameDay(task.start, date))
 
   return (
     <div
@@ -33,8 +33,8 @@ export default function CalendarBodyDayContent({
           />
         ))}
 
-        {dayEvents.map((event) => (
-          <CalendarEvent key={event.id} event={event} />
+        {dayTasks.map((task) => (
+          <CalendarTask key={task.id} task={task} />
         ))}
       </div>
     </div>

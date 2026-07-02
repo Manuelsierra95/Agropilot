@@ -1,49 +1,26 @@
-export type CalendarEventType =
-  | "irrigation"
-  | "treatment"
-  | "fertilization"
-  | "harvest"
-  | "inspection"
-  | "alert"
+export type CalendarTaskCategory = string
 
-export type CalendarEventPriority = "low" | "medium" | "high"
+export type CalendarTaskPriority = "low" | "medium" | "high"
 
-export type CalendarEventStatus = "pending" | "in_progress" | "completed"
+export type CalendarTaskStatus = "pending" | "in_progress" | "completed"
 
-export interface CalendarEventMeta {
+export interface CalendarTaskMeta {
   dose?: string
   product?: string
   waterAmount?: number
   notes?: string
-  priority?: CalendarEventPriority
+  priority?: CalendarTaskPriority
 }
 
-export interface CalendarEvent {
+export interface CalendarTask {
   id: string
   title: string
-  type: CalendarEventType
+  category: CalendarTaskCategory
   parcelId: string
   parcelName: string
   color: string
-  status: CalendarEventStatus
+  status: CalendarTaskStatus
   start: Date
   end: Date
-  meta?: CalendarEventMeta
-}
-
-export type CampaignTimelineTask = {
-  id: string
-  name: string
-  dependsOn?: string
-  status: "pending" | "in_progress" | "completed"
-  startDay: number
-  durationDays: number
-  note?: string
-}
-
-export type CampaignTimelineData = {
-  tasks: CampaignTimelineTask[]
-  days: string[]
-  todayIndex: number
-  title: string
+  meta?: CalendarTaskMeta
 }

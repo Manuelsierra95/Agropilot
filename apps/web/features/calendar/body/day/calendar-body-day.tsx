@@ -1,5 +1,5 @@
 import CalendarBodyDayCalendar from "@workspace/web/features/calendar/body/day/calendar-body-day-calendar"
-import CalendarBodyDayEvents from "@workspace/web/features/calendar/body/day/calendar-body-day-events"
+import CalendarBodyDayTasks from "@workspace/web/features/calendar/body/day/calendar-body-day-tasks"
 import { useCalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
 import CalendarBodyDayContent from "@workspace/web/features/calendar/body/day/calendar-body-day-content"
 import CalendarBodyMarginDayMargin from "@workspace/web/features/calendar/body/day/calendar-body-margin-day-margin"
@@ -14,6 +14,7 @@ export default function CalendarBodyDay() {
           <CalendarBodyMarginDayMargin />
           <CalendarBodyDayContent date={date} />
         </div>
+        <CalendarBodyDayTasks />
       </ScrollArea>
     </div>
   )

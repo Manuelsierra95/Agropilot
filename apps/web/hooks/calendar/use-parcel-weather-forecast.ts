@@ -29,7 +29,8 @@ export function useParcelWeatherForecast() {
   })
 
   const forecast = useMemo(
-    () => (query.data ? weatherResponseToForecast(query.data, from) : undefined),
+    () =>
+      query.data ? weatherResponseToForecast(query.data, from) : undefined,
     [query.data, from]
   )
 

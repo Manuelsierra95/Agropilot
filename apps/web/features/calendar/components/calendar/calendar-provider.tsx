@@ -1,13 +1,17 @@
-import { CalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
-import type { CalendarEvent, Mode } from "@workspace/web/features/calendar/components/calendar/calendar-types"
-import type { ForecastDay } from "@workspace/web/features/calendar/components/calendar/sidecards/time-weather-card"
 import { useState } from "react"
-import CalendarNewEventDialog from "@workspace/web/features/calendar/components/calendar/dialog/calendar-new-event-dialog"
-import CalendarManageEventDialog from "@workspace/web/features/calendar/components/calendar/dialog/calendar-manage-event-dialog"
+
+import { CalendarContext } from "@workspace/web/features/calendar/components/calendar/calendar-context"
+import type {
+  CalendarTask,
+  Mode,
+} from "@workspace/web/features/calendar/components/calendar/calendar-types"
+import type { ForecastDay } from "@workspace/web/features/calendar/components/calendar/sidecards/time-weather-card"
+import { CreateTaskDialog } from "@workspace/web/components/tasks/create-task-dialog"
+import { TaskDetailSheet } from "@workspace/web/components/tasks/task-detail-sheet"
 
 export default function CalendarProvider({
-  events,
-  setEvents,
+  tasks,
+  setTasks,
   mode,
   setMode,
   date,
@@ -16,8 +20,8 @@ export default function CalendarProvider({
   forecast,
   children,
 }: {
-  events: CalendarEvent[]
-  setEvents: (events: CalendarEvent[]) => void
+  tasks: CalendarTask[]
+  setTasks: (tasks: CalendarTask[]) => void
   mode: Mode
   setMode: (mode: Mode) => void
   date: Date
@@ -26,31 +30,39 @@ export default function CalendarProvider({
   forecast?: ForecastDay[]
   children: React.ReactNode
 }) {
-  const [newEventDialogOpen, setNewEventDialogOpen] = useState(false)
-  const [manageEventDialogOpen, setManageEventDialogOpen] = useState(false)
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
+  const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false)
+  const [taskDetailSheetOpen, setTaskDetailSheetOpen] = useState(false)
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
 
   return (
     <CalendarContext.Provider
       value={{
-        events,
-        setEvents,
+        tasks,
+        setTasks,
         mode,
         setMode,
         date,
         setDate,
         calendarIconIsToday,
-        newEventDialogOpen,
-        setNewEventDialogOpen,
-        manageEventDialogOpen,
-        setManageEventDialogOpen,
-        selectedEvent,
-        setSelectedEvent,
+        createTaskDialogOpen,
+        setCreateTaskDialogOpen,
+        taskDetailSheetOpen,
+        setTaskDetailSheetOpen,
+        selectedTaskId,
+        setSelectedTaskId,
         forecast,
       }}
     >
-      <CalendarNewEventDialog />
-      <CalendarManageEventDialog />
+      <CreateTaskDialog
+        open={createTaskDialogOpen}
+        onOpenChange={setCreateTaskDialogOpen}
+        defaultDate={date.toISOString().slice(0, 10)}
+      />
+      <TaskDetailSheet
+        open={taskDetailSheetOpen}
+        onOpenChange={setTaskDetailSheetOpen}
+        taskId={selectedTaskId}
+      />
       {children}
     </CalendarContext.Provider>
   )

@@ -1,7 +1,7 @@
 "use client"
 
 import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
-import { toCalendarEvents } from "@workspace/web/lib/calendar/mappers"
+import { toCalendarTasks } from "@workspace/web/lib/calendar/mappers"
 import type { DashboardOverviewAll } from "@workspace/schemas"
 
 import { OlivePrice } from "@workspace/web/features/dashboard/components/olive-price"
@@ -15,9 +15,7 @@ import { ParcelsFinanceBars } from "@workspace/web/components/charts/parcels-fin
 import { RecommendationsAll } from "@workspace/web/features/dashboard/views/all/components/recommendations-all"
 import { RiskRadarMulti } from "@workspace/web/features/dashboard/views/all/components/risk-radar-multi"
 import { ProductionValueAll } from "@workspace/web/features/dashboard/views/all/components/production-value-all"
-import {
-  dashboardGridSlot,
-} from "@workspace/web/features/dashboard/lib/dashboard-grid-layout"
+import { dashboardGridSlot } from "@workspace/web/features/dashboard/lib/dashboard-grid-layout"
 import { WidgetSkeleton } from "@workspace/web/components/widget-skeleton"
 import {
   MapSkeleton,
@@ -58,10 +56,7 @@ export function DashboardAllView({
               contentHeight="h-[140px]"
             />
           ) : (
-            <OlivePrice
-              className="min-w-0 flex-2"
-              items={olivePrices}
-            />
+            <OlivePrice className="min-w-0 flex-2" items={olivePrices} />
           )}
           <GradientSeparator
             orientation="vertical"
@@ -91,7 +86,7 @@ export function DashboardAllView({
         ) : data?.crop?.allOverviews?.length ? (
           <ResumeCropAll
             className={dashboardGridSlot.resumeCrop}
-              items={data.crop?.allOverviews ?? []}
+            items={data.crop?.allOverviews ?? []}
           />
         ) : null}
       </div>
@@ -101,12 +96,12 @@ export function DashboardAllView({
         <div className={dashboardGridSlot.rowInner}>
           {isPending ? (
             <WidgetSkeleton
-              className="min-w-0 w-full flex-1"
+              className="w-full min-w-0 flex-1"
               contentHeight="h-[200px]"
             />
           ) : data?.finance?.comparison ? (
             <ParcelsFinanceBars
-              className="min-w-0 w-full flex-1"
+              className="w-full min-w-0 flex-1"
               parcels={data.finance?.comparison?.parcels ?? []}
             />
           ) : null}
@@ -134,10 +129,7 @@ export function DashboardAllView({
           {isPending && !parcelsMap.length ? (
             <MapSkeleton className="min-w-0 flex-2" />
           ) : (
-            <DashboardMap
-              className="min-w-0 flex-2"
-              parcels={parcelsMap}
-            />
+            <DashboardMap className="min-w-0 flex-2" parcels={parcelsMap} />
           )}
           <GradientSeparator
             orientation="vertical"
@@ -168,7 +160,7 @@ export function DashboardAllView({
           ) : (
             <RecentEvents
               className="min-w-0 flex-1"
-              data={toCalendarEvents(upcomingWeek)}
+              data={toCalendarTasks(upcomingWeek)}
             />
           )}
           <GradientSeparator

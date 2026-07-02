@@ -50,10 +50,7 @@ interface TimeWeatherCardProps {
   forecast: ForecastDay[]
 }
 
-export function TimeWeatherCard({
-  weather,
-  forecast,
-}: TimeWeatherCardProps) {
+export function TimeWeatherCard({ weather, forecast }: TimeWeatherCardProps) {
   if (!weather) {
     return (
       <Card className="w-full overflow-hidden border-border/60 bg-linear-to-br from-background via-background to-muted/30 shadow-sm">

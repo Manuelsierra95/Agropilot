@@ -1,8 +1,9 @@
 import type { ForecastDay } from "@workspace/web/features/calendar/components/calendar/sidecards/time-weather-card"
+import type { CalendarTask } from "@workspace/web/lib/calendar/types"
 
 export type CalendarProps = {
-  events: CalendarEvent[]
-  setEvents: (events: CalendarEvent[]) => void
+  tasks: CalendarTask[]
+  setTasks: (tasks: CalendarTask[]) => void
   mode: Mode
   setMode: (mode: Mode) => void
   date: Date
@@ -12,20 +13,15 @@ export type CalendarProps = {
 }
 
 export type CalendarContextType = CalendarProps & {
-  newEventDialogOpen: boolean
-  setNewEventDialogOpen: (open: boolean) => void
-  manageEventDialogOpen: boolean
-  setManageEventDialogOpen: (open: boolean) => void
-  selectedEvent: CalendarEvent | null
-  setSelectedEvent: (event: CalendarEvent | null) => void
+  createTaskDialogOpen: boolean
+  setCreateTaskDialogOpen: (open: boolean) => void
+  taskDetailSheetOpen: boolean
+  setTaskDetailSheetOpen: (open: boolean) => void
+  selectedTaskId: string | null
+  setSelectedTaskId: (taskId: string | null) => void
 }
-export type CalendarEvent = {
-  id: string
-  title: string
-  color: string
-  start: Date
-  end: Date
-}
+
+export type { CalendarTask }
 
 export const calendarModes = ["day", "week", "month"] as const
 export const calendarMobilesModes = ["day", "month"] as const

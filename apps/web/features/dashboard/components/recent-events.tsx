@@ -18,7 +18,7 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 import { ArrowRightIcon } from "lucide-react"
-import type { CalendarEvent } from "@workspace/web/lib/calendar/types"
+import type { CalendarTask } from "@workspace/web/lib/calendar/types"
 import Link from "next/link"
 
 const dateFormatter = new Intl.DateTimeFormat("es-ES", {
@@ -31,7 +31,7 @@ const timeFormatter = new Intl.DateTimeFormat("es-ES", {
   minute: "2-digit",
 })
 
-const typeLabels: Record<CalendarEvent["type"], string> = {
+const typeLabels: Record<string, string> = {
   irrigation: "Riego",
   treatment: "Tratamiento",
   fertilization: "Fertilizacion",
@@ -40,13 +40,13 @@ const typeLabels: Record<CalendarEvent["type"], string> = {
   alert: "Alerta",
 }
 
-const statusLabels: Record<CalendarEvent["status"], string> = {
+const statusLabels: Record<CalendarTask["status"], string> = {
   pending: "Pendiente",
   in_progress: "En curso",
   completed: "Completado",
 }
 
-const statusTone: Record<CalendarEvent["status"], string> = {
+const statusTone: Record<CalendarTask["status"], string> = {
   pending: "bg-amber-500/10 text-amber-600",
   in_progress: "bg-sky-500/10 text-sky-600",
   completed: "bg-emerald-500/10 text-emerald-600",
@@ -60,14 +60,14 @@ function formatEventRange(start: Date, end: Date) {
   return `${dateFormatter.format(start)} ${timeFormatter.format(start)} a ${dateFormatter.format(end)} ${timeFormatter.format(end)}`
 }
 
-function getVisibleEvents(data: CalendarEvent[]) {
+function getVisibleTasks(data: CalendarTask[]) {
   const now = new Date()
   const weekEnd = new Date(now)
   weekEnd.setDate(weekEnd.getDate() + 7)
 
   const sorted = [...data].sort((a, b) => a.start.getTime() - b.start.getTime())
   const upcoming = sorted.filter(
-    (event) => event.start >= now && event.start <= weekEnd
+    (task) => task.start >= now && task.start <= weekEnd
   )
 
   const visible = (upcoming.length > 0 ? upcoming : sorted).slice(0, 6)
@@ -79,12 +79,12 @@ function getVisibleEvents(data: CalendarEvent[]) {
 }
 
 interface RecentEventsProps {
-  data: CalendarEvent[]
+  data: CalendarTask[]
   className?: string
 }
 
 export function RecentEvents({ data, className }: RecentEventsProps) {
-  const { visible, count, hasUpcoming } = getVisibleEvents(data)
+  const { visible, count, hasUpcoming } = getVisibleTasks(data)
 
   return (
     <Card className={cn("relative w-full bg-background ring-0", className)}>
@@ -125,43 +125,43 @@ export function RecentEvents({ data, className }: RecentEventsProps) {
                   className="px-6 py-6 text-center text-xs text-muted-foreground"
                   colSpan={5}
                 >
-                  Sin eventos proximos.
+                  Sin tareas proximas.
                 </TableCell>
               </TableRow>
             ) : (
-              visible.map((event) => {
-                const isCompleted = event.status === "completed"
+              visible.map((task) => {
+                const isCompleted = task.status === "completed"
 
                 return (
-                  <TableRow className="hover:bg-transparent" key={event.id}>
+                  <TableRow className="hover:bg-transparent" key={task.id}>
                     <TableCell className="max-w-[260px] truncate pl-6">
                       <div className="flex items-center gap-2">
                         <Badge
                           className="h-5 px-2 text-[10px]"
                           variant="outline"
                         >
-                          {typeLabels[event.type] ?? event.type}
+                          {typeLabels[task.category] ?? task.category}
                         </Badge>
                         <span className="min-w-0 truncate text-xs font-medium">
-                          {event.title}
+                          {task.title}
                         </span>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {formatEventRange(event.start, event.end)}
+                        {formatEventRange(task.start, task.end)}
                       </p>
                     </TableCell>
                     <TableCell className="max-w-[220px] truncate text-xs text-muted-foreground">
-                      {event.parcelName}
+                      {task.parcelName}
                     </TableCell>
                     <TableCell className="text-end text-xs text-muted-foreground">
-                      {event.type}
+                      {task.category}
                     </TableCell>
                     <TableCell className="text-end">
                       <Badge
-                        className={`h-5 px-2 text-[10px] ${statusTone[event.status]}`}
+                        className={`h-5 px-2 text-[10px] ${statusTone[task.status]}`}
                         variant="secondary"
                       >
-                        {statusLabels[event.status] ?? event.status}
+                        {statusLabels[task.status] ?? task.status}
                       </Badge>
                     </TableCell>
                     <TableCell className="pr-6 text-end">

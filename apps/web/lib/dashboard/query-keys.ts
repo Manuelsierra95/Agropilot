@@ -69,11 +69,7 @@ export const dashboardQueryKeys = {
       buildDashboardScopeKey(scope),
     ] as const,
   parcelsRecommendations: (dailyKey: string = getDashboardDailyKey()) =>
-    [
-      ...dashboardQueryKeys.all,
-      "parcels-recommendations",
-      dailyKey,
-    ] as const,
+    [...dashboardQueryKeys.all, "parcels-recommendations", dailyKey] as const,
   parcelsRisks: (dailyKey: string = getDashboardDailyKey()) =>
     [...dashboardQueryKeys.all, "parcels-risks", dailyKey] as const,
   parcelsMap: () => [...dashboardQueryKeys.all, "parcels-map"] as const,
@@ -115,13 +111,7 @@ export const dashboardQueryKeys = {
       buildDashboardScopeKey(scope),
     ] as const,
   parcelWeather: (parcelId: string, from: string, to: string) =>
-    [
-      ...dashboardQueryKeys.all,
-      "parcel-weather",
-      parcelId,
-      from,
-      to,
-    ] as const,
+    [...dashboardQueryKeys.all, "parcel-weather", parcelId, from, to] as const,
 }
 
 export type DashboardCacheFamily =

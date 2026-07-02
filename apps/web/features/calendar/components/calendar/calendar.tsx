@@ -8,8 +8,8 @@ import CalendarHeaderActionsAdd from "@workspace/web/features/calendar/component
 import CalendarProvider from "@workspace/web/features/calendar/components/calendar/calendar-provider"
 
 export default function Calendar({
-  events,
-  setEvents,
+  tasks,
+  setTasks,
   mode,
   setMode,
   date,
@@ -19,8 +19,8 @@ export default function Calendar({
 }: CalendarProps) {
   return (
     <CalendarProvider
-      events={events}
-      setEvents={setEvents}
+      tasks={tasks}
+      setTasks={setTasks}
       mode={mode}
       setMode={setMode}
       date={date}
