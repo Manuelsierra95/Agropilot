@@ -1,3 +1,6 @@
+"use client"
+
+import { useMemo } from "react"
 import {
   Leaf,
   Zap,
@@ -36,6 +39,8 @@ import type {
   YieldData,
 } from "@workspace/web/features/parcel/lib/parcel-types"
 import { formatDateTime } from "@workspace/web/features/parcel/lib/parcel-utils"
+import { useCalendarEvents } from "@workspace/web/hooks/calendar"
+import type { CalendarTask } from "@workspace/web/lib/calendar/types"
 
 type TempTrend = AgroclimateMetrics["tempTrend"]
 
@@ -191,6 +196,17 @@ function MetricCell({
 // ParcelHero
 // ─────────────────────────────────────────────
 
+function isOpenParcelTask(task: CalendarTask) {
+  return task.status === "pending" || task.status === "in_progress"
+}
+
+function countOpenTasks(tasks: CalendarTask[], parcelId?: string): number {
+  return tasks.filter(
+    (task) =>
+      isOpenParcelTask(task) && (!parcelId || task.parcelId === parcelId)
+  ).length
+}
+
 type ParcelHeroProps = {
   isAllSelected: boolean
   activeParcel?: ParcelItem
@@ -201,7 +217,6 @@ type ParcelHeroProps = {
   trend?: TempTrend
   employeeCount?: number
   tasksPending?: number
-  tasksInProgress?: number
   agroclimate?: AgroclimateMetrics
   yieldData?: YieldData
   onEditParcel?: () => void
@@ -217,11 +232,19 @@ export function ParcelHero({
   trend = "stable",
   employeeCount = 0,
   tasksPending = 0,
-  tasksInProgress = 0,
   agroclimate = DEFAULT_AGROCLIMATE,
   yieldData,
   onEditParcel,
 }: ParcelHeroProps) {
+  const calendarEvents = useCalendarEvents()
+  const pendingTasksCount = useMemo(() => {
+    const tasks = calendarEvents.data
+    if (tasks) {
+      return countOpenTasks(tasks, isAllSelected ? undefined : activeParcel?.id)
+    }
+    return tasksPending
+  }, [activeParcel?.id, calendarEvents.data, isAllSelected, tasksPending])
+
   const score = isAllSelected ? null : computeParcelScore(apiResponse)
   const scoreTokens = score !== null ? scoreToTokens(score) : null
 
@@ -236,30 +259,23 @@ export function ParcelHero({
       ? yieldData.totalKg / yieldData.trees
       : null
 
-  // ── Tasks display ──
   const tasksValue =
-    tasksPending === 0 && tasksInProgress === 0 ? (
+    pendingTasksCount === 0 ? (
       <CircleCheck size={18} className="text-muted-foreground" />
     ) : (
-      <span className="flex items-baseline gap-1">
-        {tasksPending > 0 && (
-          <span style={{ color: "var(--task-pending-text)" }}>
-            {tasksPending}
-          </span>
-        )}
+      <span
+        className="flex items-center gap-1.5"
+        style={{ color: "var(--task-pending-text)" }}
+      >
+        <ClipboardList size={18} aria-hidden />
+        {pendingTasksCount}
       </span>
     )
 
   const tasksTooltip =
-    tasksPending === 0 && tasksInProgress === 0
+    pendingTasksCount === 0
       ? "Todo al día"
-      : [
-          tasksPending > 0
-            ? `${tasksPending} tareas pendiente${tasksPending > 1 ? "s" : ""}`
-            : null,
-        ]
-          .filter(Boolean)
-          .join(" · ")
+      : `${pendingTasksCount} tarea${pendingTasksCount > 1 ? "s" : ""} pendiente${pendingTasksCount > 1 ? "s" : ""}`
 
   // ── Bottom columns ──
   type Col = {
@@ -367,7 +383,7 @@ export function ParcelHero({
       value: tasksValue,
       label: "Tareas",
       tooltip: tasksTooltip,
-      href: "/dashboard/calendar",
+      href: "/dashboard/tasks",
       linkProps: { include: SCOPE_KEYS.parcel },
     },
   ]
