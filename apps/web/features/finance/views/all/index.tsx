@@ -11,9 +11,6 @@ export function FinanceAllView({
   olivePrices,
   parcelsComparison,
   isLoadingCharts,
-  newTransactionOpen,
-  onNewTransactionOpenChange,
-  onTransactionSuccess,
 }: FinanceAllViewProps) {
   return (
     <FinanceLayout
@@ -23,9 +20,6 @@ export function FinanceAllView({
       olivePrices={olivePrices}
       parcelsComparison={parcelsComparison}
       isLoadingCharts={isLoadingCharts}
-      newTransactionOpen={newTransactionOpen}
-      onNewTransactionOpenChange={onNewTransactionOpenChange}
-      onTransactionSuccess={onTransactionSuccess}
     />
   )
 }

@@ -1,6 +1,7 @@
 import { Euro, LucideIcon, ClipboardList } from "lucide-react"
 import type { ScopeKey } from "@workspace/web/lib/navigation/scope"
 import {
+  ArrowLeftRight,
   Cpu,
   BookOpen,
   Home,
@@ -86,6 +87,12 @@ export const navigationData: NavigationData = {
       scope: ["campaignId", "parcelId"],
     },
     {
+      title: "Transactions",
+      url: "/dashboard/transactions",
+      icon: ArrowLeftRight,
+      scope: ["campaignId", "parcelId"],
+    },
+    {
       title: "Parcel",
       url: "/dashboard/parcel",
       icon: TreePine,
@@ -101,6 +108,7 @@ export const navigationData: NavigationData = {
       title: "Tasks",
       url: "/dashboard/tasks",
       icon: ClipboardList,
+      scope: ["campaignId", "parcelId"],
     },
   ],
   modules: [

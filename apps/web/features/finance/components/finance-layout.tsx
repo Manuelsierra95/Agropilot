@@ -4,14 +4,11 @@ import * as React from "react"
 
 import { PageContainer } from "@workspace/web/components/ui/page-container"
 import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
-import { CashFlowSummaryCard } from "@workspace/web/components/cards/cash-flow-summary-card"
 import { FinanceRecommendationsCard } from "@workspace/web/components/cards/finance-recommendations-card"
 import { ParcelsFinanceBars } from "@workspace/web/components/charts/parcels-finance-bars"
 import { WidgetSkeleton } from "@workspace/web/components/widget-skeleton"
 import { ExpensesPieChart } from "@workspace/web/features/finance/components/chart/expenses-pie-chart"
 import { IncomePieChart } from "@workspace/web/features/finance/components/chart/income-pie-chart"
-import { TransactionTable } from "@workspace/web/features/finance/components/table"
-import { NewTransactionSheet } from "@workspace/web/features/finance/components/new-transaction-sheet"
 import type {
   FinanceTransaction,
   FinanceTransactionSnapshot,
@@ -34,9 +31,6 @@ type FinanceLayoutProps = {
     data?: { parcels: DashboardParcelFinanceComparisonItem[] }
   }
   isLoadingCharts: boolean
-  newTransactionOpen: boolean
-  onNewTransactionOpenChange: (open: boolean) => void
-  onTransactionSuccess: () => void
 }
 
 export function FinanceLayout({
@@ -46,94 +40,70 @@ export function FinanceLayout({
   olivePrices,
   parcelsComparison,
   isLoadingCharts,
-  newTransactionOpen,
-  onNewTransactionOpenChange,
-  onTransactionSuccess,
 }: FinanceLayoutProps) {
+  const showParcelsBars =
+    isAllParcels && Boolean(parcelsComparison.data?.parcels.length)
+
   return (
-    <PageContainer className="grid grid-cols-[1fr_auto_1fr] grid-rows-[auto] gap-4">
-      <div className="col-span-1 row-span-2">
-        {isLoadingCharts ? (
-          <WidgetSkeleton contentHeight="h-[280px]" />
-        ) : (
-          <IncomePieChart data={rows} />
-        )}
+    <PageContainer className="flex flex-col gap-4">
+      <div className="grid min-h-[580px] grid-cols-[1fr_auto_1fr] items-stretch gap-4">
+        <div className="flex min-h-0 flex-col gap-4">
+          <div className="min-h-0 flex-1 basis-0">
+            {isLoadingCharts ? (
+              <WidgetSkeleton
+                className="h-full"
+                contentHeight="h-full min-h-[240px]"
+              />
+            ) : (
+              <IncomePieChart data={rows} />
+            )}
+          </div>
+
+          <GradientSeparator orientation="horizontal" />
+
+          <div className="min-h-0 flex-1 basis-0">
+            {isLoadingCharts ? (
+              <WidgetSkeleton
+                className="h-full"
+                contentHeight="h-full min-h-[240px]"
+              />
+            ) : (
+              <ExpensesPieChart data={rows} />
+            )}
+          </div>
+        </div>
+
+        <GradientSeparator orientation="vertical" className="self-stretch" />
+
+        <div className="flex min-h-0 flex-col gap-4">
+          {isAllParcels &&
+          parcelsComparison.isPending &&
+          !parcelsComparison.data ? (
+            <WidgetSkeleton className="shrink-0" contentHeight="h-[140px]" />
+          ) : showParcelsBars ? (
+            <ParcelsFinanceBars
+              className="shrink-0"
+              parcels={parcelsComparison.data!.parcels}
+            />
+          ) : null}
+
+          <div className="min-h-0 flex-1 basis-0">
+            {isLoadingCharts || (olivePrices.isPending && !olivePrices.data) ? (
+              <WidgetSkeleton
+                className="h-full"
+                contentHeight="h-full min-h-[200px]"
+              />
+            ) : (
+              <FinanceRecommendationsCard
+                className="h-full"
+                transactions={snapshots}
+                oils={olivePrices.data ?? []}
+                redirectButton={false}
+              />
+            )}
+          </div>
+        </div>
       </div>
-
-      <GradientSeparator
-        orientation="vertical"
-        className="col-span-1 row-span-5"
-      />
-
-      <div className="col-span-1 col-start-3 row-span-3 row-start-1 flex flex-col gap-4">
-        {isAllParcels &&
-        parcelsComparison.isPending &&
-        !parcelsComparison.data ? (
-          <WidgetSkeleton contentHeight="h-[140px]" />
-        ) : isAllParcels && parcelsComparison.data?.parcels.length ? (
-          <ParcelsFinanceBars parcels={parcelsComparison.data.parcels} />
-        ) : null}
-
-        {isLoadingCharts || (olivePrices.isPending && !olivePrices.data) ? (
-          <WidgetSkeleton contentHeight="h-[280px]" />
-        ) : (
-          <FinanceRecommendationsCard
-            className="flex-1"
-            transactions={snapshots}
-            oils={olivePrices.data ?? []}
-            redirectButton={false}
-          />
-        )}
-      </div>
-
-      <GradientSeparator
-        orientation="horizontal"
-        className="col-span-1 row-start-3"
-      />
-
-      <div className="col-span-1 row-span-2 row-start-4">
-        {isLoadingCharts ? (
-          <WidgetSkeleton contentHeight="h-[280px]" />
-        ) : (
-          <ExpensesPieChart data={rows} />
-        )}
-      </div>
-
-      <GradientSeparator
-        orientation="horizontal"
-        className="col-span-1 col-start-3 row-start-4"
-      />
-
-      <div className="col-span-1 col-start-3 row-start-5">
-        {isLoadingCharts ? (
-          <WidgetSkeleton contentHeight="h-[200px]" />
-        ) : (
-          <CashFlowSummaryCard transactions={snapshots} />
-        )}
-      </div>
-
-      <GradientSeparator
-        orientation="horizontal"
-        className="col-span-3 row-start-6"
-      />
-
-      <div className="col-span-3 row-start-7">
-        {isLoadingCharts ? (
-          <WidgetSkeleton contentHeight="h-[320px]" />
-        ) : (
-          <TransactionTable
-            data={rows}
-            showParcelColumn={isAllParcels}
-            onNewTransaction={() => onNewTransactionOpenChange(true)}
-          />
-        )}
-      </div>
-
-      <NewTransactionSheet
-        open={newTransactionOpen}
-        onOpenChange={onNewTransactionOpenChange}
-        onSuccess={onTransactionSuccess}
-      />
     </PageContainer>
   )
 }

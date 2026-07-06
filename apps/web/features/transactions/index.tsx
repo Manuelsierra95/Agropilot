@@ -1,23 +1,18 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 
-import { FinanceAllView } from "@workspace/web/features/finance/views/all"
-import { FinanceSingleView } from "@workspace/web/features/finance/views/single"
-import {
-  useOlivePrices,
-  useParcelsFinanceComparison,
-} from "@workspace/web/hooks/dashboard"
+import { TransactionsAllView } from "@workspace/web/features/transactions/views/all"
+import { TransactionsSingleView } from "@workspace/web/features/transactions/views/single"
 import { useFinanceTransactions } from "@workspace/web/hooks/finance"
 import { useIsAllParcelsSelected } from "@workspace/web/hooks/use-is-all-parcels-selected"
 import { toTransactionSnapshots } from "@workspace/web/lib/finance/mappers"
 
-export default function Finance() {
+export default function Transactions() {
   const isAllParcels = useIsAllParcelsSelected()
+  const [newTransactionOpen, setNewTransactionOpen] = useState(false)
 
   const transactionsQuery = useFinanceTransactions()
-  const olivePrices = useOlivePrices()
-  const parcelsComparison = useParcelsFinanceComparison()
 
   const rows = useMemo(
     () => transactionsQuery.data ?? [],
@@ -25,20 +20,21 @@ export default function Finance() {
   )
   const snapshots = useMemo(() => toTransactionSnapshots(rows), [rows])
 
-  const isLoadingCharts =
+  const isLoading =
     transactionsQuery.isPending && transactionsQuery.data === undefined
 
   const viewProps = {
     rows,
     snapshots,
-    olivePrices,
-    parcelsComparison,
-    isLoadingCharts,
+    isLoading,
+    newTransactionOpen,
+    onNewTransactionOpenChange: setNewTransactionOpen,
+    onTransactionSuccess: () => transactionsQuery.refetch(),
   }
 
   return isAllParcels ? (
-    <FinanceAllView {...viewProps} />
+    <TransactionsAllView {...viewProps} />
   ) : (
-    <FinanceSingleView {...viewProps} />
+    <TransactionsSingleView {...viewProps} />
   )
 }

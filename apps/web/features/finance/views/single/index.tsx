@@ -22,9 +22,6 @@ export type FinanceLayoutData = {
     data?: { parcels: DashboardParcelFinanceComparisonItem[] }
   }
   isLoadingCharts: boolean
-  newTransactionOpen: boolean
-  onNewTransactionOpenChange: (open: boolean) => void
-  onTransactionSuccess: () => void
 }
 
 export function FinanceSingleView({
@@ -33,9 +30,6 @@ export function FinanceSingleView({
   olivePrices,
   parcelsComparison,
   isLoadingCharts,
-  newTransactionOpen,
-  onNewTransactionOpenChange,
-  onTransactionSuccess,
 }: FinanceLayoutData) {
   return (
     <FinanceLayout
@@ -45,9 +39,6 @@ export function FinanceSingleView({
       olivePrices={olivePrices}
       parcelsComparison={parcelsComparison}
       isLoadingCharts={isLoadingCharts}
-      newTransactionOpen={newTransactionOpen}
-      onNewTransactionOpenChange={onNewTransactionOpenChange}
-      onTransactionSuccess={onTransactionSuccess}
     />
   )
 }
