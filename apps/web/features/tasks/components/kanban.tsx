@@ -170,7 +170,9 @@ export function Kanban({ tasks, onTaskClick }: KanbanProps) {
   const totalCount = filteredCards.length
 
   return (
-    <Card className={cn("h-full bg-background pt-0 ring-0", TASKS_PANEL_MIN_HEIGHT)}>
+    <Card
+      className={cn("h-full bg-background pt-0 ring-0", TASKS_PANEL_MIN_HEIGHT)}
+    >
       <CardHeader className="flex items-center justify-between gap-4 px-4 py-2">
         <div className="flex flex-col gap-0.5">
           <span className="text-sm font-semibold text-foreground capitalize">

@@ -1,71 +1,71 @@
-"use client";
+"use client"
 
-import { motion, useSpring } from "motion/react";
-import { useMemo, useRef } from "react";
+import { motion, useSpring } from "motion/react"
+import { useMemo, useRef } from "react"
 
-const TICKER_ITEM_HEIGHT = 24;
+const TICKER_ITEM_HEIGHT = 24
 
 export interface DateTickerProps {
-  currentIndex: number;
-  labels: string[];
-  visible: boolean;
+  currentIndex: number
+  labels: string[]
+  visible: boolean
 }
 
 export function DateTicker({ currentIndex, labels, visible }: DateTickerProps) {
   // Parse labels into month and day parts
   const parsedLabels = useMemo(() => {
     return labels.map((label) => {
-      const parts = label.split(" ");
-      const month = parts[0] || "";
-      const day = parts[1] || "";
-      return { month, day, full: label };
-    });
-  }, [labels]);
+      const parts = label.split(" ")
+      const month = parts[0] || ""
+      const day = parts[1] || ""
+      return { month, day, full: label }
+    })
+  }, [labels])
 
   // Get unique months and their indices
   const monthIndices = useMemo(() => {
-    const uniqueMonths: string[] = [];
-    const indices: number[] = [];
+    const uniqueMonths: string[] = []
+    const indices: number[] = []
 
     parsedLabels.forEach((label, index) => {
       if (uniqueMonths.length === 0 || uniqueMonths.at(-1) !== label.month) {
-        uniqueMonths.push(label.month);
-        indices.push(index);
+        uniqueMonths.push(label.month)
+        indices.push(index)
       }
-    });
+    })
 
-    return { uniqueMonths, indices };
-  }, [parsedLabels]);
+    return { uniqueMonths, indices }
+  }, [parsedLabels])
 
   // Find current month index
   const currentMonthIndex = useMemo(() => {
     if (currentIndex < 0 || currentIndex >= parsedLabels.length) {
-      return 0;
+      return 0
     }
-    const currentMonth = parsedLabels[currentIndex]?.month;
-    return monthIndices.uniqueMonths.indexOf(currentMonth || "");
-  }, [currentIndex, parsedLabels, monthIndices]);
+    const currentMonth = parsedLabels[currentIndex]?.month
+    return monthIndices.uniqueMonths.indexOf(currentMonth || "")
+  }, [currentIndex, parsedLabels, monthIndices])
 
   // Track previous month index
-  const prevMonthIndexRef = useRef(-1);
+  const prevMonthIndexRef = useRef(-1)
 
   // Animated Y offsets
-  const dayY = useSpring(0, { stiffness: 400, damping: 35 });
-  const monthY = useSpring(0, { stiffness: 400, damping: 35 });
+  const dayY = useSpring(0, { stiffness: 400, damping: 35 })
+  const monthY = useSpring(0, { stiffness: 400, damping: 35 })
 
-  dayY.set(-currentIndex * TICKER_ITEM_HEIGHT);
+  dayY.set(-currentIndex * TICKER_ITEM_HEIGHT)
 
   if (currentMonthIndex >= 0) {
-    const isFirstRender = prevMonthIndexRef.current === -1;
-    const monthChanged = prevMonthIndexRef.current !== currentMonthIndex;
+    const isFirstRender = prevMonthIndexRef.current === -1
+    const monthChanged = prevMonthIndexRef.current !== currentMonthIndex
     if (isFirstRender || monthChanged) {
-      monthY.set(-currentMonthIndex * TICKER_ITEM_HEIGHT);
-      prevMonthIndexRef.current = currentMonthIndex;
+      monthY.set(-currentMonthIndex * TICKER_ITEM_HEIGHT)
+      prevMonthIndexRef.current = currentMonthIndex
     }
   }
 
   if (!visible || labels.length === 0) {
-    return null;
+    return null
   }
 
   return (
@@ -80,7 +80,7 @@ export function DateTicker({ currentIndex, labels, visible }: DateTickerProps) {
                   className="flex h-6 shrink-0 items-center justify-center"
                   key={`${monthIndices.indices[monthIndex] ?? monthIndex}-${month}`}
                 >
-                  <span className="whitespace-nowrap font-medium text-sm">
+                  <span className="text-sm font-medium whitespace-nowrap">
                     {month}
                   </span>
                 </div>
@@ -96,7 +96,7 @@ export function DateTicker({ currentIndex, labels, visible }: DateTickerProps) {
                   className="flex h-6 shrink-0 items-center justify-center"
                   key={`${label.full}-${index}`}
                 >
-                  <span className="whitespace-nowrap font-medium text-sm">
+                  <span className="text-sm font-medium whitespace-nowrap">
                     {label.day}
                   </span>
                 </div>
@@ -106,9 +106,9 @@ export function DateTicker({ currentIndex, labels, visible }: DateTickerProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-DateTicker.displayName = "DateTicker";
+DateTicker.displayName = "DateTicker"
 
-export default DateTicker;
+export default DateTicker

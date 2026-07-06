@@ -1,19 +1,19 @@
-"use client";
+"use client"
 
-import { cn } from "@workspace/ui/lib/utils";
-import { useLegendItem } from "./legend-context";
+import { cn } from "@workspace/ui/lib/utils"
+import { useLegendItem } from "./legend-context"
 
 export interface LegendValueProps {
   /** Value class name. Default: "text-sm tabular-nums" */
-  className?: string;
+  className?: string
   /** Show percentage alongside value. Default: false */
-  showPercentage?: boolean;
+  showPercentage?: boolean
   /** Percentage class name. Default: "text-xs tabular-nums" */
-  percentageClassName?: string;
+  percentageClassName?: string
   /** Format function for the value. Default: toLocaleString() */
-  formatValue?: (value: number) => string;
+  formatValue?: (value: number) => string
   /** Format function for percentage. Default: (p) => `${p.toFixed(0)}%` */
-  formatPercentage?: (percentage: number) => string;
+  formatPercentage?: (percentage: number) => string
 }
 
 export function LegendValue({
@@ -23,7 +23,7 @@ export function LegendValue({
   formatValue = (v) => v.toLocaleString(),
   formatPercentage = (p) => `${p.toFixed(0)}%`,
 }: LegendValueProps) {
-  const { item, percentage } = useLegendItem();
+  const { item, percentage } = useLegendItem()
 
   return (
     <span
@@ -39,7 +39,7 @@ export function LegendValue({
         </span>
       )}
     </span>
-  );
+  )
 }
 
-LegendValue.displayName = "LegendValue";
+LegendValue.displayName = "LegendValue"

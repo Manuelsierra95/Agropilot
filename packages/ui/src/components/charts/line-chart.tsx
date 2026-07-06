@@ -1,81 +1,81 @@
-"use client";
+"use client"
 
-import { ParentSize } from "@visx/responsive";
+import { ParentSize } from "@visx/responsive"
 import {
   Children,
   isValidElement,
   type ReactNode,
   useMemo,
   useRef,
-} from "react";
-import { cn } from "@workspace/ui/lib/utils";
-import type { LineConfig, Margin } from "./chart-context";
-import { Line, type LineProps } from "./line";
-import { TimeSeriesChartInner } from "./time-series-chart-shell";
+} from "react"
+import { cn } from "@workspace/ui/lib/utils"
+import type { LineConfig, Margin } from "./chart-context"
+import { Line, type LineProps } from "./line"
+import { TimeSeriesChartInner } from "./time-series-chart-shell"
 
 export interface LineChartProps {
   /** Data array - each item should have a date field and numeric values */
-  data: Record<string, unknown>[];
+  data: Record<string, unknown>[]
   /** Key in data for the x-axis (date). Default: "date" */
-  xDataKey?: string;
+  xDataKey?: string
   /** Chart margins */
-  margin?: Partial<Margin>;
+  margin?: Partial<Margin>
   /** Animation duration in milliseconds. Default: 1100 */
-  animationDuration?: number;
+  animationDuration?: number
   /** Aspect ratio as "width / height". Default: "2 / 1" */
-  aspectRatio?: string;
+  aspectRatio?: string
   /** Additional class name for the container */
-  className?: string;
+  className?: string
   /** Child components (Line, Grid, ChartTooltip, etc.) */
-  children: ReactNode;
+  children: ReactNode
 }
 
-const DEFAULT_MARGIN: Margin = { top: 40, right: 40, bottom: 40, left: 40 };
+const DEFAULT_MARGIN: Margin = { top: 40, right: 40, bottom: 40, left: 40 }
 
 function extractLineConfigs(children: ReactNode): LineConfig[] {
-  const configs: LineConfig[] = [];
+  const configs: LineConfig[] = []
 
   Children.forEach(children, (child) => {
     if (!isValidElement(child)) {
-      return;
+      return
     }
 
     const childType = child.type as {
-      displayName?: string;
-      name?: string;
-    };
+      displayName?: string
+      name?: string
+    }
     const componentName =
       typeof child.type === "function"
         ? childType.displayName || childType.name || ""
-        : "";
+        : ""
 
-    const props = child.props as LineProps | undefined;
+    const props = child.props as LineProps | undefined
     const isLineComponent =
       componentName === "Line" ||
       child.type === Line ||
-      (props && typeof props.dataKey === "string" && props.dataKey.length > 0);
+      (props && typeof props.dataKey === "string" && props.dataKey.length > 0)
 
     if (isLineComponent && props?.dataKey) {
       configs.push({
         dataKey: props.dataKey,
         stroke: props.stroke || "var(--chart-line-primary)",
         strokeWidth: props.strokeWidth || 2.5,
-      });
+      })
     }
-  });
+  })
 
-  return configs;
+  return configs
 }
 
 interface ChartInnerProps {
-  width: number;
-  height: number;
-  data: Record<string, unknown>[];
-  xDataKey: string;
-  margin: Margin;
-  animationDuration: number;
-  children: ReactNode;
-  containerRef: React.RefObject<HTMLDivElement | null>;
+  width: number
+  height: number
+  data: Record<string, unknown>[]
+  xDataKey: string
+  margin: Margin
+  animationDuration: number
+  children: ReactNode
+  containerRef: React.RefObject<HTMLDivElement | null>
 }
 
 function ChartInner({
@@ -88,7 +88,7 @@ function ChartInner({
   children,
   containerRef,
 }: ChartInnerProps) {
-  const lines = useMemo(() => extractLineConfigs(children), [children]);
+  const lines = useMemo(() => extractLineConfigs(children), [children])
 
   return (
     <TimeSeriesChartInner
@@ -104,7 +104,7 @@ function ChartInner({
     >
       {children}
     </TimeSeriesChartInner>
-  );
+  )
 }
 
 export function LineChart({
@@ -116,8 +116,8 @@ export function LineChart({
   className = "",
   children,
 }: LineChartProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const margin = { ...DEFAULT_MARGIN, ...marginProp };
+  const containerRef = useRef<HTMLDivElement>(null)
+  const margin = { ...DEFAULT_MARGIN, ...marginProp }
 
   return (
     <div
@@ -141,9 +141,9 @@ export function LineChart({
         )}
       </ParentSize>
     </div>
-  );
+  )
 }
 
-export { Line, type LineProps } from "./line";
+export { Line, type LineProps } from "./line"
 
-export default LineChart;
+export default LineChart

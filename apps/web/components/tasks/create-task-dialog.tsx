@@ -199,32 +199,32 @@ export function CreateTaskDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Parcela</FormLabel>
-                    <Select
-                      onValueChange={(value) =>
-                        field.onChange(value === "none" ? undefined : value)
-                      }
-                      value={field.value || "none"}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue
-                            placeholder={
-                              loadingParcels
-                                ? "Cargando…"
-                                : "Seleccionar (opcional)"
-                            }
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="none">Sin parcela</SelectItem>
-                        {parcels.map((parcel) => (
-                          <SelectItem key={parcel.id} value={parcel.id}>
-                            {parcel.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <Select
+                    onValueChange={(value) =>
+                      field.onChange(value === "none" ? undefined : value)
+                    }
+                    value={field.value || "none"}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            loadingParcels
+                              ? "Cargando…"
+                              : "Seleccionar (opcional)"
+                          }
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="none">Sin parcela</SelectItem>
+                      {parcels.map((parcel) => (
+                        <SelectItem key={parcel.id} value={parcel.id}>
+                          {parcel.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

@@ -1,9 +1,9 @@
-"use client";
+"use client"
 
-import { Arc, arc as arcGenerator } from "@visx/shape";
-import { motion, useSpring, useTransform } from "motion/react";
-import { useEffect, useRef } from "react";
-import { ringCssVars, useRing } from "./ring-context";
+import { Arc, arc as arcGenerator } from "@visx/shape"
+import { motion, useSpring, useTransform } from "motion/react"
+import { useEffect, useRef } from "react"
+import { ringCssVars, useRing } from "./ring-context"
 
 // Helper to generate arc path using d3 arc generator
 function generateArcPath(
@@ -17,39 +17,39 @@ function generateArcPath(
     innerRadius,
     outerRadius,
     cornerRadius,
-  });
-  return generator({ startAngle, endAngle } as unknown as null) || "";
+  })
+  return generator({ startAngle, endAngle } as unknown as null) || ""
 }
 
-export type RingLineCap = "round" | "butt";
+export type RingLineCap = "round" | "butt"
 
 export interface RingProps {
   /** Index of the ring in the data array */
-  index: number;
+  index: number
   /** Optional color override - falls back to data color or palette */
-  color?: string;
+  color?: string
   /** Animate the progress arc. Default: true */
-  animate?: boolean;
+  animate?: boolean
   /** Show glow effect on hover. Default: true */
-  showGlow?: boolean;
+  showGlow?: boolean
   /** Line cap style for ring ends. Default: "round" */
-  lineCap?: RingLineCap;
+  lineCap?: RingLineCap
 }
 
 interface AnimatedProgressArcProps {
-  index: number;
-  innerRadius: number;
-  outerRadius: number;
-  progress: number;
-  color: string;
-  isHovered: boolean;
-  isFaded: boolean;
-  isPushedOut: boolean;
-  animationKey: number;
-  showGlow: boolean;
-  lineCap: RingLineCap;
-  startAngle: number;
-  arcRange: number;
+  index: number
+  innerRadius: number
+  outerRadius: number
+  progress: number
+  color: string
+  isHovered: boolean
+  isFaded: boolean
+  isPushedOut: boolean
+  animationKey: number
+  showGlow: boolean
+  lineCap: RingLineCap
+  startAngle: number
+  arcRange: number
 }
 
 function AnimatedProgressArc({
@@ -67,34 +67,33 @@ function AnimatedProgressArc({
   startAngle,
   arcRange,
 }: AnimatedProgressArcProps) {
-  const targetEndAngle = startAngle + arcRange * progress;
-  const cornerRadius =
-    lineCap === "round" ? (outerRadius - innerRadius) / 2 : 0;
+  const targetEndAngle = startAngle + arcRange * progress
+  const cornerRadius = lineCap === "round" ? (outerRadius - innerRadius) / 2 : 0
 
   // Progress arc delay - starts after background rings expand
-  const progressDelay = 0.6 + index * 0.1;
+  const progressDelay = 0.6 + index * 0.1
 
   // Animate the end angle with spring
   const springValue = useSpring(0, {
     stiffness: 60,
     damping: 20,
     restDelta: 0.001,
-  });
+  })
 
   // Reset and start animation on mount
   useEffect(() => {
-    springValue.jump(0);
+    springValue.jump(0)
     const timeout = setTimeout(() => {
-      springValue.set(1);
-    }, progressDelay * 1000);
-    return () => clearTimeout(timeout);
-  }, [progressDelay, springValue]);
+      springValue.set(1)
+    }, progressDelay * 1000)
+    return () => clearTimeout(timeout)
+  }, [progressDelay, springValue])
 
   // Transform spring value to arc path
   const animatedPath = useTransform(springValue, (v) => {
-    const currentEndAngle = startAngle + (targetEndAngle - startAngle) * v;
+    const currentEndAngle = startAngle + (targetEndAngle - startAngle) * v
     if (currentEndAngle <= startAngle + 0.01) {
-      return "";
+      return ""
     }
     return generateArcPath(
       innerRadius,
@@ -102,19 +101,19 @@ function AnimatedProgressArc({
       startAngle,
       currentEndAngle,
       cornerRadius
-    );
-  });
+    )
+  })
 
   // Calculate scale: hovered ring scales up, outer rings pushed out
   const getScale = () => {
     if (isHovered) {
-      return 1.03;
+      return 1.03
     }
     if (isPushedOut) {
-      return 1.02;
+      return 1.02
     }
-    return 1;
-  };
+    return 1
+  }
 
   return (
     <motion.path
@@ -135,7 +134,7 @@ function AnimatedProgressArc({
         scale: { type: "spring", stiffness: 400, damping: 25 },
       }}
     />
-  );
+  )
 }
 
 export function Ring({
@@ -154,53 +153,53 @@ export function Ring({
     getRingRadii,
     startAngle: ctxStartAngle,
     endAngle: ctxEndAngle,
-  } = useRing();
+  } = useRing()
 
-  const arcRange = ctxEndAngle - ctxStartAngle;
+  const arcRange = ctxEndAngle - ctxStartAngle
 
   // Track if initial mount animation is complete (must be before early return)
-  const hasAnimated = useRef(false);
-  const ringExpandDelay = index * 0.08;
+  const hasAnimated = useRef(false)
+  const ringExpandDelay = index * 0.08
 
   useEffect(() => {
     if (animate && !hasAnimated.current) {
       const timeout = setTimeout(
         () => {
-          hasAnimated.current = true;
+          hasAnimated.current = true
         },
         (ringExpandDelay + 0.3) * 1000
-      );
-      return () => clearTimeout(timeout);
+      )
+      return () => clearTimeout(timeout)
     }
-  }, [animate, ringExpandDelay]);
+  }, [animate, ringExpandDelay])
 
-  const ringData = data[index];
+  const ringData = data[index]
   if (!ringData) {
-    return null;
+    return null
   }
 
-  const { innerRadius, outerRadius } = getRingRadii(index);
-  const color = colorProp || getColor(index);
-  const progress = ringData.value / ringData.maxValue;
+  const { innerRadius, outerRadius } = getRingRadii(index)
+  const color = colorProp || getColor(index)
+  const progress = ringData.value / ringData.maxValue
 
-  const isHovered = hoveredIndex === index;
-  const isFaded = hoveredIndex !== null && hoveredIndex !== index;
+  const isHovered = hoveredIndex === index
+  const isFaded = hoveredIndex !== null && hoveredIndex !== index
   // Ring is pushed out when a ring with lower index (inner ring) is hovered
-  const isPushedOut = hoveredIndex !== null && hoveredIndex < index;
+  const isPushedOut = hoveredIndex !== null && hoveredIndex < index
 
   // Only apply delay on initial mount, not on hover changes
-  const shouldDelay = animate && !hasAnimated.current;
+  const shouldDelay = animate && !hasAnimated.current
 
   // Calculate scale for background and progress arcs
   const getScale = () => {
     if (isHovered) {
-      return 1.03;
+      return 1.03
     }
     if (isPushedOut) {
-      return 1.02;
+      return 1.02
     }
-    return 1;
-  };
+    return 1
+  }
 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: SVG group for hover interaction
@@ -284,9 +283,9 @@ export function Ring({
         />
       )}
     </g>
-  );
+  )
 }
 
-Ring.displayName = "Ring";
+Ring.displayName = "Ring"
 
-export default Ring;
+export default Ring

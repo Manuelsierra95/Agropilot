@@ -83,7 +83,7 @@ export function RecommendationItem({
   return (
     <div
       className={cn(
-        "group rounded-md border border-border/40 border-l-[3px] bg-muted/30 px-3 py-2.5 transition-colors hover:bg-muted/50",
+        "group rounded-md border border-l-[3px] border-border/40 bg-muted/30 px-3 py-2.5 transition-colors hover:bg-muted/50",
         urg.borderClass
       )}
     >

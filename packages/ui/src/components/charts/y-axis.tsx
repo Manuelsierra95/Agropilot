@@ -1,15 +1,15 @@
-"use client";
+"use client"
 
-import { useEffect, useMemo, useState } from "react";
-import { useChart } from "./chart-context";
+import { useEffect, useMemo, useState } from "react"
+import { useChart } from "./chart-context"
 
 export interface YAxisProps {
   /** Number of ticks to show. Default: 5 */
-  numTicks?: number;
+  numTicks?: number
   /** Format large numbers (e.g. 1000 as "1k"). Default: true */
-  formatLargeNumbers?: boolean;
+  formatLargeNumbers?: boolean
   /** Custom formatter for tick labels (e.g. USD). Overrides formatLargeNumbers when set. */
-  formatValue?: (value: number) => string;
+  formatValue?: (value: number) => string
 }
 
 function formatLabel(
@@ -18,12 +18,12 @@ function formatLabel(
   formatValue?: (value: number) => string
 ): string {
   if (formatValue) {
-    return formatValue(value);
+    return formatValue(value)
   }
   if (formatLargeNumbers && value >= 1000) {
-    return `${(value / 1000).toFixed(0)}k`;
+    return `${(value / 1000).toFixed(0)}k`
   }
-  return String(value);
+  return String(value)
 }
 
 export function YAxis({
@@ -31,28 +31,28 @@ export function YAxis({
   formatLargeNumbers = true,
   formatValue,
 }: YAxisProps) {
-  const { yScale, margin, containerRef } = useChart();
-  const [mounted, setMounted] = useState(false);
+  const { yScale, margin, containerRef } = useChart()
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
   const ticks = useMemo(() => {
-    const tickValues = yScale.ticks(numTicks);
+    const tickValues = yScale.ticks(numTicks)
     return tickValues.map((value) => ({
       value,
       y: (yScale(value) ?? 0) + margin.top,
       label: formatLabel(value, formatLargeNumbers, formatValue),
-    }));
-  }, [yScale, margin.top, numTicks, formatLargeNumbers, formatValue]);
+    }))
+  }, [yScale, margin.top, numTicks, formatLargeNumbers, formatValue])
 
-  const container = containerRef.current;
+  const container = containerRef.current
   if (!(mounted && container)) {
-    return null;
+    return null
   }
 
-  const { createPortal } = require("react-dom") as typeof import("react-dom");
+  const { createPortal } = require("react-dom") as typeof import("react-dom")
 
   return createPortal(
     <div
@@ -65,14 +65,14 @@ export function YAxis({
           key={`${tick.value}-${tick.y}-${index}`}
           style={{ top: tick.y, transform: "translateY(-50%)" }}
         >
-          <span className="text-chart-label text-xs">{tick.label}</span>
+          <span className="text-xs text-chart-label">{tick.label}</span>
         </div>
       ))}
     </div>,
     container
-  );
+  )
 }
 
-YAxis.displayName = "YAxis";
+YAxis.displayName = "YAxis"
 
-export default YAxis;
+export default YAxis

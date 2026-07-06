@@ -1,57 +1,57 @@
-"use client";
+"use client"
 
-import { motion } from "motion/react";
-import { useMemo } from "react";
-import { useChart } from "./chart-context";
+import { motion } from "motion/react"
+import { useMemo } from "react"
+import { useChart } from "./chart-context"
 
-const DEFAULT_POSITIVE = "url(#candlestick-positive)";
-const DEFAULT_NEGATIVE = "url(#candlestick-negative)";
+const DEFAULT_POSITIVE = "url(#candlestick-positive)"
+const DEFAULT_NEGATIVE = "url(#candlestick-negative)"
 
 export interface CandlestickProps {
   /** Whether to animate the candlesticks. Default: true */
-  animate?: boolean;
+  animate?: boolean
   /** Fill for positive (close >= open) candles. Color or url(#gradient). Default: --chart-1 */
-  positiveFill?: string;
+  positiveFill?: string
   /** Fill for negative candles. Color or url(#gradient). Default: --chart-5 */
-  negativeFill?: string;
+  negativeFill?: string
   /** Optional pattern URL for body only (e.g. url(#pattern)). When set, body is drawn solid first, then pattern overlaid and masked to the body rect. */
-  bodyPatternPositive?: string;
+  bodyPatternPositive?: string
   /** Optional pattern URL for negative candle body. */
-  bodyPatternNegative?: string;
+  bodyPatternNegative?: string
   /** Inner border width on the body (drawn inside so it does not expand the shape). Default: 0 (off). */
-  insideStrokeWidth?: number;
+  insideStrokeWidth?: number
   /** Opacity when another candle is hovered. Default: 0.3 */
-  fadedOpacity?: number;
+  fadedOpacity?: number
 }
 
-const SOLID_POSITIVE = "var(--color-emerald-500)";
-const SOLID_NEGATIVE = "var(--color-red-500)";
+const SOLID_POSITIVE = "var(--color-emerald-500)"
+const SOLID_NEGATIVE = "var(--color-red-500)"
 
-const WICK_WIDTH = 1.5;
+const WICK_WIDTH = 1.5
 
 function getSolidColor(isPositive: boolean): string {
-  return isPositive ? SOLID_POSITIVE : SOLID_NEGATIVE;
+  return isPositive ? SOLID_POSITIVE : SOLID_NEGATIVE
 }
 
 interface CandleShape {
-  bodyHeight: number;
-  bodyLeft: number;
-  bodyTop: number;
-  bodySolidFill: string;
-  wickFill: string;
-  wickHeight: number;
-  wickLeft: number;
-  wickTop: number;
-  centerX: number;
-  wickCenterY: number;
-  candleWidth: number;
-  bodyPattern: string | undefined;
-  hasPatternOverlay: boolean;
-  insideStrokeWidth: number;
-  transition: { duration: number; ease: "easeInOut" };
-  delay: number;
-  isFaded: boolean;
-  fadedOpacity: number;
+  bodyHeight: number
+  bodyLeft: number
+  bodyTop: number
+  bodySolidFill: string
+  wickFill: string
+  wickHeight: number
+  wickLeft: number
+  wickTop: number
+  centerX: number
+  wickCenterY: number
+  candleWidth: number
+  bodyPattern: string | undefined
+  hasPatternOverlay: boolean
+  insideStrokeWidth: number
+  transition: { duration: number; ease: "easeInOut" }
+  delay: number
+  isFaded: boolean
+  fadedOpacity: number
 }
 
 function CandleRect({
@@ -74,8 +74,8 @@ function CandleRect({
   isFaded,
   fadedOpacity,
 }: CandleShape) {
-  const bodyOrigin = `${centerX}px ${bodyTop + bodyHeight / 2}px`;
-  const t = { ...transition, delay };
+  const bodyOrigin = `${centerX}px ${bodyTop + bodyHeight / 2}px`
+  const t = { ...transition, delay }
   return (
     <motion.g
       animate={{ opacity: isFaded ? fadedOpacity : 1 }}
@@ -142,7 +142,7 @@ function CandleRect({
         />
       )}
     </motion.g>
-  );
+  )
 }
 
 export function Candlestick({
@@ -163,15 +163,15 @@ export function Candlestick({
     bandWidth,
     columnWidth,
     hoveredCandleIndex,
-  } = useChart();
+  } = useChart()
 
-  const candleWidth = Math.min(bandWidth ?? columnWidth * 0.8, columnWidth);
+  const candleWidth = Math.min(bandWidth ?? columnWidth * 0.8, columnWidth)
   const staggerDelayMs = useMemo(() => {
     if (data.length === 0) {
-      return 0;
+      return 0
     }
-    return (animationDuration * 0.6) / data.length;
-  }, [animationDuration, data.length]);
+    return (animationDuration * 0.6) / data.length
+  }, [animationDuration, data.length])
 
   const transition = useMemo(
     () => ({
@@ -179,41 +179,41 @@ export function Candlestick({
       ease: "easeInOut" as const,
     }),
     []
-  );
+  )
 
   return (
     <g className="chart-candlesticks">
       {data.map((d, index) => {
-        const date = xAccessor(d);
-        const open = d.open as number;
-        const high = d.high as number;
-        const low = d.low as number;
-        const close = d.close as number;
-        const centerX = xScale(date) ?? 0;
-        const yHigh = yScale(high) ?? 0;
-        const yLow = yScale(low) ?? 0;
-        const yOpen = yScale(open) ?? 0;
-        const yClose = yScale(close) ?? 0;
-        const bodyTop = Math.min(yOpen, yClose);
-        const bodyHeight = Math.abs(yClose - yOpen) || 1;
-        const bodyLeft = centerX - candleWidth / 2;
-        const wickTop = Math.min(yHigh, yLow);
-        const wickHeight = Math.abs(yLow - yHigh) || 1;
-        const wickLeft = centerX - WICK_WIDTH / 2;
-        const wickCenterY = wickTop + wickHeight / 2;
-        const isPositive = close >= open;
-        const fill = isPositive ? positiveFill : negativeFill;
+        const date = xAccessor(d)
+        const open = d.open as number
+        const high = d.high as number
+        const low = d.low as number
+        const close = d.close as number
+        const centerX = xScale(date) ?? 0
+        const yHigh = yScale(high) ?? 0
+        const yLow = yScale(low) ?? 0
+        const yOpen = yScale(open) ?? 0
+        const yClose = yScale(close) ?? 0
+        const bodyTop = Math.min(yOpen, yClose)
+        const bodyHeight = Math.abs(yClose - yOpen) || 1
+        const bodyLeft = centerX - candleWidth / 2
+        const wickTop = Math.min(yHigh, yLow)
+        const wickHeight = Math.abs(yLow - yHigh) || 1
+        const wickLeft = centerX - WICK_WIDTH / 2
+        const wickCenterY = wickTop + wickHeight / 2
+        const isPositive = close >= open
+        const fill = isPositive ? positiveFill : negativeFill
         const bodyPattern = isPositive
           ? bodyPatternPositive
-          : bodyPatternNegative;
-        const hasPatternOverlay = Boolean(bodyPattern);
+          : bodyPatternNegative
+        const hasPatternOverlay = Boolean(bodyPattern)
         const bodySolidFill = hasPatternOverlay
           ? getSolidColor(isPositive)
-          : fill;
-        const wickFill = hasPatternOverlay ? bodySolidFill : fill;
+          : fill
+        const wickFill = hasPatternOverlay ? bodySolidFill : fill
         const isFaded =
-          hoveredCandleIndex !== null && hoveredCandleIndex !== index;
-        const delay = animate ? (index * staggerDelayMs) / 1000 : 0;
+          hoveredCandleIndex !== null && hoveredCandleIndex !== index
+        const delay = animate ? (index * staggerDelayMs) / 1000 : 0
 
         return (
           <CandleRect
@@ -237,12 +237,12 @@ export function Candlestick({
             wickLeft={wickLeft}
             wickTop={wickTop}
           />
-        );
+        )
       })}
     </g>
-  );
+  )
 }
 
-Candlestick.displayName = "Candlestick";
+Candlestick.displayName = "Candlestick"
 
-export default Candlestick;
+export default Candlestick

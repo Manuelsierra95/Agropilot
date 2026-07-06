@@ -1,32 +1,32 @@
-"use client";
+"use client"
 
-import { motion } from "motion/react";
-import { useEffect, useMemo, useState } from "react";
-import { chartCssVars, useChart } from "./chart-context";
+import { motion } from "motion/react"
+import { useEffect, useMemo, useState } from "react"
+import { chartCssVars, useChart } from "./chart-context"
 
-const BAR_EASING = "cubic-bezier(0.85, 0, 0.15, 1)";
+const BAR_EASING = "cubic-bezier(0.85, 0, 0.15, 1)"
 
 function computeSeriesBarLayout(input: {
-  stacked: boolean;
-  composedStackOffsets: Map<number, Map<string, number>> | undefined;
-  rowIndex: number;
-  dataKey: string;
-  value: number;
-  yScale: (n: number) => number | undefined;
-  innerHeight: number;
-  xCenter: number;
-  barWidth: number;
-  seriesCount: number;
-  gap: number;
-  seriesIndex: number;
-  stackGap: number;
-  isLastSeries: boolean;
-  radius: number;
+  stacked: boolean
+  composedStackOffsets: Map<number, Map<string, number>> | undefined
+  rowIndex: number
+  dataKey: string
+  value: number
+  yScale: (n: number) => number | undefined
+  innerHeight: number
+  xCenter: number
+  barWidth: number
+  seriesCount: number
+  gap: number
+  seriesIndex: number
+  stackGap: number
+  isLastSeries: boolean
+  radius: number
 }): {
-  barLeft: number;
-  barHeight: number;
-  effectiveRadius: number;
-  valueY: number;
+  barLeft: number
+  barHeight: number
+  effectiveRadius: number
+  valueY: number
 } {
   const {
     stacked,
@@ -44,52 +44,52 @@ function computeSeriesBarLayout(input: {
     stackGap,
     isLastSeries,
     radius,
-  } = input;
+  } = input
 
   if (stacked && composedStackOffsets) {
-    const offset = composedStackOffsets.get(rowIndex)?.get(dataKey) ?? 0;
-    const valuePos = yScale(value) ?? 0;
-    let barHeight = innerHeight - valuePos;
-    const offsetY = yScale(offset) ?? innerHeight;
-    const gapOffset = seriesIndex * stackGap;
-    const valueY = offsetY - barHeight - gapOffset;
+    const offset = composedStackOffsets.get(rowIndex)?.get(dataKey) ?? 0
+    const valuePos = yScale(value) ?? 0
+    let barHeight = innerHeight - valuePos
+    const offsetY = yScale(offset) ?? innerHeight
+    const gapOffset = seriesIndex * stackGap
+    const valueY = offsetY - barHeight - gapOffset
     if (!isLastSeries && stackGap > 0) {
-      barHeight = Math.max(0, barHeight - stackGap);
+      barHeight = Math.max(0, barHeight - stackGap)
     }
-    const barLeft = xCenter - barWidth / 2;
-    const applyRounding = stackGap > 0 || isLastSeries;
+    const barLeft = xCenter - barWidth / 2
+    const applyRounding = stackGap > 0 || isLastSeries
     return {
       barLeft,
       barHeight,
       effectiveRadius: applyRounding ? radius : 0,
       valueY,
-    };
+    }
   }
 
   const groupWidth =
-    seriesCount * barWidth + (seriesCount > 1 ? (seriesCount - 1) * gap : 0);
-  const valueY = yScale(value) ?? innerHeight;
+    seriesCount * barWidth + (seriesCount > 1 ? (seriesCount - 1) * gap : 0)
+  const valueY = yScale(value) ?? innerHeight
   return {
     barLeft: xCenter - groupWidth / 2 + seriesIndex * (barWidth + gap),
     barHeight: innerHeight - valueY,
     effectiveRadius: radius,
     valueY,
-  };
+  }
 }
 
 export interface SeriesBarProps {
   /** Key in data for bar height (y value) */
-  dataKey: string;
+  dataKey: string
   /** Fill color. Default: var(--chart-line-primary) */
-  fill?: string;
+  fill?: string
   /** Tooltip dot color when fill is gradient/pattern. Default: fill */
-  stroke?: string;
+  stroke?: string
   /** Corner radius for bar top corners. Default: 0 (square tops, similar to Bar lineCap="butt") */
-  radius?: number;
+  radius?: number
   /** Animate grow from baseline. Default: true */
-  animate?: boolean;
+  animate?: boolean
   /** Opacity for non-hovered bars when another point is hovered (matches BarChart). Default: 0.3 */
-  fadedOpacity?: number;
+  fadedOpacity?: number
 }
 
 export function SeriesBar({
@@ -118,84 +118,84 @@ export function SeriesBar({
     composedStackOffsets,
     composedStackGap,
     tooltipData,
-  } = useChart();
+  } = useChart()
 
   const barKeys = useMemo(() => {
     if (composedBarDataKeys && composedBarDataKeys.length > 0) {
-      return composedBarDataKeys;
+      return composedBarDataKeys
     }
-    return [dataKey];
-  }, [composedBarDataKeys, dataKey]);
+    return [dataKey]
+  }, [composedBarDataKeys, dataKey])
 
   const seriesIndex = useMemo(() => {
-    const idx = barKeys.indexOf(dataKey);
-    return idx >= 0 ? idx : 0;
-  }, [barKeys, dataKey]);
+    const idx = barKeys.indexOf(dataKey)
+    return idx >= 0 ? idx : 0
+  }, [barKeys, dataKey])
 
-  const n = barKeys.length;
-  const gap = composedBarGap ?? 4;
-  const stackGap = composedStackGap ?? 0;
+  const n = barKeys.length
+  const gap = composedBarGap ?? 4
+  const stackGap = composedStackGap ?? 0
 
   const stacked =
     Boolean(composedStacked) &&
     composedStackOffsets != null &&
     composedBarDataKeys != null &&
-    composedBarDataKeys.length > 0;
+    composedBarDataKeys.length > 0
 
-  const isLastSeries = seriesIndex === n - 1;
+  const isLastSeries = seriesIndex === n - 1
 
   const slot = useMemo(() => {
     if (columnWidth > 0) {
-      return columnWidth;
+      return columnWidth
     }
     if (data.length < 2) {
-      return innerWidth;
+      return innerWidth
     }
-    return innerWidth / (data.length - 1);
-  }, [columnWidth, data.length, innerWidth]);
+    return innerWidth / (data.length - 1)
+  }, [columnWidth, data.length, innerWidth])
 
   const barWidth = useMemo(() => {
-    const groupCount = stacked ? 1 : n;
+    const groupCount = stacked ? 1 : n
     let w =
       composedBarSize ??
-      Math.min(slot * 0.88, composedMaxBarSize ?? Number.POSITIVE_INFINITY);
+      Math.min(slot * 0.88, composedMaxBarSize ?? Number.POSITIVE_INFINITY)
     if (composedMaxBarSize != null) {
-      w = Math.min(w, composedMaxBarSize);
+      w = Math.min(w, composedMaxBarSize)
     }
     if (groupCount > 1) {
-      const maxGroup = slot * 0.92;
-      const needed = groupCount * w + (groupCount - 1) * gap;
+      const maxGroup = slot * 0.92
+      const needed = groupCount * w + (groupCount - 1) * gap
       if (needed > maxGroup && maxGroup > 0) {
-        w = Math.max(4, (maxGroup - (groupCount - 1) * gap) / groupCount);
+        w = Math.max(4, (maxGroup - (groupCount - 1) * gap) / groupCount)
       }
     }
-    return Math.max(2, w);
-  }, [composedBarSize, composedMaxBarSize, gap, n, slot, stacked]);
+    return Math.max(2, w)
+  }, [composedBarSize, composedMaxBarSize, gap, n, slot, stacked])
 
-  const totalAnimDuration = animationDuration || 1100;
-  const staggerSpread = totalAnimDuration * 0.4;
+  const totalAnimDuration = animationDuration || 1100
+  const staggerSpread = totalAnimDuration * 0.4
   const calculatedStaggerDelay =
-    data.length > 1 ? staggerSpread / 1000 / data.length : 0;
-  const barDuration = totalAnimDuration * 0.6;
+    data.length > 1 ? staggerSpread / 1000 / data.length : 0
+  const barDuration = totalAnimDuration * 0.6
 
   if (barScale) {
     console.warn(
       "SeriesBar is for time-based ComposedChart / LineChart context. Use Bar inside BarChart for categorical x."
-    );
-    return null;
+    )
+    return null
   }
 
-  const hoveredIndex = tooltipData?.index ?? null;
+  const hoveredIndex = tooltipData?.index ?? null
 
   return (
     <g className="series-bar">
       {data.map((d, i) => {
-        const value = d[dataKey];
+        const value = d[dataKey]
         if (typeof value !== "number") {
-          return null;
+          return null
         }
 
-        const xCenter = xScale(xAccessor(d)) ?? 0;
+        const xCenter = xScale(xAccessor(d)) ?? 0
 
         const { barLeft, valueY, barHeight, effectiveRadius } =
           computeSeriesBarLayout({
@@ -214,10 +214,10 @@ export function SeriesBar({
             stackGap,
             isLastSeries,
             radius,
-          });
+          })
 
-        const categoryLabel = String(xAccessor(d).getTime());
-        const isFaded = hoveredIndex !== null && hoveredIndex !== i;
+        const categoryLabel = String(xAccessor(d).getTime())
+        const isFaded = hoveredIndex !== null && hoveredIndex !== i
 
         if (animate && !isLoaded) {
           return (
@@ -236,7 +236,7 @@ export function SeriesBar({
               x={barLeft}
               y={valueY}
             />
-          );
+          )
         }
 
         return (
@@ -252,27 +252,27 @@ export function SeriesBar({
             x={barLeft}
             y={valueY}
           />
-        );
+        )
       })}
     </g>
-  );
+  )
 }
 
-SeriesBar.displayName = "SeriesBar";
+SeriesBar.displayName = "SeriesBar"
 
 interface SeriesBarRectProps {
-  x: number;
-  y: number;
-  barWidth: number;
-  barHeight: number;
-  fill: string;
-  radius: number;
-  index: number;
-  innerHeight: number;
-  calculatedStaggerDelay: number;
-  animationDuration: number;
-  isFaded: boolean;
-  fadedOpacity: number;
+  x: number
+  y: number
+  barWidth: number
+  barHeight: number
+  fill: string
+  radius: number
+  index: number
+  innerHeight: number
+  calculatedStaggerDelay: number
+  animationDuration: number
+  isFaded: boolean
+  fadedOpacity: number
 }
 
 function SeriesBarRect({
@@ -289,20 +289,20 @@ function SeriesBarRect({
   isFaded,
   fadedOpacity,
 }: SeriesBarRectProps) {
-  const [isAnimated, setIsAnimated] = useState(false);
+  const [isAnimated, setIsAnimated] = useState(false)
 
   useEffect(() => {
     const timeout = setTimeout(
       () => {
-        setIsAnimated(true);
+        setIsAnimated(true)
       },
       index * calculatedStaggerDelay * 1000
-    );
-    return () => clearTimeout(timeout);
-  }, [index, calculatedStaggerDelay]);
+    )
+    return () => clearTimeout(timeout)
+  }, [index, calculatedStaggerDelay])
 
-  const h = isAnimated ? barHeight : 0;
-  const yi = isAnimated ? y : innerHeight;
+  const h = isAnimated ? barHeight : 0
+  const yi = isAnimated ? y : innerHeight
 
   return (
     <motion.rect
@@ -319,7 +319,7 @@ function SeriesBarRect({
       x={x}
       y={yi}
     />
-  );
+  )
 }
 
-export default SeriesBar;
+export default SeriesBar

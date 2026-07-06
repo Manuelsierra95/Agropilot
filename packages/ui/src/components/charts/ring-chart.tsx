@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import { Group } from "@visx/group";
-import { ParentSize } from "@visx/responsive";
+import { Group } from "@visx/group"
+import { ParentSize } from "@visx/responsive"
 import {
   Children,
   isValidElement,
@@ -10,55 +10,55 @@ import {
   useMemo,
   useRef,
   useState,
-} from "react";
-import { cn } from "@workspace/ui/lib/utils";
+} from "react"
+import { cn } from "@workspace/ui/lib/utils"
 import {
   defaultRingColors,
   type RingContextValue,
   type RingData,
   RingProvider,
-} from "./ring-context";
+} from "./ring-context"
 
 export interface RingChartProps {
   /** Data array - each item represents a ring */
-  data: RingData[];
+  data: RingData[]
   /** Chart size in pixels. If not provided, uses parent container size */
-  size?: number;
+  size?: number
   /** Stroke width of each ring. Default: 12 */
-  strokeWidth?: number;
+  strokeWidth?: number
   /** Gap between rings. Default: 6 */
-  ringGap?: number;
+  ringGap?: number
   /** Inner radius of the innermost ring. Default: 60 */
-  baseInnerRadius?: number;
+  baseInnerRadius?: number
   /** Animation duration in milliseconds. Default: 1100 */
-  animationDuration?: number;
+  animationDuration?: number
   /** Additional class name for the container */
-  className?: string;
+  className?: string
   /** Controlled hover state - index of hovered ring */
-  hoveredIndex?: number | null;
+  hoveredIndex?: number | null
   /** Callback when hover state changes */
-  onHoverChange?: (index: number | null) => void;
+  onHoverChange?: (index: number | null) => void
   /** Start angle in radians. Default: -PI/2 (top) */
-  startAngle?: number;
+  startAngle?: number
   /** End angle in radians. Default: 3*PI/2 (full circle) */
-  endAngle?: number;
+  endAngle?: number
   /** Child components (Ring, RingCenter, etc.) */
-  children: ReactNode;
+  children: ReactNode
 }
 
 interface RingChartInnerProps {
-  width: number;
-  height: number;
-  data: RingData[];
-  strokeWidth: number;
-  ringGap: number;
-  baseInnerRadius: number;
-  children: ReactNode;
-  containerRef: React.RefObject<HTMLDivElement | null>;
-  hoveredIndexProp?: number | null;
-  onHoverChange?: (index: number | null) => void;
-  startAngle: number;
-  endAngle: number;
+  width: number
+  height: number
+  data: RingData[]
+  strokeWidth: number
+  ringGap: number
+  baseInnerRadius: number
+  children: ReactNode
+  containerRef: React.RefObject<HTMLDivElement | null>
+  hoveredIndexProp?: number | null
+  onHoverChange?: (index: number | null) => void
+  startAngle: number
+  endAngle: number
 }
 
 // Helper to check if a child is a RingCenter component
@@ -68,7 +68,7 @@ function isRingCenter(child: ReactNode): boolean {
     typeof child.type === "function" &&
     ((child.type as { displayName?: string }).displayName === "RingCenter" ||
       child.type.name === "RingCenter")
-  );
+  )
 }
 
 function RingChartInner({
@@ -87,104 +87,104 @@ function RingChartInner({
 }: RingChartInnerProps) {
   const [internalHoveredIndex, setInternalHoveredIndex] = useState<
     number | null
-  >(null);
-  const [animationKey] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
+  >(null)
+  const [animationKey] = useState(0)
+  const [isLoaded, setIsLoaded] = useState(false)
 
   // Use controlled or uncontrolled hover state
-  const isControlled = hoveredIndexProp !== undefined;
-  const hoveredIndex = isControlled ? hoveredIndexProp : internalHoveredIndex;
+  const isControlled = hoveredIndexProp !== undefined
+  const hoveredIndex = isControlled ? hoveredIndexProp : internalHoveredIndex
   const setHoveredIndex = useCallback(
     (index: number | null) => {
       if (isControlled) {
-        onHoverChange?.(index);
+        onHoverChange?.(index)
       } else {
-        setInternalHoveredIndex(index);
+        setInternalHoveredIndex(index)
       }
     },
     [isControlled, onHoverChange]
-  );
+  )
 
   // Use the smaller dimension to ensure the chart fits
-  const size = Math.min(width, height);
-  const center = size / 2;
+  const size = Math.min(width, height)
+  const center = size / 2
 
   // Calculate scaled dimensions to fit within the available space
   // The outermost ring needs to fit within the chart with some padding
-  const ringCount = data.length;
-  const padding = 8; // Padding from edge
-  const availableRadius = center - padding;
+  const ringCount = data.length
+  const padding = 8 // Padding from edge
+  const availableRadius = center - padding
 
   // Calculate the "design" outer radius (what we'd need at 1:1 scale)
   const designOuterRadius =
     baseInnerRadiusProp +
     (ringCount - 1) * (strokeWidthProp + ringGapProp) +
-    strokeWidthProp;
+    strokeWidthProp
 
   // Scale factor to fit within available space
-  const scale = Math.min(1, availableRadius / designOuterRadius);
+  const scale = Math.min(1, availableRadius / designOuterRadius)
 
   // Apply scaling to all dimensions
-  const strokeWidth = strokeWidthProp * scale;
-  const ringGap = ringGapProp * scale;
-  const baseInnerRadius = baseInnerRadiusProp * scale;
+  const strokeWidth = strokeWidthProp * scale
+  const ringGap = ringGapProp * scale
+  const baseInnerRadius = baseInnerRadiusProp * scale
 
   // Calculate total value
   const totalValue = useMemo(
     () => data.reduce((sum, d) => sum + d.value, 0),
     [data]
-  );
+  )
 
   // Get color for a ring index
   const getColor = useCallback(
     (index: number) => {
-      const item = data[index];
+      const item = data[index]
       if (item?.color) {
-        return item.color;
+        return item.color
       }
-      return defaultRingColors[index % defaultRingColors.length] as string;
+      return defaultRingColors[index % defaultRingColors.length] as string
     },
     [data]
-  );
+  )
 
   // Get ring radii for an index
   const getRingRadii = useCallback(
     (index: number) => {
-      const innerRadius = baseInnerRadius + index * (strokeWidth + ringGap);
-      const outerRadius = innerRadius + strokeWidth;
-      return { innerRadius, outerRadius };
+      const innerRadius = baseInnerRadius + index * (strokeWidth + ringGap)
+      const outerRadius = innerRadius + strokeWidth
+      return { innerRadius, outerRadius }
     },
     [baseInnerRadius, strokeWidth, ringGap]
-  );
+  )
 
   // Mark as loaded after initial render
   useState(() => {
     const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  });
+      setIsLoaded(true)
+    }, 100)
+    return () => clearTimeout(timer)
+  })
 
   // Separate SVG children (rings) from HTML children (RingCenter)
   // This avoids Safari's foreignObject positioning bugs (WebKit #23113)
   const { svgChildren, centerChildren } = useMemo(() => {
-    const svgNodes: ReactNode[] = [];
-    const centerNodes: ReactNode[] = [];
+    const svgNodes: ReactNode[] = []
+    const centerNodes: ReactNode[] = []
 
     Children.forEach(children, (child) => {
       if (isRingCenter(child)) {
-        centerNodes.push(child);
+        centerNodes.push(child)
       } else {
-        svgNodes.push(child);
+        svgNodes.push(child)
       }
-    });
+    })
 
-    return { svgChildren: svgNodes, centerChildren: centerNodes };
-  }, [children]);
+    return { svgChildren: svgNodes, centerChildren: centerNodes }
+  }, [children])
 
   // Early return if dimensions not ready
   if (size < 10) {
-    return null;
+    return null
   }
 
   const contextValue: RingContextValue = {
@@ -204,7 +204,7 @@ function RingChartInner({
     getRingRadii,
     startAngle,
     endAngle,
-  };
+  }
 
   // Use CSS Grid stacking to layer SVG and HTML content
   // This avoids Safari's foreignObject rendering bugs where HTML content
@@ -243,7 +243,7 @@ function RingChartInner({
         )}
       </div>
     </RingProvider>
-  );
+  )
 }
 
 export function RingChart({
@@ -259,7 +259,7 @@ export function RingChart({
   endAngle = (3 * Math.PI) / 2,
   children,
 }: RingChartProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null)
 
   // If fixed size is provided, use it directly
   if (fixedSize) {
@@ -285,7 +285,7 @@ export function RingChart({
           {children}
         </RingChartInner>
       </div>
-    );
+    )
   }
 
   // Otherwise use ParentSize for responsive sizing
@@ -314,7 +314,7 @@ export function RingChart({
         )}
       </ParentSize>
     </div>
-  );
+  )
 }
 
-export default RingChart;
+export default RingChart

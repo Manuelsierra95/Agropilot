@@ -1,36 +1,36 @@
-"use client";
+"use client"
 
-import type { ReactNode } from "react";
-import { cn } from "@workspace/ui/lib/utils";
+import type { ReactNode } from "react"
+import { cn } from "@workspace/ui/lib/utils"
 import {
   ChartStatFlow,
   type ChartStatFlowFormat,
   defaultChartStatFlowFormat,
-} from "./chart-stat-flow";
-import { useRing } from "./ring-context";
+} from "./chart-stat-flow"
+import { useRing } from "./ring-context"
 
 export interface RingCenterProps {
   /** Label shown below the value. Default: "Total" when not hovering */
-  defaultLabel?: string;
+  defaultLabel?: string
   /** Format options for NumberFlow. Default: standard notation */
-  formatOptions?: ChartStatFlowFormat;
+  formatOptions?: ChartStatFlowFormat
   /** Custom render function for complete control over center content */
   children?: (props: {
-    value: number;
-    label: string;
-    isHovered: boolean;
-    data: { label: string; value: number; maxValue: number; color?: string };
-  }) => ReactNode;
+    value: number
+    label: string
+    isHovered: boolean
+    data: { label: string; value: number; maxValue: number; color?: string }
+  }) => ReactNode
   /** Additional class name for the container */
-  className?: string;
+  className?: string
   /** Class name for the value text. Default: "text-2xl font-bold" */
-  valueClassName?: string;
+  valueClassName?: string
   /** Class name for the label text. Default: "text-xs" */
-  labelClassName?: string;
+  labelClassName?: string
   /** Prefix to show before the number (e.g., "$") */
-  prefix?: string;
+  prefix?: string
   /** Suffix to show after the number (e.g., "%") */
-  suffix?: string;
+  suffix?: string
 }
 
 /**
@@ -53,15 +53,15 @@ export function RingCenter({
   prefix,
   suffix,
 }: RingCenterProps) {
-  const { data, hoveredIndex, totalValue, baseInnerRadius } = useRing();
+  const { data, hoveredIndex, totalValue, baseInnerRadius } = useRing()
 
-  const hoveredData = hoveredIndex === null ? null : data[hoveredIndex];
-  const displayValue = hoveredData ? hoveredData.value : totalValue;
-  const displayLabel = hoveredData ? hoveredData.label : defaultLabel;
+  const hoveredData = hoveredIndex === null ? null : data[hoveredIndex]
+  const displayValue = hoveredData ? hoveredData.value : totalValue
+  const displayLabel = hoveredData ? hoveredData.label : defaultLabel
 
   // Calculate center area size based on scaled baseInnerRadius
   // Leave some padding so text doesn't touch the inner ring
-  const centerSize = baseInnerRadius * 2 - 16;
+  const centerSize = baseInnerRadius * 2 - 16
 
   // If custom render function is provided, use it
   if (children && hoveredData) {
@@ -77,7 +77,7 @@ export function RingCenter({
           data: hoveredData,
         })}
       </div>
-    );
+    )
   }
 
   // Default center content with NumberFlow animations
@@ -100,9 +100,9 @@ export function RingCenter({
         valueClassName={valueClassName}
       />
     </div>
-  );
+  )
 }
 
-RingCenter.displayName = "RingCenter";
+RingCenter.displayName = "RingCenter"
 
-export default RingCenter;
+export default RingCenter

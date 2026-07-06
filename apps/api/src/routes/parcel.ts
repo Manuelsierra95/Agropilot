@@ -23,10 +23,7 @@ import {
   listParcels,
   updateParcel,
 } from "@workspace/api/services/parcels"
-import {
-  parcelCreateSchema,
-  parcelUpdateInputSchema,
-} from "@workspace/schemas"
+import { parcelCreateSchema, parcelUpdateInputSchema } from "@workspace/schemas"
 
 const cache5min = createCacheMiddleware({ ttlSeconds: 300 })
 const cache1min = createCacheMiddleware({ ttlSeconds: 60 })
@@ -77,16 +74,17 @@ export const parcelRoutes = new Hono<{
         )
       }
       if (include.includes("recommendations")) {
-        data.recommendations = await getParcelsRecommendationsForDashboard(
-          organizationId
-        )
+        data.recommendations =
+          await getParcelsRecommendationsForDashboard(organizationId)
       }
       if (include.includes("risks")) {
         data.risks = await getParcelsRisksForDashboard(organizationId)
       }
       if (include.includes("weatherComparison")) {
-        data.weatherComparison =
-          await getParcelsWeatherComparisonForDashboard(organizationId, query)
+        data.weatherComparison = await getParcelsWeatherComparisonForDashboard(
+          organizationId,
+          query
+        )
       }
 
       return c.json(
@@ -133,31 +131,27 @@ export const parcelRoutes = new Hono<{
     )
   })
 
-  .get(
-    "/:id/crop-overview",
-    zValidator("query", apiQuerySchema),
-    async (c) => {
-      const query = c.req.valid("query")
-      const olivar = await getParcelCropOverview(
-        c.get("organizationId"),
-        c.req.param("id"),
-        query
-      )
-      return c.json(
-        apiResponse({
-          data: { olivar },
-          meta: {
-            scope: "parcel",
-            mode: query.mode,
-            parcelId: c.req.param("id"),
-            from: query.from,
-            to: query.to,
-          },
-        }),
-        200
-      )
-    }
-  )
+  .get("/:id/crop-overview", zValidator("query", apiQuerySchema), async (c) => {
+    const query = c.req.valid("query")
+    const olivar = await getParcelCropOverview(
+      c.get("organizationId"),
+      c.req.param("id"),
+      query
+    )
+    return c.json(
+      apiResponse({
+        data: { olivar },
+        meta: {
+          scope: "parcel",
+          mode: query.mode,
+          parcelId: c.req.param("id"),
+          from: query.from,
+          to: query.to,
+        },
+      }),
+      200
+    )
+  })
 
   .get(
     "/:id/agroclimate",
