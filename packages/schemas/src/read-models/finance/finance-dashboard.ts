@@ -140,6 +140,18 @@ export const dashboardParcelsSellingWindowsResponseSchema = z.object({
   sellingWindows: dashboardParcelsSellingWindowsSchema,
 })
 
+export const updateCampaignSaleTargetSchema = z.object({
+  parcelId: z.string().uuid(),
+  campaignTarget: z.coerce.number().positive(),
+  campaignId: z.string().optional(),
+  from: z.string().date().optional(),
+  to: z.string().date().optional(),
+})
+
+export const updateCampaignSaleTargetResponseSchema = z.object({
+  campaignTarget: z.number(),
+})
+
 export type DashboardOlivePriceItem = z.infer<
   typeof dashboardOlivePriceItemSchema
 >
@@ -172,6 +184,9 @@ export type DashboardParcelsSellingWindows = z.infer<
 >
 export type DashboardParcelSellingWindowItem = z.infer<
   typeof dashboardParcelSellingWindowItemSchema
+>
+export type UpdateCampaignSaleTargetInput = z.infer<
+  typeof updateCampaignSaleTargetSchema
 >
 
 /** @internal Used when aggregating market prices by grade */

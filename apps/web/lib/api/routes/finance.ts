@@ -16,6 +16,7 @@ import {
   type DashboardParcelsSellingWindows,
   type DashboardSellingWindow,
   type DashboardTransactionSnapshot,
+  type UpdateCampaignSaleTargetInput,
 } from "@workspace/schemas"
 import { cache } from "react"
 
@@ -210,6 +211,17 @@ const getParcelsFinanceComparison = (
     )
     .then((res) => res.data.parcelsComparison)
 
+const updateCampaignSaleTarget = (data: UpdateCampaignSaleTargetInput) =>
+  client.api.v1.finance["selling-window"]["campaign-target"]
+    .$patch({ json: data })
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { campaignTarget: number }
+        }>
+    )
+    .then((res) => res.data)
+
 export const financeApi = {
   listTransactions,
   getTransactionById,
@@ -226,4 +238,5 @@ export const financeApi = {
   getProductionValue,
   getParcelsFinanceComparison,
   getParcelsSellingWindows,
+  updateCampaignSaleTarget,
 }

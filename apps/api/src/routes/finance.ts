@@ -22,12 +22,14 @@ import {
   getTransactionById,
   getTransactionsForDashboard,
   listTransactions,
+  updateCampaignSaleTarget,
   updateTransaction,
 } from "@workspace/api/services/finance"
 import {
   transactionBulkCreateSchema,
   transactionCreateSchema,
   transactionUpdateInputSchema,
+  updateCampaignSaleTargetSchema,
 } from "@workspace/schemas"
 
 const cache5min = createCacheMiddleware({ ttlSeconds: 300 })
@@ -117,6 +119,30 @@ export const financeRoutes = new Hono<{
       200
     )
   })
+
+  .patch(
+    "/selling-window/campaign-target",
+    zValidator("json", updateCampaignSaleTargetSchema),
+    async (c) => {
+      const data = c.req.valid("json")
+      const result = await updateCampaignSaleTarget(
+        c.get("organizationId"),
+        data
+      )
+
+      return c.json(
+        apiResponse({
+          data: result,
+          meta: {
+            scope: "parcel",
+            mode: "full",
+            parcelId: data.parcelId,
+          },
+        }),
+        200
+      )
+    }
+  )
 
   .get("/:id", async (c) => {
     const transaction = await getTransactionById(

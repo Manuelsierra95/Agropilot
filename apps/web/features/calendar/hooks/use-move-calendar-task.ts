@@ -14,9 +14,7 @@ type MoveCalendarTaskVariables = {
   nextTasks: CalendarTask[]
 }
 
-export function useMoveCalendarTask(
-  setTasks: (tasks: CalendarTask[]) => void
-) {
+export function useMoveCalendarTask(setTasks: (tasks: CalendarTask[]) => void) {
   return useMutation({
     mutationFn: ({ taskId, payload }: MoveCalendarTaskVariables) =>
       api.tasks.updateTask(taskId, payload),

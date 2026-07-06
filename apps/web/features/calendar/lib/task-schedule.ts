@@ -28,10 +28,16 @@ function formatScheduleDate(date: Date): string {
 }
 
 export function isSameSchedule(a: CalendarTask, b: CalendarTask): boolean {
-  return a.start.getTime() === b.start.getTime() && a.end.getTime() === b.end.getTime()
+  return (
+    a.start.getTime() === b.start.getTime() &&
+    a.end.getTime() === b.end.getTime()
+  )
 }
 
-export function moveTaskToDay(task: CalendarTask, targetDay: Date): CalendarTask {
+export function moveTaskToDay(
+  task: CalendarTask,
+  targetDay: Date
+): CalendarTask {
   const dayOffset = differenceInCalendarDays(targetDay, task.start)
   if (dayOffset === 0) return task
 

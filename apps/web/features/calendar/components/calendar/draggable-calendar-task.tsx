@@ -49,7 +49,10 @@ export function DraggableCalendarTask({
       <CalendarTask
         task={task}
         month={month}
-        className={cn("cursor-grabbing shadow-lg ring-2 ring-primary", className)}
+        className={cn(
+          "cursor-grabbing shadow-lg ring-2 ring-primary",
+          className
+        )}
         disableLayoutAnimation
       />
     )

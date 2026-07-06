@@ -187,7 +187,7 @@ type ScopeContext = {
   dateRange: { from: string; to: string }
 }
 
-async function resolveScopeContext(
+export async function resolveFinanceScopeContext(
   organizationId: string,
   filters: DashboardScopeQuery
 ): Promise<ScopeContext> {
@@ -360,7 +360,7 @@ export async function getSellingWindowForDashboard(
   organizationId: string,
   filters: DashboardScopeQuery = {}
 ): Promise<DashboardSellingWindow> {
-  const { parcelId, campaignId } = await resolveScopeContext(
+  const { parcelId, campaignId } = await resolveFinanceScopeContext(
     organizationId,
     filters
   )
@@ -376,7 +376,7 @@ export async function getParcelsSellingWindowsForDashboard(
   organizationId: string,
   filters: DashboardScopeQuery = {}
 ): Promise<DashboardParcelsSellingWindows> {
-  const { campaignId } = await resolveScopeContext(organizationId, filters)
+  const { campaignId } = await resolveFinanceScopeContext(organizationId, filters)
 
   const [parcels, virgenExtraPrice, summaries] = await Promise.all([
     listParcels(organizationId),
@@ -409,7 +409,7 @@ export async function getFinanceResumeForDashboard(
   organizationId: string,
   filters: DashboardScopeQuery = {}
 ): Promise<DashboardFinanceResume> {
-  const { parcelId, campaignId, dateRange } = await resolveScopeContext(
+  const { parcelId, campaignId, dateRange } = await resolveFinanceScopeContext(
     organizationId,
     filters
   )
@@ -459,7 +459,7 @@ export async function getCampaignMarginForDashboard(
   organizationId: string,
   filters: DashboardScopeQuery = {}
 ): Promise<DashboardCampaignMargin> {
-  const { parcelId, campaignId, dateRange } = await resolveScopeContext(
+  const { parcelId, campaignId, dateRange } = await resolveFinanceScopeContext(
     organizationId,
     filters
   )
@@ -476,7 +476,7 @@ export async function getTransactionsForDashboard(
   organizationId: string,
   filters: DashboardScopeQuery = {}
 ): Promise<DashboardFinanceTransaction[]> {
-  const { parcelId, dateRange } = await resolveScopeContext(
+  const { parcelId, dateRange } = await resolveFinanceScopeContext(
     organizationId,
     filters
   )
@@ -504,7 +504,7 @@ export async function getRecentTransactionsForDashboard(
   organizationId: string,
   filters: DashboardScopeQuery & { limit?: number } = {}
 ): Promise<DashboardTransactionSnapshot[]> {
-  const { parcelId, dateRange } = await resolveScopeContext(
+  const { parcelId, dateRange } = await resolveFinanceScopeContext(
     organizationId,
     filters
   )
@@ -531,7 +531,7 @@ export async function getParcelsFinanceComparisonForDashboard(
   organizationId: string,
   filters: DashboardScopeQuery = {}
 ): Promise<DashboardParcelsFinanceComparison> {
-  const { campaignId } = await resolveScopeContext(organizationId, filters)
+  const { campaignId } = await resolveFinanceScopeContext(organizationId, filters)
 
   const [parcels, summaries] = await Promise.all([
     listParcels(organizationId),
@@ -563,7 +563,7 @@ export async function getProductionValueForDashboard(
   organizationId: string,
   filters: DashboardScopeQuery = {}
 ): Promise<DashboardProductionValue> {
-  const { parcelId, campaignId, dateRange } = await resolveScopeContext(
+  const { parcelId, campaignId, dateRange } = await resolveFinanceScopeContext(
     organizationId,
     filters
   )

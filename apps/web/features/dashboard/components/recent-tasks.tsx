@@ -78,12 +78,12 @@ function getVisibleTasks(data: CalendarTask[]) {
   }
 }
 
-interface RecentEventsProps {
+interface RecentTasksProps {
   data: CalendarTask[]
   className?: string
 }
 
-export function RecentEvents({ data, className }: RecentEventsProps) {
+export function RecentTasks({ data, className }: RecentTasksProps) {
   const { visible, count, hasUpcoming } = getVisibleTasks(data)
 
   return (

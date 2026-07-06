@@ -50,7 +50,7 @@ export function CalendarDropZone({
       onClick={onClick}
       className={cn(
         "transition-colors",
-        isOver && "bg-primary/5 ring-2 ring-inset ring-primary/40",
+        isOver && "bg-primary/5 ring-2 ring-primary/40 ring-inset",
         className
       )}
     >

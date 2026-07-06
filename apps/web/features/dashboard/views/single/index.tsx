@@ -82,6 +82,7 @@ export function DashboardSingleView({
           ) : data?.market?.sellingWindow ? (
             <SellingWindow
               className="min-w-0 flex-1"
+              parcelId={scope.parcelId}
               {...data.market?.sellingWindow}
             />
           ) : null}

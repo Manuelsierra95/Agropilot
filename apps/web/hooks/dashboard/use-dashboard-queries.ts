@@ -48,7 +48,6 @@ export function useSellingWindow() {
     return {
       ...query.data,
       estimatedKg: overrides?.estimatedKg ?? query.data.estimatedKg,
-      campaignTarget: overrides?.campaignTarget ?? query.data.campaignTarget,
     }
   }, [overrides, query.data])
 
