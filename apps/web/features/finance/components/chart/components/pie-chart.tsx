@@ -100,6 +100,10 @@ function SortHeader({
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+const EMPTY_PIE_DATA: PieChartDataItem[] = [
+  { category: "Sin datos", amount: 1, fill: "var(--chart-empty)" },
+]
+
 export function FinancePieChart({
   id,
   title,
@@ -114,6 +118,8 @@ export function FinancePieChart({
     () => data.reduce((acc, d) => acc + d.amount, 0),
     [data]
   )
+  const isEmpty = data.length === 0 || total === 0
+  const pieData = isEmpty ? EMPTY_PIE_DATA : data
 
   // ── Sort state — default: % ────────────────────────────────────
   const [sort, setSort] = React.useState<SortState>({
@@ -131,6 +137,8 @@ export function FinancePieChart({
 
   // ── Sorted data (original indices preserved for pie sync) ─────────────────
   const sortedEntries = React.useMemo(() => {
+    if (isEmpty) return []
+
     const entries = data.map((item, originalIndex) => ({ item, originalIndex }))
 
     return entries.sort((a, b) => {
@@ -143,17 +151,19 @@ export function FinancePieChart({
       }
       return sort.dir === "asc" ? cmp : -cmp
     })
-  }, [data, sort])
+  }, [data, isEmpty, sort])
 
   // ── Active index tracks the *original* data index (stays in sync with pie) ─
   const maxOriginalIndex = React.useMemo(
     () =>
-      data.reduce(
-        (maxIdx, item, idx, arr) =>
-          item.amount > (arr[maxIdx]?.amount ?? 0) ? idx : maxIdx,
-        0
-      ),
-    [data]
+      isEmpty
+        ? 0
+        : data.reduce(
+            (maxIdx, item, idx, arr) =>
+              item.amount > (arr[maxIdx]?.amount ?? 0) ? idx : maxIdx,
+            0
+          ),
+    [data, isEmpty]
   )
 
   const [activeOriginalIndex, setActiveOriginalIndex] =
@@ -195,8 +205,8 @@ export function FinancePieChart({
   }, [activeOriginalIndex, sort])
 
   // ── Derived ───────────────────────────────────────────────────────────────
-  const activeItem = data[activeOriginalIndex]
-  const needsScroll = data.length > legendScrollThreshold
+  const activeItem = isEmpty ? null : data[activeOriginalIndex]
+  const needsScroll = !isEmpty && data.length > legendScrollThreshold
 
   const renderActiveShape = React.useCallback((props: SectorProps) => {
     const { outerRadius = 0, ...rest } = props
@@ -208,6 +218,7 @@ export function FinancePieChart({
   }, [])
 
   const handleSelect = (item: PieChartDataItem, originalIndex: number) => {
+    if (isEmpty) return
     setActiveOriginalIndex(originalIndex)
     setSelectedItem(item)
     setDrawerOpen(true)
@@ -216,44 +227,61 @@ export function FinancePieChart({
   return (
     <Card
       data-chart={id}
-      className="col-span-1 flex h-full flex-col bg-background ring-0"
+      className="col-span-1 flex h-full min-h-0 flex-col overflow-hidden bg-background ring-0"
     >
-      <ChartStyle id={id} config={chartConfig} />
+      <ChartStyle
+        id={id}
+        config={{
+          ...chartConfig,
+          empty: { label: "Sin datos", color: "var(--muted)" },
+        }}
+      />
 
       <CardHeader className="pb-0">
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
 
-      <CardContent className="flex flex-1 items-center gap-6">
+      <CardContent className="flex min-h-0 flex-1 items-center gap-4 overflow-hidden">
         {/* ── Pie ── */}
         <ChartContainer
           id={id}
           config={chartConfig}
-          className="aspect-square h-fit min-h-60 w-fit shrink-0"
+          className="mx-auto aspect-square h-full max-h-[200px] w-full max-w-[200px] shrink-0 [--chart-empty:var(--muted)]"
         >
           <PieChart>
             <Pie
-              data={data}
+              data={pieData}
               dataKey="amount"
               nameKey="category"
-              innerRadius={55}
-              strokeWidth={4}
-              activeIndex={activeOriginalIndex}
-              activeShape={renderActiveShape}
-              onMouseEnter={(_, index) => setActiveOriginalIndex(index)}
-              onClick={(_, index) => handleSelect(data[index]!, index)}
-              className="cursor-pointer"
+              innerRadius={50}
+              strokeWidth={isEmpty ? 0 : 4}
+              activeIndex={isEmpty ? undefined : activeOriginalIndex}
+              activeShape={isEmpty ? undefined : renderActiveShape}
+              onMouseEnter={
+                isEmpty
+                  ? undefined
+                  : (_, index) => setActiveOriginalIndex(index)
+              }
+              onClick={
+                isEmpty
+                  ? undefined
+                  : (_, index) => handleSelect(data[index]!, index)
+              }
+              className={isEmpty ? "pointer-events-none" : "cursor-pointer"}
             >
               <Label
                 content={({ viewBox }) => {
                   if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    const category = activeItem?.category ?? ""
+                    const category = isEmpty
+                      ? "Sin datos"
+                      : (activeItem?.category ?? "")
                     const words = category.split(" ")
                     const mid = Math.ceil(words.length / 2)
                     const line1 = words.slice(0, mid).join(" ")
                     const line2 = words.slice(mid).join(" ")
                     const hasTwo = line2.length > 0
+                    const amount = isEmpty ? 0 : (activeItem?.amount ?? 0)
 
                     return (
                       <text
@@ -268,7 +296,7 @@ export function FinancePieChart({
                           y={(viewBox.cy ?? 0) - (hasTwo ? 10 : 0)}
                           className="fill-foreground text-xl font-bold"
                         >
-                          {activeItem?.amount.toLocaleString("es-ES")}
+                          {amount.toLocaleString("es-ES")}
                           {"\u00A0"}€
                         </tspan>
                         <tspan
@@ -297,90 +325,107 @@ export function FinancePieChart({
         </ChartContainer>
 
         {/* ── Legend ── */}
-        <div className="flex flex-1 flex-col gap-1 overflow-hidden">
-          {/* ── Column headers ── */}
-          <div className="flex items-center gap-2 border-b pr-2 pb-1">
-            {/* spacer for color dot */}
-            <span className="h-2.5 w-2.5 shrink-0" />
-            <SortHeader
-              label="Nombre"
-              sortKey="category"
-              sort={sort}
-              onSort={handleSort}
-              className="flex-1"
-            />
-            <SortHeader
-              label="%"
-              sortKey="percentage"
-              sort={sort}
-              onSort={handleSort}
-              className="shrink-0"
-            />
-            <SortHeader
-              label="Importe"
-              sortKey="amount"
-              sort={sort}
-              onSort={handleSort}
-              className="w-[60px] shrink-0 justify-end"
-            />
-          </div>
+        <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-hidden">
+          {isEmpty ? (
+            <div className="flex flex-1 items-center justify-center px-2 text-center text-xs text-muted-foreground">
+              Sin datos registrados
+            </div>
+          ) : (
+            <>
+              {/* ── Column headers ── */}
+              <div className="flex items-center gap-2 border-b pr-2 pb-1">
+                {/* spacer for color dot */}
+                <span className="h-2.5 w-2.5 shrink-0" />
+                <SortHeader
+                  label="Nombre"
+                  sortKey="category"
+                  sort={sort}
+                  onSort={handleSort}
+                  className="flex-1"
+                />
+                <SortHeader
+                  label="%"
+                  sortKey="percentage"
+                  sort={sort}
+                  onSort={handleSort}
+                  className="shrink-0"
+                />
+                <SortHeader
+                  label="Importe"
+                  sortKey="amount"
+                  sort={sort}
+                  onSort={handleSort}
+                  className="w-[60px] shrink-0 justify-end"
+                />
+              </div>
 
-          {/* ── Rows ── */}
-          <ScrollArea className={`${needsScroll ? "h-[220px]" : "h-auto"}`}>
-            <ul className="flex flex-col gap-2 pt-0.5">
-              {sortedEntries.map(({ item, originalIndex }) => {
-                const key = categoryToKey[item.category]
-                const pct = ((item.amount / total) * 100).toFixed(1)
-                const isActive = originalIndex === activeOriginalIndex
+              {/* ── Rows ── */}
+              <ScrollArea className={needsScroll ? "min-h-0 flex-1" : "h-auto"}>
+                <ul className="flex flex-col gap-2 pt-0.5">
+                  {sortedEntries.map(({ item, originalIndex }) => {
+                    const key = categoryToKey[item.category]
+                    const pct = ((item.amount / total) * 100).toFixed(1)
+                    const isActive = originalIndex === activeOriginalIndex
 
-                return (
-                  <li
-                    key={item.category}
-                    ref={isActive ? activeItemRef : undefined}
-                    className={`flex cursor-pointer items-start gap-2 rounded-md px-1 py-0.5 transition-colors ${
-                      isActive ? "bg-muted" : "hover:bg-muted/50"
-                    }`}
-                    onMouseEnter={() => setActiveOriginalIndex(originalIndex)}
-                    onClick={() => handleSelect(item, originalIndex)}
-                  >
-                    <span
-                      className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-[2px]"
-                      style={{ backgroundColor: `var(--color-${key})` }}
-                    />
-                    <span
-                      className={`flex-1 text-xs leading-tight font-semibold wrap-break-word transition-colors ${
-                        isActive ? "text-foreground" : "text-muted-foreground"
-                      }`}
-                    >
-                      {item.category}
-                    </span>
-                    <span
-                      className={`shrink-0 text-xs font-semibold tabular-nums transition-colors ${
-                        isActive ? "text-foreground" : "text-muted-foreground"
-                      }`}
-                    >
-                      {pct}
-                      {"\u00A0"}%
-                    </span>
-                    <span
-                      className={`w-[60px] shrink-0 pr-2 text-right text-xs font-semibold tabular-nums transition-colors ${
-                        isActive ? "text-foreground" : "text-muted-foreground"
-                      }`}
-                    >
-                      {item.amount.toLocaleString("es-ES")}
-                      {"\u00A0"}€
-                    </span>
-                  </li>
-                )
-              })}
-            </ul>
-            <ScrollBar orientation="vertical" />
-          </ScrollArea>
+                    return (
+                      <li
+                        key={item.category}
+                        ref={isActive ? activeItemRef : undefined}
+                        className={`flex cursor-pointer items-start gap-2 rounded-md px-1 py-0.5 transition-colors ${
+                          isActive ? "bg-muted" : "hover:bg-muted/50"
+                        }`}
+                        onMouseEnter={() =>
+                          setActiveOriginalIndex(originalIndex)
+                        }
+                        onClick={() => handleSelect(item, originalIndex)}
+                      >
+                        <span
+                          className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                          style={{ backgroundColor: `var(--color-${key})` }}
+                        />
+                        <span
+                          className={`flex-1 text-xs leading-tight font-semibold wrap-break-word transition-colors ${
+                            isActive
+                              ? "text-foreground"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {item.category}
+                        </span>
+                        <span
+                          className={`shrink-0 text-xs font-semibold tabular-nums transition-colors ${
+                            isActive
+                              ? "text-foreground"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {pct}
+                          {"\u00A0"}%
+                        </span>
+                        <span
+                          className={`w-[60px] shrink-0 pr-2 text-right text-xs font-semibold tabular-nums transition-colors ${
+                            isActive
+                              ? "text-foreground"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {item.amount.toLocaleString("es-ES")}
+                          {"\u00A0"}€
+                        </span>
+                      </li>
+                    )
+                  })}
+                </ul>
+                <ScrollBar orientation="vertical" />
+              </ScrollArea>
+            </>
+          )}
         </div>
       </CardContent>
 
       {/* ── Drawer (delegated to the consumer) ── */}
-      {renderDrawer &&
+      {!isEmpty &&
+        renderDrawer &&
         selectedItem &&
         renderDrawer({
           open: drawerOpen,
