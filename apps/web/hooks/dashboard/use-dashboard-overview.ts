@@ -54,9 +54,6 @@ export function useDashboardOverview() {
           ...overview.market.sellingWindow,
           estimatedKg:
             overrides?.estimatedKg ?? overview.market.sellingWindow.estimatedKg,
-          campaignTarget:
-            overrides?.campaignTarget ??
-            overview.market.sellingWindow.campaignTarget,
         },
       },
     }

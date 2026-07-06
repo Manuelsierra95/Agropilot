@@ -16,6 +16,7 @@ const financeMocks = vi.hoisted(() => ({
   getProductionValueForDashboard: vi.fn(),
   getParcelsFinanceComparisonForDashboard: vi.fn(),
   getParcelsSellingWindowsForDashboard: vi.fn(),
+  updateCampaignSaleTarget: vi.fn(),
 }))
 
 vi.mock("@workspace/api/services/finance", () => financeMocks)
@@ -25,6 +26,7 @@ import {
   mockAuthenticatedSession,
   mockUnauthenticated,
 } from "../helpers/mock-session"
+import { TEST_ORG_ID } from "../helpers/fixtures"
 import { apiRequest } from "../helpers/request"
 
 describe("finance routes", () => {
@@ -114,6 +116,73 @@ describe("finance routes", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ concept: "" }),
     })
+
+    expect(res.status).toBe(400)
+  })
+
+  it("PATCH /finance/selling-window/campaign-target returns 401 without auth", async () => {
+    const res = await apiRequest(
+      app,
+      "/api/v1/finance/selling-window/campaign-target",
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          parcelId: "00000000-0000-4000-8000-000000000001",
+          campaignTarget: 5.5,
+        }),
+      }
+    )
+
+    expect(res.status).toBe(401)
+  })
+
+  it("PATCH /finance/selling-window/campaign-target updates campaign target", async () => {
+    mockAuthenticatedSession()
+    financeMocks.updateCampaignSaleTarget.mockResolvedValue({
+      campaignTarget: 5.5,
+    })
+
+    const res = await apiRequest(
+      app,
+      "/api/v1/finance/selling-window/campaign-target",
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          parcelId: "00000000-0000-4000-8000-000000000001",
+          campaignTarget: 5.5,
+        }),
+      }
+    )
+
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.data.campaignTarget).toBe(5.5)
+    expect(financeMocks.updateCampaignSaleTarget).toHaveBeenCalledWith(
+      TEST_ORG_ID,
+      {
+        parcelId: "00000000-0000-4000-8000-000000000001",
+        campaignTarget: 5.5,
+      }
+    )
+  })
+
+  it("PATCH /finance/selling-window/campaign-target returns 400 for invalid payload", async () => {
+    mockAuthenticatedSession()
+
+    const res = await apiRequest(
+      app,
+      "/api/v1/finance/selling-window/campaign-target",
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          parcelId: "not-a-uuid",
+          campaignTarget: -1,
+        }),
+      }
+    )
 
     expect(res.status).toBe(400)
   })

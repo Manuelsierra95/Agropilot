@@ -5,6 +5,8 @@ export {
   bulkCreateTransactions,
 } from "@workspace/api/services/finance/commands/transaction-commands"
 
+export { updateCampaignSaleTarget } from "@workspace/api/services/finance/commands/campaign-sale-target-commands"
+
 export {
   listTransactions,
   queryTransactions,

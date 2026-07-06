@@ -19,3 +19,4 @@ export {
   useSellingWindow,
   useUpcomingWeekTasks,
 } from "@workspace/web/hooks/dashboard/use-dashboard-queries"
+export { useUpdateCampaignSaleTarget } from "@workspace/web/hooks/dashboard/use-update-campaign-sale-target"

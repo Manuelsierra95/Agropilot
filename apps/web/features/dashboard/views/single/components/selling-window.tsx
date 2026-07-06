@@ -12,6 +12,7 @@ import {
 } from "@workspace/ui/components/card"
 import { TrendingUp, TrendingDown, Minus } from "lucide-react"
 
+import { CampaignTargetComparison } from "@workspace/web/features/dashboard/components/campaign-target-comparison"
 import { RegisterSaleModal } from "@workspace/web/features/dashboard/components/register-sale-modal"
 
 import {
@@ -172,23 +173,10 @@ export function SellingWindow({
               )}
 
               {campaignTarget !== undefined && (
-                <div className="flex items-center justify-between gap-3 text-sm">
-                  <span className="text-muted-foreground">
-                    vs. objetivo ({campaignTarget.toFixed(2)} €/kg)
-                  </span>
-                  <span
-                    className={cn(
-                      "font-medium",
-                      lonjaPrice >= campaignTarget
-                        ? "text-emerald-500"
-                        : "text-red-500"
-                    )}
-                  >
-                    {lonjaPrice >= campaignTarget
-                      ? "Superado"
-                      : `-${(campaignTarget - lonjaPrice).toFixed(2)} €/kg`}
-                  </span>
-                </div>
+                <CampaignTargetComparison
+                  lonjaPrice={lonjaPrice}
+                  campaignTarget={campaignTarget}
+                />
               )}
             </div>
           )}

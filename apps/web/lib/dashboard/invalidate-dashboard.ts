@@ -11,11 +11,13 @@ const GLOBAL_KEY_SEGMENTS = new Set(["olive-prices", "parcels-map"])
 
 const FAMILY_KEY_SEGMENTS: Record<DashboardCacheFamily, readonly string[]> = {
   finance: [
+    "overview",
     "finance-resume",
     "finance-transactions",
     "campaign-margin",
     "recent-transactions",
     "selling-window",
+    "parcels-selling-windows",
   ],
   production: ["production-value", "selling-window"],
   events: ["upcoming-week", "calendar-events"],
