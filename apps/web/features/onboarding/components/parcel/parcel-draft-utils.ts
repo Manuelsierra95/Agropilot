@@ -8,17 +8,7 @@ import {
 } from "@workspace/web/features/onboarding/components/parcel/parcel-constants"
 import type { FieldFormData } from "@workspace/web/features/onboarding/components/parcel/parcel-form"
 
-const PARCEL_MAP_COLORS = [
-  "#3b6d11",
-  "#ca8a04",
-  "#2563eb",
-  "#c2410c",
-  "#7c3aed",
-  "#0d9488",
-] as const
-
 const ACTIVE_PARCEL_COLOR = "#16a34a"
-const INACTIVE_PARCEL_COLOR = "#86efac"
 
 export function createParcelDraft(): FieldFormData {
   return {
@@ -85,36 +75,26 @@ export function parsePolygonCoordinates(
   return null
 }
 
-export function fieldFormDraftsToMapParcels(
-  drafts: FieldFormData[],
-  activeParcelId: string | null
-): Parcel[] {
-  return drafts.flatMap((draft, index) => {
-    const coordinates = parsePolygonCoordinates(draft.polygon)
-    if (!coordinates?.length) return []
+export function fieldFormDraftToMapParcel(
+  draft: FieldFormData
+): Parcel | undefined {
+  const coordinates = parsePolygonCoordinates(draft.polygon)
+  if (!coordinates?.length) return undefined
 
-    const isActive = draft.id === activeParcelId
-    const cropLabel =
-      CROP_TYPE_LABELS[
-        (draft.cropType || DEFAULT_CROP_TYPE) as CropTypeValue
-      ] ?? draft.cropType
+  const cropLabel =
+    CROP_TYPE_LABELS[(draft.cropType || DEFAULT_CROP_TYPE) as CropTypeValue] ??
+    draft.cropType
 
-    return [
-      {
-        id: draft.id,
-        name: draft.name.trim() || "Parcela sin nombre",
-        area: draft.areaHa ?? undefined,
-        type: cropLabel,
-        irrigationType: draft.irrigationType
-          ? IRRIGATION_TYPE_LABELS[draft.irrigationType]
-          : undefined,
-        color: isActive
-          ? ACTIVE_PARCEL_COLOR
-          : (PARCEL_MAP_COLORS[index % PARCEL_MAP_COLORS.length] ??
-            INACTIVE_PARCEL_COLOR),
-        geometryType: "Polygon" as const,
-        geometryCoordinates: coordinates,
-      },
-    ]
-  })
+  return {
+    id: draft.id,
+    name: draft.name.trim() || "Parcela sin nombre",
+    area: draft.areaHa ?? undefined,
+    type: cropLabel,
+    irrigationType: draft.irrigationType
+      ? IRRIGATION_TYPE_LABELS[draft.irrigationType]
+      : undefined,
+    color: ACTIVE_PARCEL_COLOR,
+    geometryType: "Polygon" as const,
+    geometryCoordinates: coordinates,
+  }
 }

@@ -99,15 +99,6 @@ export function useProductionValue() {
   })
 }
 
-export function useParcelsMap() {
-  return useQuery({
-    queryKey: dashboardQueryKeys.parcelsMap(),
-    queryFn: () => api.parcel.getParcelsMap(),
-    ...mutationQueryOptions,
-    placeholderData: keepPreviousData,
-  })
-}
-
 export function useParcelRecommendations() {
   const scope = useDashboardScope()
   const parcelId = scope.parcelId ?? ""

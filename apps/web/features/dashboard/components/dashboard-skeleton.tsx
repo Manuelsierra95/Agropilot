@@ -163,11 +163,6 @@ export function DashboardSkeleton() {
               orientation="vertical"
               className={dashboardGridSlot.verticalSepDesktop}
             />
-            <MapSkeleton className="min-w-0 flex-2" />
-            <GradientSeparator
-              orientation="vertical"
-              className={dashboardGridSlot.verticalSepDesktop}
-            />
             <WidgetSkeleton
               className="min-w-0 flex-[1.5]"
               contentHeight="h-[240px]"

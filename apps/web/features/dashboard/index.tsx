@@ -21,7 +21,6 @@ export default function DashboardOverview() {
   const isPending = overview.isPending || !data
 
   const olivePrices = data?.market.olivePrices ?? []
-  const parcelsMap = data?.operations.parcelsMap ?? []
   const upcomingWeek = data?.operations.upcomingWeek ?? []
   const recentTransactions = data?.finance.recentTransactions ?? []
   const productionValue = data?.crop.productionValue
@@ -33,7 +32,6 @@ export default function DashboardOverview() {
           <DashboardAllView
             data={data as DashboardOverviewAll | undefined}
             olivePrices={olivePrices}
-            parcelsMap={parcelsMap}
             upcomingWeek={upcomingWeek}
             recentTransactions={recentTransactions}
             productionValue={productionValue}
@@ -43,7 +41,6 @@ export default function DashboardOverview() {
           <DashboardSingleView
             data={data as DashboardOverviewSingle | undefined}
             olivePrices={olivePrices}
-            parcelsMap={parcelsMap}
             upcomingWeek={upcomingWeek}
             recentTransactions={recentTransactions}
             productionValue={productionValue}

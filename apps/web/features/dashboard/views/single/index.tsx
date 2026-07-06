@@ -1,18 +1,21 @@
 "use client"
 
+import { useMemo } from "react"
+
 import { GradientSeparator } from "@workspace/web/components/ui/gradient-separator"
 import { toCalendarTasks } from "@workspace/web/lib/calendar/mappers"
 import type { DashboardOverviewSingle } from "@workspace/schemas"
 import type { FinanceTransactionSnapshot } from "@workspace/web/lib/finance/types"
+import { useDashboardScope } from "@workspace/web/hooks/dashboard"
 
 import { OlivePrice } from "@workspace/web/features/dashboard/components/olive-price"
 import { ResumeCrop } from "@workspace/web/features/dashboard/views/single/components/resume-crop"
 import { FinanceResume } from "@workspace/web/features/dashboard/views/single/components/finance-resume"
 import { CampaignAccumulatedMargin } from "@workspace/web/features/dashboard/views/single/components/campaign-accumulated-margin"
 import { Recommendations } from "@workspace/web/features/dashboard/views/single/components/recommendations"
-import { DashboardMap } from "@workspace/web/features/dashboard/components/map"
+import { ParcelMap } from "@workspace/web/features/dashboard/views/single/components/parcel-map"
 import { RiskRadar } from "@workspace/web/features/dashboard/views/single/components/risk-radar"
-import { RecentEvents } from "@workspace/web/features/dashboard/components/recent-events"
+import { RecentTasks } from "@workspace/web/features/dashboard/components/recent-tasks"
 import { RecentTransactions } from "@workspace/web/features/dashboard/components/recent-transactions"
 import type { TransactionSnapshot } from "@workspace/web/features/dashboard/components/recent-transactions"
 import { SellingWindow } from "@workspace/web/features/dashboard/views/single/components/selling-window"
@@ -28,7 +31,6 @@ import {
 type DashboardSingleViewProps = {
   data?: DashboardOverviewSingle
   olivePrices: DashboardOverviewSingle["market"]["olivePrices"]
-  parcelsMap: DashboardOverviewSingle["operations"]["parcelsMap"]
   upcomingWeek: DashboardOverviewSingle["operations"]["upcomingWeek"]
   recentTransactions: DashboardOverviewSingle["finance"]["recentTransactions"]
   productionValue?: DashboardOverviewSingle["crop"]["productionValue"]
@@ -39,13 +41,19 @@ type DashboardSingleViewProps = {
 export function DashboardSingleView({
   data,
   olivePrices,
-  parcelsMap,
   upcomingWeek,
   recentTransactions,
   productionValue,
   isPending,
   scopeKey,
 }: DashboardSingleViewProps) {
+  const scope = useDashboardScope()
+  const mapParcel = useMemo(() => {
+    if (!scope.parcelId) return undefined
+    return data?.operations.parcelsMap?.find(
+      (parcel) => parcel.id === scope.parcelId
+    )
+  }, [data?.operations.parcelsMap, scope.parcelId])
   return (
     <>
       <div className={dashboardGridSlot.topRow}>
@@ -74,7 +82,6 @@ export function DashboardSingleView({
           ) : data?.market?.sellingWindow ? (
             <SellingWindow
               className="min-w-0 flex-1"
-              scopeKey={scopeKey}
               {...data.market?.sellingWindow}
             />
           ) : null}
@@ -156,10 +163,10 @@ export function DashboardSingleView({
             orientation="vertical"
             className={dashboardGridSlot.verticalSepDesktop}
           />
-          {isPending && !parcelsMap.length ? (
+          {isPending ? (
             <MapSkeleton className="min-w-0 flex-2" />
           ) : (
-            <DashboardMap className="min-w-0 flex-2" parcels={parcelsMap} />
+            <ParcelMap className="min-w-0 flex-2 py-4" parcel={mapParcel} />
           )}
           <GradientSeparator
             orientation="vertical"
@@ -188,7 +195,7 @@ export function DashboardSingleView({
               contentHeight="h-[220px]"
             />
           ) : (
-            <RecentEvents
+            <RecentTasks
               className="min-w-0 flex-1"
               data={toCalendarTasks(upcomingWeek)}
             />

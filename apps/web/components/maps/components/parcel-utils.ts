@@ -25,7 +25,6 @@ export function getPolygonCenter(coordinates: number[][][]): ParcelLngLat {
 export function toParcelFeature(parcel: Parcel) {
   return {
     type: "Feature" as const,
-    id: Number(parcel.id),
     geometry: {
       type: parcel.geometryType,
       coordinates: parcel.geometryCoordinates,

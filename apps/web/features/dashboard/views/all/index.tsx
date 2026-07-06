@@ -5,8 +5,7 @@ import { toCalendarTasks } from "@workspace/web/lib/calendar/mappers"
 import type { DashboardOverviewAll } from "@workspace/schemas"
 
 import { OlivePrice } from "@workspace/web/features/dashboard/components/olive-price"
-import { DashboardMap } from "@workspace/web/features/dashboard/components/map"
-import { RecentEvents } from "@workspace/web/features/dashboard/components/recent-events"
+import { RecentTasks } from "@workspace/web/features/dashboard/components/recent-tasks"
 import { RecentTransactions } from "@workspace/web/features/dashboard/components/recent-transactions"
 import type { TransactionSnapshot } from "@workspace/web/features/dashboard/components/recent-transactions"
 import { SellingWindowAll } from "@workspace/web/features/dashboard/views/all/components/selling-window-all"
@@ -18,7 +17,6 @@ import { ProductionValueAll } from "@workspace/web/features/dashboard/views/all/
 import { dashboardGridSlot } from "@workspace/web/features/dashboard/lib/dashboard-grid-layout"
 import { WidgetSkeleton } from "@workspace/web/components/widget-skeleton"
 import {
-  MapSkeleton,
   ProductionValueSkeleton,
   ResumeCropSkeleton,
 } from "@workspace/web/features/dashboard/components/dashboard-skeleton"
@@ -26,7 +24,6 @@ import {
 type DashboardAllViewProps = {
   data?: DashboardOverviewAll
   olivePrices: DashboardOverviewAll["market"]["olivePrices"]
-  parcelsMap: DashboardOverviewAll["operations"]["parcelsMap"]
   upcomingWeek: DashboardOverviewAll["operations"]["upcomingWeek"]
   recentTransactions: DashboardOverviewAll["finance"]["recentTransactions"]
   productionValue?: DashboardOverviewAll["crop"]["productionValue"]
@@ -36,7 +33,6 @@ type DashboardAllViewProps = {
 export function DashboardAllView({
   data,
   olivePrices,
-  parcelsMap,
   upcomingWeek,
   recentTransactions,
   productionValue,
@@ -126,15 +122,6 @@ export function DashboardAllView({
             orientation="vertical"
             className={dashboardGridSlot.verticalSepDesktop}
           />
-          {isPending && !parcelsMap.length ? (
-            <MapSkeleton className="min-w-0 flex-2" />
-          ) : (
-            <DashboardMap className="min-w-0 flex-2" parcels={parcelsMap} />
-          )}
-          <GradientSeparator
-            orientation="vertical"
-            className={dashboardGridSlot.verticalSepDesktop}
-          />
           {isPending ? (
             <WidgetSkeleton
               className="min-w-0 flex-[1.5]"
@@ -158,7 +145,7 @@ export function DashboardAllView({
               contentHeight="h-[220px]"
             />
           ) : (
-            <RecentEvents
+            <RecentTasks
               className="min-w-0 flex-1"
               data={toCalendarTasks(upcomingWeek)}
             />

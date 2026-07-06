@@ -14,7 +14,6 @@ export {
   useOlivePrices,
   useParcelRecommendations,
   useParcelRisks,
-  useParcelsMap,
   useProductionValue,
   useRecentTransactions,
   useSellingWindow,

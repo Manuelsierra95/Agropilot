@@ -18,7 +18,10 @@ import { getParcelById, listParcels } from "@workspace/api/services/parcels/quer
 import {
   mapDbRisksToDashboard,
 } from "@workspace/api/services/parcels/mappers/parcel-dashboard.mapper"
-import { parseWktPoint } from "@workspace/api/services/shared/geometry-utils"
+import {
+  parsePolygonGeometry,
+  parseWktPoint,
+} from "@workspace/api/services/shared/geometry-utils"
 
 const TREES_PER_HECTARE = 200
 
@@ -31,22 +34,6 @@ const MAP_PARCEL_COLORS = [
   "#14b8a6",
 ] as const
 
-function parseWktPolygon(wkt: string | null | undefined): number[][][] | null {
-  if (!wkt) return null
-
-  const match = wkt.match(/POLYGON\s*\(\(([^)]+)\)\)/i)
-  if (!match?.[1]) return null
-
-  const ring = match[1].split(",").map((pair) => {
-    const parts = pair.trim().split(/\s+/).map(Number)
-    const lng = parts[0] ?? 0
-    const lat = parts[1] ?? 0
-    return [lng, lat]
-  })
-
-  return ring.length > 0 ? [ring] : null
-}
-
 function mapParcelsToMapFeatures(
   parcels: {
     id: string
@@ -57,7 +44,7 @@ function mapParcelsToMapFeatures(
   }[]
 ): DashboardMapParcel[] {
   return parcels.flatMap((parcel, index) => {
-    const geometryCoordinates = parseWktPolygon(parcel.polygon)
+    const geometryCoordinates = parsePolygonGeometry(parcel.polygon)
     if (!geometryCoordinates) return []
 
     return [
@@ -208,8 +195,31 @@ async function resolveCampaignIdForFilters(
 export async function getParcelsForMap(
   organizationId: string
 ): Promise<DashboardMapParcel[]> {
-  const parcels = await listParcels(organizationId)
-  return mapParcelsToMapFeatures(parcels)
+  const rows = await db
+    .select({
+      id: schema.parcels.id,
+      name: schema.parcels.name,
+      cropType: schema.parcels.cropType,
+      areaM2: schema.parcels.areaM2,
+      polygonGeoJson: sql<string | null>`ST_AsGeoJSON(${schema.parcels.polygon})::text`,
+    })
+    .from(schema.parcels)
+    .where(
+      and(
+        eq(schema.parcels.organizationId, organizationId),
+        sql`${schema.parcels.polygon} IS NOT NULL`
+      )
+    )
+
+  return mapParcelsToMapFeatures(
+    rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      cropType: row.cropType,
+      areaM2: row.areaM2,
+      polygon: row.polygonGeoJson,
+    }))
+  )
 }
 
 export async function getParcelRecommendations(

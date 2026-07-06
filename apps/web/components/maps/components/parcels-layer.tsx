@@ -12,14 +12,14 @@ import type {
 
 type ParcelsLayerProps = {
   geojsonData: GeoJSON.FeatureCollection
-  parcels: Parcel[]
+  parcel: Parcel
   isSatellite: boolean
   onParcelClick: (parcel: Parcel, lngLat: ParcelLngLat) => void
 }
 
 export function ParcelsLayer({
   geojsonData,
-  parcels,
+  parcel,
   isSatellite,
   onParcelClick,
 }: ParcelsLayerProps) {
@@ -87,9 +87,8 @@ export function ParcelsLayer({
       }
     ) => {
       const id = e.features?.[0]?.properties?.id as string
-      const parcel = parcels.find((item) => item.id === id)
 
-      if (parcel) {
+      if (id === parcel.id) {
         onParcelClick(parcel, getPolygonCenter(parcel.geometryCoordinates))
       }
     }
@@ -103,7 +102,7 @@ export function ParcelsLayer({
       map.off("mouseleave", "parcels-fill", onLeave)
       map.off("click", "parcels-fill", onClick)
     }
-  }, [isLoaded, map, onParcelClick, parcels])
+  }, [isLoaded, map, onParcelClick, parcel])
 
   useEffect(() => {
     if (!map || !isLoaded || !map.isStyleLoaded()) return
