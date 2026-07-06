@@ -137,12 +137,22 @@ function toneClass(value: number) {
   return value >= 0 ? "text-(--primary-income)" : "text-(--primary-expense)"
 }
 
+function buildEmptyCashFlowChartData(): CashFlowChartPoint[] {
+  const anchorDay = startOfDay(new Date())
+  const trendDays = 7
+
+  return Array.from({ length: trendDays }, (_, index) => {
+    const day = addDays(anchorDay, index - (trendDays - 1))
+    return { day: getDayKey(day), trend: 0 }
+  })
+}
+
 function buildCashFlowChartData(
   transactions: CashFlowTransaction[],
   anchorDate: Date,
   dailyRunRate: number
 ): CashFlowChartPoint[] {
-  if (transactions.length === 0) return []
+  if (transactions.length === 0) return buildEmptyCashFlowChartData()
 
   const trendDays = 7
   const projectionDays = 30
@@ -191,6 +201,7 @@ export function CashFlowSummaryCard({
   transactions,
   className,
 }: CashFlowSummaryCardProps) {
+  const isEmpty = transactions.length === 0
   const anchorDate = getAnchorDate(transactions)
   const last7Range = getWindowRange(anchorDate, 7)
   const last30Range = getWindowRange(anchorDate, 30)
@@ -274,61 +285,68 @@ export function CashFlowSummaryCard({
             </ul>
           </div>
         </div>
-        <ChartContainer config={chartConfig} className="h-[160px]">
-          <LineChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              top: 8,
-              left: 8,
-              right: 8,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="day"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={24}
-              tickFormatter={formatChartDate}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  labelFormatter={(value) => formatChartDate(value)}
-                  formatter={(value, name) => (
-                    <>
-                      <span className="text-muted-foreground">
-                        {chartConfig[name as keyof typeof chartConfig]?.label ??
-                          name}
-                      </span>
-                      <span className="font-mono font-semibold tabular-nums">
-                        {formatSignedCurrency(Number(value))}
-                      </span>
-                    </>
-                  )}
-                />
-              }
-            />
-            <Line
-              dataKey="trend"
-              type="linear"
-              stroke="var(--color-trend)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              dataKey="projection"
-              type="linear"
-              stroke="var(--color-projection)"
-              strokeDasharray="4 4"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
-        </ChartContainer>
+        <div className="relative w-full">
+          <ChartContainer config={chartConfig} className="h-[160px] w-full">
+            <LineChart
+              accessibilityLayer
+              data={chartData}
+              margin={{
+                top: 8,
+                left: 8,
+                right: 8,
+              }}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="day"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                minTickGap={24}
+                tickFormatter={formatChartDate}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent
+                    labelFormatter={(value) => formatChartDate(value)}
+                    formatter={(value, name) => (
+                      <>
+                        <span className="text-muted-foreground">
+                          {chartConfig[name as keyof typeof chartConfig]
+                            ?.label ?? name}
+                        </span>
+                        <span className="font-mono font-semibold tabular-nums">
+                          {formatSignedCurrency(Number(value))}
+                        </span>
+                      </>
+                    )}
+                  />
+                }
+              />
+              <Line
+                dataKey="trend"
+                type="linear"
+                stroke="var(--color-trend)"
+                strokeWidth={2}
+                dot={false}
+              />
+              <Line
+                dataKey="projection"
+                type="linear"
+                stroke="var(--color-projection)"
+                strokeDasharray="4 4"
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          </ChartContainer>
+          {isEmpty ? (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-background/60 text-xs text-muted-foreground">
+              Sin datos registrados
+            </div>
+          ) : null}
+        </div>
         <span className="text-xs text-muted-foreground underline decoration-dashed underline-offset-2">
           Proyección basada en tendencia reciente
         </span>

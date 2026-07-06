@@ -51,6 +51,17 @@ function buildRecommendations(
   transactions: TransactionSnapshot[],
   oils: KpiItem[]
 ): { recs: Recommendation[]; totalIncome: number; totalExpenses: number } {
+  const totalIncome = transactions
+    .filter((t) => t.type === "ingreso")
+    .reduce((a, t) => a + t.amount, 0)
+  const totalExpenses = transactions
+    .filter((t) => t.type === "gasto")
+    .reduce((a, t) => a + t.amount, 0)
+
+  if (transactions.length === 0) {
+    return { recs: [], totalIncome, totalExpenses }
+  }
+
   const recs: Recommendation[] = []
 
   const expensesByCategory = transactions
@@ -59,14 +70,6 @@ function buildRecommendations(
       acc[t.category] = (acc[t.category] ?? 0) + t.amount
       return acc
     }, {})
-
-  const totalExpenses = Object.values(expensesByCategory).reduce(
-    (a, b) => a + b,
-    0
-  )
-  const totalIncome = transactions
-    .filter((t) => t.type === "ingreso")
-    .reduce((a, t) => a + t.amount, 0)
 
   const balance = totalIncome - totalExpenses
   const margin =
@@ -171,6 +174,7 @@ export function FinanceRecommendationsCard({
     transactions,
     oils
   )
+  const isEmpty = transactions.length === 0
 
   const balance = totalIncome - totalExpenses
   const isPositive = balance >= 0
@@ -192,13 +196,13 @@ export function FinanceRecommendationsCard({
   return (
     <Card
       className={cn(
-        "flex h-full flex-col gap-0 overflow-hidden bg-background pt-0 ring-0",
+        "flex h-full min-h-0 flex-col gap-0 overflow-hidden bg-background pt-0 ring-0",
         className
       )}
     >
-      <CardHeader className="flex flex-col items-center gap-0 pb-4">
+      <CardHeader className="flex shrink-0 flex-col items-center gap-0 pb-4">
         {/* ── Gauge ── */}
-        <div className="mx-auto flex h-full max-w-[220px] justify-center">
+        <div className="mx-auto flex w-full max-w-[240px] justify-center">
           <Gauge
             value={gaugeValue}
             centerValue={balance}
@@ -209,8 +213,8 @@ export function FinanceRecommendationsCard({
             notchCornerRadius={7}
             startAngle={140}
             endAngle={400}
-            inactiveFillOpacity={0.4}
-            defaultLabel="Balance"
+            inactiveFillOpacity={isEmpty ? 0.2 : 0.4}
+            defaultLabel={isEmpty ? "Sin datos" : "Balance"}
             formatOptions={{
               style: "currency",
               currency: "EUR",
@@ -240,36 +244,42 @@ export function FinanceRecommendationsCard({
         </div>
       </CardHeader>
 
-      <CardContent className="flex flex-col items-center gap-0 p-0">
+      <CardContent className="flex min-h-0 flex-1 flex-col items-center gap-0 overflow-hidden p-0">
         <Separator className="w-full bg-border/70" />
-        {recs.map((rec) => {
-          const cfg = priorityConfig[rec.priority]
-          return (
-            <div
-              key={rec.id}
-              className="flex w-full items-start gap-3 px-4 py-3 transition-colors hover:bg-muted/40"
-            >
-              <div className={cn("mt-0.5 shrink-0", cfg.iconClass)}>
-                {rec.icon}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="mb-1 flex flex-wrap items-center gap-2">
-                  <span className="truncate text-xs leading-snug font-semibold text-foreground">
-                    {rec.title}
-                  </span>
-                  <Badge
-                    variant={cfg.variant}
-                    className="h-4 px-1.5 text-[10px] font-medium tracking-wide uppercase"
-                  >
-                    {cfg.label}
-                  </Badge>
+        {isEmpty ? (
+          <div className="flex w-full flex-1 items-center justify-center px-4 py-6 text-center text-xs text-muted-foreground">
+            Sin datos de transacciones
+          </div>
+        ) : (
+          recs.map((rec) => {
+            const cfg = priorityConfig[rec.priority]
+            return (
+              <div
+                key={rec.id}
+                className="flex w-full items-start gap-3 px-4 py-3 transition-colors hover:bg-muted/40"
+              >
+                <div className={cn("mt-0.5 shrink-0", cfg.iconClass)}>
+                  {rec.icon}
                 </div>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
+                    <span className="truncate text-xs leading-snug font-semibold text-foreground">
+                      {rec.title}
+                    </span>
+                    <Badge
+                      variant={cfg.variant}
+                      className="h-4 px-1.5 text-[10px] font-medium tracking-wide uppercase"
+                    >
+                      {cfg.label}
+                    </Badge>
+                  </div>
 
-                <ClampedTooltip text={rec.description} lines={1} />
+                  <ClampedTooltip text={rec.description} lines={1} />
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })
+        )}
       </CardContent>
 
       {redirectButton && (
