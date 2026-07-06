@@ -3,24 +3,26 @@
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
 
+import { cn } from "@workspace/ui/lib/utils"
 import { PageContainer } from "@workspace/web/components/ui/page-container"
 import { WidgetSkeleton } from "@workspace/web/components/widget-skeleton"
-import { CampaignTimeline } from "@workspace/web/features/tasks/components/campaign-timeline"
 import { Kanban } from "@workspace/web/features/tasks/components/kanban"
 import { RecommendationsCard } from "@workspace/web/features/tasks/components/recommendations-card"
+import type { Recommendation } from "@workspace/web/features/tasks/components/recommendations-card"
 import {
   useAcceptRecommendation,
   useDismissRecommendation,
 } from "@workspace/web/features/tasks/hooks/use-recommendations-mutations"
+import {
+  RECOMMENDATIONS_PANEL_HEIGHT,
+  TASKS_PANEL_MIN_HEIGHT,
+} from "@workspace/web/features/tasks/lib/constants"
 import { taskSelectToCalendarTask } from "@workspace/web/features/tasks/lib/task-helpers"
-import type { CampaignTimelineData } from "@workspace/web/features/tasks/lib/types"
-import type { Recommendation } from "@workspace/web/features/tasks/components/recommendations-card"
 import type { CalendarTask } from "@workspace/web/lib/calendar/types"
 
 export type TasksLayoutData = {
   recommendations: Recommendation[]
   tasks: CalendarTask[]
-  timelineData: CampaignTimelineData | null
   isLoading: boolean
   isLoadingRecommendations?: boolean
 }
@@ -28,7 +30,6 @@ export type TasksLayoutData = {
 export function TasksLayout({
   recommendations,
   tasks,
-  timelineData,
   isLoading,
   isLoadingRecommendations,
 }: TasksLayoutData) {
@@ -85,10 +86,10 @@ export function TasksLayout({
 
   return (
     <PageContainer className="grid gap-4 lg:grid-cols-12">
-      <div className="lg:col-span-4">
+      <div className={cn("lg:col-span-4", RECOMMENDATIONS_PANEL_HEIGHT)}>
         {isLoadingRecommendations ? (
           <WidgetSkeleton
-            className="h-full min-h-[480px]"
+            className={cn("h-full", RECOMMENDATIONS_PANEL_HEIGHT)}
             contentHeight="h-full"
           />
         ) : (
@@ -101,27 +102,14 @@ export function TasksLayout({
         )}
       </div>
 
-      <div className="lg:col-span-8">
+      <div className={cn("lg:col-span-8", TASKS_PANEL_MIN_HEIGHT)}>
         {isLoading ? (
           <WidgetSkeleton
-            className="h-full min-h-[480px]"
+            className={cn("h-full", TASKS_PANEL_MIN_HEIGHT)}
             contentHeight="h-full"
           />
         ) : (
           <Kanban tasks={displayedTasks} />
-        )}
-      </div>
-
-      <div className="lg:col-span-12">
-        {isLoading || !timelineData ? (
-          <WidgetSkeleton className="h-[280px]" contentHeight="h-[240px]" />
-        ) : (
-          <CampaignTimeline
-            tasks={timelineData.tasks}
-            days={timelineData.days}
-            todayIndex={timelineData.todayIndex}
-            title={timelineData.title}
-          />
         )}
       </div>
     </PageContainer>

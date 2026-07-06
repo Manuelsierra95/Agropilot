@@ -8,7 +8,6 @@ export type TasksAllViewProps = TasksLayoutData
 export function TasksAllView({
   recommendations,
   tasks,
-  timelineData,
   isLoading,
   isLoadingRecommendations,
 }: TasksAllViewProps) {
@@ -16,7 +15,6 @@ export function TasksAllView({
     <TasksLayout
       recommendations={recommendations}
       tasks={tasks}
-      timelineData={timelineData}
       isLoading={isLoading}
       isLoadingRecommendations={isLoadingRecommendations}
     />

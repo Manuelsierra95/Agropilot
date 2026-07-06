@@ -8,7 +8,6 @@ export type TasksSingleViewProps = TasksLayoutData
 export function TasksSingleView({
   recommendations,
   tasks,
-  timelineData,
   isLoading,
   isLoadingRecommendations,
 }: TasksSingleViewProps) {
@@ -16,7 +15,6 @@ export function TasksSingleView({
     <TasksLayout
       recommendations={recommendations}
       tasks={tasks}
-      timelineData={timelineData}
       isLoading={isLoading}
       isLoadingRecommendations={isLoadingRecommendations}
     />

@@ -19,12 +19,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@workspace/ui/components/card"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@workspace/ui/components/tooltip"
+import { ClampedTooltip } from "@workspace/web/components/clamped-tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 import { PreservedLink } from "@workspace/web/components/preserved-link"
 import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
@@ -270,7 +265,7 @@ export function FinanceRecommendationsCard({
                   </Badge>
                 </div>
 
-                <ClampedTooltip text={rec.description} />
+                <ClampedTooltip text={rec.description} lines={1} />
               </div>
             </div>
           )
@@ -293,36 +288,5 @@ export function FinanceRecommendationsCard({
         </CardFooter>
       )}
     </Card>
-  )
-}
-
-function ClampedTooltip({ text }: { text: string }) {
-  const ref = React.useRef<HTMLParagraphElement>(null)
-  const [isClamped, setIsClamped] = React.useState(false)
-
-  React.useLayoutEffect(() => {
-    const el = ref.current
-    if (el) setIsClamped(el.scrollHeight > el.clientHeight)
-  }, [text])
-
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <p
-          ref={ref}
-          className="line-clamp-1 cursor-default text-xs leading-relaxed text-muted-foreground"
-        >
-          {text}
-        </p>
-      </TooltipTrigger>
-      {isClamped && (
-        <TooltipContent
-          side="bottom"
-          className="max-w-[260px] text-xs leading-relaxed"
-        >
-          {text}
-        </TooltipContent>
-      )}
-    </Tooltip>
   )
 }
