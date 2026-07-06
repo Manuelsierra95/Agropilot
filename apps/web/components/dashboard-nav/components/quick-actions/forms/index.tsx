@@ -6,18 +6,12 @@ import type { MiniFormProps } from "@workspace/web/components/dashboard-nav/comp
 import { ExpenseMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/expense-mini-form"
 import { HarvestMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/harvest-mini-form"
 import { IncomeMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/income-mini-form"
-import { IrrigationMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/irrigation-mini-form"
-import { PestMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/pest-mini-form"
 import { TaskMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/task-mini-form"
-import { TreatmentMiniForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/treatment-mini-form"
 import { ParcelDialogForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/parcel-dialog-form"
 import { BulkFinanceDialogForm } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/bulk-finance-dialog-form"
 
 export const formMap: Record<string, ComponentType<MiniFormProps>> = {
-  irrigation: IrrigationMiniForm,
-  treatment: TreatmentMiniForm,
   harvest: HarvestMiniForm,
-  pest: PestMiniForm,
   expense: ExpenseMiniForm,
   income: IncomeMiniForm,
   task: TaskMiniForm,

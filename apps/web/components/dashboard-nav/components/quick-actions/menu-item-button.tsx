@@ -2,7 +2,6 @@
 
 import { cn } from "@workspace/ui/lib/utils"
 import type { QuickActionsItem } from "@workspace/web/components/dashboard-nav/components/quick-actions/quick-actions-items"
-import { Button } from "@workspace/ui/components/button"
 
 interface MenuItemButtonProps {
   item: QuickActionsItem
@@ -16,23 +15,23 @@ export function MenuItemButton({
   onSelect,
 }: MenuItemButtonProps) {
   return (
-    <Button
-      variant="ghost"
+    <button
+      type="button"
       className={cn(
-        "group flex w-full items-center justify-start gap-2 rounded-sm px-2 py-1.5 ...",
+        "group flex w-full items-center justify-start gap-3 rounded-sm px-2 py-2 text-sm transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground",
         isActive && "bg-accent text-accent-foreground"
       )}
       onClick={() => onSelect(item.id)}
     >
       <item.icon
         className={cn(
-          "size-3.5 shrink-0 transition-colors",
+          "size-4 shrink-0 transition-colors",
           isActive
             ? "text-foreground"
             : "text-muted-foreground group-hover:text-foreground"
         )}
       />
       <span className="truncate">{item.label}</span>
-    </Button>
+    </button>
   )
 }

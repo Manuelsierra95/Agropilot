@@ -4,6 +4,7 @@ import { userApi } from "@workspace/web/lib/api/routes/user"
 import { billingApi } from "@workspace/web/lib/api/routes/billing"
 import { searchApi } from "@workspace/web/lib/api/routes/search"
 import { financeApi } from "@workspace/web/lib/api/routes/finance"
+import { productionApi } from "@workspace/web/lib/api/routes/production"
 import { copilotApi } from "@workspace/web/lib/api/routes/copilot"
 import { parcelApi } from "@workspace/web/lib/api/routes/parcel"
 import { campaignApi } from "@workspace/web/lib/api/routes/campaign"
@@ -19,6 +20,7 @@ export const api = {
   billing: billingApi,
   search: searchApi,
   finance: financeApi,
+  production: productionApi,
   copilot: copilotApi,
   parcel: parcelApi,
   campaign: campaignApi,

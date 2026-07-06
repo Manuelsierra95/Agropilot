@@ -17,9 +17,7 @@ export function FormContent({
   onSuccess,
 }: FormContentProps) {
   const ActiveFormComponent = formMap[activeForm]
-  const activeItem = quickActionsItems
-    .flatMap((g) => g.items)
-    .find((item) => item.id === activeForm)
+  const activeItem = quickActionsItems.find((item) => item.id === activeForm)
 
   if (!ActiveFormComponent || !activeItem) return null
 

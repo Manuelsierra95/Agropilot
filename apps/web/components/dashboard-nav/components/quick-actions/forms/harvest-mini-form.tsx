@@ -1,9 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import {
   Form,
   FormControl,
@@ -20,62 +19,79 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
+import { Textarea } from "@workspace/ui/components/textarea"
 
 import { MiniFormShell } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-shell"
-import {
-  DESTINATIONS,
-  PARCELS,
-} from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-data"
 import type { MiniFormProps } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-types"
+import { useDefaultParcelId } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/use-default-parcel-id"
+import { useParcels } from "@workspace/web/hooks/parcel"
+import { useCreateHarvestDelivery } from "@workspace/web/hooks/production"
+import { harvestDeliveryCreateSchema } from "@workspace/schemas"
+import type { HarvestDeliveryCreateInput } from "@workspace/schemas"
 
-const harvestSchema = z.object({
-  parcelId: z.string().min(1),
-  date: z.string().min(1),
-  kg: z.coerce.number().positive(),
-  destination: z.string().min(1),
-})
-
-type HarvestValues = z.infer<typeof harvestSchema>
+const RAW_UNITS = ["kg", "t", "caja"]
+const PROCESSED_UNITS = ["l", "kg", "botella"]
 
 export function HarvestMiniForm({ onSuccess }: MiniFormProps) {
-  const form = useForm<HarvestValues>({
-    resolver: zodResolver(harvestSchema),
-    defaultValues: { date: new Date().toISOString().slice(0, 10) },
-  })
-  const [loading, setLoading] = React.useState(false)
+  const defaultParcelId = useDefaultParcelId()
+  const { data: parcels, isLoading: isLoadingParcels } = useParcels()
+  const { mutate: createHarvestDelivery, isPending } =
+    useCreateHarvestDelivery()
 
-  async function onSubmit(values: HarvestValues) {
-    setLoading(true)
-    try {
-      await new Promise((r) => setTimeout(r, 700))
-      console.log("Cosecha:", values)
-      onSuccess()
-    } finally {
-      setLoading(false)
-    }
+  const form = useForm({
+    resolver: zodResolver(harvestDeliveryCreateSchema),
+    defaultValues: {
+      parcelId: defaultParcelId ?? "",
+      deliveryDate: new Date().toISOString().slice(0, 10),
+      destinationName: "",
+      rawQuantity: 0,
+      rawUnit: "kg",
+      conversionRate: null,
+      processedUnit: "l",
+      grade: "",
+      targetSalePricePerUnit: null,
+      notes: "",
+    },
+  })
+
+  const conversionRate = useWatch({
+    control: form.control,
+    name: "conversionRate",
+  })
+  const hasConversion =
+    conversionRate !== null &&
+    conversionRate !== undefined &&
+    conversionRate > 0
+
+  function onSubmit(values: HarvestDeliveryCreateInput) {
+    createHarvestDelivery(values, {
+      onSuccess: () => {
+        onSuccess()
+      },
+    })
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <MiniFormShell submitLabel="Guardar cosecha" loading={loading}>
+        <MiniFormShell
+          submitLabel="Guardar entrega"
+          loading={isPending || isLoadingParcels}
+        >
           <FormField
             control={form.control}
             name="parcelId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs">Parcela</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="h-7 text-xs">
-                      <SelectValue placeholder="Selecciona" />
+                      <SelectValue placeholder="Selecciona parcela" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {PARCELS.map((p) => (
+                    {parcels?.map((p) => (
                       <SelectItem key={p.id} value={p.id} className="text-xs">
                         {p.name}
                       </SelectItem>
@@ -90,7 +106,7 @@ export function HarvestMiniForm({ onSuccess }: MiniFormProps) {
           <div className="grid grid-cols-2 gap-2">
             <FormField
               control={form.control}
-              name="date"
+              name="deliveryDate"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs">Fecha</FormLabel>
@@ -103,16 +119,168 @@ export function HarvestMiniForm({ onSuccess }: MiniFormProps) {
             />
             <FormField
               control={form.control}
-              name="kg"
+              name="destinationName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs">Kg recogidos</FormLabel>
+                  <FormLabel className="text-xs">Destino</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Cooperativa, almacén..."
+                      className="h-7 text-xs"
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <FormField
+              control={form.control}
+              name="rawQuantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs">Cantidad bruta</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
+                      step="0.01"
                       placeholder="0"
                       className="h-7 text-xs"
                       {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="rawUnit"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs">Unidad bruta</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="h-7 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {RAW_UNITS.map((u) => (
+                        <SelectItem key={u} value={u} className="text-xs">
+                          {u}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <FormField
+              control={form.control}
+              name="conversionRate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs">Rendimiento (%)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="Sin conversión"
+                      className="h-7 text-xs"
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        field.onChange(value === "" ? null : Number(value))
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {hasConversion && (
+              <FormField
+                control={form.control}
+                name="processedUnit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Unidad procesada</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="h-7 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {PROCESSED_UNITS.map((u) => (
+                          <SelectItem key={u} value={u} className="text-xs">
+                            {u}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <FormField
+              control={form.control}
+              name="grade"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs">Calidad / Grado</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Virgen extra..."
+                      className="h-7 text-xs"
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="targetSalePricePerUnit"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs">
+                    Precio objetivo (€/u)
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step="0.0001"
+                      placeholder="Opcional"
+                      className="h-7 text-xs"
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        field.onChange(value === "" ? null : Number(value))
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -123,27 +291,18 @@ export function HarvestMiniForm({ onSuccess }: MiniFormProps) {
 
           <FormField
             control={form.control}
-            name="destination"
+            name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs">Destino</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger className="h-7 text-xs">
-                      <SelectValue placeholder="Selecciona" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {DESTINATIONS.map((d) => (
-                      <SelectItem key={d} value={d} className="text-xs">
-                        {d}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormLabel className="text-xs">Notas</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Observaciones..."
+                    className="min-h-[60px] resize-none text-xs"
+                    {...field}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

@@ -24,6 +24,7 @@ import {
 } from "@workspace/ui/components/select"
 
 import { MiniFormShell } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-shell"
+import { useDefaultParcelId } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/use-default-parcel-id"
 import { INCOME_CONCEPTS } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-data"
 import { useParcels } from "@workspace/web/hooks/parcel"
 import { api } from "@workspace/web/lib/api"
@@ -46,10 +47,14 @@ const CONCEPT_MAP: Record<string, string> = {
 }
 
 export function IncomeMiniForm({ onSuccess }: MiniFormProps) {
+  const defaultParcelId = useDefaultParcelId()
   const { data: parcels = [], isLoading: loadingParcels } = useParcels()
   const form = useForm<IncomeValues>({
     resolver: zodResolver(incomeSchema),
-    defaultValues: { date: new Date().toISOString().slice(0, 10) },
+    defaultValues: {
+      date: new Date().toISOString().slice(0, 10),
+      parcelId: defaultParcelId,
+    },
   })
   const [loading, setLoading] = React.useState(false)
 
@@ -84,10 +89,7 @@ export function IncomeMiniForm({ onSuccess }: MiniFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs">Parcela</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="h-7 text-xs">
                       <SelectValue

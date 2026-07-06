@@ -10,6 +10,7 @@ import { userRoutes } from "@workspace/api/routes/user"
 import { billingRoutes } from "@workspace/api/routes/billing"
 import { searchRoutes } from "@workspace/api/routes/search"
 import { financeRoutes } from "@workspace/api/routes/finance"
+import { productionRoutes } from "@workspace/api/routes/production"
 import { copilotRoutes } from "@workspace/api/routes/copilot"
 import { campaignRoutes } from "@workspace/api/routes/campaign"
 import { taskRoutes } from "@workspace/api/routes/tasks"
@@ -35,6 +36,7 @@ export const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .route("/parcel", parcelRoutes)
   .route("/billing", billingRoutes)
   .route("/finance", financeRoutes)
+  .route("/production", productionRoutes)
   .route("/copilot", copilotRoutes)
   .route("/campaign", campaignRoutes)
   .route("/tasks", taskRoutes)

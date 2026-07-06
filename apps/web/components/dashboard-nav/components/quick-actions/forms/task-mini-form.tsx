@@ -25,6 +25,7 @@ import {
 
 import { CategorySelector } from "@workspace/web/components/tasks/category-selector"
 import { MiniFormShell } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-shell"
+import { useDefaultParcelId } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/use-default-parcel-id"
 import { useParcels } from "@workspace/web/hooks/parcel"
 import { api } from "@workspace/web/lib/api"
 import type { MiniFormProps } from "@workspace/web/components/dashboard-nav/components/quick-actions/forms/mini-form-types"
@@ -39,12 +40,14 @@ const taskSchema = z.object({
 type TaskValues = z.infer<typeof taskSchema>
 
 export function TaskMiniForm({ onSuccess }: MiniFormProps) {
+  const defaultParcelId = useDefaultParcelId()
   const { data: parcels = [], isLoading: loadingParcels } = useParcels()
   const form = useForm<TaskValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
       category: "inspection",
       dueDate: new Date().toISOString().slice(0, 10),
+      parcelId: defaultParcelId,
     },
   })
   const [loading, setLoading] = React.useState(false)
@@ -112,10 +115,7 @@ export function TaskMiniForm({ onSuccess }: MiniFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs">Parcela</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="h-7 text-xs">
                       <SelectValue
