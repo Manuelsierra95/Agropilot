@@ -2,6 +2,7 @@ import { db, schema, eq, and } from "@workspace/db"
 import { HTTPException } from "hono/http-exception"
 import type { HarvestDeliveryCreateInput } from "@workspace/schemas"
 import { ensureCampaignForDate } from "@workspace/api/services/campaigns"
+import { invalidateOrganizationApiCache } from "@workspace/api/lib/invalidate-org-api-cache"
 
 type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
 
@@ -48,13 +49,42 @@ async function resolveCampaignId(
   return ensureCampaignForDate(data.deliveryDate, tx)
 }
 
+async function incrementParcelFinancialSummaryTotalKg(
+  tx: DbTransaction,
+  parcelId: string,
+  campaignId: string,
+  addedRawKg: number
+) {
+  const existing = await tx.query.parcelFinancialSummaries.findFirst({
+    where: and(
+      eq(schema.parcelFinancialSummaries.parcelId, parcelId),
+      eq(schema.parcelFinancialSummaries.campaignId, campaignId)
+    ),
+    columns: { id: true, totalKg: true },
+  })
+
+  if (existing) {
+    const currentTotalKg = Number(existing.totalKg ?? 0)
+    await tx
+      .update(schema.parcelFinancialSummaries)
+      .set({ totalKg: toAmountString(currentTotalKg + addedRawKg) })
+      .where(eq(schema.parcelFinancialSummaries.id, existing.id))
+  } else {
+    await tx.insert(schema.parcelFinancialSummaries).values({
+      parcelId,
+      campaignId,
+      totalKg: toAmountString(addedRawKg),
+    })
+  }
+}
+
 export async function createHarvestDelivery(
   organizationId: string,
   data: HarvestDeliveryCreateInput
 ) {
   await assertParcelBelongsToOrg(organizationId, data.parcelId)
 
-  return db.transaction(async (tx) => {
+  const delivery = await db.transaction(async (tx) => {
     const campaignId = await resolveCampaignId(data, tx)
 
     const rawQuantity = data.rawQuantity
@@ -66,7 +96,7 @@ export async function createHarvestDelivery(
     const processedUnit =
       conversionRate != null ? data.processedUnit : data.rawUnit
 
-    const [delivery] = await tx
+    const [created] = await tx
       .insert(schema.harvestDeliveries)
       .values({
         organizationId,
@@ -90,12 +120,27 @@ export async function createHarvestDelivery(
       })
       .returning()
 
-    if (!delivery) {
+    if (!created) {
       throw new HTTPException(500, {
         message: "Failed to create harvest delivery",
       })
     }
 
-    return delivery
+    await incrementParcelFinancialSummaryTotalKg(
+      tx,
+      data.parcelId,
+      campaignId,
+      rawQuantity
+    )
+
+    return created
   })
+
+  await invalidateOrganizationApiCache(organizationId, [
+    "/api/v1/production",
+    "/api/v1/dashboard",
+    "/api/v1/finance",
+  ])
+
+  return delivery
 }

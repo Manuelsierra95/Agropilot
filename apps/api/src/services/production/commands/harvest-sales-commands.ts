@@ -6,6 +6,7 @@ import type {
   TransactionSelect,
 } from "@workspace/schemas"
 import { ensureCampaignForDate } from "@workspace/api/services/campaigns"
+import { invalidateOrganizationApiCache } from "@workspace/api/lib/invalidate-org-api-cache"
 
 type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
 
@@ -239,7 +240,7 @@ export async function createHarvestSale(
 }> {
   await assertParcelBelongsToOrg(organizationId, parcelId)
 
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     await fetchDeliveriesForSale(tx, organizationId, parcelId, data.deliveries)
 
     const campaignId = await resolveCampaignId(data, tx)
@@ -275,4 +276,12 @@ export async function createHarvestSale(
 
     return { transaction, sales }
   })
+
+  await invalidateOrganizationApiCache(organizationId, [
+    "/api/v1/production",
+    "/api/v1/dashboard",
+    "/api/v1/finance",
+  ])
+
+  return result
 }
