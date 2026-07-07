@@ -1,4 +1,4 @@
-import { db, schema, eq, and, asc, desc, gte, lte } from "@workspace/db"
+import { db, schema, eq, and, asc, desc, gte, lte, sql } from "@workspace/db"
 import type {
   DashboardCampaignMargin,
   DashboardFinanceResume,
@@ -253,6 +253,44 @@ async function loadFinancialSummaries(
   })
 }
 
+async function loadHarvestRemainingForScope(
+  campaignId: string | undefined,
+  parcelId: string | null
+) {
+  if (!campaignId) return 0
+
+  const conditions = [eq(schema.harvestDeliveries.campaignId, campaignId)]
+  if (parcelId) {
+    conditions.push(eq(schema.harvestDeliveries.parcelId, parcelId))
+  }
+
+  const result = await db
+    .select({
+      total: sql<string | null>`sum(${schema.harvestDeliveries.quantityRemaining})`,
+    })
+    .from(schema.harvestDeliveries)
+    .where(and(...conditions))
+
+  return Number(result[0]?.total ?? 0)
+}
+
+async function loadHarvestRemainingByParcelForScope(
+  campaignId: string | undefined
+) {
+  if (!campaignId) return new Map<string, number>()
+
+  const rows = await db
+    .select({
+      parcelId: schema.harvestDeliveries.parcelId,
+      total: sql<string | null>`sum(${schema.harvestDeliveries.quantityRemaining})`,
+    })
+    .from(schema.harvestDeliveries)
+    .where(eq(schema.harvestDeliveries.campaignId, campaignId))
+    .groupBy(schema.harvestDeliveries.parcelId)
+
+  return new Map(rows.map((row) => [row.parcelId, Number(row.total ?? 0)]))
+}
+
 async function loadPreviousSummaries(campaignName: string | null) {
   if (!campaignName) return []
 
@@ -334,7 +372,8 @@ type FinancialSummaryRow = Awaited<
 
 function buildSellingWindowFromSummaries(
   virgenExtraPrice: number,
-  financialSummaries: FinancialSummaryRow[]
+  financialSummaries: FinancialSummaryRow[],
+  actualRemainingKg = 0
 ): DashboardSellingWindow {
   const primarySummary = financialSummaries[0]
   const totalExpectedKg = financialSummaries.reduce(
@@ -349,7 +388,9 @@ function buildSellingWindowFromSummaries(
       ? Number(primarySummary.revenuePerKg)
       : undefined,
     estimatedKg:
-      totalExpectedKg || Number(primarySummary?.expectedYieldKg ?? 0),
+      actualRemainingKg > 0
+        ? actualRemainingKg
+        : totalExpectedKg || Number(primarySummary?.expectedYieldKg ?? 0),
     campaignTarget: primarySummary?.avgMarketPrice
       ? Number(primarySummary.avgMarketPrice)
       : virgenExtraPrice,
@@ -364,12 +405,18 @@ export async function getSellingWindowForDashboard(
     organizationId,
     filters
   )
-  const [virgenExtraPrice, financialSummaries] = await Promise.all([
-    getVirgenExtraPrice(),
-    loadFinancialSummaries(campaignId, parcelId),
-  ])
+  const [virgenExtraPrice, financialSummaries, actualRemainingKg] =
+    await Promise.all([
+      getVirgenExtraPrice(),
+      loadFinancialSummaries(campaignId, parcelId),
+      loadHarvestRemainingForScope(campaignId, parcelId),
+    ])
 
-  return buildSellingWindowFromSummaries(virgenExtraPrice, financialSummaries)
+  return buildSellingWindowFromSummaries(
+    virgenExtraPrice,
+    financialSummaries,
+    actualRemainingKg
+  )
 }
 
 export async function getParcelsSellingWindowsForDashboard(
@@ -378,11 +425,13 @@ export async function getParcelsSellingWindowsForDashboard(
 ): Promise<DashboardParcelsSellingWindows> {
   const { campaignId } = await resolveFinanceScopeContext(organizationId, filters)
 
-  const [parcels, virgenExtraPrice, summaries] = await Promise.all([
-    listParcels(organizationId),
-    getVirgenExtraPrice(),
-    loadFinancialSummaries(campaignId, null),
-  ])
+  const [parcels, virgenExtraPrice, summaries, remainingByParcel] =
+    await Promise.all([
+      listParcels(organizationId),
+      getVirgenExtraPrice(),
+      loadFinancialSummaries(campaignId, null),
+      loadHarvestRemainingByParcelForScope(campaignId),
+    ])
 
   const summariesByParcelId = new Map(
     summaries.map((row) => [row.parcelId, row])
@@ -393,7 +442,8 @@ export async function getParcelsSellingWindowsForDashboard(
       const summary = summariesByParcelId.get(parcel.id)
       const sellingWindow = buildSellingWindowFromSummaries(
         virgenExtraPrice,
-        summary ? [summary] : []
+        summary ? [summary] : [],
+        remainingByParcel.get(parcel.id) ?? 0
       )
 
       return {
