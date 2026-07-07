@@ -45,7 +45,7 @@ export function QuickActionsButton() {
         >
           <Plus className="size-3.5 shrink-0 sm:text-muted-foreground" />
           <span className="hidden truncate text-xs font-medium sm:inline sm:text-sm">
-            Añadir rápido
+            Añadir
           </span>
         </Button>
       </PopoverTrigger>

@@ -20,13 +20,13 @@ export const quickActionsItems: QuickActionsItem[] = [
   {
     id: "task",
     label: "Añadir tarea",
-    description: "Nueva tarea para el calendario",
+    description: "Planificar una tarea en el calendario",
     icon: CalendarPlus,
   },
   {
     id: "harvest",
-    label: "Añadir cosecha",
-    description: "Registrar una entrega de cosecha",
+    label: "Registrar entrega",
+    description: "Registrar entrega a cooperativa",
     icon: Wheat,
   },
   {
@@ -43,13 +43,13 @@ export const quickActionsItems: QuickActionsItem[] = [
   },
   {
     id: "bulkFinance",
-    label: "Bulk de finanzas",
-    description: "Importar movimientos desde Excel",
+    label: "Importar finanzas",
+    description: "Subir movimientos desde Excel",
     icon: FileSpreadsheet,
   },
   {
     id: "parcel",
-    label: "Crear parcela",
+    label: "Añadir parcela",
     description: "Registrar una nueva parcela",
     icon: Map,
   },

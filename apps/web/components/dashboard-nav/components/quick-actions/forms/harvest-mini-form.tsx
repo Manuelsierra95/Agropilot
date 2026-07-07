@@ -27,6 +27,7 @@ import { useDefaultParcelId } from "@workspace/web/components/dashboard-nav/comp
 import { useParcels } from "@workspace/web/hooks/parcel"
 import { useCreateHarvestDelivery } from "@workspace/web/hooks/production"
 import { harvestDeliveryCreateSchema } from "@workspace/schemas"
+import { toast } from "sonner"
 import type { HarvestDeliveryCreateInput } from "@workspace/schemas"
 
 const RAW_UNITS = ["kg", "t", "caja"]
@@ -66,7 +67,11 @@ export function HarvestMiniForm({ onSuccess }: MiniFormProps) {
   function onSubmit(values: HarvestDeliveryCreateInput) {
     createHarvestDelivery(values, {
       onSuccess: () => {
+        toast.success("Entrega registrada")
         onSuccess()
+      },
+      onError: (error) => {
+        toast.error(error.message || "Error al registrar la entrega")
       },
     })
   }
