@@ -10,5 +10,6 @@ export function useHarvestDeliveries(query: HarvestDeliveriesQuery) {
     queryKey: ["harvest-deliveries", query.parcelId, query.status],
     queryFn: () => api.production.getHarvestDeliveries(query),
     enabled: Boolean(query.parcelId),
+    staleTime: 0,
   })
 }

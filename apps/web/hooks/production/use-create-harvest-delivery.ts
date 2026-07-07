@@ -13,6 +13,7 @@ export function useCreateHarvestDelivery() {
       api.production.createHarvestDelivery(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["harvest-deliveries"] })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
     },
   })
 }

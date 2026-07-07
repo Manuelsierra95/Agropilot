@@ -6,20 +6,19 @@ import type {
   HarvestDeliveryCreateInput,
   HarvestSaleCreateInput,
 } from "@workspace/schemas"
-import { cache } from "react"
 
-const getHarvestDeliveries = cache(
-  (query: HarvestDeliveriesQuery): Promise<HarvestDeliveryListItem[]> =>
-    client.api.v1.production.deliveries
-      .$get({ query })
-      .then(
-        (res) =>
-          res.json() as Promise<{
-            data: { deliveries: HarvestDeliveryListItem[] }
-          }>
-      )
-      .then((res) => res.data.deliveries)
-)
+const getHarvestDeliveries = (
+  query: HarvestDeliveriesQuery
+): Promise<HarvestDeliveryListItem[]> =>
+  client.api.v1.production.deliveries
+    .$get({ query })
+    .then(
+      (res) =>
+        res.json() as Promise<{
+          data: { deliveries: HarvestDeliveryListItem[] }
+        }>
+    )
+    .then((res) => res.data.deliveries)
 
 const createHarvestDelivery = (data: HarvestDeliveryCreateInput) =>
   client.api.v1.production.deliveries

@@ -15,6 +15,7 @@ export function useCreateHarvestSale() {
     onSuccess: () => {
       toast.success("Venta registrada")
       queryClient.invalidateQueries({ queryKey: ["harvest-deliveries"] })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
     },
     onError: () => {
       toast.error("Error al registrar la venta")

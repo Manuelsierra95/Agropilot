@@ -19,7 +19,7 @@ const FAMILY_KEY_SEGMENTS: Record<DashboardCacheFamily, readonly string[]> = {
     "selling-window",
     "parcels-selling-windows",
   ],
-  production: ["production-value", "selling-window"],
+  production: ["overview", "production-value", "selling-window"],
   events: ["upcoming-week", "calendar-events"],
   parcels: [
     "parcels-map",
