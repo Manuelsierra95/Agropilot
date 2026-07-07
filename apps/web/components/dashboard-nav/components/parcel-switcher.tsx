@@ -18,7 +18,7 @@ import { useDashboardScopeActions } from "@workspace/web/hooks/use-dashboard-sco
 import { useDashboardListsStore } from "@workspace/web/store/useDashboardListsStore"
 import { ParcelSwitcherPlaceholder } from "@workspace/web/components/dashboard-nav/components/switcher-placeholders"
 import { getParcelIcon } from "@workspace/web/lib/navigation/parcel-icon"
-import { CreateParcelDialog } from "@workspace/web/components/parcel/create-parcel-dialog"
+import { CreateParcelDashboardDialog } from "@workspace/web/features/parcel/components/create-parcel-dashboard-dialog"
 
 interface ParcelSwitcherProps {
   variant?: "sidebar" | "dock"
@@ -138,7 +138,7 @@ export function ParcelSwitcher({ variant = "sidebar" }: ParcelSwitcherProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
 
-      <CreateParcelDialog
+      <CreateParcelDashboardDialog
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
       />

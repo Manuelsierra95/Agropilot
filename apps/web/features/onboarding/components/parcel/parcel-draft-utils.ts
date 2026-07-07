@@ -16,8 +16,17 @@ export function createParcelDraft(): FieldFormData {
     name: "",
     cropType: DEFAULT_CROP_TYPE,
     irrigationType: undefined,
+    areaHa: null,
+    areaM2: null,
+    variety: null,
+    soilType: null,
+    plantingDate: null,
+    plantCount: null,
+    data: undefined,
     polygon: null,
     centroid: null,
+    refcat: null,
+    address: null,
   }
 }
 
@@ -29,6 +38,12 @@ export function clearParcelDraftData(parcel: FieldFormData): FieldFormData {
     cropType: DEFAULT_CROP_TYPE,
     irrigationType: undefined,
     areaHa: null,
+    areaM2: null,
+    variety: null,
+    soilType: null,
+    plantingDate: null,
+    plantCount: null,
+    data: undefined,
     polygon: null,
     centroid: null,
     refcat: null,
@@ -88,7 +103,9 @@ export function fieldFormDraftToMapParcel(
   return {
     id: draft.id,
     name: draft.name.trim() || "Parcela sin nombre",
-    area: draft.areaHa ?? undefined,
+    area:
+      draft.areaHa ??
+      (draft.areaM2 != null ? draft.areaM2 / 10_000 : undefined),
     type: cropLabel,
     irrigationType: draft.irrigationType
       ? IRRIGATION_TYPE_LABELS[draft.irrigationType]

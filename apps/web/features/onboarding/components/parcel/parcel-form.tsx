@@ -15,6 +15,7 @@ import type { ParcelSearchResult } from "@workspace/web/features/onboarding/comp
 import type { SearchParcelFn } from "@workspace/web/lib/cadastre/types"
 import {
   type ParcelCreateInput,
+  type ParcelCropData,
   type ParcelUpdateInput,
 } from "@workspace/schemas"
 import { parsePolygonCoordinates } from "@workspace/web/features/onboarding/components/parcel/parcel-draft-utils"
@@ -35,6 +36,12 @@ export interface FieldFormData {
   cropType: CropTypeValue
   irrigationType?: IrrigationType
   areaHa?: number | null
+  areaM2?: number | null
+  variety?: string | null
+  soilType?: string | null
+  plantingDate?: string | null
+  plantCount?: number | null
+  data?: ParcelCropData | null
   polygon?: string | null
   centroid?: string | null
   refcat?: string | null
@@ -156,6 +163,33 @@ function toParcelLocationFields(data: FieldFormData) {
   }
 }
 
+function toParcelAreaField(data: FieldFormData) {
+  if (data.areaM2 != null) {
+    return { areaM2: data.areaM2 }
+  }
+  if (data.areaHa != null) {
+    return { areaM2: Math.round(data.areaHa * 10_000) }
+  }
+  return {}
+}
+
+function toParcelCropFields(data: FieldFormData) {
+  const fields: Pick<
+    ParcelCreateInput,
+    "variety" | "soilType" | "plantingDate" | "plantCount" | "data"
+  > = {}
+
+  if (data.variety) fields.variety = data.variety
+  if (data.soilType) fields.soilType = data.soilType
+  if (data.plantingDate) fields.plantingDate = data.plantingDate
+  if (data.plantCount != null) fields.plantCount = data.plantCount
+  if (data.data?.oliveCropType) {
+    fields.data = { oliveCropType: data.data.oliveCropType }
+  }
+
+  return fields
+}
+
 function toParcelCoreFields(data: FieldFormData) {
   const coordinates = parsePolygonCoordinates(data.polygon)
   const polygon =
@@ -170,9 +204,7 @@ function toParcelCoreFields(data: FieldFormData) {
     name: data.name.trim(),
     cropType: (data.cropType || DEFAULT_CROP_TYPE) as "olive",
     irrigationType: data.irrigationType,
-    ...(data.areaHa != null
-      ? { areaM2: Math.round(data.areaHa * 10_000) }
-      : {}),
+    ...toParcelAreaField(data),
     ...(centroid ? { centroid } : {}),
     ...(polygon ? { polygon } : {}),
   }
@@ -182,6 +214,7 @@ export function toParcelCreateInput(data: FieldFormData): ParcelCreateInput {
   return {
     ...toParcelCoreFields(data),
     ...toParcelLocationFields(data),
+    ...toParcelCropFields(data),
   }
 }
 
@@ -189,6 +222,7 @@ export function toParcelUpdateInput(data: FieldFormData): ParcelUpdateInput {
   return {
     ...toParcelCoreFields(data),
     ...toParcelLocationFields(data),
+    ...toParcelCropFields(data),
   }
 }
 
@@ -196,7 +230,15 @@ export function hasUnsavedParcelData(data: FieldFormData): boolean {
   if (data.serverId) return false
 
   return Boolean(
-    data.name.trim() || data.irrigationType || hasParcelGeometry(data)
+    data.name.trim() ||
+      data.irrigationType ||
+      data.areaM2 ||
+      data.variety ||
+      data.soilType ||
+      data.plantingDate ||
+      data.plantCount != null ||
+      data.data?.oliveCropType ||
+      hasParcelGeometry(data)
   )
 }
 

@@ -25,6 +25,7 @@ export function ParcelMap({ parcels, activeParcelId }: ParcelMapProps) {
     activeDraft?.name,
     activeDraft?.cropType,
     activeDraft?.areaHa,
+    activeDraft?.areaM2,
     activeDraft?.irrigationType,
   ])
 
