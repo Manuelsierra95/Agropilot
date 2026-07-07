@@ -77,18 +77,14 @@ export const searchRoutes = new Hono<{
     async (c) => {
       const { refcat } = c.req.valid("param")
 
-      console.log("Searching by refcat:", refcat)
-
       try {
         const data = await searchByRefcat(refcat)
-        console.log("Search result:", data)
         return c.json({ data })
       } catch (error) {
         const message =
           error instanceof Error
             ? error.message
             : "No se pudo localizar la parcela por referencia catastral."
-        console.error("Error searching by refcat:", error)
         return c.json({ error: message }, 400)
       }
     }
