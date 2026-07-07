@@ -25,6 +25,8 @@ import {
 import { Separator } from "@workspace/ui/components/separator"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
+import { Badge } from "@workspace/ui/components/badge"
+import { ScrollArea } from "@workspace/ui/components/scroll-area"
 import { Spinner } from "@workspace/ui/components/spinner"
 import { cn } from "@workspace/ui/lib/utils"
 import {
@@ -180,6 +182,22 @@ export function RegisterSaleModal({
     })
   }
 
+  const handleToggleAllDeliveries = (selectAll: boolean) => {
+    if (!selectAll) {
+      setSelectedItems(new Map())
+      return
+    }
+
+    setSelectedItems(
+      new Map(
+        availableDeliveries.map((delivery) => [
+          delivery.id,
+          delivery.quantityRemaining,
+        ])
+      )
+    )
+  }
+
   const handleQuantityChange = (
     deliveryId: string,
     value: number,
@@ -249,6 +267,7 @@ export function RegisterSaleModal({
           selectedItems={selectedItems}
           isLoading={isLoadingDeliveries}
           onToggle={handleToggleDelivery}
+          onToggleAll={handleToggleAllDeliveries}
           onQuantityChange={handleQuantityChange}
         />
 
@@ -319,7 +338,7 @@ export function RegisterSaleModal({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="flex min-w-[420px] flex-col sm:max-w-lg"
+        className="flex min-w-[620px] flex-col sm:max-w-lg"
       >
         <SheetHeader className="sr-only">
           <SheetTitle>
@@ -356,30 +375,26 @@ function ModalHeader({
         : "Por debajo del umbral de rentabilidad"
 
   return (
-    <div className={cn("rounded-xl p-4", config.bg)}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          {parcelName && (
-            <p className="mb-1 truncate text-sm font-semibold text-foreground">
-              {parcelName}
-            </p>
-          )}
-          <div className="flex items-center gap-2">
-            <SignalIcon className={cn("size-4 shrink-0", config.color)} />
-            <p className={cn("text-sm font-medium", config.color)}>
-              {signalLabel}
-            </p>
-          </div>
+    <div className={cn("rounded-xl p-4")}>
+      <div className="flex items-center gap-1">
+        {parcelName && (
+          <p className="truncate text-sm font-semibold text-foreground">
+            {parcelName}
+          </p>
+        )}
+        <div className="flex items-center justify-center gap-2">
+          <SignalIcon className={cn("size-4 shrink-0", config.color)} />
+          <p className={cn("text-sm font-medium", config.color)}>
+            {signalLabel}
+          </p>
         </div>
-        <span
-          className={cn(
-            "shrink-0 text-xs font-semibold tabular-nums",
-            config.color
-          )}
+        <Badge
+          variant="secondary"
+          className={cn("text-xs font-semibold tabular-nums", config.color)}
         >
           {marginPct >= 0 ? "+" : ""}
           {marginPct.toFixed(0)}% margen
-        </span>
+        </Badge>
       </div>
     </div>
   )
@@ -403,7 +418,7 @@ function PriceGrid({
   const color = SELLING_WINDOW_SIGNAL_CONFIG[signal].color
 
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-4 gap-3">
       <MetricCard
         icon={Scale}
         label="Precio lonja"
@@ -485,6 +500,7 @@ function DeliverySelection({
   selectedItems,
   isLoading,
   onToggle,
+  onToggleAll,
   onQuantityChange,
 }: {
   deliveries: Array<{
@@ -499,15 +515,42 @@ function DeliverySelection({
   selectedItems: Map<string, number>
   isLoading: boolean
   onToggle: (deliveryId: string, maxQty: number) => void
+  onToggleAll: (selectAll: boolean) => void
   onQuantityChange: (deliveryId: string, value: number, maxQty: number) => void
 }) {
+  const selectedCount = deliveries.filter((delivery) =>
+    selectedItems.has(delivery.id)
+  ).length
+  const allSelected =
+    deliveries.length > 0 && selectedCount === deliveries.length
+  const someSelected = selectedCount > 0 && !allSelected
+
   return (
     <div className="rounded-xl border bg-muted/20 p-4">
-      <div className="mb-3 flex items-center gap-2">
-        <Package className="size-4 text-muted-foreground" />
-        <p className="text-xs font-medium text-muted-foreground uppercase">
-          Entregas disponibles
-        </p>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Package className="size-4 text-muted-foreground" />
+          <p className="text-xs font-medium text-muted-foreground uppercase">
+            Entregas disponibles
+          </p>
+        </div>
+
+        {deliveries.length > 0 && !isLoading ? (
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="delivery-select-all"
+              checked={allSelected || (someSelected && "indeterminate")}
+              onCheckedChange={(checked) => onToggleAll(checked === true)}
+              aria-label="Seleccionar todas las entregas"
+            />
+            <Label
+              htmlFor="delivery-select-all"
+              className="cursor-pointer text-xs text-muted-foreground"
+            >
+              Seleccionar todas
+            </Label>
+          </div>
+        ) : null}
       </div>
 
       {isLoading ? (
@@ -519,84 +562,86 @@ function DeliverySelection({
           No hay entregas con stock disponible para esta parcela.
         </p>
       ) : (
-        <ul className="space-y-2">
-          {deliveries.map((delivery) => {
-            const isSelected = selectedItems.has(delivery.id)
-            const quantitySold = selectedItems.get(delivery.id) ?? 0
+        <ScrollArea className="max-h-72 overflow-hidden [&>[data-slot=scroll-area-viewport]]:max-h-72">
+          <ul className="space-y-2 pr-3">
+            {deliveries.map((delivery) => {
+              const isSelected = selectedItems.has(delivery.id)
+              const quantitySold = selectedItems.get(delivery.id) ?? 0
 
-            return (
-              <li
-                key={delivery.id}
-                className={cn(
-                  "rounded-lg border p-3 transition-colors",
-                  isSelected
-                    ? "border-primary/30 bg-primary/5"
-                    : "bg-background"
-                )}
-              >
-                <div className="flex items-start gap-3">
-                  <Checkbox
-                    id={`delivery-${delivery.id}`}
-                    checked={isSelected}
-                    onCheckedChange={() =>
-                      onToggle(delivery.id, delivery.quantityRemaining)
-                    }
-                    className="mt-0.5"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <Label
-                      htmlFor={`delivery-${delivery.id}`}
-                      className="cursor-pointer text-sm font-medium"
-                    >
-                      {delivery.destinationName ?? "Entrega sin destino"}
-                    </Label>
-                    <p className="text-xs text-muted-foreground tabular-nums">
-                      {formatQty(delivery.rawQuantity)} {delivery.rawUnit}{" "}
-                      entregados · {delivery.deliveryDate}
-                    </p>
-                    <p className="text-xs text-foreground tabular-nums">
-                      {formatQty(delivery.quantityRemaining)}{" "}
-                      {delivery.processedUnit} disponibles
-                    </p>
+              return (
+                <li
+                  key={delivery.id}
+                  className={cn(
+                    "rounded-lg border p-3 transition-colors",
+                    isSelected
+                      ? "border-primary/30 bg-primary/5"
+                      : "bg-background"
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id={`delivery-${delivery.id}`}
+                      checked={isSelected}
+                      onCheckedChange={() =>
+                        onToggle(delivery.id, delivery.quantityRemaining)
+                      }
+                      className="mt-0.5"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <Label
+                        htmlFor={`delivery-${delivery.id}`}
+                        className="cursor-pointer text-sm font-medium"
+                      >
+                        {delivery.destinationName ?? "Entrega sin destino"}
+                      </Label>
+                      <p className="text-xs text-muted-foreground tabular-nums">
+                        {formatQty(delivery.rawQuantity)} {delivery.rawUnit}{" "}
+                        entregados · {delivery.deliveryDate}
+                      </p>
+                      <p className="text-xs text-foreground tabular-nums">
+                        {formatQty(delivery.quantityRemaining)}{" "}
+                        {delivery.processedUnit} disponibles
+                      </p>
 
-                    {isSelected && (
-                      <div className="mt-2 flex items-center gap-2">
-                        <Label
-                          htmlFor={`qty-${delivery.id}`}
-                          className="text-xs text-muted-foreground"
-                        >
-                          Cantidad
-                        </Label>
-                        <Input
-                          id={`qty-${delivery.id}`}
-                          type="number"
-                          min={0}
-                          max={delivery.quantityRemaining}
-                          step="0.01"
-                          value={quantitySold}
-                          onChange={(event) => {
-                            const value = Number(event.target.value)
-                            if (Number.isFinite(value)) {
-                              onQuantityChange(
-                                delivery.id,
-                                value,
-                                delivery.quantityRemaining
-                              )
-                            }
-                          }}
-                          className="h-7 w-24 text-right text-sm tabular-nums"
-                        />
-                        <span className="text-xs text-muted-foreground">
-                          {delivery.processedUnit}
-                        </span>
-                      </div>
-                    )}
+                      {isSelected && (
+                        <div className="mt-2 flex items-center gap-2">
+                          <Label
+                            htmlFor={`qty-${delivery.id}`}
+                            className="text-xs text-muted-foreground"
+                          >
+                            Cantidad
+                          </Label>
+                          <Input
+                            id={`qty-${delivery.id}`}
+                            type="number"
+                            min={0}
+                            max={delivery.quantityRemaining}
+                            step="0.01"
+                            value={quantitySold}
+                            onChange={(event) => {
+                              const value = Number(event.target.value)
+                              if (Number.isFinite(value)) {
+                                onQuantityChange(
+                                  delivery.id,
+                                  value,
+                                  delivery.quantityRemaining
+                                )
+                              }
+                            }}
+                            className="h-7 w-24 text-right text-sm tabular-nums"
+                          />
+                          <span className="text-xs text-muted-foreground">
+                            {delivery.processedUnit}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </li>
-            )
-          })}
-        </ul>
+                </li>
+              )
+            })}
+          </ul>
+        </ScrollArea>
       )}
     </div>
   )
