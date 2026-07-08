@@ -1,5 +1,5 @@
 import { auth } from "@workspace/auth"
-import { eq, and, db, schema } from "@workspace/db"
+import { eq, db, schema } from "@workspace/db"
 import { HTTPException } from "hono/http-exception"
 import {
   parseInvitationSelect,
@@ -110,29 +110,40 @@ export async function listInvitations(
   }
 }
 
+const CANCELED_STATUSES = new Set(["canceled", "cancelled"])
+
 export async function cancelInvitation(
   invitationId: string,
   organizationId: string,
-  headers: Headers
+  _headers: Headers
 ): Promise<void> {
   const invitation = await db.query.invitations.findFirst({
-    where: and(
-      eq(schema.invitations.id, invitationId),
-      eq(schema.invitations.organizationId, organizationId)
-    ),
-    columns: { id: true },
+    where: eq(schema.invitations.id, invitationId),
+    columns: { id: true, status: true, organizationId: true },
   })
 
-  if (!invitation) {
+  if (!invitation || invitation.organizationId !== organizationId) {
     throw new HTTPException(404, { message: "Invitation not found" })
   }
 
-  try {
-    await auth.api.cancelInvitation({
-      body: { invitationId },
-      headers,
-    })
-  } catch (error) {
-    throw new HTTPException(400, { message: getErrorMessage(error) })
+  if (CANCELED_STATUSES.has(invitation.status)) {
+    return
   }
+
+  if (invitation.status === "accepted") {
+    throw new HTTPException(400, {
+      message: "No se puede cancelar una invitación ya aceptada",
+    })
+  }
+
+  if (invitation.status !== "pending") {
+    throw new HTTPException(400, {
+      message: `No se puede cancelar una invitación con estado "${invitation.status}"`,
+    })
+  }
+
+  await db
+    .update(schema.invitations)
+    .set({ status: "canceled" })
+    .where(eq(schema.invitations.id, invitationId))
 }

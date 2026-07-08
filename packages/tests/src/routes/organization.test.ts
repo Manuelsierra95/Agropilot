@@ -107,4 +107,75 @@ describe("organization routes", () => {
     const body = await res.json()
     expect(body.data.invitation.id).toBe("inv-1")
   })
+
+  it("POST /organization/invitations returns 403 for non-admin", async () => {
+    mockAuthenticatedSession("member")
+
+    const res = await apiRequest(app, "/api/v1/organization/invitations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "nuevo@agropilot.dev",
+        role: "member",
+      }),
+    })
+
+    expect(res.status).toBe(403)
+  })
+
+  it("GET /organization/invitations returns invitations for admin", async () => {
+    mockAuthenticatedSession("admin")
+    orgMocks.listInvitations.mockResolvedValue([
+      { id: "inv-1", email: "a@test.com", status: "pending" },
+    ])
+
+    const res = await apiRequest(app, "/api/v1/organization/invitations")
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.data.invitations).toHaveLength(1)
+  })
+
+  it("GET /organization/invitations returns 403 for non-admin", async () => {
+    mockAuthenticatedSession("member")
+
+    const res = await apiRequest(app, "/api/v1/organization/invitations")
+    expect(res.status).toBe(403)
+  })
+
+  it("POST /organization/invitations/bulk creates multiple invitations", async () => {
+    mockAuthenticatedSession("admin")
+    orgMocks.bulkCreateInvitations.mockResolvedValue({
+      invitations: [{ id: "inv-1" }, { id: "inv-2" }],
+      failed: [],
+      count: 2,
+    })
+
+    const res = await apiRequest(app, "/api/v1/organization/invitations/bulk", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        invitations: [
+          { email: "a@test.com", role: "member" },
+          { email: "b@test.com", role: "viewer" },
+        ],
+      }),
+    })
+
+    expect(res.status).toBe(201)
+    const body = await res.json()
+    expect(body.data.count).toBe(2)
+  })
+
+  it("DELETE /organization/invitations/:id cancels invitation for admin", async () => {
+    mockAuthenticatedSession("admin")
+    orgMocks.cancelInvitation.mockResolvedValue(undefined)
+
+    const res = await apiRequest(app, "/api/v1/organization/invitations/inv-1", {
+      method: "DELETE",
+    })
+
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.data.id).toBe("inv-1")
+  })
 })

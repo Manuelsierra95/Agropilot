@@ -38,19 +38,13 @@ export const MOCK_FINANCE_ROWS: FinanceBulkRow[] = [
   },
 ]
 
-export type TeamInviteRole = "admin" | "member" | "viewer"
-
-export interface TeamInviteDraft {
-  id: string
-  email: string
-  role: TeamInviteRole
-}
-
-export const TEAM_ROLE_LABELS: Record<TeamInviteRole, string> = {
-  admin: "Administrador",
-  member: "Miembro",
-  viewer: "Solo lectura",
-}
+export type {
+  InviteDraft as TeamInviteDraft,
+  InvitationRole as TeamInviteRole,
+} from "@workspace/web/features/organization/constants"
+export {
+  INVITATION_ROLE_LABELS as TEAM_ROLE_LABELS,
+} from "@workspace/web/features/organization/constants"
 
 export type CatastroProvince = {
   Codigo: number

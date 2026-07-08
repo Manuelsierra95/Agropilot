@@ -1,0 +1,21 @@
+{
+  "name": "@workspace/email",
+  "version": "1.0.0",
+  "description": "Transactional email for Agropilot",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./templates/invitation": "./src/templates/invitation.ts"
+  },
+  "dependencies": {
+    "resend": "^4.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.1.0",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "eslint": "^8.57.1",
+    "prettier": "^3.3.3",
+    "typescript": "^5.9.3"
+  }
+}

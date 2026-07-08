@@ -11,6 +11,27 @@ import type {
 } from "@workspace/schemas"
 import { cache } from "react"
 
+type ApiErrorBody = {
+  message?: string
+  error?: { message?: string }
+}
+
+function getApiErrorMessage(body: ApiErrorBody, status: number): string {
+  if (typeof body.error?.message === "string") return body.error.message
+  if (typeof body.message === "string") return body.message
+  return `API error: ${status}`
+}
+
+async function parseApiResponse<T>(response: Response): Promise<T> {
+  const body = (await response.json()) as T & ApiErrorBody
+
+  if (!response.ok) {
+    throw new Error(getApiErrorMessage(body, response.status))
+  }
+
+  return body
+}
+
 const getActiveOrganization = cache(
   (): Promise<ActiveOrganizationData> =>
     client.api.v1.organization.active
@@ -52,44 +73,45 @@ const updateOrganization = (data: UpdateOrganizationInput) =>
     .then((r) => r.json() as Promise<{ data: UpdateOrganizationInput }>)
     .then((body) => body.data)
 
-const listInvitations = (): Promise<InvitationSelect[]> =>
-  client.api.v1.organization.invitations
-    .$get()
-    .then(
-      (response) =>
-        response.json() as Promise<{
-          data: { invitations: InvitationSelect[] }
-        }>
-    )
-    .then((body) => body.data.invitations)
+const listInvitations = async (): Promise<InvitationSelect[]> => {
+  const response = await client.api.v1.organization.invitations.$get()
+  const body = await parseApiResponse<{
+    data: { invitations: InvitationSelect[] }
+  }>(response)
+  return body.data.invitations
+}
 
-const createInvitation = (
+const createInvitation = async (
   data: InvitationCreateInput
-): Promise<InvitationSelect> =>
-  client.api.v1.organization.invitations
-    .$post({ json: data })
-    .then(
-      (response) =>
-        response.json() as Promise<{ data: { invitation: InvitationSelect } }>
-    )
-    .then((body) => body.data.invitation)
+): Promise<InvitationSelect> => {
+  const response = await client.api.v1.organization.invitations.$post({
+    json: data,
+  })
+  const body = await parseApiResponse<{
+    data: { invitation: InvitationSelect }
+  }>(response)
+  return body.data.invitation
+}
 
-const bulkCreateInvitations = (
+const bulkCreateInvitations = async (
   data: InvitationBulkCreateInput
-): Promise<InvitationBulkCreateResult> =>
-  client.api.v1.organization.invitations.bulk
-    .$post({ json: data })
-    .then(
-      (response) =>
-        response.json() as Promise<{ data: InvitationBulkCreateResult }>
-    )
-    .then((body) => body.data)
+): Promise<InvitationBulkCreateResult> => {
+  const response = await client.api.v1.organization.invitations.bulk.$post({
+    json: data,
+  })
+  const body = await parseApiResponse<{ data: InvitationBulkCreateResult }>(
+    response
+  )
+  return body.data
+}
 
-const cancelInvitation = (id: string): Promise<string> =>
-  client.api.v1.organization.invitations[":id"]
-    .$delete({ param: { id } })
-    .then((response) => response.json() as Promise<{ data: { id: string } }>)
-    .then((body) => body.data.id)
+const cancelInvitation = async (id: string): Promise<string> => {
+  const response = await client.api.v1.organization.invitations[":id"].$delete({
+    param: { id },
+  })
+  const body = await parseApiResponse<{ data: { id: string } }>(response)
+  return body.data.id
+}
 
 export const organizationApi = {
   getActive: getActiveOrganization,

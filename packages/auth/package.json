@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "@workspace/db": "workspace:*",
+    "@workspace/email": "workspace:*",
     "better-auth": "^1.6.2"
   },
   "devDependencies": {

@@ -1,8 +1,7 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@workspace/ui/components/button"
-import { Input } from "@workspace/ui/components/input"
-import { Label } from "@workspace/ui/components/label"
 import { Badge } from "@workspace/ui/components/badge"
 import {
   Avatar,
@@ -11,17 +10,20 @@ import {
 } from "@workspace/ui/components/avatar"
 import { Camera, Crown, Shield, User } from "lucide-react"
 import type { OrganizationMeResponse } from "@workspace/schemas"
-
-const ROLE_LABELS: Record<string, string> = {
-  owner: "Propietario",
-  admin: "Administrador",
-  member: "Miembro",
-}
+import { InviteMembersDialog } from "@workspace/web/features/organization/components/invite-members-dialog"
+import { PendingInvitationsList } from "@workspace/web/features/organization/components/pending-invitations-list"
+import { MEMBER_ROLE_LABELS } from "@workspace/web/features/organization/constants"
+import { useCancelInvitation } from "@workspace/web/features/organization/hooks/use-cancel-invitation"
+import { useOrganizationInvitations } from "@workspace/web/features/organization/hooks/use-organization-invitations"
+import { Input } from "@workspace/ui/components/input"
+import { Label } from "@workspace/ui/components/label"
 
 const ROLE_ICONS: Record<string, React.ReactNode> = {
   owner: <Crown className="h-3 w-3" />,
   admin: <Shield className="h-3 w-3" />,
   member: <User className="h-3 w-3" />,
+  editor: <User className="h-3 w-3" />,
+  viewer: <User className="h-3 w-3" />,
 }
 
 const PLAN_LABELS: Record<string, string> = {
@@ -41,6 +43,13 @@ export function SettingsOrganizationSection({
   canEdit,
   canManageMembers,
 }: Props) {
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
+  const { data: invitations = [] } = useOrganizationInvitations(
+    org.id,
+    canManageMembers
+  )
+  const cancelInvitation = useCancelInvitation(org.id)
+
   const initials = org.name
     .split(" ")
     .slice(0, 2)
@@ -50,19 +59,15 @@ export function SettingsOrganizationSection({
 
   return (
     <div className="space-y-8">
-      {/* Header — idéntico al de Profile */}
       <div>
         <h2 className="text-lg font-medium">Organización</h2>
         <p className="text-sm text-muted-foreground">
-          Gestiona los datos de tu explotación y los miembros del equipo.
+          Gestiona los datos de tu organización y los miembros del equipo.
         </p>
       </div>
 
-      {/* Two-column layout — same divide-x pattern as Profile */}
       <div className="grid grid-cols-2 gap-0 divide-x divide-border">
-        {/* ── Left column: editable fields ── */}
         <div className="flex flex-col gap-6 pr-8">
-          {/* Logo + org name header */}
           <div className="flex items-center gap-3">
             <div className="relative">
               <Avatar className="h-14 w-14 rounded-lg">
@@ -85,10 +90,9 @@ export function SettingsOrganizationSection({
             </div>
           </div>
 
-          {/* Editable fields */}
           <div className="flex flex-col gap-4">
             <div className="space-y-2">
-              <Label htmlFor="org-name">Nombre de la explotación</Label>
+              <Label htmlFor="org-name">Nombre de la organización</Label>
               <Input
                 id="org-name"
                 defaultValue={org.name}
@@ -98,7 +102,6 @@ export function SettingsOrganizationSection({
             </div>
           </div>
 
-          {/* Save actions */}
           {canEdit && (
             <div className="flex items-center gap-3 border-t pt-4">
               <Button>Guardar cambios</Button>
@@ -107,9 +110,7 @@ export function SettingsOrganizationSection({
           )}
         </div>
 
-        {/* ── Right column: org info + members ── */}
         <div className="flex flex-col gap-6 pl-8">
-          {/* Org metadata cards */}
           <div className="flex flex-col gap-3">
             <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
               Cuenta
@@ -125,13 +126,12 @@ export function SettingsOrganizationSection({
               <div className="rounded-lg border bg-muted/40 px-4 py-3">
                 <p className="text-xs text-muted-foreground">Tu rol</p>
                 <p className="mt-1 text-sm font-medium">
-                  {ROLE_LABELS[org.viewerRole] ?? org.viewerRole}
+                  {MEMBER_ROLE_LABELS[org.viewerRole] ?? org.viewerRole}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Members list */}
           <div className="flex flex-col gap-3 border-t pt-4">
             <div className="flex items-center justify-between">
               <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
@@ -141,7 +141,12 @@ export function SettingsOrganizationSection({
                 </span>
               </p>
               {canManageMembers && (
-                <Button size="sm" variant="outline" className="h-7 text-xs">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs"
+                  onClick={() => setInviteDialogOpen(true)}
+                >
                   Invitar miembro
                 </Button>
               )}
@@ -157,7 +162,6 @@ export function SettingsOrganizationSection({
                   .toUpperCase()
 
                 const isSelf = m.userId === org.viewerUserId
-                const canManage = canManageMembers && !isSelf
 
                 return (
                   <div
@@ -186,28 +190,43 @@ export function SettingsOrganizationSection({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="gap-1 text-xs">
-                        {ROLE_ICONS[m.role]}
-                        {ROLE_LABELS[m.role] ?? m.role}
-                      </Badge>
-                      {canManage && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-                        >
-                          Expulsar
-                        </Button>
-                      )}
-                    </div>
+                    <Badge variant="secondary" className="gap-1 text-xs">
+                      {ROLE_ICONS[m.role]}
+                      {MEMBER_ROLE_LABELS[m.role] ?? m.role}
+                    </Badge>
                   </div>
                 )
               })}
             </div>
           </div>
+
+          {canManageMembers ? (
+            <PendingInvitationsList
+              invitations={invitations}
+              canManage={canManageMembers}
+              cancellingId={
+                cancelInvitation.isPending
+                  ? (cancelInvitation.variables ?? null)
+                  : null
+              }
+              onCancel={(id) =>
+                new Promise<void>((resolve, reject) => {
+                  cancelInvitation.mutate(id, {
+                    onSuccess: () => resolve(),
+                    onError: (error) => reject(error),
+                  })
+                })
+              }
+            />
+          ) : null}
         </div>
       </div>
+
+      <InviteMembersDialog
+        organizationId={org.id}
+        open={inviteDialogOpen}
+        onOpenChange={setInviteDialogOpen}
+      />
     </div>
   )
 }

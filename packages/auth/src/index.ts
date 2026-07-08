@@ -4,11 +4,21 @@ import type { Auth, Session, User as BetterAuthUser } from "better-auth"
 import { openAPI, organization } from "better-auth/plugins"
 
 import { db } from "@workspace/db"
+import { getWebAppUrl, sendEmail } from "@workspace/email"
+import { buildInvitationEmailHtml } from "@workspace/email/templates/invitation"
 import {
   createOrganizationForUser,
   setActiveOrgOnSession,
 } from "./hooks/organization"
 import { ac, organizationRoles } from "./permissions"
+
+const INVITATION_ROLE_LABELS: Record<string, string> = {
+  admin: "Administrador",
+  member: "Miembro",
+  viewer: "Solo lectura",
+  editor: "Editor",
+  owner: "Propietario",
+}
 
 const env = {
   NODE_ENV: process.env.NODE_ENV,
@@ -89,6 +99,25 @@ const auth = betterAuth({
       },
       requireEmailVerificationOnInvitation: false,
       cancelPendingInvitationsOnReInvite: true,
+      invitationExpiresIn: 60 * 60 * 24 * 7,
+
+      async sendInvitationEmail(data) {
+        const { email, organization: org, inviter, invitation } = data
+        const inviteUrl = `${getWebAppUrl()}/invite/${invitation.id}`
+        const roleLabel =
+          INVITATION_ROLE_LABELS[invitation.role ?? "member"] ?? "Miembro"
+
+        await sendEmail({
+          to: email,
+          subject: `Te han invitado a ${org.name} en Agropilot`,
+          html: buildInvitationEmailHtml({
+            inviteUrl,
+            organizationName: org.name,
+            inviterName: inviter.user.name,
+            roleLabel,
+          }),
+        })
+      },
 
       organizationCreation: {
         disabled: true, // no user can call createOrganization from client

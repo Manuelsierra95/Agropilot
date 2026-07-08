@@ -5,6 +5,9 @@ export type Env = {
   ORIGINS: string
   CORS_MAX_AGE: number
   FRONTEND_URI: string
+  RESEND_API_KEY?: string
+  EMAIL_FROM?: string
+  WEB_APP_URL?: string
   BETTER_AUTH_SECRET: string
   BETTER_AUTH_URL: string
   GOOGLE_CLIENT_ID: string

@@ -33,13 +33,9 @@ export async function seedInvitations() {
       id: crypto.randomUUID(),
       organizationId: SEED_ORGANIZATION_ID,
       role: "editor",
-      permission: "parcel:create",
-    },
-    {
-      id: crypto.randomUUID(),
-      organizationId: SEED_ORGANIZATION_ID,
-      role: "editor",
-      permission: "parcel:update",
+      permission: JSON.stringify({
+        parcel: ["create", "update"],
+      }),
     },
   ])
 
