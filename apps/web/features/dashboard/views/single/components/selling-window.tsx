@@ -13,6 +13,7 @@ import {
 import { TrendingUp, TrendingDown, Minus } from "lucide-react"
 
 import { CampaignTargetComparison } from "@workspace/web/features/dashboard/components/campaign-target-comparison"
+import { RegisterHarvestDeliveryModal } from "@workspace/web/features/dashboard/components/register-harvest-delivery-modal"
 import { RegisterSaleModal } from "@workspace/web/features/dashboard/components/register-sale-modal"
 
 import {
@@ -65,10 +66,17 @@ export function SellingWindow({
 }: SellingWindowProps) {
   const [modalOpen, setModalOpen] = React.useState(false)
   const [modalKey, setModalKey] = React.useState(0)
+  const [harvestModalOpen, setHarvestModalOpen] = React.useState(false)
+  const [harvestModalKey, setHarvestModalKey] = React.useState(0)
 
   const handleOpenModal = React.useCallback(() => {
     setModalKey((k) => k + 1)
     setModalOpen(true)
+  }, [])
+
+  const handleOpenHarvestModal = React.useCallback(() => {
+    setHarvestModalKey((k) => k + 1)
+    setHarvestModalOpen(true)
   }, [])
 
   const margin = lonjaPrice - costPerKg
@@ -182,7 +190,15 @@ export function SellingWindow({
           )}
         </CardContent>
 
-        <CardFooter className="flex items-center justify-center border-0 bg-background px-4 pt-0">
+        <CardFooter className="grid grid-cols-2 gap-2 border-0 bg-background px-4 pt-0">
+          <Button
+            className="w-full gap-2 border-0 bg-muted-foreground/5 text-xs"
+            size="sm"
+            variant="outline"
+            onClick={handleOpenHarvestModal}
+          >
+            Registrar entrega
+          </Button>
           <Button
             className="w-full gap-2 border-0 bg-muted-foreground/5 text-xs"
             size="sm"
@@ -193,6 +209,13 @@ export function SellingWindow({
           </Button>
         </CardFooter>
       </Card>
+
+      <RegisterHarvestDeliveryModal
+        key={harvestModalKey}
+        open={harvestModalOpen}
+        onOpenChange={setHarvestModalOpen}
+        parcelId={parcelId}
+      />
 
       <RegisterSaleModal
         key={modalKey}
