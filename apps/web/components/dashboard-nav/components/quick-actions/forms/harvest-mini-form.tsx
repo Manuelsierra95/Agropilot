@@ -33,8 +33,13 @@ import type { HarvestDeliveryCreateInput } from "@workspace/schemas"
 const RAW_UNITS = ["kg", "t", "caja"]
 const PROCESSED_UNITS = ["l", "kg", "botella"]
 
-export function HarvestMiniForm({ onSuccess }: MiniFormProps) {
+type HarvestMiniFormProps = MiniFormProps & {
+  parcelId?: string
+}
+
+export function HarvestMiniForm({ onSuccess, parcelId }: HarvestMiniFormProps) {
   const defaultParcelId = useDefaultParcelId()
+  const resolvedParcelId = parcelId ?? defaultParcelId
   const { data: parcels, isLoading: isLoadingParcels } = useParcels()
   const { mutate: createHarvestDelivery, isPending } =
     useCreateHarvestDelivery()
@@ -42,7 +47,7 @@ export function HarvestMiniForm({ onSuccess }: MiniFormProps) {
   const form = useForm({
     resolver: zodResolver(harvestDeliveryCreateSchema),
     defaultValues: {
-      parcelId: defaultParcelId ?? "",
+      parcelId: resolvedParcelId ?? "",
       deliveryDate: new Date().toISOString().slice(0, 10),
       destinationName: "",
       rawQuantity: 0,
