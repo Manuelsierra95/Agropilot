@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+import { AlertTriangle } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
@@ -9,7 +11,19 @@ import {
   AvatarImage,
 } from "@workspace/ui/components/avatar"
 import { Badge } from "@workspace/ui/components/badge"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@workspace/ui/components/alert-dialog"
 import type { UserMeResponse } from "@workspace/schemas"
+import { useDeleteAccount } from "@workspace/web/features/settings/hooks/use-delete-account"
+import { useDeleteOrganization } from "@workspace/web/features/settings/hooks/use-delete-organization"
 
 const PROVIDER_LABELS: Record<string, string> = {
   google: "Google",
@@ -23,6 +37,16 @@ const ROLE_LABELS: Record<string, string> = {
 }
 
 export function SettingsProfileSection({ user }: { user: UserMeResponse }) {
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false)
+  const [deleteOrganizationOpen, setDeleteOrganizationOpen] = useState(false)
+
+  const deleteAccount = useDeleteAccount()
+  const deleteOrganization = useDeleteOrganization()
+
+  const isOwner = user.role === "owner"
+  const isDeleting =
+    deleteAccount.isPending || deleteOrganization.isPending
+
   const initials = user.name
     .split(" ")
     .slice(0, 2)
@@ -38,6 +62,22 @@ export function SettingsProfileSection({ user }: { user: UserMeResponse }) {
       year: "numeric",
     }
   )
+
+  const handleDeleteAccount = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    deleteAccount.mutate(undefined, {
+      onSuccess: () => setDeleteAccountOpen(false),
+    })
+  }
+
+  const handleDeleteOrganization = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault()
+    deleteOrganization.mutate(user.organizationId, {
+      onSuccess: () => setDeleteOrganizationOpen(false),
+    })
+  }
 
   return (
     <div className="space-y-8">
@@ -136,31 +176,105 @@ export function SettingsProfileSection({ user }: { user: UserMeResponse }) {
                     permanente. No afecta a la organización.
                   </p>
                 </div>
-                <Button variant="destructive" size="sm">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  disabled={isDeleting}
+                  onClick={() => setDeleteAccountOpen(true)}
+                >
                   Eliminar Cuenta
                 </Button>
               </div>
             </div>
 
-            <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-destructive">
-                    Eliminar organización
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Elimina permanentemente tu organización, todos los usuarios
-                    y datos asociados.
-                  </p>
+            {isOwner ? (
+              <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-destructive">
+                      Eliminar organización
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Elimina permanentemente tu organización, todos los usuarios
+                      y datos asociados.
+                    </p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={isDeleting}
+                    onClick={() => setDeleteOrganizationOpen(true)}
+                  >
+                    Eliminar Organización
+                  </Button>
                 </div>
-                <Button variant="destructive" size="sm">
-                  Eliminar Organización
-                </Button>
               </div>
-            </div>
+            ) : null}
           </div>
         </div>
       </div>
+
+      <AlertDialog open={deleteAccountOpen} onOpenChange={setDeleteAccountOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="size-5 text-destructive" />
+              Eliminar cuenta
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Vas a eliminar permanentemente la cuenta de{" "}
+              <span className="font-semibold text-foreground">{user.email}</span>
+              . Se borrarán tus datos personales y cerrarás sesión en todos los
+              dispositivos. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteAccount.isPending}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
+              onClick={handleDeleteAccount}
+              disabled={deleteAccount.isPending}
+            >
+              {deleteAccount.isPending ? "Eliminando..." : "Eliminar cuenta"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={deleteOrganizationOpen}
+        onOpenChange={setDeleteOrganizationOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="size-5 text-destructive" />
+              Eliminar organización
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Vas a eliminar permanentemente tu organización y todos los datos
+              asociados: parcelas, finanzas, miembros e invitaciones. Esta
+              acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteOrganization.isPending}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
+              onClick={handleDeleteOrganization}
+              disabled={deleteOrganization.isPending}
+            >
+              {deleteOrganization.isPending
+                ? "Eliminando..."
+                : "Eliminar organización"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

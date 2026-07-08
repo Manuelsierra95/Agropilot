@@ -58,6 +58,9 @@ const auth = betterAuth({
         input: false,
       },
     },
+    deleteUser: {
+      enabled: true,
+    },
   },
   databaseHooks: {
     user: {
