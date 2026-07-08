@@ -1,15 +1,29 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import { Separator } from "@workspace/ui/components/separator"
 import { SearchMenu } from "@workspace/web/components/dashboard-nav/components/search/search-menu"
 import { useNavigationSearchActions } from "@workspace/web/lib/navigation/navigation-actions"
 import { cn } from "@workspace/ui/lib/utils"
 
+function isNavLink(target: EventTarget | null) {
+  const anchor = (target as HTMLElement | null)?.closest("a[href]")
+  if (!anchor) return false
+
+  const href = anchor.getAttribute("href")
+  return Boolean(href && !href.startsWith("#"))
+}
+
 export function NavDockToggle({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname()
   const actions = useNavigationSearchActions()
+
+  useEffect(() => {
+    setIsOpen(false)
+  }, [pathname])
 
   return (
     <>
@@ -22,7 +36,17 @@ export function NavDockToggle({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Nav panel */}
-      {isOpen && children}
+      {isOpen && (
+        <div
+          onClick={(e) => {
+            if (isNavLink(e.target)) {
+              setIsOpen(false)
+            }
+          }}
+        >
+          {children}
+        </div>
+      )}
 
       {/* Floating dock pill */}
       <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2">
