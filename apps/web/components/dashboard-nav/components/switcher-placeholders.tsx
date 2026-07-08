@@ -2,6 +2,25 @@ import { cn } from "@workspace/ui/lib/utils"
 
 const pulseBlock = "animate-pulse rounded-md bg-secondary"
 
+export function NavUserPlaceholder() {
+  return (
+    <div
+      className="group/menu-item relative w-full"
+      aria-busy="true"
+      aria-label="Cargando usuario"
+    >
+      <div className="flex h-12 w-full items-center gap-2 rounded-md p-2">
+        <div className={cn(pulseBlock, "size-8 shrink-0 rounded-full")} />
+        <div className="grid min-w-0 flex-1 gap-1.5">
+          <div className={cn(pulseBlock, "h-3.5 max-w-[8rem]")} />
+          <div className={cn(pulseBlock, "h-3 max-w-[10rem]")} />
+        </div>
+        <div className={cn(pulseBlock, "ml-auto size-4 shrink-0")} />
+      </div>
+    </div>
+  )
+}
+
 export function OrgSwitcherPlaceholder() {
   return (
     <div

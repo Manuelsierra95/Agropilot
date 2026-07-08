@@ -26,7 +26,7 @@ export function AppSidebar() {
         <NavSettings items={navigationData.settings} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={navigationData.user} />
+        <NavUser />
       </SidebarFooter>
     </>
   )

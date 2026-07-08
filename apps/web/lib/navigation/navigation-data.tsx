@@ -2,15 +2,17 @@ import { Euro, LucideIcon, ClipboardList } from "lucide-react"
 import type { ScopeKey } from "@workspace/web/lib/navigation/scope"
 import {
   ArrowLeftRight,
-  Cpu,
+  BadgeCheckIcon,
   BookOpen,
-  Home,
+  Building2Icon,
   Calendar,
-  TreePine,
   CheckCircle,
   Clock,
+  Cpu,
+  CreditCardIcon,
+  Home,
+  TreePine,
   Zap,
-  Settings2Icon,
 } from "lucide-react"
 
 export type NavigationParcel = {
@@ -48,14 +50,7 @@ export type NavigationNavModulesItem = NavigationNavItem & {
   purchaseUrl?: string
 }
 
-export type NavigationUser = {
-  name: string
-  email: string
-  avatar: string
-}
-
 export type NavigationData = {
-  user: NavigationUser
   parcels: NavigationParcel[]
   navMain: NavigationNavItem[]
   modules: NavigationNavModulesItem[]
@@ -63,11 +58,6 @@ export type NavigationData = {
 }
 
 export const navigationData: NavigationData = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   parcels: [
     { name: "Alivos Cazorla", crop: "Olivos", icon: "TreePine" },
     { name: "Almendros Sierra", crop: "Almendros", icon: "TreePine" },
@@ -172,17 +162,17 @@ export const navigationData: NavigationData = {
     {
       title: "Profile",
       url: "/dashboard/settings/profile",
-      icon: Settings2Icon,
+      icon: BadgeCheckIcon,
     },
     {
       title: "Organization",
       url: "/dashboard/settings/organization",
-      icon: Settings2Icon,
+      icon: Building2Icon,
     },
     {
       title: "Billing",
       url: "/dashboard/settings/billing",
-      icon: Settings2Icon,
+      icon: CreditCardIcon,
     },
   ],
 }
