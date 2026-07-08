@@ -88,9 +88,9 @@ export function SettingsProfileSection({ user }: { user: UserMeResponse }) {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-0 divide-x divide-border">
+      <div className="grid grid-cols-1 divide-y divide-border md:grid-cols-2 md:divide-x md:divide-y-0">
         {/* Left column — editable fields */}
-        <div className="flex flex-col gap-6 pr-8">
+        <div className="flex flex-col gap-6 pb-8 md:pb-0 md:pr-8">
           <div className="flex items-center gap-3">
             <Avatar className="h-14 w-14">
               <AvatarImage src={user.image ?? ""} alt={user.name} />
@@ -128,7 +128,7 @@ export function SettingsProfileSection({ user }: { user: UserMeResponse }) {
         </div>
 
         {/* Right column — account info + danger zone */}
-        <div className="flex flex-col gap-6 pl-8">
+        <div className="flex flex-col gap-6 pt-8 md:pt-0 md:pl-8">
           <div className="flex flex-col gap-3">
             <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
               Cuenta
@@ -146,7 +146,7 @@ export function SettingsProfileSection({ user }: { user: UserMeResponse }) {
               <Badge variant="secondary">OAuth</Badge>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="rounded-lg border bg-muted/40 px-4 py-3">
                 <p className="text-xs text-muted-foreground">Rol</p>
                 <p className="mt-1 text-sm font-medium">
