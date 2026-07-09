@@ -77,7 +77,7 @@ export function CampaignAccumulatedMargin({
         {/* Cifra principal: gap actual */}
         <div
           className={cn(
-            "text-3xl font-bold tracking-tight",
+            "text-2xl font-bold tracking-tight sm:text-3xl",
             isProfit ? "text-(--primary-income)" : "text-(--primary-expense)"
           )}
         >
@@ -85,12 +85,12 @@ export function CampaignAccumulatedMargin({
           {formatCurrency(gap)}
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
           <span className="text-sm text-muted-foreground">
             Beneficio acumulado estimado
           </span>
 
-          <div className="flex items-center gap-2 text-xs font-medium">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
             {/* ROI */}
             <TooltipProvider>
               <Tooltip>
@@ -147,7 +147,7 @@ export function CampaignAccumulatedMargin({
         </div>
 
         {/* Sub-métricas */}
-        <div className="flex gap-6 pt-1">
+        <div className="flex flex-wrap gap-x-6 gap-y-1 pt-1">
           <div>
             <p className="text-xs text-muted-foreground">Coste acumulado</p>
             <p className="text-sm font-semibold">{formatCurrency(last.cost)}</p>
@@ -163,7 +163,7 @@ export function CampaignAccumulatedMargin({
 
       <CardContent className="pr-4 pb-0">
         <AreaChart
-          aspectRatio="4 / 1"
+          aspectRatio="3 / 1"
           data={chartData}
           xDataKey="date"
           margin={{ top: 16, right: 26, bottom: 40, left: 56 }}

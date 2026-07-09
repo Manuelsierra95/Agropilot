@@ -90,43 +90,47 @@ export function SellingWindow({
 
   return (
     <>
-      <Card className={cn("overflow-hidden bg-background ring-0", className)}>
-        <CardHeader className="pb-3">
-          <div className={cn("rounded-lg p-3", bg)}>
-            <p className={cn("text-sm font-medium", color)}>{label}</p>
+      <Card className={cn("flex h-full min-h-0 flex-col overflow-hidden bg-background ring-0", className)}>
+        <CardHeader className="shrink-0 pb-2 sm:pb-3">
+          <div className={cn("rounded-lg p-2 sm:p-3", bg)}>
+            <p className={cn("text-xs font-medium sm:text-sm", color)}>
+              {label}
+            </p>
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="flex min-h-0 flex-1 flex-col justify-start overflow-y-auto">
           {/* Price Grid */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground uppercase">
-                Precio lonja
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
+            <div className="space-y-0 sm:space-y-1">
+              <p className="text-[10px] text-muted-foreground uppercase sm:text-xs">
+                Precio
               </p>
-              <p className="text-2xl font-semibold tracking-tight tabular-nums">
+              <p className="text-base font-semibold tracking-tight tabular-nums sm:text-2xl">
                 {lonjaPrice.toFixed(2)}
-                <span className="ml-1 text-sm font-normal text-muted-foreground">
+                <span className="ml-0.5 text-[10px] font-normal text-muted-foreground sm:ml-1 sm:text-sm">
                   €/kg
                 </span>
               </p>
             </div>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground uppercase">
-                Tu coste
+            <div className="space-y-0 sm:space-y-1">
+              <p className="text-[10px] text-muted-foreground uppercase sm:text-xs">
+                Coste
               </p>
-              <p className="text-2xl font-semibold tracking-tight tabular-nums">
+              <p className="text-base font-semibold tracking-tight tabular-nums sm:text-2xl">
                 {costPerKg.toFixed(2)}
-                <span className="ml-1 text-sm font-normal text-muted-foreground">
+                <span className="ml-0.5 text-[10px] font-normal text-muted-foreground sm:ml-1 sm:text-sm">
                   €/kg
                 </span>
               </p>
             </div>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground uppercase">Margen</p>
+            <div className="space-y-0 sm:space-y-1">
+              <p className="text-[10px] text-muted-foreground uppercase sm:text-xs">
+                Margen
+              </p>
               <p
                 className={cn(
-                  "text-2xl font-semibold tracking-tight tabular-nums",
+                  "text-base font-semibold tracking-tight tabular-nums sm:text-2xl",
                   color
                 )}
               >
@@ -137,20 +141,20 @@ export function SellingWindow({
           </div>
 
           {/* Divider */}
-          <div className="my-5 h-px bg-border" />
+          <div className="my-3 h-px shrink-0 bg-border sm:my-5" />
 
           {/* Potential Revenue */}
-          <div className="rounded-lg bg-muted/50 px-4 py-3">
+          <div className="shrink-0 rounded-lg bg-muted/50 px-3 py-2 sm:px-4 sm:py-3">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-muted-foreground">
+                <p className="text-[10px] font-medium text-muted-foreground sm:text-xs">
                   Ingreso potencial
                 </p>
-                <p className="text-xs text-muted-foreground/70">
+                <p className="text-[10px] text-muted-foreground/70 sm:text-xs">
                   {estimatedKg.toLocaleString("es-ES")} kg disponibles
                 </p>
               </div>
-              <p className="text-xl font-semibold tracking-tight tabular-nums">
+              <p className="text-base font-semibold tracking-tight tabular-nums sm:text-xl">
                 {potentialRevenue.toLocaleString("es-ES", {
                   style: "currency",
                   currency: "EUR",
@@ -162,9 +166,9 @@ export function SellingWindow({
 
           {/* Comparisons */}
           {(vsLastSale !== null || campaignTarget) && (
-            <div className="mt-4 space-y-2">
+            <div className="mt-2 shrink-0 space-y-1 sm:mt-4 sm:space-y-2">
               {vsLastSale !== null && (
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">
                     vs. último precio ({lastSalePrice?.toFixed(2)} €/kg)
                   </span>
@@ -190,14 +194,14 @@ export function SellingWindow({
           )}
         </CardContent>
 
-        <CardFooter className="grid grid-cols-2 gap-2 border-0 bg-background px-4 pt-0">
+        <CardFooter className="mt-auto grid shrink-0 grid-cols-2 gap-2 border-0 bg-background px-4 pt-2 pb-4">
           <Button
             className="w-full gap-2 border-0 bg-muted-foreground/5 text-xs"
             size="sm"
             variant="outline"
             onClick={handleOpenHarvestModal}
           >
-            Registrar entrega
+            Entrega
           </Button>
           <Button
             className="w-full gap-2 border-0 bg-muted-foreground/5 text-xs"
@@ -205,7 +209,7 @@ export function SellingWindow({
             variant="outline"
             onClick={handleOpenModal}
           >
-            Registrar venta
+            Venta
           </Button>
         </CardFooter>
       </Card>

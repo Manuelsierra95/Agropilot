@@ -97,88 +97,92 @@ export function RecentTasks({ data, className }: RecentTasksProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="mask-b-from-50% mask-b-to-100% p-0 pb-2">
-        <Table className="border-t">
-          <TableCaption className="sr-only">
-            Eventos recientes con estado, tipo y hora.
-          </TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="pl-6" scope="col">
-                Evento
-              </TableHead>
-              <TableHead scope="col">Parcela</TableHead>
-              <TableHead className="text-end" scope="col">
-                Tipo
-              </TableHead>
-              <TableHead className="text-end" scope="col">
-                Estado
-              </TableHead>
-              <TableHead className="pr-6 text-end" scope="col">
-                Completar
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {visible.length === 0 ? (
+        <div className="overflow-x-auto">
+          <Table className="min-w-[540px] border-t">
+            <TableCaption className="sr-only">
+              Eventos recientes con estado, tipo y hora.
+            </TableCaption>
+            <TableHeader>
               <TableRow>
-                <TableCell
-                  className="px-6 py-6 text-center text-xs text-muted-foreground"
-                  colSpan={5}
-                >
-                  Sin tareas proximas.
-                </TableCell>
+                <TableHead className="pl-6" scope="col">
+                  Evento
+                </TableHead>
+                <TableHead className="hidden sm:table-cell" scope="col">
+                  Parcela
+                </TableHead>
+                <TableHead className="hidden sm:table-cell text-end" scope="col">
+                  Tipo
+                </TableHead>
+                <TableHead className="text-end" scope="col">
+                  Estado
+                </TableHead>
+                <TableHead className="pr-6 text-end" scope="col">
+                  Completar
+                </TableHead>
               </TableRow>
-            ) : (
-              visible.map((task) => {
-                const isCompleted = task.status === "completed"
+            </TableHeader>
+            <TableBody>
+              {visible.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    className="px-6 py-6 text-center text-xs text-muted-foreground"
+                    colSpan={5}
+                  >
+                    Sin tareas proximas.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                visible.map((task) => {
+                  const isCompleted = task.status === "completed"
 
-                return (
-                  <TableRow className="hover:bg-transparent" key={task.id}>
-                    <TableCell className="max-w-[260px] truncate pl-6">
-                      <div className="flex items-center gap-2">
+                  return (
+                    <TableRow className="hover:bg-transparent" key={task.id}>
+                      <TableCell className="max-w-[200px] truncate pl-6 sm:max-w-[260px]">
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            className="h-5 px-2 text-[10px]"
+                            variant="outline"
+                          >
+                            {typeLabels[task.category] ?? task.category}
+                          </Badge>
+                          <span className="min-w-0 truncate text-xs font-medium">
+                            {task.title}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {formatEventRange(task.start, task.end)}
+                        </p>
+                      </TableCell>
+                      <TableCell className="hidden max-w-[220px] truncate text-xs text-muted-foreground sm:table-cell">
+                        {task.parcelName}
+                      </TableCell>
+                      <TableCell className="hidden text-end text-xs text-muted-foreground sm:table-cell">
+                        {task.category}
+                      </TableCell>
+                      <TableCell className="text-end">
                         <Badge
-                          className="h-5 px-2 text-[10px]"
-                          variant="outline"
+                          className={`h-5 px-2 text-[10px] ${statusTone[task.status]}`}
+                          variant="secondary"
                         >
-                          {typeLabels[task.category] ?? task.category}
+                          {statusLabels[task.status] ?? task.status}
                         </Badge>
-                        <span className="min-w-0 truncate text-xs font-medium">
-                          {task.title}
-                        </span>
-                      </div>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {formatEventRange(task.start, task.end)}
-                      </p>
-                    </TableCell>
-                    <TableCell className="max-w-[220px] truncate text-xs text-muted-foreground">
-                      {task.parcelName}
-                    </TableCell>
-                    <TableCell className="text-end text-xs text-muted-foreground">
-                      {task.category}
-                    </TableCell>
-                    <TableCell className="text-end">
-                      <Badge
-                        className={`h-5 px-2 text-[10px] ${statusTone[task.status]}`}
-                        variant="secondary"
-                      >
-                        {statusLabels[task.status] ?? task.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="pr-6 text-end">
-                      <Button
-                        size="sm"
-                        variant={isCompleted ? "secondary" : "outline"}
-                        disabled={isCompleted}
-                      >
-                        {isCompleted ? "Completado" : "Completar"}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                )
-              })
-            )}
-          </TableBody>
-        </Table>
+                      </TableCell>
+                      <TableCell className="pr-6 text-end">
+                        <Button
+                          size="sm"
+                          variant={isCompleted ? "secondary" : "outline"}
+                          disabled={isCompleted}
+                        >
+                          {isCompleted ? "Completado" : "Completar"}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
 
       <div className="absolute inset-x-0 bottom-0 flex h-1/5 items-center justify-center bg-background mask-t-from-30%">

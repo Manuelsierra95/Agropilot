@@ -90,12 +90,12 @@ export function OlivePrice({ items, className }: OlivePriceCardProps) {
                   "rounded-xl hover:bg-muted/40 focus-visible:ring-ring focus-visible:outline-none"
                 )}
               >
-                <CardContent className="flex flex-col gap-2 p-3">
+                <CardContent className="flex flex-col gap-1 p-1.5 sm:gap-2 sm:p-3">
                   {/* Header */}
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-1">
                     <span
                       className={cn(
-                        "text-sm font-medium transition-colors",
+                        "truncate text-[10px] font-medium transition-colors sm:text-sm",
                         isSelected ? "text-foreground" : "text-muted-foreground"
                       )}
                     >
@@ -103,25 +103,25 @@ export function OlivePrice({ items, className }: OlivePriceCardProps) {
                     </span>
                     <span
                       className={cn(
-                        "h-1.5 w-1.5 rounded-full transition-opacity",
+                        "h-1.5 w-1.5 shrink-0 rounded-full transition-opacity",
                         isSelected ? "bg-foreground opacity-100" : "opacity-0"
                       )}
                     />
                   </div>
 
                   {/* Price */}
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-xl font-semibold tracking-tight text-foreground">
+                  <div className="flex items-baseline gap-0.5 sm:gap-1">
+                    <span className="text-base font-semibold tracking-tight text-foreground sm:text-xl">
                       {item.price.toFixed(2)}
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-[10px] text-muted-foreground sm:text-sm">
                       {item.unit}
                     </span>
                   </div>
 
                   {/* Trend */}
-                  <div className="flex items-center gap-1 text-xs font-medium">
-                    <div className="relative h-3.5 w-3.5">
+                  <div className="flex items-center gap-1 text-[10px] font-medium">
+                    <div className="relative h-3 w-3 sm:h-3.5 sm:w-3.5">
                       <div
                         className={cn(
                           "absolute inset-0 rounded-full",
@@ -131,23 +131,20 @@ export function OlivePrice({ items, className }: OlivePriceCardProps) {
                         )}
                       />
                       {isUp ? (
-                        <ArrowUp className="absolute inset-0 m-auto h-2 w-2 text-black" />
+                        <ArrowUp className="absolute inset-0 m-auto h-1.5 w-1.5 text-black sm:h-2 sm:w-2" />
                       ) : (
-                        <ArrowDown className="absolute inset-0 m-auto h-2 w-2 text-black" />
+                        <ArrowDown className="absolute inset-0 m-auto h-1.5 w-1.5 text-black sm:h-2 sm:w-2" />
                       )}
                     </div>
                     <span
                       className={cn(
-                        "font-semibold",
+                        "truncate font-semibold",
                         isUp
                           ? "text-(--primary-income)"
                           : "text-(--primary-expense)"
                       )}
                     >
                       10%
-                    </span>
-                    <span className="font-normal text-muted-foreground">
-                      vs últimos 10 días
                     </span>
                   </div>
                 </CardContent>
@@ -179,7 +176,7 @@ export function OlivePrice({ items, className }: OlivePriceCardProps) {
               <LineChart
                 data={chartData}
                 margin={{ top: 8, right: 28, bottom: 48, left: 28 }}
-                aspectRatio="4 / 1"
+                aspectRatio="3 / 1"
               >
                 <Grid horizontal numTicksRows={3} />
                 <Line

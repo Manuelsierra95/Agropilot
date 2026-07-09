@@ -8,7 +8,7 @@ export const PageContainer = ({
   className?: string
 }) => {
   return (
-    <main className={cn("@container/main flex flex-1 flex-col p-4", className)}>
+    <main className={cn("@container/main flex flex-1 flex-col p-3 sm:p-4 lg:p-6", className)}>
       {children}
     </main>
   )

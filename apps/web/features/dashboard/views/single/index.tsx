@@ -64,11 +64,11 @@ export function DashboardSingleView({
         <div className={dashboardGridSlot.rowInner}>
           {isPending ? (
             <WidgetSkeleton
-              className="min-w-0 flex-2"
+              className="min-w-0 md:flex-2"
               contentHeight="h-[140px]"
             />
           ) : (
-            <OlivePrice className="min-w-0 flex-2" items={olivePrices} />
+            <OlivePrice className="min-w-0 md:flex-2" items={olivePrices} />
           )}
           <GradientSeparator
             orientation="vertical"
@@ -76,12 +76,12 @@ export function DashboardSingleView({
           />
           {isPending ? (
             <WidgetSkeleton
-              className="min-w-0 flex-1"
+              className="min-w-0 md:flex-1"
               contentHeight="h-[140px]"
             />
           ) : data?.market?.sellingWindow ? (
             <SellingWindow
-              className="min-w-0 flex-1"
+              className="min-w-0 md:flex-1"
               parcelId={scope.parcelId}
               {...data.market?.sellingWindow}
             />
@@ -132,12 +132,12 @@ export function DashboardSingleView({
           />
           {isPending ? (
             <WidgetSkeleton
-              className="min-w-0 flex-2"
+              className="min-w-0 flex-[1.5] md:flex-2"
               contentHeight="h-[200px]"
             />
           ) : data?.finance?.campaignMargin ? (
             <CampaignAccumulatedMargin
-              className="min-w-0 flex-2"
+              className="min-w-0 flex-[1.5] md:flex-2"
               data={data.finance?.campaignMargin}
             />
           ) : null}

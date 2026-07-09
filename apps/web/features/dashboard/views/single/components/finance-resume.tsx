@@ -87,13 +87,13 @@ export function FinanceResume({
   return (
     <Card
       className={cn(
-        "flex h-full w-full max-w-xs min-w-0 flex-col gap-0 overflow-hidden bg-background pt-0 ring-0",
+        "flex h-full w-full min-w-0 flex-col items-center justify-between gap-0 overflow-hidden bg-background pt-0 ring-0",
         className
       )}
     >
-      <CardHeader className="flex flex-col items-center">
+      <CardHeader className="flex w-full flex-1 flex-col items-center justify-center py-4">
         {/* ── Gauge ── */}
-        <div className="mx-auto flex h-full w-full max-w-xs justify-center">
+        <div className="mx-auto flex h-auto w-full max-w-[200px] justify-center sm:max-w-[240px]">
           <Gauge
             value={gaugeValue}
             centerValue={balance}
@@ -115,17 +115,17 @@ export function FinanceResume({
         </div>
 
         {/* ── Leyenda ── */}
-        <div className="flex items-center justify-center gap-5">
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 shrink-0 rounded-sm bg-(--primary-income)" />
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 sm:gap-x-5">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="h-2.5 w-2.5 shrink-0 rounded-sm bg-(--primary-income) sm:h-3 sm:w-3" />
             <span className="text-xs text-muted-foreground">Ingresos</span>
             <span className="font-mono text-xs font-semibold text-foreground">
               {totalIncome.toLocaleString("es-ES")}
               {"\u00A0"}€
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 shrink-0 rounded-sm bg-(--primary-expense)" />
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="h-2.5 w-2.5 shrink-0 rounded-sm bg-(--primary-expense) sm:h-3 sm:w-3" />
             <span className="text-xs text-muted-foreground">Gastos</span>
             <span className="font-mono text-xs font-semibold text-foreground">
               {totalExpenses.toLocaleString("es-ES")}

@@ -157,11 +157,11 @@ function MetricCell({
   linkProps,
 }: MetricCellProps) {
   const inner = (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 px-4 py-4 transition-colors hover:bg-muted/40">
-      <div className="text-xl leading-none font-semibold tabular-nums">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 px-2 py-3 transition-colors hover:bg-muted/40 sm:px-4 sm:py-4">
+      <div className="text-lg leading-none font-semibold tabular-nums sm:text-xl">
         {value}
       </div>
-      <div className="text-[10px] font-medium tracking-[0.1em] text-muted-foreground uppercase">
+      <div className="text-[9px] font-medium tracking-[0.1em] text-muted-foreground uppercase sm:text-[10px]">
         {label}
       </div>
     </div>
@@ -395,14 +395,14 @@ export function ParcelHero({
   return (
     <Card className="gap-0 overflow-hidden bg-background pt-0 ring-0">
       {/* ── Fila superior ── */}
-      <div className="flex items-center justify-between gap-8 px-6 py-5">
+      <div className="flex flex-col items-start justify-between gap-4 px-4 py-4 sm:flex-row sm:items-center sm:gap-8 sm:px-6 sm:py-5">
         {/* Identidad */}
         <div className="flex min-w-0 flex-col gap-2">
-          <p className="text-lg font-extralight tracking-wide text-muted-foreground uppercase">
+          <p className="text-sm font-extralight tracking-wide text-muted-foreground uppercase sm:text-lg">
             Inteligencia de Parcela
           </p>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl leading-none font-semibold tracking-tight">
+            <h1 className="text-2xl leading-none font-semibold tracking-tight sm:text-3xl">
               {parcelName}
             </h1>
             {!isAllSelected && activeParcel && onEditParcel && (
@@ -419,21 +419,27 @@ export function ParcelHero({
           </div>
           {/* Metadatos con divisores */}
           {!isAllSelected && apiResponse && activeParcel && (
-            <div className="mt-1 flex items-center gap-4">
-              <span className="font-mono text-sm text-muted-foreground">
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 sm:gap-4">
+              <span className="hidden font-mono text-xs text-muted-foreground sm:inline sm:text-sm">
                 Coords: {apiResponse.request.coords.lat.toFixed(4)},&nbsp;
                 {apiResponse.request.coords.lng.toFixed(4)}
               </span>
-              <GradientSeparator orientation="vertical" />
-              <span className="text-sm text-muted-foreground">
+              <GradientSeparator
+                orientation="vertical"
+                className="hidden h-4 sm:block"
+              />
+              <span className="text-xs text-muted-foreground sm:text-sm">
                 {activeParcel.type}
               </span>
-              <GradientSeparator orientation="vertical" />
-              <span className="text-sm text-muted-foreground">
+              <GradientSeparator orientation="vertical" className="h-4" />
+              <span className="text-xs text-muted-foreground sm:text-sm">
                 {activeParcel.area} m²
               </span>
-              <GradientSeparator orientation="vertical" />
-              <span className="flex items-center gap-2 text-sm text-muted-foreground">
+              <GradientSeparator
+                orientation="vertical"
+                className="hidden h-4 sm:block"
+              />
+              <span className="flex items-center gap-2 text-xs text-muted-foreground sm:text-sm">
                 <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_5px_var(--color-emerald-500)]" />
                 {formatDateTime(apiResponse.summary.lastUpdate)}
               </span>
@@ -443,10 +449,10 @@ export function ParcelHero({
 
         {/* Temperatura + etapa fenológica */}
         {!isAllSelected && (
-          <div className="flex shrink-0 items-center gap-5">
-            <div className="text-right">
+          <div className="flex w-full shrink-0 items-center justify-between gap-4 sm:w-auto">
+            <div className="text-left sm:text-right">
               <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-light tracking-tight text-foreground tabular-nums">
+                <span className="text-3xl font-light tracking-tight text-foreground tabular-nums sm:text-4xl">
                   {currentTemp.toFixed(1)}°C
                 </span>
                 <span
@@ -464,7 +470,7 @@ export function ParcelHero({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm font-medium text-foreground">
+                  <div className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-foreground sm:text-sm">
                     <Sprout
                       size={14}
                       style={{ color: "var(--color-pheno)" }}
@@ -482,20 +488,20 @@ export function ParcelHero({
         )}
       </div>
 
-      <GradientSeparator orientation="horizontal" className="mx-6" />
+      <GradientSeparator orientation="horizontal" className="mx-4 sm:mx-6" />
 
-      <CardContent className="flex items-stretch">
+      <CardContent className="grid grid-cols-2 items-stretch py-2 sm:flex sm:flex-wrap sm:items-stretch">
         {/* ── Fila inferior: cuadrícula de métricas ── */}
         {bottomCols.map((col, i) => [
-          <div key={`metric-${col.label}-${i}`} className="flex-1">
+          <div key={`metric-${col.label}-${i}`} className="relative flex-1">
             <MetricCell {...col} />
+            {i < bottomCols.length - 1 && (
+              <GradientSeparator
+                orientation="vertical"
+                className="absolute top-1/2 right-0 hidden h-3/4 -translate-y-1/2 sm:block"
+              />
+            )}
           </div>,
-          i < bottomCols.length - 1 ? (
-            <GradientSeparator
-              key={`metric-sep-${col.label}-${i}`}
-              orientation="vertical"
-            />
-          ) : null,
         ])}
       </CardContent>
       <GradientSeparator orientation="horizontal" />

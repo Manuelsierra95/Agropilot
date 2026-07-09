@@ -47,8 +47,8 @@ export function ResumeCropAll({ className, items }: ResumeCropAllProps) {
             Sin datos de parcelas.
           </p>
         ) : (
-          <ScrollArea className="max-h-[180px] @min-[1100px]/main:max-h-[220px]">
-            <ul className="w-full divide-y divide-border/40 pr-3">
+          <ScrollArea className="h-[280px] @min-[1100px]/main:h-[900px]">
+            <ul className="grid grid-cols-2 gap-2 pr-3 md:grid-cols-1">
               {items.map((item) => {
                 const yieldPerTree =
                   item.totalTrees > 0 ? item.totalYieldKg / item.totalTrees : 0
@@ -59,7 +59,7 @@ export function ResumeCropAll({ className, items }: ResumeCropAllProps) {
                     <button
                       type="button"
                       onClick={() => void selectParcel(item.parcelId)}
-                      className="flex w-full flex-col gap-2 py-2.5 text-left transition-colors hover:bg-muted/40"
+                      className="flex h-full w-full flex-col gap-2 rounded-lg border border-border/40 p-2.5 text-left transition-colors hover:bg-muted/40"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
@@ -86,16 +86,13 @@ export function ResumeCropAll({ className, items }: ResumeCropAllProps) {
                           </Badge>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs @min-[1100px]/main:grid-cols-4">
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
                         <Metric
-                          label="Rendimiento"
-                          value={`${yieldPerTree.toFixed(1)} kg/árbol`}
+                          label="Rend."
+                          value={`${yieldPerTree.toFixed(1)} kg`}
                         />
                         <Metric label="Kc" value={String(item.kc)} />
-                        <Metric
-                          label="Balance hídrico"
-                          value={`${item.waterBalance}%`}
-                        />
+                        <Metric label="H₂O" value={`${item.waterBalance}%`} />
                         <Metric
                           label="GDD"
                           value={`${item.gdd}/${item.gddTarget}`}

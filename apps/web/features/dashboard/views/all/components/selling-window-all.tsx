@@ -91,7 +91,7 @@ export function SellingWindowAll({ className, items }: SellingWindowAllProps) {
               Sin datos de parcelas.
             </p>
           ) : (
-            <ScrollArea className="-mr-2 max-h-[220px] pr-2">
+            <ScrollArea className="-mr-2 max-h-[320px] pr-2 md:max-h-[240px]">
               <ul className="flex flex-col">
                 {items.map((item, index) => {
                   const margin = item.lonjaPrice - item.costPerKg

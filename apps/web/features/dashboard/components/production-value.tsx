@@ -231,7 +231,7 @@ export function ProductionValueKPIs({
   return (
     <div
       className={cn(
-        "flex w-full min-w-0 flex-wrap items-start justify-start gap-x-8 gap-y-3",
+        "grid w-full min-w-0 grid-cols-2 items-start justify-start gap-x-4 gap-y-3 sm:flex sm:flex-wrap sm:gap-x-8",
         className
       )}
     >
@@ -335,7 +335,7 @@ export function ProductionValueAreaChart({
 
       <AreaChart
         className="max-w-full min-w-0"
-        aspectRatio="4 / 2"
+        aspectRatio="3 / 2"
         data={areaData}
         xDataKey="date"
         margin={{ top: 12, right: 16, bottom: 36, left: 44 }}
@@ -425,7 +425,7 @@ function ProductionValueBarChart({
         xDataKey="month"
         orientation="horizontal"
         barGap={0.2}
-        aspectRatio="4 / 3"
+        aspectRatio="3 / 2"
         margin={{ top: 8, right: 12, bottom: 8, left: 36 }}
       >
         <Grid horizontal={false} vertical fadeVertical />

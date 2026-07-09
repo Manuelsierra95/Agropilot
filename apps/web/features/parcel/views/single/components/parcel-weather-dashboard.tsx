@@ -120,7 +120,7 @@ export function ParcelWeatherDashboard({
       {/* <ParcelWaterBalanceChart dailySeries={dailySeries} /> */}
       <ParcelRainBalanceChart dailySeries={dailySeries} />
 
-      <section className="grid xl:grid-cols-2">
+      <section className="grid gap-4 xl:grid-cols-2">
         <ParcelDeficitChart dailySeries={dailySeries} />
         <ParcelTemperatureChart
           dailySeries={dailySeries}

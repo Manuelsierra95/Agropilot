@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 import { Separator } from "@workspace/ui/components/separator"
-import { formatCurrency } from "@workspace/web/features/finance/components/table/helpers"
+import { formatCurrency } from "@workspace/web/components/finance"
 import {
   CROP_TYPE_LABELS,
   IRRIGATION_TYPE_LABELS,
