@@ -15,7 +15,6 @@ export default function Calendar({
   date,
   setDate,
   calendarIconIsToday = true,
-  forecast,
 }: CalendarProps) {
   return (
     <CalendarProvider
@@ -26,9 +25,8 @@ export default function Calendar({
       date={date}
       setDate={setDate}
       calendarIconIsToday={calendarIconIsToday}
-      forecast={forecast}
     >
-      <div className="flex h-full min-h-0 flex-col border-border/30">
+      <div className="flex flex-col border-border/30">
         <CalendarHeader>
           <CalendarHeaderDate />
           <CalendarHeaderActions>

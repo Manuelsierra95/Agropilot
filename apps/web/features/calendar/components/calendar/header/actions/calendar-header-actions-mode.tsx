@@ -1,5 +1,7 @@
 "use client"
 
+import { useEffect } from "react"
+
 import {
   Mode,
   calendarModes,
@@ -19,9 +21,11 @@ export default function CalendarHeaderActionsMode() {
   const isMobile = useIsMobile()
   const visibleModes = isMobile ? calendarMobilesModes : calendarModes
 
-  if (isMobile && mode === "week") {
-    setMode("day")
-  }
+  useEffect(() => {
+    if (isMobile && mode === "week") {
+      setMode("day")
+    }
+  }, [isMobile, mode, setMode])
 
   return (
     <div className="flex gap-1 rounded-md bg-muted p-1">

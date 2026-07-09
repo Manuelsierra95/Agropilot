@@ -8,21 +8,18 @@ export default function CalendarBody() {
   const { mode } = useCalendarContext()
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden border-x border-y border-border/30 text-muted-foreground">
+    <div className="flex flex-col border-x border-y border-border/30 text-muted-foreground">
       {mode === "day" ? (
         <CalendarBodyDay />
+      ) : mode === "month" ? (
+        <CalendarBodyMonth maxVisibleEvents={4} />
       ) : (
-        <ScrollArea className="min-h-0 w-full flex-1">
-          {mode === "week" && (
-            <div className="hidden md:block">
-              <CalendarBodyWeek />
-            </div>
-          )}
-          {mode === "month" && <CalendarBodyMonth maxVisibleEvents={4} />}
+        <ScrollArea className="min-h-0 w-full">
+          <div className="hidden md:block">
+            <CalendarBodyWeek />
+          </div>
           <ScrollBar orientation="vertical" />
-          {mode === "week" && (
-            <ScrollBar orientation="horizontal" className="md:hidden" />
-          )}
+          <ScrollBar orientation="horizontal" className="md:hidden" />
         </ScrollArea>
       )}
     </div>

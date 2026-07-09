@@ -5,7 +5,6 @@ import type {
   CalendarTask,
   Mode,
 } from "@workspace/web/features/calendar/components/calendar/calendar-types"
-import type { ForecastDay } from "@workspace/web/features/calendar/components/calendar/sidecards/time-weather-card"
 import { CreateTaskDialog } from "@workspace/web/components/tasks/create-task-dialog"
 import { TaskDetailSheet } from "@workspace/web/components/tasks/task-detail-sheet"
 import { CalendarDndProvider } from "@workspace/web/features/calendar/components/calendar/calendar-dnd-provider"
@@ -18,7 +17,6 @@ export default function CalendarProvider({
   date,
   setDate,
   calendarIconIsToday = true,
-  forecast,
   children,
 }: {
   tasks: CalendarTask[]
@@ -28,7 +26,6 @@ export default function CalendarProvider({
   date: Date
   setDate: (date: Date) => void
   calendarIconIsToday: boolean
-  forecast?: ForecastDay[]
   children: React.ReactNode
 }) {
   const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false)
@@ -51,7 +48,6 @@ export default function CalendarProvider({
         setTaskDetailSheetOpen,
         selectedTaskId,
         setSelectedTaskId,
-        forecast,
       }}
     >
       <CreateTaskDialog

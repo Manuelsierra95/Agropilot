@@ -7,7 +7,7 @@ import {
   type CalendarClientProps,
 } from "@workspace/web/features/calendar/components/calendar-client"
 
-export type CalendarAllViewProps = Omit<CalendarClientProps, "forecast">
+export type CalendarAllViewProps = CalendarClientProps
 
 export function CalendarAllView({ initialTasks }: CalendarAllViewProps) {
   const key = useMemo(

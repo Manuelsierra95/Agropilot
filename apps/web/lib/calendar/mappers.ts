@@ -1,13 +1,8 @@
-import { format, parseISO } from "date-fns"
-import { es } from "date-fns/locale"
 import type {
   DashboardCalendarEvent,
   DashboardRecommendation,
   DashboardRisks,
-  ParcelWeatherResponse,
 } from "@workspace/schemas"
-
-import type { ForecastDay } from "@workspace/web/features/calendar/components/calendar/sidecards/time-weather-card"
 import type { Recommendation } from "@workspace/web/features/tasks/components/recommendations-card"
 import type { CalendarTask } from "@workspace/web/lib/calendar/types"
 
@@ -168,41 +163,4 @@ export function allParcelsRecommendationsToCardItems(
       item.id
     )
   )
-}
-
-function addDaysIso(isoDate: string, days: number): string {
-  const date = parseISO(isoDate)
-  date.setUTCDate(date.getUTCDate() + days)
-  return date.toISOString().slice(0, 10)
-}
-
-export function weatherResponseToForecast(
-  weather: ParcelWeatherResponse,
-  fromDate = new Date().toISOString().slice(0, 10)
-): ForecastDay[] {
-  const byDate = new Map(weather.forecast.map((entry) => [entry.date, entry]))
-
-  return Array.from({ length: 5 }, (_, index) => {
-    const date = addDaysIso(fromDate, index)
-    const entry = byDate.get(date)
-    if (!entry) {
-      return {
-        date,
-        day: format(parseISO(date), "EEE d", { locale: es }),
-        condition: "cloudy" as const,
-        tempMax: 0,
-        tempMin: 0,
-        humidity: 0,
-      }
-    }
-
-    return {
-      date: entry.date,
-      day: format(parseISO(entry.date), "EEE d", { locale: es }),
-      condition: entry.condition,
-      tempMax: entry.tempMax,
-      tempMin: entry.tempMin,
-      humidity: entry.humidity,
-    }
-  })
 }

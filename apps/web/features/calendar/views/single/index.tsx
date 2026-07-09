@@ -7,16 +7,11 @@ import type { CalendarClientProps } from "@workspace/web/features/calendar/compo
 
 export type CalendarSingleViewProps = CalendarClientProps
 
-export function CalendarSingleView({
-  initialTasks,
-  forecast,
-}: CalendarSingleViewProps) {
+export function CalendarSingleView({ initialTasks }: CalendarSingleViewProps) {
   const key = useMemo(
     () => initialTasks.map((task) => task.id).join(","),
     [initialTasks]
   )
 
-  return (
-    <CalendarClient key={key} initialTasks={initialTasks} forecast={forecast} />
-  )
+  return <CalendarClient key={key} initialTasks={initialTasks} />
 }

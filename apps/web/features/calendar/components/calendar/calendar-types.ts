@@ -1,4 +1,3 @@
-import type { ForecastDay } from "@workspace/web/features/calendar/components/calendar/sidecards/time-weather-card"
 import type { CalendarTask } from "@workspace/web/lib/calendar/types"
 
 export type CalendarProps = {
@@ -9,7 +8,6 @@ export type CalendarProps = {
   date: Date
   setDate: (date: Date) => void
   calendarIconIsToday?: boolean
-  forecast?: ForecastDay[]
 }
 
 export type CalendarContextType = CalendarProps & {
