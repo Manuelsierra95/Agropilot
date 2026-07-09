@@ -13,8 +13,10 @@ import {
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
 import { ScrollArea } from "@workspace/ui/components/scroll-area"
-import { TransactionTable } from "@workspace/web/features/finance/components/table"
-import type { Transaction as TableTransaction } from "@workspace/web/features/finance/components/table/types"
+import {
+  TransactionTable,
+  type Transaction as TableTransaction,
+} from "@workspace/web/components/finance"
 import {
   ChartContainer,
   ChartTooltip,
@@ -277,7 +279,7 @@ export function CategoryDrawer({
         <ScrollArea className="overflow-y-auto">
           <div className="flex flex-col gap-6 px-6 py-5">
             {/* ── KPI cards ──────────────────────────────────────────────── */}
-            <div className="flex gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <KpiCard
                 label={cfg.kpiAvgLabel}
                 value={formatCurrency(avgMonthly)}

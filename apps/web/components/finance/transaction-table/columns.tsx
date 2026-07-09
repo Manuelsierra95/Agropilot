@@ -18,14 +18,14 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
 
-import type { Transaction } from "@workspace/web/features/finance/components/table/types"
-import { PAYMENT_METHOD_LABELS } from "@workspace/web/features/finance/components/table/constants"
+import type { Transaction } from "@workspace/web/components/finance/transaction-table/types"
+import { PAYMENT_METHOD_LABELS } from "@workspace/web/components/finance/transaction-table/constants"
 import {
   formatCurrency,
   formatDate,
-} from "@workspace/web/features/finance/components/table/helpers"
-import { TypeBadge } from "@workspace/web/features/finance/components/table/components/type-badge"
-import { TableCellViewer } from "@workspace/web/features/finance/components/table/components/table-cell-viewer"
+} from "@workspace/web/components/finance/transaction-table/helpers"
+import { TypeBadge } from "@workspace/web/components/finance/transaction-table/components/type-badge"
+import { TableCellViewer } from "@workspace/web/components/finance/transaction-table/components/table-cell-viewer"
 
 const parcelColumn: ColumnDef<Transaction> = {
   accessorKey: "parcelName",

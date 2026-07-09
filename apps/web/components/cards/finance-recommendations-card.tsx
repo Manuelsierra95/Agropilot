@@ -224,7 +224,7 @@ export function FinanceRecommendationsCard({
         </div>
 
         {/* ── Leyenda ── */}
-        <div className="flex items-center justify-center gap-5">
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           <div className="flex items-center gap-2">
             <span className="h-3 w-3 shrink-0 rounded-sm bg-(--primary-income)" />
             <span className="text-xs text-muted-foreground">Ingresos</span>

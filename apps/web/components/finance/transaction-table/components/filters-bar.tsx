@@ -39,8 +39,8 @@ import { BulkFinanceDialog } from "@workspace/web/components/finance/bulk-financ
 import {
   CATEGORIES,
   PAYMENT_METHOD_LABELS,
-} from "@workspace/web/features/finance/components/table/constants"
-import type { TransactionFilters } from "@workspace/web/features/finance/components/table/hooks/use-transaction-filters"
+} from "@workspace/web/components/finance/transaction-table/constants"
+import type { TransactionFilters } from "@workspace/web/components/finance/transaction-table/hooks/use-transaction-filters"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

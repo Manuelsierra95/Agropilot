@@ -26,9 +26,9 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 
-import { BulkActionsBar } from "@workspace/web/features/finance/components/table/components/bulk-actions-bar"
-import { columns } from "@workspace/web/features/finance/components/table/columns"
-import type { Transaction } from "@workspace/web/features/finance/components/table/types"
+import { BulkActionsBar } from "@workspace/web/components/finance/transaction-table/components/bulk-actions-bar"
+import { columns } from "@workspace/web/components/finance/transaction-table/columns"
+import type { Transaction } from "@workspace/web/components/finance/transaction-table/types"
 
 type TransactionResultsTableProps = {
   table: TanStackTable<Transaction>
@@ -46,15 +46,19 @@ export function TransactionResultsTable({
   return (
     <>
       <div
-        className="overflow-hidden rounded-lg border"
+        className="overflow-x-auto rounded-lg border"
         style={{ minHeight: "420px" }}
       >
-        <Table>
+        <Table className="min-w-[720px]">
           <TableHeader className="sticky top-0 z-10 bg-muted">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} colSpan={header.colSpan}>
+                  <TableHead
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    className={header.column.columnDef.meta?.className}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(

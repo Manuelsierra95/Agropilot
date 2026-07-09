@@ -103,7 +103,7 @@ export function ParcelsFinanceBars({
           data={chartData}
           xDataKey="axisLabel"
           barGap={0.25}
-          aspectRatio="8 / 2"
+          aspectRatio="4 / 2"
           margin={{ top: 8, right: 12, bottom: 36, left: 44 }}
         >
           <Grid horizontal />

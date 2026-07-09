@@ -5,7 +5,7 @@ import { GradientSeparator } from "@workspace/web/components/ui/gradient-separat
 import { PageContainer } from "@workspace/web/components/ui/page-container"
 import { WidgetSkeleton } from "@workspace/web/components/widget-skeleton"
 import { NewTransactionSheet } from "@workspace/web/features/finance/components/new-transaction-sheet"
-import { TransactionTable } from "@workspace/web/features/finance/components/table"
+import { TransactionTable } from "@workspace/web/components/finance"
 import type { TransactionsLayoutData } from "@workspace/web/features/transactions/views/single"
 
 type TransactionsLayoutProps = TransactionsLayoutData & {

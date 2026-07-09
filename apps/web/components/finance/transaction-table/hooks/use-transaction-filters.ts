@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { Transaction } from "@workspace/web/features/finance/components/table/types"
+import type { Transaction } from "@workspace/web/components/finance/transaction-table/types"
 
 export interface TransactionFilters {
   globalSearch: string
