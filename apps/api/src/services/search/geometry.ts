@@ -16,7 +16,10 @@ function parsePolygon(json: any): [number, number][][] {
 
   const polygon: [number, number][] = []
   for (let i = 0; i < values.length - 1; i += 2) {
-    polygon.push([values[i + 1], values[i]])
+    const lat = values[i + 1]
+    const lng = values[i]
+    if (lat === undefined || lng === undefined) continue
+    polygon.push([lng, lat])
   }
 
   return [polygon]

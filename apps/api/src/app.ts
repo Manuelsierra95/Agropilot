@@ -4,6 +4,7 @@ import type { Env } from "@env"
 import type { ApiVariables } from "@workspace/api/types/variables"
 import { errorHandler } from "@workspace/api/middlewares/error-handler"
 import { corsMiddleware } from "@workspace/api/middlewares/cors"
+import { blockDemoMutations } from "@workspace/api/middlewares/block-demo-mutations"
 import { parcelRoutes } from "@workspace/api/routes/parcel"
 import { organizationRoutes } from "@workspace/api/routes/organization"
 import { userRoutes } from "@workspace/api/routes/user"
@@ -23,6 +24,7 @@ export const app = new Hono<{ Bindings: Env; Variables: ApiVariables }>()
   .basePath("/api/v1")
   .onError(errorHandler)
   .use(corsMiddleware)
+  .use(blockDemoMutations)
 
   .use(logger())
 
