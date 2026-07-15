@@ -1,12 +1,41 @@
 import { describe, expect, it } from "vitest"
 
 import {
+  normalizeLatLng,
   parseGeoJsonPolygon,
   parsePolygonGeometry,
+  parseWktPoint,
   parseWktPolygon,
 } from "@workspace/api/services/shared/geometry-utils"
 
 describe("geometry-utils polygon parsers", () => {
+  it("parseWktPoint reads WKT as lng lat", () => {
+    expect(parseWktPoint("POINT(-3.3712 38.0112)")).toEqual({
+      lat: 38.0112,
+      lng: -3.3712,
+    })
+  })
+
+  it("parseWktPoint corrects swapped catastro-style POINT(lat lng)", () => {
+    expect(parseWktPoint("POINT(38.01122756 -3.371160160000001)")).toEqual({
+      lat: 38.01122756,
+      lng: -3.371160160000001,
+    })
+  })
+
+  it("normalizeLatLng fixes ST_Y/ST_X reads from swapped storage", () => {
+    expect(normalizeLatLng(-3.371160160000001, 38.01122756)).toEqual({
+      lat: 38.01122756,
+      lng: -3.371160160000001,
+    })
+  })
+
+  it("normalizeLatLng keeps correct lat/lng", () => {
+    expect(normalizeLatLng(38.0112, -3.3712)).toEqual({
+      lat: 38.0112,
+      lng: -3.3712,
+    })
+  })
   it("parseWktPolygon reads WKT rings", () => {
     const coordinates = parseWktPolygon(
       "POLYGON((-3.3712 38.0112, -3.3692 38.0112, -3.3692 38.0132, -3.3712 38.0132, -3.3712 38.0112))"

@@ -16,8 +16,9 @@ function parsePolygon(json: any): [number, number][][] {
 
   const polygon: [number, number][] = []
   for (let i = 0; i < values.length - 1; i += 2) {
-    const lat = values[i + 1]
-    const lng = values[i]
+    // Catastro GML posList for EPSG:4326 is latitude then longitude.
+    const lat = values[i]
+    const lng = values[i + 1]
     if (lat === undefined || lng === undefined) continue
     polygon.push([lng, lat])
   }

@@ -1,5 +1,27 @@
 import { sql } from "@workspace/db"
 
+/** Iberian peninsula bounding box — used to detect lat/lng axis swaps. */
+function iberianLatLngScore(lat: number, lng: number): number {
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return -1
+  if (lat >= 25 && lat <= 46 && lng >= -19 && lng <= 6) return 10
+  return 0
+}
+
+/** Resolves lat/lng when values may be swapped (WKT axis order, ST_X/ST_Y reads). */
+export function normalizeLatLng(
+  first: number,
+  second: number
+): { lat: number; lng: number } {
+  const asGiven = { lat: first, lng: second }
+  const swapped = { lat: second, lng: first }
+
+  const scoreGiven = iberianLatLngScore(asGiven.lat, asGiven.lng)
+  const scoreSwapped = iberianLatLngScore(swapped.lat, swapped.lng)
+
+  if (scoreSwapped > scoreGiven) return swapped
+  return asGiven
+}
+
 export function parseWktPoint(
   wkt: string | null | undefined
 ): { lat: number; lng: number } | null {
@@ -8,10 +30,7 @@ export function parseWktPoint(
   const match = wkt.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i)
   if (!match?.[1] || !match[2]) return null
 
-  return {
-    lng: Number(match[1]),
-    lat: Number(match[2]),
-  }
+  return normalizeLatLng(Number(match[2]), Number(match[1]))
 }
 
 export function parseWktPolygon(

@@ -3,7 +3,10 @@ import {
   getBestStations,
   type StationCandidate,
 } from "@workspace/scrapers"
-import { geoService } from "@workspace/api/services/shared/geometry-utils"
+import {
+  geoService,
+  normalizeLatLng,
+} from "@workspace/api/services/shared/geometry-utils"
 
 type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
 
@@ -78,7 +81,10 @@ export async function getStations(
 
     if (!parcel) return
 
-    const coords = parcel as { lat: number; lng: number }
+    const coords = normalizeLatLng(
+      (parcel as { lat: number }).lat,
+      (parcel as { lng: number }).lng
+    )
     lat = coords.lat
     lng = coords.lng
   }
