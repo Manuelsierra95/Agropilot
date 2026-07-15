@@ -3,12 +3,10 @@ import { db, schema } from "@workspace/db"
 import {
   generateCampaigns,
   generateMarketPrices,
-  generateWeatherStations,
 } from "../data/generators"
 
 export type CatalogSeedResult = {
   campaigns: Awaited<ReturnType<typeof db.query.campaigns.findMany>>
-  weatherStations: Awaited<ReturnType<typeof db.query.weatherStation.findMany>>
 }
 
 export async function seedCatalog(): Promise<CatalogSeedResult> {
@@ -84,13 +82,5 @@ export async function seedCatalog(): Promise<CatalogSeedResult> {
     console.log(`✓ market_prices (${marketPrices.length} rows)`)
   }
 
-  const generatedStations = generateWeatherStations()
-  await db
-    .insert(schema.weatherStation)
-    .values(generatedStations)
-    .onConflictDoNothing()
-  const weatherStations = await db.query.weatherStation.findMany()
-  console.log(`✓ weather_station (${weatherStations.length})`)
-
-  return { campaigns, weatherStations }
+  return { campaigns }
 }

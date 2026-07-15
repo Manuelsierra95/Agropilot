@@ -1,14 +1,16 @@
 /**
- * Seeds de dominio para desarrollo.
+ * Seeds de dominio para desarrollo y demo pública.
  *
- * 1. Inicia sesión con Google para crear user + org + member.
- * 2. Copia los UUIDs reales a src/config.ts.
- * 3. Ejecuta: pnpm --filter @workspace/seeds seed
+ * Ejecutar: pnpm seed
+ * Requiere: DEMO_USER_PASSWORD y DATABASE_URL en packages/db/.env
  */
+import { clearOrgData } from "./clear-org-data"
 import { SeedError } from "./errors"
 import { validateContext } from "./validate-context"
+import { generateHarvestDeliveries } from "./data/generators"
 import { seedBilling } from "./seeds/billing"
 import { seedCatalog } from "./seeds/catalog"
+import { seedDemoAuth } from "./seeds/demo-auth"
 import { seedFinance } from "./seeds/finance"
 import { seedInvitations } from "./seeds/invitations"
 import { seedParcelWeather } from "./seeds/parcel-weather"
@@ -18,22 +20,36 @@ import { seedRecommendations } from "./seeds/recommendations"
 import { seedTasks } from "./seeds/tasks"
 
 async function main() {
-  console.log("Validando contexto de auth...")
+  console.log("Creando usuario demo...")
+  await seedDemoAuth()
+
+  console.log("Validando contexto demo...")
   await validateContext()
   console.log("✓ user, organization y membership verificados\n")
 
-  const { campaigns, weatherStations } = await seedCatalog()
+  await clearOrgData()
+
+  const { campaigns } = await seedCatalog()
+  const campaignRows = campaigns.map((c) => ({
+    id: c.id,
+    startDate: c.startDate,
+    isActive: c.isActive,
+  }))
+
   const { parcels } = await seedParcels(
-    weatherStations.map((s) => s.id),
     campaigns.map((c) => ({ id: c.id, startDate: c.startDate }))
   )
   const parcelIds = parcels.map((p) => p.id)
 
   await seedParcelWeather(parcelIds)
-  await seedRecommendations(parcelIds)
-  await seedFinance(parcelIds, campaigns)
-  await seedProduction(parcelIds, campaigns)
-  await seedTasks(parcelIds)
+  const recommendations = await seedRecommendations(parcelIds)
+
+  const deliveries = generateHarvestDeliveries(parcelIds, campaignRows)
+  const saleTransactions =
+    (await seedFinance(parcelIds, campaignRows, deliveries)) ?? []
+
+  await seedProduction(parcelIds, campaignRows, saleTransactions)
+  await seedTasks(parcelIds, recommendations)
   await seedBilling()
   await seedInvitations()
 

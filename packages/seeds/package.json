@@ -7,7 +7,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@workspace/db": "workspace:*"
+    "@workspace/auth": "workspace:*",
+    "@workspace/db": "workspace:*",
+    "@workspace/schemas": "workspace:*",
+    "api": "workspace:*",
+    "better-auth": "^1.6.2"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",

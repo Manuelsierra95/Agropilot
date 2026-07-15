@@ -7,7 +7,12 @@ import {
 
 export async function seedProduction(
   parcelIds: string[],
-  campaigns: { id: string }[]
+  campaigns: { id: string }[],
+  saleTransactions: {
+    id: string
+    deliveryId: string
+    saleAmount: number
+  }[]
 ) {
   const deliveries = generateHarvestDeliveries(parcelIds, campaigns)
   if (deliveries.length === 0) {
@@ -18,7 +23,7 @@ export async function seedProduction(
   await db.insert(schema.harvestDeliveries).values(deliveries)
   console.log(`✓ harvest_deliveries (${deliveries.length})`)
 
-  const sales = generateHarvestSales(deliveries)
+  const sales = generateHarvestSales(deliveries, saleTransactions)
   await db.insert(schema.harvestSales).values(sales)
   console.log(`✓ harvest_sales (${sales.length})`)
 }

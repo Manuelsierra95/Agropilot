@@ -27,7 +27,7 @@ export async function seedBilling() {
           id: crypto.randomUUID(),
           organizationId: SEED_ORGANIZATION_ID,
           moduleId: mod.id,
-          active: mod.slug === "ai-analysis",
+          active: true,
         }))
       )
       .onConflictDoNothing()

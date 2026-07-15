@@ -7,6 +7,30 @@ const BASE_PRICES: Record<(typeof GRADES)[number], number> = {
   lampante: 0.75,
 }
 
+export const CAMPAIGN_IDS = {
+  active: "00000000-0000-4000-8000-000000000101",
+  previous: "00000000-0000-4000-8000-000000000102",
+} as const
+
+export const PARCEL_COORDS = [
+  { lng: -3.3712, lat: 38.0112, name: "La Mata", municipality: "Úbeda" },
+  { lng: -3.3891, lat: 37.9934, name: "El Cerro", municipality: "Baeza" },
+  { lng: -3.3521, lat: 38.0245, name: "Los Olivos", municipality: "Linares" },
+  { lng: -3.4102, lat: 37.9789, name: "Hoya Verde", municipality: "Andújar" },
+  { lng: -3.9725, lat: 37.7211, name: "El Olivar", municipality: "Martos" },
+  { lng: -3.7903, lat: 37.7796, name: "Sierra Magina", municipality: "Jaén" },
+] as const
+
+type DashboardRiskLevel = "low" | "medium" | "high"
+
+function buildRiskDetail(
+  level: DashboardRiskLevel,
+  score: number,
+  reasons: string[]
+) {
+  return { level, score, reasons }
+}
+
 export function isoDate(year: number, month: number, day: number) {
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
 }
@@ -29,70 +53,18 @@ export function pointWkt(lng: number, lat: number) {
 export function generateCampaigns() {
   return [
     {
-      id: crypto.randomUUID(),
+      id: CAMPAIGN_IDS.active,
       name: "2025/2026",
       startDate: "2025-10-01",
       endDate: "2026-09-30",
       isActive: true,
     },
     {
-      id: crypto.randomUUID(),
+      id: CAMPAIGN_IDS.previous,
       name: "2024/2025",
       startDate: "2024-10-01",
       endDate: "2025-09-30",
       isActive: false,
-    },
-  ]
-}
-
-export function generateParcels() {
-  const coords = [
-    { lng: -3.3712, lat: 38.0112, name: "La Mata" },
-    { lng: -3.3891, lat: 37.9934, name: "El Cerro" },
-    { lng: -3.3521, lat: 38.0245, name: "Los Olivos" },
-    { lng: -3.4102, lat: 37.9789, name: "Hoya Verde" },
-  ] as const
-
-  return coords.map((c, index) => {
-    const areaHa = 6.3 + index * 2.1
-
-    return {
-      id: crypto.randomUUID(),
-      organizationId: SEED_ORGANIZATION_ID,
-      name: c.name,
-      cropType: "olive" as const,
-      irrigationType: (index % 2 === 0 ? "dryland" : "irrigated") as
-        | "dryland"
-        | "irrigated",
-      areaM2: Math.round(areaHa * 10_000),
-      centroid: pointWkt(c.lng, c.lat),
-      polygon: `POLYGON((${c.lng} ${c.lat}, ${c.lng + 0.002} ${c.lat}, ${c.lng + 0.002} ${c.lat + 0.002}, ${c.lng} ${c.lat + 0.002}, ${c.lng} ${c.lat}))`,
-    }
-  })
-}
-
-export function generateWeatherStations() {
-  return [
-    {
-      id: crypto.randomUUID(),
-      stationId: "AEMET-JAE-01",
-      name: "Estación Úbeda",
-      location: pointWkt(-3.3712, 38.0112),
-      altitude: 420,
-    },
-    {
-      id: crypto.randomUUID(),
-      stationId: "AEMET-BAE-02",
-      name: "Estación Baeza",
-      location: pointWkt(-3.3891, 37.9934),
-      altitude: 485,
-    },
-    {
-      id: crypto.randomUUID(),
-      stationId: "AEMET-LIN-03",
-      name: "Estación Linares",
-      location: pointWkt(-3.3521, 38.0245),
-      altitude: 360,
     },
   ]
 }
@@ -103,8 +75,7 @@ export function generateMarketPrices(days = 90) {
   start.setUTCDate(end.getUTCDate() - days)
 
   const from = start.toISOString().slice(0, 10)
-  const to = end.toISOString().slice(0, 10)
-  const dates = eachDay(from, to)
+  const dates = eachDay(from, end.toISOString().slice(0, 10))
   const rows: {
     id: string
     product: "olive_oil"
@@ -114,6 +85,7 @@ export function generateMarketPrices(days = 90) {
     unit: string
     date: string
     currency: string
+    trend: "up" | "down" | "stable"
     source: string
   }[] = []
 
@@ -122,9 +94,11 @@ export function generateMarketPrices(days = 90) {
 
     for (const grade of GRADES) {
       const base = BASE_PRICES[grade]
-      const trend = dayIndex * 0.0004
+      const trendValue = dayIndex * 0.0004
       const noise = Math.sin(dayIndex / 17 + GRADES.indexOf(grade)) * 0.08
-      const price = Math.max(0.4, base + seasonal * 0.25 + trend + noise)
+      const price = Math.max(0.4, base + seasonal * 0.25 + trendValue + noise)
+      const trend: "up" | "down" | "stable" =
+        trendValue > 0.01 ? "up" : trendValue < -0.01 ? "down" : "stable"
 
       rows.push({
         id: crypto.randomUUID(),
@@ -135,6 +109,7 @@ export function generateMarketPrices(days = 90) {
         unit: "€/kg",
         date,
         currency: "EUR",
+        trend,
         source: "seed",
       })
     }
@@ -147,7 +122,7 @@ export function generateTransactions(
   parcelIds: string[],
   campaignId: string
 ) {
-  const categories = [
+  const expenseCategories = [
     "irrigation",
     "fertilization",
     "treatment",
@@ -155,10 +130,19 @@ export function generateTransactions(
     "machinery",
     "fuel",
     "harvest",
-    "sale",
-    "subsidy",
     "other",
   ] as const
+
+  const expenseConcepts: Record<(typeof expenseCategories)[number], string> = {
+    irrigation: "Riego por goteo",
+    fertilization: "Abonado de fondo",
+    treatment: "Tratamiento contra repilo",
+    labor: "Poda de formación",
+    machinery: "Alquiler vibradora",
+    fuel: "Gasoil maquinaria",
+    harvest: "Cosecha mecánica",
+    other: "Seguro agrario",
+  }
 
   const rows: {
     id: string
@@ -169,41 +153,104 @@ export function generateTransactions(
     description: string
     flow: "income" | "expense"
     date: string
-    category: (typeof categories)[number] | "sale"
+    category: (typeof expenseCategories)[number] | "subsidy"
     amount: string
     campaignId: string
     paymentMethod: "transferencia"
     invoiceNumber: string | null
   }[] = []
 
-  for (let i = 0; i < 120; i++) {
-    const date = isoDate(2025, (i % 12) + 1, (i % 27) + 1)
-    const isIncome = i % 4 === 0
+  const campaignDates = eachDay("2025-10-01", "2026-06-08")
+
+  for (let i = 0; i < 96; i++) {
+    const date = campaignDates[i % campaignDates.length]!
     const parcelId = parcelIds[i % parcelIds.length]!
+    const category = expenseCategories[i % expenseCategories.length]!
 
     rows.push({
       id: crypto.randomUUID(),
       organizationId: SEED_ORGANIZATION_ID,
       parcelId,
       userId: SEED_USER_ID,
-      concept: isIncome ? "Venta aceite" : "Gasto explotación",
-      description: isIncome ? "Liquidación cooperativa" : "Operación de campo",
-      flow: isIncome ? ("income" as const) : ("expense" as const),
+      concept: expenseConcepts[category],
+      description: "Operación registrada en explotación olivarera",
+      flow: "expense",
       date,
-      category: isIncome ? ("sale" as const) : categories[i % categories.length]!,
-      amount: (isIncome ? 1200 + (i % 9) * 340 : 180 + (i % 7) * 95).toFixed(2),
+      category,
+      amount: (180 + (i % 7) * 95 + (i % 3) * 40).toFixed(2),
       campaignId,
-      paymentMethod: "transferencia" as const,
-      invoiceNumber: isIncome ? `FAC-2025-${String(i + 1).padStart(4, "0")}` : null,
+      paymentMethod: "transferencia",
+      invoiceNumber: null,
+    })
+  }
+
+  if (parcelIds.length > 0) {
+    rows.push({
+      id: crypto.randomUUID(),
+      organizationId: SEED_ORGANIZATION_ID,
+      parcelId: parcelIds[0]!,
+      userId: SEED_USER_ID,
+      concept: "Ayuda PAC olivar",
+      description: "Pago de subvención de la campaña",
+      flow: "income",
+      date: isoDate(2026, 3, 15),
+      category: "subsidy",
+      amount: "2400.00",
+      campaignId,
+      paymentMethod: "transferencia",
+      invoiceNumber: "SUB-2026-001",
     })
   }
 
   return rows
 }
 
+export function generateSaleTransactions(
+  deliveries: {
+    id: string
+    parcelId: string
+    campaignId: string
+    processedQuantity: string
+    grade: string | null
+  }[]
+) {
+  const pricesByGrade: Record<string, number> = {
+    virgen_extra: 6.2,
+    virgen: 5.1,
+    lampante: 1.8,
+  }
+
+  return deliveries.map((delivery, index) => {
+    const qty = Number.parseFloat(delivery.processedQuantity)
+    const soldQty = index % 3 === 0 ? Math.round(qty * 0.6) : qty
+    const grade = delivery.grade ?? "virgen_extra"
+    const price = pricesByGrade[grade] ?? 5.0
+    const amount = soldQty * price
+
+    return {
+      id: crypto.randomUUID(),
+      organizationId: SEED_ORGANIZATION_ID,
+      parcelId: delivery.parcelId,
+      userId: SEED_USER_ID,
+      concept: "Venta aceite de oliva",
+      description: `Liquidación cooperativa — entrega ${delivery.id.slice(0, 8)}`,
+      flow: "income" as const,
+      date: isoDate(2025, 12, 5 + index),
+      category: "sale" as const,
+      amount: amount.toFixed(2),
+      campaignId: delivery.campaignId,
+      paymentMethod: "transferencia" as const,
+      invoiceNumber: `VTA-2025-${String(index + 1).padStart(4, "0")}`,
+      deliveryId: delivery.id,
+      saleAmount: amount,
+    }
+  })
+}
+
 export function generateParcelCashflow(
   parcelIds: string[],
-  campaignId: string
+  campaignId: string,
+  transactions: { parcelId: string | null; date: string; flow: string; amount: string }[]
 ) {
   const dates = eachDay("2025-10-01", "2026-06-08")
   const rows: {
@@ -216,11 +263,16 @@ export function generateParcelCashflow(
   }[] = []
 
   for (const parcelId of parcelIds) {
-    for (const [index, date] of dates.entries()) {
-      const income =
-        index % 14 === 0 ? 1800 + index * 3 : index % 9 === 0 ? 420 : 0
-      const expense =
-        index % 11 === 0 ? 260 + index : index % 7 === 0 ? 90 : 0
+    const parcelTx = transactions.filter((tx) => tx.parcelId === parcelId)
+
+    for (const date of dates) {
+      const dayTx = parcelTx.filter((tx) => tx.date === date)
+      const income = dayTx
+        .filter((tx) => tx.flow === "income")
+        .reduce((sum, tx) => sum + Number.parseFloat(tx.amount), 0)
+      const expense = dayTx
+        .filter((tx) => tx.flow === "expense")
+        .reduce((sum, tx) => sum + Number.parseFloat(tx.amount), 0)
 
       rows.push({
         id: crypto.randomUUID(),
@@ -238,7 +290,13 @@ export function generateParcelCashflow(
 
 export function generateFinancialSummaries(
   parcelIds: string[],
-  campaigns: { id: string }[]
+  campaigns: { id: string }[],
+  transactions: {
+    parcelId: string | null
+    campaignId: string
+    flow: string
+    amount: string
+  }[]
 ) {
   const rows: {
     id: string
@@ -260,8 +318,17 @@ export function generateFinancialSummaries(
 
   for (const campaign of campaigns) {
     parcelIds.forEach((parcelId, index) => {
-      const income = 18000 + index * 2400
-      const expense = 9200 + index * 1100
+      const parcelTx = transactions.filter(
+        (tx) => tx.parcelId === parcelId && tx.campaignId === campaign.id
+      )
+      const income = parcelTx
+        .filter((tx) => tx.flow === "income")
+        .reduce((sum, tx) => sum + Number.parseFloat(tx.amount), 0)
+      const expense = parcelTx
+        .filter((tx) => tx.flow === "expense")
+        .reduce((sum, tx) => sum + Number.parseFloat(tx.amount), 0)
+      const profit = income - expense
+      const totalKg = 6200 + index * 800
 
       rows.push({
         id: crypto.randomUUID(),
@@ -269,11 +336,11 @@ export function generateFinancialSummaries(
         campaignId: campaign.id,
         totalIncome: income.toFixed(2),
         totalExpense: expense.toFixed(2),
-        profit: (income - expense).toFixed(2),
-        totalKg: (6200 + index * 800).toFixed(2),
-        costPerKg: (expense / (6200 + index * 800)).toFixed(4),
-        revenuePerKg: (income / (6200 + index * 800)).toFixed(4),
-        marginPerKg: ((income - expense) / (6200 + index * 800)).toFixed(4),
+        profit: profit.toFixed(2),
+        totalKg: totalKg.toFixed(2),
+        costPerKg: (expense / totalKg).toFixed(4),
+        revenuePerKg: (income / totalKg).toFixed(4),
+        marginPerKg: (profit / totalKg).toFixed(4),
         avgMarketPrice: "5.2000",
         marginVsMarket: "0.8500",
         expectedYieldKg: (7000 + index * 500).toFixed(2),
@@ -286,17 +353,41 @@ export function generateFinancialSummaries(
   return rows
 }
 
+function buildRisks(index: number) {
+  const levels: DashboardRiskLevel[] = ["low", "medium", "high"]
+  const waterLevel = levels[index % 3]!
+  const fungalLevel = levels[(index + 1) % 3]!
+  const insectLevel = levels[(index + 2) % 3]!
+  const thermalLevel = levels[index % 2]!
+
+  return {
+    waterStress: buildRiskDetail(waterLevel, 20 + index * 12, [
+      "Déficit hídrico en suelo",
+      "Evapotranspiración elevada",
+    ]),
+    fungalRisk: buildRiskDetail(fungalLevel, 15 + index * 10, [
+      "Humedad relativa favorable a hongos",
+    ]),
+    insectRisk: buildRiskDetail(insectLevel, 10 + index * 8, [
+      "Presión de mosca del olivo",
+    ]),
+    thermalStress: buildRiskDetail(thermalLevel, 12 + index * 9, [
+      "Temperaturas máximas en floración",
+    ]),
+  }
+}
+
 export function generateParcelWeatherData(parcelIds: string[]) {
   const dates = eachDay("2025-01-01", "2026-06-08")
 
-  return parcelIds.map((parcelId) => {
-    const daily = dates.map((date, index) => {
-      const seasonal = Math.sin((index / 30) * Math.PI)
+  return parcelIds.map((parcelId, index) => {
+    const daily = dates.map((date, dayIndex) => {
+      const seasonal = Math.sin((dayIndex / 30) * Math.PI)
       return {
         date,
         soilMoisture: Math.round(28 + seasonal * 12 + (index % 5)),
-        rainfall: Math.max(0, Math.round(seasonal * 18 + (index % 3) * 2)),
-        temperature: Math.round(14 + seasonal * 8 + (index % 4)),
+        rainfall: Math.max(0, Math.round(seasonal * 18 + (dayIndex % 3) * 2)),
+        temperature: Math.round(14 + seasonal * 8 + (dayIndex % 4)),
       }
     })
 
@@ -312,17 +403,108 @@ export function generateParcelWeatherData(parcelIds: string[]) {
         totalRainfall: 412,
         avgSoilMoisture: 31.2,
       },
-      risks: {
-        frost: "low",
-        drought: "medium",
-        pest: "low",
-      },
+      risks: buildRisks(index),
       algorithmVersion: "seed-v1",
     }
   })
 }
 
-export function generateTasks(parcelIds: string[]) {
+export function generateRecommendationRows(parcelIds: string[]) {
+  const parcelTemplates = [
+    {
+      type: "irrigation" as const,
+      source: "weather" as const,
+      title: "Programar riego de refuerzo",
+      details: "El balance hídrico indica déficit moderado en los próximos días.",
+      priority: "high" as const,
+    },
+    {
+      type: "treatment" as const,
+      source: "risk_engine" as const,
+      title: "Tratamiento preventivo contra repilo",
+      details: "Condiciones de humedad y temperatura favorables al desarrollo fúngico.",
+      priority: "medium" as const,
+    },
+  ]
+
+  const orgTemplates = [
+    {
+      type: "sale" as const,
+      source: "market" as const,
+      title: "Ventana de venta favorable",
+      details: "El precio del aceite en la Lonja de Jaén muestra tendencia alcista.",
+      priority: "low" as const,
+    },
+    {
+      type: "general" as const,
+      source: "copilot" as const,
+      title: "Revisar calendario de labores",
+      details: "Hay tareas de poda y tratamiento pendientes para esta semana.",
+      priority: "medium" as const,
+    },
+  ]
+
+  function expiresInDays(days: number): Date {
+    const date = new Date()
+    date.setUTCDate(date.getUTCDate() + days)
+    return date
+  }
+
+  const rows: {
+    id: string
+    organizationId: string
+    parcelId: string | null
+    dedupeKey: string
+    type: (typeof parcelTemplates)[number]["type"] | (typeof orgTemplates)[number]["type"]
+    source: (typeof parcelTemplates)[number]["source"] | (typeof orgTemplates)[number]["source"]
+    title: string
+    details: string
+    priority: "low" | "medium" | "high"
+    status: "pending"
+    expiresAt: Date
+  }[] = []
+
+  for (const parcelId of parcelIds) {
+    for (const [index, template] of parcelTemplates.entries()) {
+      rows.push({
+        id: crypto.randomUUID(),
+        organizationId: SEED_ORGANIZATION_ID,
+        parcelId,
+        dedupeKey: `seed:${template.type}:${parcelId}:${index}`,
+        type: template.type,
+        source: template.source,
+        title: template.title,
+        details: template.details,
+        priority: template.priority,
+        status: "pending",
+        expiresAt: expiresInDays(7),
+      })
+    }
+  }
+
+  for (const [index, template] of orgTemplates.entries()) {
+    rows.push({
+      id: crypto.randomUUID(),
+      organizationId: SEED_ORGANIZATION_ID,
+      parcelId: null,
+      dedupeKey: `seed:${template.type}:org:${index}`,
+      type: template.type,
+      source: template.source,
+      title: template.title,
+      details: template.details,
+      priority: template.priority,
+      status: "pending",
+      expiresAt: expiresInDays(7),
+    })
+  }
+
+  return rows
+}
+
+export function generateTasks(
+  parcelIds: string[],
+  recommendations: { id: string; parcelId: string | null; type: string }[]
+) {
   const categories = [
     "irrigation",
     "fertilization",
@@ -330,7 +512,7 @@ export function generateTasks(parcelIds: string[]) {
     "harvest",
     "inspection",
   ] as const
-  const statuses = ["pending", "in_progress", "done", "skipped"] as const
+
   const rows: {
     id: string
     organizationId: string
@@ -341,34 +523,82 @@ export function generateTasks(parcelIds: string[]) {
     description: string
     startDate: Date
     endDate: Date | null
-    status: (typeof statuses)[number]
+    status: "pending" | "in_progress" | "done" | "skipped"
     priority: number
-    source: "weather" | "manual"
-    sourceId: null
+    source: "weather" | "manual" | "risk_engine"
+    sourceId: string | null
+    recommendationId: string | null
     meta: { seeded: boolean }
   }[] = []
 
-  for (let i = 0; i < 48; i++) {
+  const now = new Date()
+  const upcomingStart = new Date(now)
+  upcomingStart.setUTCDate(upcomingStart.getUTCDate() + 1)
+  upcomingStart.setUTCHours(8, 0, 0, 0)
+
+  for (let i = 0; i < 12; i++) {
     const parcelId = parcelIds[i % parcelIds.length]!
-    const month = (i % 12) + 1
+    const startDate = new Date(upcomingStart)
+    startDate.setUTCDate(startDate.getUTCDate() + (i % 7))
+    const endDate = new Date(startDate)
+    endDate.setUTCDate(endDate.getUTCDate() + 1)
+
+    const matchingRec = recommendations.find(
+      (rec) =>
+        rec.parcelId === parcelId &&
+        (rec.type === categories[i % categories.length] ||
+          (rec.type === "treatment" &&
+            categories[i % categories.length] === "treatment"))
+    )
 
     rows.push({
       id: crypto.randomUUID(),
       organizationId: SEED_ORGANIZATION_ID,
       parcelId,
-      taskType: i % 3 === 0 ? ("recommended" as const) : ("manual" as const),
+      taskType: matchingRec ? "recommended" : "manual",
       category: categories[i % categories.length]!,
-      title: `Tarea ${categories[i % categories.length]} — parcela ${i + 1}`,
-      description: "Generada por seed de desarrollo",
-      startDate: new Date(`${isoDate(2026, month, (i % 20) + 1)}T08:00:00Z`),
+      title: `${categories[i % categories.length] === "irrigation" ? "Revisar riego" : "Labor de campo"} — semana ${i + 1}`,
+      description: "Tarea programada para la semana en curso",
+      startDate,
+      endDate,
+      status: i % 4 === 0 ? "in_progress" : "pending",
+      priority: i % 3,
+      source:
+        matchingRec?.type === "treatment"
+          ? "risk_engine"
+          : matchingRec
+            ? "weather"
+            : "manual",
+      sourceId: matchingRec?.id ?? null,
+      recommendationId: matchingRec?.id ?? null,
+      meta: { seeded: true },
+    })
+  }
+
+  const campaignDates = eachDay("2025-10-01", "2026-05-30")
+
+  for (let i = 0; i < 36; i++) {
+    const parcelId = parcelIds[i % parcelIds.length]!
+    const date = campaignDates[i % campaignDates.length]!
+
+    rows.push({
+      id: crypto.randomUUID(),
+      organizationId: SEED_ORGANIZATION_ID,
+      parcelId,
+      taskType: i % 3 === 0 ? "recommended" : "manual",
+      category: categories[i % categories.length]!,
+      title: `Tarea ${categories[i % categories.length]} — campaña`,
+      description: "Registro histórico de labores en olivar",
+      startDate: new Date(`${date}T08:00:00Z`),
       endDate:
         i % 5 === 0
           ? null
-          : new Date(`${isoDate(2026, month, (i % 20) + 3)}T18:00:00Z`),
-      status: statuses[i % statuses.length]!,
+          : new Date(`${date}T18:00:00Z`),
+      status: i % 4 === 0 ? "done" : "pending",
       priority: i % 4,
-      source: i % 2 === 0 ? ("weather" as const) : ("manual" as const),
+      source: i % 2 === 0 ? "weather" : "manual",
       sourceId: null,
+      recommendationId: null,
       meta: { seeded: true },
     })
   }
@@ -378,7 +608,12 @@ export function generateTasks(parcelIds: string[]) {
 
 export function generateParcelCrops(parcelIds: string[]) {
   const varieties = ["Picual", "Hojiblanca", "Arbequina", "Cornicabra"] as const
-  const soilTypes = ["arcilloso", "franco-arcilloso", "franco-arenoso", "calizo"] as const
+  const soilTypes = [
+    "arcilloso",
+    "franco-arcilloso",
+    "franco-arenoso",
+    "calizo",
+  ] as const
 
   return parcelIds.map((parcelId, index) => ({
     id: crypto.randomUUID(),
@@ -403,7 +638,6 @@ export function generateParcelCropSeasons(
     id: string
     parcelId: string
     campaignId: string
-    year: number
     yieldActualKg: string | null
     yieldTargetKg: string | null
     expectedYieldKg: string | null
@@ -412,22 +646,23 @@ export function generateParcelCropSeasons(
   }[] = []
 
   for (const campaign of campaigns) {
-    const year = Number.parseInt(campaign.startDate.slice(0, 4), 10)
-
     parcelIds.forEach((parcelId, index) => {
       const baseYield = 6200 + index * 800
       rows.push({
         id: crypto.randomUUID(),
         parcelId,
         campaignId: campaign.id,
-        year,
-        yieldActualKg: campaign.startDate < "2026-01-01"
-          ? (baseYield + (index % 3) * 200).toFixed(2)
-          : null,
+        yieldActualKg:
+          campaign.startDate < "2026-01-01"
+            ? (baseYield + (index % 3) * 200).toFixed(2)
+            : null,
         yieldTargetKg: (baseYield + 500).toFixed(2),
         expectedYieldKg: (baseYield + 300).toFixed(2),
         targetPricePerKg: "5.5000",
-        notes: index % 3 === 0 ? "Campaña consequat" : null,
+        notes:
+          index % 3 === 0
+            ? "Campaña con buena acumulación de aceite en almazara"
+            : null,
       })
     })
   }
@@ -439,9 +674,14 @@ export function generateHarvestDeliveries(
   parcelIds: string[],
   campaigns: { id: string }[]
 ) {
-  const destinations = ["Cooperativa San Francisco", "Almazara La Ermita", "Bodega El Campillo"] as const
+  const destinations = [
+    "Cooperativa San Francisco",
+    "Almazara Nuestra Señora de la Paz",
+    "Almazara La Ermita",
+    "Cooperativa Olivarera de Martos",
+  ] as const
   const grades = ["virgen_extra", "virgen", "lampante"] as const
-  const activeCampaign = campaigns[0]
+  const activeCampaign = campaigns.find((c) => c.id === CAMPAIGN_IDS.active) ?? campaigns[0]
 
   if (!activeCampaign) return []
 
@@ -485,10 +725,10 @@ export function generateHarvestDeliveries(
       grade: grades[index % grades.length]!,
       quantityRemaining: isPartial
         ? (processedQty * 0.4).toFixed(2)
-        : processedQty.toFixed(2),
-      status: isPartial ? "partial" : "stored",
+        : "0.00",
+      status: isPartial ? "partial" : "sold",
       targetSalePricePerUnit: "5.8000",
-      notes: isPartial ? "Venta parcial a cooperativa" : null,
+      notes: isPartial ? "Venta parcial a cooperativa" : "Cosecha entregada en almazara",
     })
   })
 
@@ -496,51 +736,50 @@ export function generateHarvestDeliveries(
 }
 
 export function generateHarvestSales(
-  deliveries: { id: string; parcelId: string; campaignId: string; processedQuantity: string; grade: string | null }[]
+  deliveries: {
+    id: string
+    parcelId: string
+    campaignId: string
+    processedQuantity: string
+    grade: string | null
+  }[],
+  saleTransactions: { id: string; deliveryId: string; saleAmount: number }[]
 ) {
-  const buyers = ["Cooperativa San Francisco", "Almazara La Ermita", "Distribuidora Sur"] as const
+  const buyers = [
+    "Cooperativa San Francisco",
+    "Almazara La Ermita",
+    "Distribuidora Aceites del Sur",
+  ] as const
   const pricesByGrade: Record<string, number> = {
     virgen_extra: 6.2,
     virgen: 5.1,
     lampante: 1.8,
   }
 
-  const rows: {
-    id: string
-    organizationId: string
-    deliveryId: string
-    parcelId: string
-    campaignId: string
-    transactionId: string | null
-    saleDate: string
-    quantitySold: string
-    pricePerUnit: string
-    totalAmount: string
-    buyerName: string
-    notes: string | null
-  }[] = []
+  const txByDelivery = new Map(
+    saleTransactions.map((tx) => [tx.deliveryId, tx])
+  )
 
-  deliveries.forEach((delivery, index) => {
+  return deliveries.map((delivery, index) => {
     const qty = Number.parseFloat(delivery.processedQuantity)
     const soldQty = index % 3 === 0 ? Math.round(qty * 0.6) : qty
     const grade = delivery.grade ?? "virgen_extra"
     const price = pricesByGrade[grade] ?? 5.0
+    const saleTx = txByDelivery.get(delivery.id)
 
-    rows.push({
+    return {
       id: crypto.randomUUID(),
       organizationId: SEED_ORGANIZATION_ID,
       deliveryId: delivery.id,
       parcelId: delivery.parcelId,
       campaignId: delivery.campaignId,
-      transactionId: null,
+      transactionId: saleTx?.id ?? null,
       saleDate: isoDate(2025, 12, 5 + index),
       quantitySold: soldQty.toFixed(2),
       pricePerUnit: price.toFixed(4),
-      totalAmount: (soldQty * price).toFixed(2),
+      totalAmount: (saleTx?.saleAmount ?? soldQty * price).toFixed(2),
       buyerName: buyers[index % buyers.length]!,
       notes: index % 3 === 0 ? "Entrega parcial" : null,
-    })
+    }
   })
-
-  return rows
 }

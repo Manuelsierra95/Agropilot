@@ -1,46 +1,82 @@
 # @workspace/seeds
 
-Script para poblar la base de datos con datos de desarrollo. **No crea** usuarios ni organizaciones: asume que ya existen tras autenticarte con Google.
+Script para poblar la base de datos con datos de demostración. Crea automáticamente el usuario demo y su organización; no requiere login previo con Google.
 
-## Uso de seeds
+## Variables de entorno
 
-1. **Login con Google** en la app de desarrollo.
-2. Copia los UUIDs reales de tu usuario y organización en [`src/config.ts`](src/config.ts):
-   - `SEED_USER_ID` → `users.id`
-   - `SEED_ORGANIZATION_ID` → `organizations.id`
+En `packages/db/.env`:
 
-   Puedes consultarlos en Drizzle Studio (`pnpm --filter @workspace/db studio`) o directamente en Postgres.
+```env
+DEMO_USER_PASSWORD=tu-password-segura-demo
+DEMO_ENABLED=true
+```
 
-3. Levanta la base de datos y aplica migraciones:
+`DEMO_USER_PASSWORD` se usa para:
+- Sembrar la cuenta credential del usuario demo (`pnpm seed`)
+- Auto-login en la ruta `/demo` del frontend
+
+## Uso
+
+1. Levanta la base de datos y aplica migraciones:
 
 ```bash
 pnpm --filter @workspace/db db:setup
 ```
 
-4. Ejecuta los seeds:
+2. Ejecuta los seeds:
 
 ```bash
 pnpm seed
 ```
 
-También puedes lanzarlo desde el package:
+También:
 
 ```bash
 pnpm --filter @workspace/seeds seed
 ```
 
-## Errores controlados
+3. En el landing, pulsa **Ver demo** (`/demo`) para entrar al dashboard con datos completos.
 
-Si los IDs en `config.ts` no coinciden con tu sesión, el script termina con un mensaje claro:
+## Usuario demo
+
+| Campo | Valor |
+|-------|-------|
+| Email | `demo@agropilot.dev` |
+| Organización | Olivares Sierra Mágina |
+| Plan | pro |
+| Onboarding | completado |
+
+Los visitantes **no necesitan credenciales**: `/demo` inicia sesión automáticamente en el servidor.
+
+## Modo solo lectura
+
+Con `DEMO_ENABLED=true`, el usuario demo solo puede hacer peticiones **GET** en la API. Cualquier POST, PUT, PATCH o DELETE devuelve `403`.
+
+## Re-ejecución
+
+`pnpm seed` limpia los datos de la organización demo y los vuelve a crear. Es idempotente para el usuario demo.
+
+## Red externa
+
+Durante el seed, las parcelas intentan obtener geometría real del Catastro (`searchByCoords`) y estaciones meteorológicas (`getStations` vía WeatherCloud). Si falla la red, se usan datos sintéticos de respaldo.
+
+## Retirar el demo
+
+1. `DEMO_ENABLED=false` en producción
+2. Eliminar ruta `apps/web/app/demo/route.ts`, middleware `block-demo-mutations`, y módulo `seedDemoAuth`
+3. Borrar filas del usuario demo en la base de datos
+
+## Errores controlados
 
 | Código | Causa |
 |--------|--------|
-| `USER_NOT_FOUND` | No existe el usuario con `SEED_USER_ID` |
-| `ORGANIZATION_NOT_FOUND` | No existe la organización con `SEED_ORGANIZATION_ID` |
-| `MEMBERSHIP_NOT_FOUND` | El usuario no es miembro de esa organización |
+| `USER_NOT_FOUND` | No existe el usuario demo tras `seedDemoAuth` |
+| `ORGANIZATION_NOT_FOUND` | No existe la organización demo |
+| `MEMBERSHIP_NOT_FOUND` | El usuario demo no es miembro de la org demo |
+| `DEMO_PASSWORD_MISSING` | Falta `DEMO_USER_PASSWORD` en el entorno |
 
 ## Qué se siembra
 
-Catálogo global (`plan_limits`, `modules`, `campaigns`, `market_prices`, `weather_station`) y datos de dominio scoped a tu organización: parcels, transacciones, tareas, billing, invitaciones, etc.
+Catálogo global (`plan_limits`, `modules`, `campaigns`, `market_prices`) y datos de dominio bajo la org demo: 6 parcelas olivar en Jaén, clima, finanzas, producción, tareas, recomendaciones y billing.
 
-**No se siembran** `sessions`, `accounts` ni `verifications` (los gestiona Better Auth).
+**No se siembran** sesiones OAuth de usuarios reales. Las sesiones del demo se crean al visitar `/demo`.
