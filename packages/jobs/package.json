@@ -4,12 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "job:oil-prices": "dotenv -e ../db/.env -- bun src/oil-prices.ts",
+    "job:weather-stations": "dotenv -e ../db/.env -- bun src/weather-stations.ts",
+    "job:parcel-recommendations": "dotenv -e ../db/.env -- bun src/parcel-recommendations.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "api": "workspace:*",
     "@workspace/db": "workspace:*",
     "@workspace/scrapers": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "@workspace/typescript-config": "workspace:*",
+    "dotenv-cli": "^11.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   },
   "keywords": [],
   "author": "",
