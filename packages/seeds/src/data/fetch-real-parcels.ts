@@ -24,9 +24,23 @@ export type ResolvedParcelGeometry = {
   areaM2: number | null
 }
 
-function toWktPolygon(coordinates: [number, number][][]): string {
-  const ring = coordinates[0]
-  if (!ring?.length) {
+export function ringCentroid(ring: [number, number][]): { lng: number; lat: number } {
+  let lngSum = 0
+  let latSum = 0
+
+  for (const [lng, lat] of ring) {
+    lngSum += lng
+    latSum += lat
+  }
+
+  return {
+    lng: lngSum / ring.length,
+    lat: latSum / ring.length,
+  }
+}
+
+export function toWktPolygon(ring: [number, number][]): string {
+  if (!ring.length) {
     throw new Error("Polygon ring is empty")
   }
 
@@ -73,6 +87,29 @@ function estimateAreaFromPolygon(polygon: string): number | null {
   return Math.round(degArea * metersPerDegLat * metersPerDegLng)
 }
 
+export function resolveFixedParcelGeometry(
+  parcel: { name: string; municipality: string; ring: [number, number][] },
+  index: number
+): ResolvedParcelGeometry {
+  const polygon = toWktPolygon(parcel.ring)
+  const { lng, lat } = ringCentroid(parcel.ring)
+
+  return {
+    name: parcel.name,
+    municipality: parcel.municipality,
+    lng,
+    lat,
+    centroid: pointWkt(lng, lat),
+    polygon,
+    refcat: `12345${String(index + 1).padStart(8, "0")}AB`,
+    province: "Jaén",
+    streetType: "Camino",
+    streetName: `Vereda ${parcel.name}`,
+    postalCode: "23400",
+    areaM2: estimateAreaFromPolygon(polygon),
+  }
+}
+
 export async function resolveParcelGeometry(
   coord: ParcelSeedCoord,
   index: number
@@ -80,7 +117,8 @@ export async function resolveParcelGeometry(
   try {
     const result = await searchByCoords({ lat: coord.lat, lng: coord.lng })
     const [lng, lat] = result.geometry.centroid.coordinates
-    const polygon = toWktPolygon(result.geometry.polygon.coordinates)
+    const polygon = toWktPolygon(result.geometry.polygon.coordinates[0]!)
+
     const address = result.metadata.address
 
     return {

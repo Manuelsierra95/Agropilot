@@ -4,9 +4,9 @@ import { db, schema } from "@workspace/db"
 import {
   generateParcelCropSeasons,
   generateParcelCrops,
-  PARCEL_COORDS,
 } from "../data/generators"
-import { resolveParcelGeometry } from "../data/fetch-real-parcels"
+import { resolveFixedParcelGeometry } from "../data/fetch-real-parcels"
+import { SEED_PARCELS } from "../data/parcel-geometries"
 import { SEED_ORGANIZATION_ID } from "../config"
 
 export type ParcelSeedResult = {
@@ -20,8 +20,8 @@ export type ParcelSeedResult = {
 export async function seedParcels(
   campaigns: { id: string; startDate: string }[]
 ): Promise<ParcelSeedResult> {
-  const resolved = await Promise.all(
-    PARCEL_COORDS.map((coord, index) => resolveParcelGeometry(coord, index))
+  const resolved = SEED_PARCELS.map((parcel, index) =>
+    resolveFixedParcelGeometry(parcel, index)
   )
 
   const parcels = resolved.map((geometry, index) => ({

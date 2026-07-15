@@ -12,15 +12,6 @@ export const CAMPAIGN_IDS = {
   previous: "00000000-0000-4000-8000-000000000102",
 } as const
 
-export const PARCEL_COORDS = [
-  { lng: -3.3712, lat: 38.0112, name: "La Mata", municipality: "Úbeda" },
-  { lng: -3.3891, lat: 37.9934, name: "El Cerro", municipality: "Baeza" },
-  { lng: -3.3521, lat: 38.0245, name: "Los Olivos", municipality: "Linares" },
-  { lng: -3.4102, lat: 37.9789, name: "Hoya Verde", municipality: "Andújar" },
-  { lng: -3.9725, lat: 37.7211, name: "El Olivar", municipality: "Martos" },
-  { lng: -3.7903, lat: 37.7796, name: "Sierra Magina", municipality: "Jaén" },
-] as const
-
 type DashboardRiskLevel = "low" | "medium" | "high"
 
 function buildRiskDetail(
