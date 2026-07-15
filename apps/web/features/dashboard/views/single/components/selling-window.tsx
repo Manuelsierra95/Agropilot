@@ -151,7 +151,7 @@ export function SellingWindow({
                   Ingreso potencial
                 </p>
                 <p className="text-[10px] text-muted-foreground/70 sm:text-xs">
-                  {estimatedKg.toLocaleString("es-ES")} kg disponibles
+                  {estimatedKg.toLocaleString("es-ES")} litros disponibles
                 </p>
               </div>
               <p className="text-base font-semibold tracking-tight tabular-nums sm:text-xl">

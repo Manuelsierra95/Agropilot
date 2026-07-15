@@ -79,7 +79,7 @@ export function SellingWindowAll({ className, items }: SellingWindowAllProps) {
                   {formatEur(totalRevenue)}
                 </p>
                 <p className="text-[11px] text-muted-foreground tabular-nums">
-                  {totalKg.toLocaleString("es-ES")} kg
+                  {totalKg.toLocaleString("es-ES")} litros
                 </p>
               </div>
             )}
@@ -126,7 +126,7 @@ export function SellingWindowAll({ className, items }: SellingWindowAllProps) {
                             {item.name}
                           </p>
                           <p className="text-xs text-muted-foreground tabular-nums">
-                            {item.estimatedKg.toLocaleString("es-ES")} kg
+                            {item.estimatedKg.toLocaleString("es-ES")} litros
                           </p>
                         </div>
 

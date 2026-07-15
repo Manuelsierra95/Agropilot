@@ -145,7 +145,7 @@ export function HeroSection() {
               className="h-14 rounded-full border-foreground/20 px-8 text-base hover:bg-foreground/5"
               asChild
             >
-              <Link href={landingRoutes.howItWorks}>Ver demo</Link>
+              <Link href={landingRoutes.demo}>Ver demo</Link>
             </Button>
           </div>
         </div>

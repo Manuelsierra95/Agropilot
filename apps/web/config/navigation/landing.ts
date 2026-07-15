@@ -24,6 +24,7 @@ export const landingRoutes = {
   contact: `mailto:${siteConfig.contact.email}`,
   features: "#features",
   howItWorks: "#how-it-works",
+  demo: "/demo",
   agricultores: "#agricultores",
   pricing: "#pricing",
 } as const
