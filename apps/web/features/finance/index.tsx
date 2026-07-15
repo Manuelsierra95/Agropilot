@@ -5,12 +5,13 @@ import { useMemo } from "react"
 import { FinanceAllView } from "@workspace/web/features/finance/views/all"
 import { FinanceSingleView } from "@workspace/web/features/finance/views/single"
 import {
+  useCampaignMargin,
+  useFinanceResume,
   useOlivePrices,
   useParcelsFinanceComparison,
 } from "@workspace/web/hooks/dashboard"
 import { useFinanceTransactions } from "@workspace/web/hooks/finance"
 import { useIsAllParcelsSelected } from "@workspace/web/hooks/use-is-all-parcels-selected"
-import { toTransactionSnapshots } from "@workspace/web/lib/finance/mappers"
 
 export default function Finance() {
   const isAllParcels = useIsAllParcelsSelected()
@@ -18,20 +19,22 @@ export default function Finance() {
   const transactionsQuery = useFinanceTransactions()
   const olivePrices = useOlivePrices()
   const parcelsComparison = useParcelsFinanceComparison()
+  const financeResume = useFinanceResume()
+  const campaignMargin = useCampaignMargin()
 
   const rows = useMemo(
     () => transactionsQuery.data ?? [],
     [transactionsQuery.data]
   )
-  const snapshots = useMemo(() => toTransactionSnapshots(rows), [rows])
 
   const isLoadingCharts =
     transactionsQuery.isPending && transactionsQuery.data === undefined
 
   const viewProps = {
     rows,
-    snapshots,
     olivePrices,
+    financeResume,
+    campaignMargin,
     parcelsComparison,
     isLoadingCharts,
   }
