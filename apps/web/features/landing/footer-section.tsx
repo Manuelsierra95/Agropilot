@@ -1,39 +1,45 @@
 "use client"
 
+import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { AnimatedWave } from "@workspace/web/features/landing/animated-wave"
+import { siteConfig } from "@workspace/web/config/app/site"
+import { landingRoutes } from "@workspace/web/config/navigation/landing"
 
 const footerLinks = {
   Producto: [
-    { name: "Funcionalidades", href: "#features" },
-    { name: "Cómo funciona", href: "#how-it-works" },
-    { name: "Precios", href: "#pricing" },
-    { name: "Precios del aceite", href: "#" },
+    { name: "Funcionalidades", href: landingRoutes.features },
+    { name: "Cómo funciona", href: landingRoutes.howItWorks },
+    { name: "Precios", href: landingRoutes.pricing },
+    { name: "Precios del aceite", href: landingRoutes.agricultores },
   ],
   Agricultores: [
-    { name: "Tu parcela en tiempo real", href: "#agricultores" },
-    { name: "Riesgos y alertas", href: "#agricultores" },
-    { name: "Recomendaciones IA", href: "#agricultores" },
-    { name: "Resumen de campaña", href: "#agricultores" },
+    { name: "Tu parcela en tiempo real", href: landingRoutes.agricultores },
+    { name: "Riesgos y alertas", href: landingRoutes.agricultores },
+    { name: "Recomendaciones IA", href: landingRoutes.agricultores },
+    { name: "Resumen de campaña", href: landingRoutes.agricultores },
   ],
   Empresa: [
-    { name: "Sobre nosotros", href: "#" },
-    { name: "Blog", href: "#" },
-    { name: "Contacto", href: "#" },
-    { name: "Soporte", href: "#" },
+    { name: "Sobre nosotros", href: landingRoutes.home },
+    { name: "Contacto", href: landingRoutes.contact },
+    { name: "Soporte", href: landingRoutes.contact },
   ],
   Legal: [
-    { name: "Privacidad", href: "#" },
-    { name: "Términos", href: "#" },
-    { name: "Seguridad", href: "#security" },
+    { name: "Privacidad", href: landingRoutes.privacy },
+    { name: "Términos", href: landingRoutes.terms },
+    { name: "Seguridad", href: landingRoutes.features },
   ],
 }
 
 const socialLinks = [
-  { name: "Twitter", href: "#" },
-  { name: "GitHub", href: "#" },
-  { name: "LinkedIn", href: "#" },
-]
+  {
+    name: "Twitter",
+    href: siteConfig.social.twitter
+      ? `https://twitter.com/${siteConfig.social.twitter.replace("@", "")}`
+      : undefined,
+  },
+  { name: "GitHub", href: siteConfig.social.github },
+].filter((link): link is { name: string; href: string } => Boolean(link.href))
 
 export function FooterSection() {
   return (
@@ -49,12 +55,15 @@ export function FooterSection() {
           <div className="grid grid-cols-2 gap-12 md:grid-cols-6 lg:gap-8">
             {/* Brand Column */}
             <div className="col-span-2">
-              <a href="#" className="mb-6 inline-flex items-center gap-2">
-                <span className="font-display text-2xl">Agropilot</span>
+              <Link
+                href={landingRoutes.home}
+                className="mb-6 inline-flex items-center gap-2"
+              >
+                <span className="font-display text-2xl">{siteConfig.name}</span>
                 <span className="font-mono text-xs text-muted-foreground">
                   TM
                 </span>
-              </a>
+              </Link>
 
               <p className="mb-8 max-w-xs leading-relaxed text-muted-foreground">
                 La plataforma inteligente para el olivar moderno. Monitoriza,
@@ -67,6 +76,8 @@ export function FooterSection() {
                   <a
                     key={link.name}
                     href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="group flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {link.name}
@@ -88,11 +99,6 @@ export function FooterSection() {
                         className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
                       >
                         {link.name}
-                        {"badge" in link && link.badge && (
-                          <span className="rounded-full bg-foreground px-2 py-0.5 text-xs text-background">
-                            {link.badge}
-                          </span>
-                        )}
                       </a>
                     </li>
                   ))}
@@ -105,7 +111,7 @@ export function FooterSection() {
         {/* Bottom Bar */}
         <div className="flex flex-col items-center justify-between gap-4 border-t border-foreground/10 py-8 md:flex-row">
           <p className="text-sm text-muted-foreground">
-            2025 Agropilot. Todos los derechos reservados.
+            2025 {siteConfig.name}. Todos los derechos reservados.
           </p>
 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">

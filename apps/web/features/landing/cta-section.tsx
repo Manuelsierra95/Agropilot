@@ -1,8 +1,10 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
 import { ArrowRight } from "lucide-react"
+import { landingRoutes } from "@workspace/web/config/navigation/landing"
 import { AnimatedTetrahedron } from "@workspace/web/features/landing/animated-tetrahedron"
 
 export function CtaSection() {
@@ -69,16 +71,22 @@ export function CtaSection() {
                   <Button
                     size="lg"
                     className="group h-14 rounded-full bg-foreground px-8 text-base text-background hover:bg-foreground/90"
+                    asChild
                   >
-                    Empieza gratis
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    <Link href={landingRoutes.signIn}>
+                      Empieza gratis
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Link>
                   </Button>
                   <Button
                     size="lg"
                     variant="outline"
                     className="h-14 rounded-full border-foreground/20 px-8 text-base hover:bg-foreground/5"
+                    asChild
                   >
-                    Hablar con el equipo
+                    <Link href={landingRoutes.contact}>
+                      Hablar con el equipo
+                    </Link>
                   </Button>
                 </div>
 

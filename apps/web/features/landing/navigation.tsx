@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@workspace/ui/components/button"
 import { Menu, X } from "lucide-react"
 import Link from "next/link"
-import { navigation } from "@workspace/web/config/navigation/landing"
+import { navigation, landingRoutes } from "@workspace/web/config/navigation/landing"
 import { siteConfig } from "@workspace/web/config/app/site"
 
 export function Navigation() {
@@ -38,7 +38,7 @@ export function Navigation() {
           }`}
         >
           {/* Logo */}
-          <a href="#" className="group flex items-center gap-2">
+          <Link href={landingRoutes.home} className="group flex items-center gap-2">
             <span
               className={`font-display tracking-tight transition-all duration-500 ${isScrolled ? "text-xl" : "text-2xl"}`}
             >
@@ -49,7 +49,7 @@ export function Navigation() {
             >
               TM
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden items-center gap-12 md:flex">
@@ -68,16 +68,16 @@ export function Navigation() {
           {/* Desktop CTA */}
           <div className="hidden items-center gap-4 md:flex">
             <Link
-              href="/auth/sign-in"
+              href={navigation.login.href}
               className={`text-foreground/70 transition-all duration-500 hover:text-foreground ${isScrolled ? "text-xs" : "text-sm"}`}
             >
-              {navigation.register.name}
+              {navigation.login.name}
             </Link>
             <Link
-              href="/dashboard"
+              href={navigation.register.href}
               className={`flex items-center justify-center rounded-full bg-foreground text-background transition-all duration-500 hover:bg-foreground/90 ${isScrolled ? "h-6 px-4 text-xs" : "h-8 px-6 text-sm"}`}
             >
-              {navigation.login.name}
+              {navigation.register.name}
             </Link>
           </div>
 
@@ -139,15 +139,25 @@ export function Navigation() {
             <Button
               variant="outline"
               className="h-14 flex-1 rounded-full text-base"
-              onClick={() => setIsMobileMenuOpen(false)}
+              asChild
             >
-              {navigation.login.name}
+              <Link
+                href={navigation.login.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {navigation.login.name}
+              </Link>
             </Button>
             <Button
               className="h-14 flex-1 rounded-full bg-foreground text-base text-background"
-              onClick={() => setIsMobileMenuOpen(false)}
+              asChild
             >
-              {navigation.register.name}
+              <Link
+                href={navigation.register.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {navigation.register.name}
+              </Link>
             </Button>
           </div>
         </div>

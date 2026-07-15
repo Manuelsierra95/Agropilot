@@ -1,7 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { ArrowRight, Check } from "lucide-react"
+import { landingRoutes } from "@workspace/web/config/navigation/landing"
 
 const plans = [
   {
@@ -16,6 +18,7 @@ const plans = [
       "Soporte por comunidad",
     ],
     cta: "Empieza gratis",
+    href: landingRoutes.signIn,
     popular: false,
   },
   {
@@ -32,6 +35,7 @@ const plans = [
       "Soporte prioritario",
     ],
     cta: "Empieza la prueba",
+    href: landingRoutes.signIn,
     popular: true,
   },
   {
@@ -49,6 +53,7 @@ const plans = [
       "Soporte dedicado",
     ],
     cta: "Contactar",
+    href: landingRoutes.contact,
     popular: false,
   },
 ]
@@ -169,7 +174,8 @@ export function PricingSection() {
               </ul>
 
               {/* CTA */}
-              <button
+              <Link
+                href={plan.href}
                 className={`group flex w-full items-center justify-center gap-2 py-4 text-sm font-medium transition-all ${
                   plan.popular
                     ? "bg-foreground text-primary-foreground hover:bg-foreground/90"
@@ -178,7 +184,7 @@ export function PricingSection() {
               >
                 {plan.cta}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </button>
+              </Link>
             </div>
           ))}
         </div>
@@ -188,7 +194,7 @@ export function PricingSection() {
           Todos los planes incluyen datos meteorológicos, precios de mercado y
           actualizaciones automáticas.{" "}
           <a
-            href="#"
+            href={landingRoutes.features}
             className="underline underline-offset-4 transition-colors hover:text-foreground"
           >
             Comparar todas las funcionalidades
