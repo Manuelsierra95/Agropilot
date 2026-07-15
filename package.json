@@ -11,7 +11,10 @@
     "format": "turbo format",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
-    "seed": "pnpm --filter @workspace/seeds seed"
+    "seed": "pnpm --filter @workspace/seeds seed",
+    "jobs:oil": "pnpm --filter @workspace/jobs job:oil-prices",
+    "jobs:weather": "pnpm --filter @workspace/jobs job:weather-stations",
+    "jobs:recommendations": "pnpm --filter @workspace/jobs job:parcel-recommendations"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
