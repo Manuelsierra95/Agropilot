@@ -6,6 +6,7 @@ import { openAPI, organization } from "better-auth/plugins"
 import { db } from "@workspace/db"
 import { getWebAppUrl, sendEmail } from "@workspace/email"
 import { buildInvitationEmailHtml } from "@workspace/email/templates/invitation"
+import { DEMO_USER_ID } from "./demo"
 import {
   createOrganizationForUser,
   setActiveOrgOnSession,
@@ -45,7 +46,8 @@ const auth = betterAuth({
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BETTER_AUTH_URL,
   emailAndPassword: {
-    enabled: false,
+    enabled: true,
+    disableSignUp: true,
   },
   socialProviders: {
     google: {
@@ -76,6 +78,7 @@ const auth = betterAuth({
     user: {
       create: {
         after: async (user) => {
+          if (user.id === DEMO_USER_ID) return
           await createOrganizationForUser(user)
         },
       },
