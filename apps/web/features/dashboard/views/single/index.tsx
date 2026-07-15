@@ -152,7 +152,7 @@ export function DashboardSingleView({
               className="min-w-0 flex-1"
               contentHeight="h-[240px]"
             />
-          ) : data?.intelligence?.recommendations?.length ? (
+          ) : data ? (
             <Recommendations
               className="min-w-0 flex-1"
               data={{

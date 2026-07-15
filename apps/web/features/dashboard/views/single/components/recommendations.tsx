@@ -10,16 +10,15 @@ import {
 import { Badge } from "@workspace/ui/components/badge"
 import { LinkButton } from "@workspace/web/components/ui/link-button"
 import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
-import type { ParcelApiResponse } from "@workspace/web/lib/parcel/types"
+import type { DashboardRecommendation } from "@workspace/schemas"
 
 type RecommendationsProps = ComponentProps<typeof Card> & {
   data: {
-    recommendations: ParcelApiResponse["recommendations"]
+    recommendations: DashboardRecommendation[]
   }
 }
 
-type RecommendationPriority =
-  ParcelApiResponse["recommendations"][number]["priority"]
+type RecommendationPriority = DashboardRecommendation["priority"]
 
 const priorityConfig: Record<
   RecommendationPriority,

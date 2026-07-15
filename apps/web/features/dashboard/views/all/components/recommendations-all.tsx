@@ -13,7 +13,8 @@ import { LinkButton } from "@workspace/web/components/ui/link-button"
 import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
 
 type RecommendationItem = {
-  parcelId: string
+  id: string
+  parcelId: string | null
   parcelName: string
   type: string
   priority: "low" | "medium" | "high"
@@ -80,7 +81,7 @@ export function RecommendationsAll({
               const config = priorityConfig[rec.priority]
               return (
                 <li
-                  key={`${rec.parcelId}-${rec.type}-${rec.message}`}
+                  key={rec.id}
                   className="flex items-start justify-between gap-3 px-2 py-2"
                 >
                   <div className="min-w-0 space-y-1">

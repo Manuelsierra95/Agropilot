@@ -112,7 +112,7 @@ export function DashboardAllView({
               className="min-w-0 flex-1"
               contentHeight="h-[240px]"
             />
-          ) : data?.intelligence?.allRecommendations?.length ? (
+          ) : data ? (
             <RecommendationsAll
               className="min-w-0 flex-1"
               items={data.intelligence?.allRecommendations ?? []}

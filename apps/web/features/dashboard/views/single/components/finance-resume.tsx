@@ -5,10 +5,12 @@ import * as React from "react"
 import type { FinanceTransactionSnapshot } from "@workspace/web/lib/finance/types"
 import type { Item } from "@workspace/web/features/dashboard/components/olive-price"
 import { Gauge } from "@workspace/ui/components/charts"
-import { Card, CardHeader } from "@workspace/ui/components/card"
+import { Card, CardContent, CardHeader } from "@workspace/ui/components/card"
+import { Separator } from "@workspace/ui/components/separator"
 import { cn } from "@workspace/ui/lib/utils"
 import { LinkButton } from "@workspace/web/components/ui/link-button"
 import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
+import { FinanceInsightsList } from "@workspace/web/features/finance/components/finance-insights-list"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,6 +24,7 @@ interface FinanceRecommendationsProps {
     totalExpenses: number
   }
   redirectButton?: boolean
+  showInsights?: boolean
   className?: string
 }
 
@@ -30,7 +33,10 @@ interface FinanceRecommendationsProps {
 export function FinanceResume({
   className,
   transactions,
+  oils,
   previousCampaign,
+  redirectButton = true,
+  showInsights = false,
 }: FinanceRecommendationsProps) {
   const expensesByCategory = transactions
     .filter((t) => t.type === "gasto")
@@ -49,6 +55,7 @@ export function FinanceResume({
 
   const balance = totalIncome - totalExpenses
   const isPositive = balance >= 0
+  const isEmpty = transactions.length === 0
 
   const prevBalance = previousCampaign
     ? previousCampaign.totalIncome - previousCampaign.totalExpenses
@@ -87,11 +94,17 @@ export function FinanceResume({
   return (
     <Card
       className={cn(
-        "flex h-full w-full min-w-0 flex-col items-center justify-between gap-0 overflow-hidden bg-background pt-0 ring-0",
+        "flex h-full w-full min-w-0 flex-col gap-0 overflow-hidden bg-background pt-0 ring-0",
+        !showInsights && "items-center justify-between",
         className
       )}
     >
-      <CardHeader className="flex w-full flex-1 flex-col items-center justify-center py-4">
+      <CardHeader
+        className={cn(
+          "flex w-full shrink-0 flex-col items-center py-4",
+          showInsights ? "pb-2" : "flex-1 justify-center"
+        )}
+      >
         {/* ── Gauge ── */}
         <div className="mx-auto flex h-auto w-full max-w-[200px] justify-center sm:max-w-[240px]">
           <Gauge
@@ -104,8 +117,8 @@ export function FinanceResume({
             notchCornerRadius={7}
             startAngle={140}
             endAngle={400}
-            inactiveFillOpacity={0.4}
-            defaultLabel="Balance"
+            inactiveFillOpacity={isEmpty ? 0.2 : 0.4}
+            defaultLabel={isEmpty ? "Sin datos" : "Balance"}
             formatOptions={{
               style: "currency",
               currency: "EUR",
@@ -152,11 +165,20 @@ export function FinanceResume({
         )}
       </CardHeader>
 
-      <LinkButton
-        href="/dashboard/finance"
-        text="Ver recomendaciones detalladas"
-        include={SCOPE_KEYS.parcel}
-      />
+      {showInsights ? (
+        <CardContent className="flex min-h-0 w-full flex-1 flex-col overflow-hidden p-0">
+          <Separator className="bg-border/70" />
+          <FinanceInsightsList transactions={transactions} oils={oils} />
+        </CardContent>
+      ) : null}
+
+      {redirectButton ? (
+        <LinkButton
+          href="/dashboard/finance"
+          text="Ver recomendaciones detalladas"
+          include={SCOPE_KEYS.parcel}
+        />
+      ) : null}
     </Card>
   )
 }

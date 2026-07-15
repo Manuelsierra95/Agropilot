@@ -159,24 +159,24 @@ export function OlivePrice({ items, className }: OlivePriceCardProps) {
         className={cn(
           "transition-all duration-300 ease-in-out",
           selectedItem
-            ? "max-h-64 pb-2 opacity-100"
+            ? "max-h-64 overflow-hidden pb-2 opacity-100"
             : "max-h-0 overflow-hidden opacity-0"
         )}
       >
         {selectedItem && (
           <>
             <GradientSeparator orientation="horizontal" />
-            <div className="px-4 pt-4 pb-2">
-              <p className="mb-3 text-xs text-muted-foreground">
+            <div className="min-h-0 overflow-hidden px-4 pt-4 pb-2">
+              <p className="mb-2 text-xs text-muted-foreground">
                 Evolución —{" "}
                 <span className="font-medium text-foreground">
                   {selectedItem.name}
                 </span>
               </p>
               <LineChart
+                className="h-52 w-full min-w-0"
                 data={chartData}
-                margin={{ top: 8, right: 28, bottom: 48, left: 28 }}
-                aspectRatio="3 / 1"
+                margin={{ top: 8, right: 28, bottom: 36, left: 28 }}
               >
                 <Grid horizontal numTicksRows={3} />
                 <Line

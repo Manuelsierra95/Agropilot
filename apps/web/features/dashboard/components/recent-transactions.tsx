@@ -88,15 +88,20 @@ export function RecentTransactions({
   const visible = getVisibleTransactions(data)
 
   return (
-    <Card className={cn("relative w-full bg-background ring-0", className)}>
+    <Card
+      className={cn(
+        "relative flex min-h-[220px] w-full flex-col bg-background ring-0",
+        className
+      )}
+    >
       <CardHeader>
         <CardTitle className="text-balance">Transacciones</CardTitle>
         <CardDescription className="text-pretty">
           Últimas transacciones realizadas.
         </CardDescription>
       </CardHeader>
-      <CardContent className="mask-b-from-50% mask-b-to-100% p-0 pb-2">
-        <div className="overflow-x-auto">
+      <CardContent className="mask-b-from-50% mask-b-to-100% flex min-h-0 flex-1 flex-col p-0 pb-[20%]">
+        <div className="flex min-h-[140px] flex-1 flex-col overflow-x-auto">
           <Table className="min-w-[540px] border-t">
             <TableCaption className="sr-only">
               Ultimas transacciones con metodo y fecha.
@@ -124,9 +129,9 @@ export function RecentTransactions({
             </TableHeader>
             <TableBody>
               {visible.length === 0 ? (
-                <TableRow>
+                <TableRow className="hover:bg-transparent">
                   <TableCell
-                    className="px-6 py-6 text-center text-xs text-muted-foreground"
+                    className="h-full px-6 py-16 text-center text-xs text-muted-foreground"
                     colSpan={showParcelColumn ? 5 : 4}
                   >
                     Sin transacciones recientes.

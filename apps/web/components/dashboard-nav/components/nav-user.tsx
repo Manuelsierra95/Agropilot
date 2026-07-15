@@ -1,5 +1,6 @@
 "use client"
 
+import type { MouseEvent } from "react"
 import { useRouter } from "next/navigation"
 import {
   Avatar,
@@ -26,12 +27,15 @@ import { PreservedLink } from "@workspace/web/components/preserved-link"
 import { NavUserPlaceholder } from "@workspace/web/components/dashboard-nav/components/switcher-placeholders"
 import { signOut, useSession } from "@workspace/web/lib/auth-client"
 import { SCOPE_KEYS } from "@workspace/web/lib/navigation/scope"
+import { useTheme } from "next-themes"
 import {
   BadgeCheckIcon,
   Building2Icon,
   ChevronsUpDownIcon,
   CreditCardIcon,
   LogOutIcon,
+  MoonIcon,
+  SunIcon,
 } from "lucide-react"
 
 const SETTINGS_LINKS = [
@@ -65,12 +69,30 @@ export function NavUser() {
   const router = useRouter()
   const { isMobile } = useSidebar()
   const { data: session, isPending } = useSession()
+  const { resolvedTheme, setTheme } = useTheme()
 
   const user = parseAuthUser(session?.user)
 
   const handleSignOut = async () => {
     await signOut()
     router.push("/auth/sign-in")
+  }
+
+  const handleThemeToggle = (event: MouseEvent<HTMLDivElement>) => {
+    const nextTheme = resolvedTheme === "dark" ? "light" : "dark"
+    const root = document.documentElement
+
+    if (!document.startViewTransition) {
+      setTheme(nextTheme)
+      return
+    }
+
+    root.style.setProperty("--x", `${event.clientX}px`)
+    root.style.setProperty("--y", `${event.clientY}px`)
+
+    document.startViewTransition(() => {
+      setTheme(nextTheme)
+    })
   }
 
   if (isPending || !user) {
@@ -132,6 +154,11 @@ export function NavUser() {
                 </DropdownMenuItem>
               ))}
             </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleThemeToggle}>
+              {resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}
+              {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => void handleSignOut()}>
               <LogOutIcon />
