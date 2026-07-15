@@ -22,7 +22,7 @@ import {
 
 export const dashboardOverviewRecommendationItemSchema =
   dashboardRecommendationSchema.extend({
-    parcelId: z.string().uuid(),
+    parcelId: z.string().uuid().nullable(),
     parcelName: z.string(),
   })
 

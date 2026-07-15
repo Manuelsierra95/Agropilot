@@ -26,6 +26,10 @@ import {
   getParcelsRisksForDashboard,
 } from "@workspace/api/services/parcels"
 import { listUpcomingWeekTasks } from "@workspace/api/services/tasks"
+import {
+  listActiveRecommendations,
+  mapRecommendationToDashboard,
+} from "@workspace/api/services/recommendations"
 
 const cache5min = createCacheMiddleware({ ttlSeconds: 300 })
 
@@ -109,6 +113,7 @@ export const dashboardRoutes = new Hono<{
       comparison,
       recentTransactions,
       allRecommendationsRaw,
+      orgRecommendations,
       allRisksRaw,
       upcomingWeek,
       parcelsMap,
@@ -123,19 +128,28 @@ export const dashboardRoutes = new Hono<{
         limit: query.limit ?? 50,
       }),
       getParcelsRecommendationsForDashboard(organizationId),
+      listActiveRecommendations(organizationId, { status: "pending" }),
       getParcelsRisksForDashboard(organizationId),
       listUpcomingWeekTasks(organizationId, { weekStart: query.from }),
       getParcelsForMap(organizationId),
     ])
 
-    const allRecommendations = allRecommendationsRaw.parcels.flatMap(
-      (parcel) =>
+    const allRecommendations = [
+      ...allRecommendationsRaw.parcels.flatMap((parcel) =>
         parcel.recommendations.map((rec) => ({
           parcelId: parcel.parcelId,
           parcelName: parcel.name,
           ...rec,
         }))
-    )
+      ),
+      ...orgRecommendations
+        .filter((rec) => !rec.parcelId)
+        .map((rec) => ({
+          ...mapRecommendationToDashboard(rec),
+          parcelId: null,
+          parcelName: "Organización",
+        })),
+    ]
     allRecommendations.sort(
       (a, b) =>
         RECOMMENDATION_PRIORITY_ORDER[a.priority] -
