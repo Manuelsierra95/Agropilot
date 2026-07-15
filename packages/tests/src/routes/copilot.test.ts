@@ -1,21 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
-const copilotMocks = vi.hoisted(() => ({
-  streamCopilotResponse: vi.fn(),
-}))
-
-const contextMocks = vi.hoisted(() => ({
-  resolveCopilotContext: vi.fn(),
-}))
-
-vi.mock("@workspace/copilot", () => ({
-  streamCopilotResponse: copilotMocks.streamCopilotResponse,
-}))
-
 vi.mock("@workspace/api/services/copilot", () => ({
-  resolveCopilotContext: contextMocks.resolveCopilotContext,
-  executeCopilotQuery: vi.fn(),
-  getLastUserText: vi.fn(),
   getCopilotSuggestions: vi.fn().mockResolvedValue([
     "Muéstrame ingresos y gastos del último trimestre",
     "¿Cómo está el clima en mis parcelas?",
@@ -42,16 +27,6 @@ describe("copilot routes", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockUnauthenticated()
-    copilotMocks.streamCopilotResponse.mockReturnValue(
-      new Response("stream", { status: 200 })
-    )
-    contextMocks.resolveCopilotContext.mockResolvedValue({
-      organizationId: "org-1",
-      userId: "user-1",
-      organizationName: "Finca Demo",
-      activeParcelId: "parcel-1",
-      activeParcelName: "Parcela Norte",
-    })
   })
 
   it("GET /copilot/suggestions returns 401 without auth", async () => {
@@ -96,10 +71,9 @@ describe("copilot routes", () => {
     })
 
     expect(res.status).toBe(400)
-    expect(copilotMocks.streamCopilotResponse).not.toHaveBeenCalled()
   })
 
-  it("POST /copilot/chat streams response when authenticated", async () => {
+  it("POST /copilot/chat returns under construction message when authenticated", async () => {
     mockAuthenticatedSession()
 
     const res = await apiRequest(app, "/api/v1/copilot/chat", {
@@ -110,12 +84,13 @@ describe("copilot routes", () => {
       }),
     })
 
+    const body = await res.text()
+
     expect(res.status).toBe(200)
-    expect(contextMocks.resolveCopilotContext).toHaveBeenCalledOnce()
-    expect(copilotMocks.streamCopilotResponse).toHaveBeenCalledOnce()
+    expect(body).toContain("en construcción")
   })
 
-  it("POST /copilot/chat passes parcelId into copilot context", async () => {
+  it("POST /copilot/chat accepts parcelId while copilot is under construction", async () => {
     mockAuthenticatedSession()
 
     const res = await apiRequest(app, "/api/v1/copilot/chat", {
@@ -127,20 +102,9 @@ describe("copilot routes", () => {
       }),
     })
 
+    const body = await res.text()
+
     expect(res.status).toBe(200)
-    expect(contextMocks.resolveCopilotContext).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.any(String),
-      parcelId
-    )
-    expect(copilotMocks.streamCopilotResponse).toHaveBeenCalledWith(
-      [userMessage],
-      expect.objectContaining({
-        ctx: expect.objectContaining({
-          activeParcelId: "parcel-1",
-          activeParcelName: "Parcela Norte",
-        }),
-      })
-    )
+    expect(body).toContain("en construcción")
   })
 })

@@ -25,9 +25,27 @@ const taskMocks = vi.hoisted(() => ({
   listUpcomingWeekTasks: vi.fn(),
 }))
 
+const recommendationMocks = vi.hoisted(() => ({
+  listActiveRecommendations: vi.fn(),
+  mapRecommendationToDashboard: vi.fn((rec: {
+    id: string
+    type: string
+    priority: string
+    title: string
+    details: string
+  }) => ({
+    id: rec.id,
+    type: rec.type,
+    priority: rec.priority,
+    message: rec.title,
+    details: rec.details,
+  })),
+}))
+
 vi.mock("@workspace/api/services/finance", () => financeMocks)
 vi.mock("@workspace/api/services/parcels", () => parcelMocks)
 vi.mock("@workspace/api/services/tasks", () => taskMocks)
+vi.mock("@workspace/api/services/recommendations", () => recommendationMocks)
 
 import { app } from "@workspace/api/app"
 import {
@@ -109,6 +127,8 @@ describe("dashboard routes", () => {
       data: { risks: RISKS },
     })
     parcelMocks.getParcelsForMap.mockResolvedValue([])
+
+    recommendationMocks.listActiveRecommendations.mockResolvedValue([])
 
     taskMocks.listUpcomingWeekTasks.mockResolvedValue([])
 
@@ -201,6 +221,18 @@ describe("dashboard routes", () => {
     })
     parcelMocks.getParcelsForMap.mockResolvedValue([])
 
+    recommendationMocks.listActiveRecommendations.mockResolvedValue([
+      {
+        id: "rec-00000000-0000-4000-8000-000000000004",
+        parcelId: null,
+        parcelName: null,
+        type: "sale",
+        priority: "low",
+        title: "org-rec",
+        details: "d",
+      },
+    ])
+
     taskMocks.listUpcomingWeekTasks.mockResolvedValue([])
 
     const res = await apiRequest(app, "/api/v1/dashboard/overview")
@@ -212,10 +244,15 @@ describe("dashboard routes", () => {
     expect(body.data.crop.allOverviews).toHaveLength(1)
     expect(body.data.finance.comparison.parcels).toHaveLength(1)
 
-    expect(body.data.intelligence.allRecommendations).toHaveLength(2)
+    expect(body.data.intelligence.allRecommendations).toHaveLength(3)
     expect(body.data.intelligence.allRecommendations[0].priority).toBe("high")
     expect(body.data.intelligence.allRecommendations[0].parcelId).toBe(PARCEL_ID)
     expect(body.data.intelligence.allRecommendations[0].parcelName).toBe("P1")
+    expect(body.data.intelligence.allRecommendations[2]).toMatchObject({
+      parcelId: null,
+      parcelName: "Organización",
+      message: "org-rec",
+    })
 
     expect(body.data.intelligence.allRisks).toHaveLength(1)
     expect(body.data.intelligence.allRisks[0]).toEqual({
