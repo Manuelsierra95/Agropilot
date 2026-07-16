@@ -29,12 +29,14 @@ interface CampaignMonthPoint {
   date: Date
   productionKg: number
   valueEur: number
+  [key: string]: unknown
 }
 
 interface BarMonthPoint {
   month: string
   currentKg: number
   prevKg: number
+  [key: string]: unknown
 }
 
 export interface ProductionValueProps {

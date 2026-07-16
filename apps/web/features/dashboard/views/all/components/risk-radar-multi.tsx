@@ -73,7 +73,7 @@ function riskHeatBand(scorePct: number) {
   const clamped = Math.max(0, Math.min(scorePct, 100))
   return (
     RISK_HEAT_BANDS.find((band) => clamped < band.max) ??
-    RISK_HEAT_BANDS[RISK_HEAT_BANDS.length - 1]
+    RISK_HEAT_BANDS[RISK_HEAT_BANDS.length - 1]!
   )
 }
 

@@ -65,7 +65,7 @@ export function CampaignAccumulatedMargin({
   const breakevenIdx = chartData.findIndex((d) => d.value >= d.cost)
   const breakevenLabel =
     breakevenIdx >= 0
-      ? chartData[breakevenIdx].date.toLocaleDateString("es-ES", {
+      ? chartData[breakevenIdx]!.date.toLocaleDateString("es-ES", {
           day: "numeric",
           month: "short",
         })
