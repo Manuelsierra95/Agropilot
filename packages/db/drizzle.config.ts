@@ -1,6 +1,9 @@
 import { defineConfig } from "drizzle-kit"
+import dotenv from "dotenv"
 
-const databaseUrl = "postgresql://myuser:mypassword@localhost:5432/mydb"
+dotenv.config()
+
+const databaseUrl = process.env.DATABASE
 
 if (!databaseUrl) {
   throw new Error("Missing database URL. Set DATABASE_URL.")
