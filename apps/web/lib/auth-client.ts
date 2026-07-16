@@ -1,9 +1,9 @@
 import { createAuthClient } from "better-auth/react"
 import { organizationClient } from "better-auth/client/plugins"
-import { getVersionedApiPath } from "@workspace/web/lib/env"
+import { getAuthClientBaseUrl } from "@workspace/web/lib/env"
 
 export const authClient: any = createAuthClient({
-  baseURL: `${getVersionedApiPath()}/auth`,
+  baseURL: getAuthClientBaseUrl(),
   plugins: [
     organizationClient({
       dynamicAccessControl: {

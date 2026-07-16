@@ -48,6 +48,15 @@ export function getClientApiBaseUrl(): string {
   return ""
 }
 
+/** Better Auth exige URL absoluta en SSR/build; en el navegador usa el origen actual. */
+export function getAuthClientBaseUrl(): string {
+  const authPath = `${getVersionedApiPath()}/auth`
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}${authPath}`
+  }
+  return `${getServerApiBaseUrl()}${authPath}`
+}
+
 function trimEnvValue(value: string | undefined): string | undefined {
   if (!value) return undefined
 
