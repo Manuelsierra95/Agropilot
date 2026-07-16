@@ -217,6 +217,7 @@ export function TimeSeriesChartInner({
 
   const contextValue = {
     data,
+    renderData: data,
     xScale,
     yScale,
     width,

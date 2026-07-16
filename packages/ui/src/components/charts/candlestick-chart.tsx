@@ -232,6 +232,7 @@ function ChartInner({
 
   const contextValue = {
     data,
+    renderData: data,
     xScale,
     yScale,
     width,
