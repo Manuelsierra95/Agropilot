@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { SettingsOrganizationSection } from "@workspace/web/features/settings/organization"
 import { api } from "@workspace/web/lib/api"
 
@@ -8,10 +9,12 @@ export default async function SettingsOrganizationPage() {
   const isAdmin = org.viewerRole === "admin" || isOwner
 
   return (
-    <SettingsOrganizationSection
-      org={org}
-      canEdit={isOwner}
-      canManageMembers={isAdmin}
-    />
+    <Suspense>
+      <SettingsOrganizationSection
+        org={org}
+        canEdit={isOwner}
+        canManageMembers={isAdmin}
+      />
+    </Suspense>
   )
 }

@@ -1,5 +1,10 @@
+import { Suspense } from "react"
 import Finance from "@workspace/web/features/finance"
 
 export default function FinancePage() {
-  return <Finance />
+  return (
+    <Suspense>
+      <Finance />
+    </Suspense>
+  )
 }

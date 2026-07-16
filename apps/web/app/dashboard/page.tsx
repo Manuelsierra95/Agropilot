@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { redirect } from "next/navigation"
 
 import DashboardOverview from "@workspace/web/features/dashboard"
@@ -20,5 +21,9 @@ export default async function DashboardOverviewPage({
     redirect(redirectTo)
   }
 
-  return <DashboardOverview />
+  return (
+    <Suspense>
+      <DashboardOverview />
+    </Suspense>
+  )
 }

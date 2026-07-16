@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import Calendar from "@workspace/web/features/calendar"
 
 export default function CalendarPage() {
@@ -8,5 +9,9 @@ export default function CalendarPage() {
   // } else {
   //   redirect('/dashboard');
   // }
-  return <Calendar />
+  return (
+    <Suspense>
+      <Calendar />
+    </Suspense>
+  )
 }

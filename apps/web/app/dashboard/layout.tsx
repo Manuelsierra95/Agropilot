@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { DashboardProviders } from "@workspace/web/components/dashboard-nav/dashboard-providers"
 import { NavigationWrapper } from "@workspace/web/components/dashboard-nav/navigation-wrapper"
 import { Providers } from "@workspace/web/providers/providers"
@@ -11,12 +12,14 @@ export default async function DashboardLayout({
 }>) {
   return (
     <Providers>
-      <NuqsAdapter>
-        <NextTopLoader color="var(--primary)" showSpinner={false} />
-        <DashboardProviders>
-          <NavigationWrapper>{children}</NavigationWrapper>
-        </DashboardProviders>
-      </NuqsAdapter>
+      <Suspense>
+        <NuqsAdapter>
+          <NextTopLoader color="var(--primary)" showSpinner={false} />
+          <DashboardProviders>
+            <NavigationWrapper>{children}</NavigationWrapper>
+          </DashboardProviders>
+        </NuqsAdapter>
+      </Suspense>
     </Providers>
   )
 }
