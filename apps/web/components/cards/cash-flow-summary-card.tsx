@@ -185,7 +185,9 @@ function buildCashFlowChartData(
 
   const lastIndex = points.length - 1
   const lastValue = points[lastIndex]?.trend ?? 0
-  points[lastIndex] = { ...points[lastIndex], projection: lastValue }
+  if (points[lastIndex]) {
+    points[lastIndex] = { ...points[lastIndex], projection: lastValue }
+  }
 
   let projectionValue = lastValue
   for (let i = 1; i <= projectionDays; i += 1) {

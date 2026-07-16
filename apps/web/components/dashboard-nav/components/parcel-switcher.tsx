@@ -48,7 +48,7 @@ export function ParcelSwitcher({ variant = "sidebar" }: ParcelSwitcherProps) {
 
   const ActiveIcon = isAllSelected
     ? LayersIcon
-    : getParcelIcon(activeParcel?.cropType)
+    : getParcelIcon(activeParcel?.cropType ?? "")
   const displayName = isAllSelected
     ? ALL_PARCELS_LABEL
     : (activeParcel?.name ?? parcels[0]!.name)

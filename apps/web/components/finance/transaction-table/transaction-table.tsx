@@ -1,5 +1,13 @@
 "use client"
 
+import type { ColumnMeta } from "@tanstack/react-table"
+
+declare module "@tanstack/react-table" {
+  interface ColumnMeta<TData, TValue> {
+    className?: string
+  }
+}
+
 import {
   IconChevronLeft,
   IconChevronRight,

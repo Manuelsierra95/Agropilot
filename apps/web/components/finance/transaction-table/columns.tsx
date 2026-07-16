@@ -199,7 +199,9 @@ export const columns: ColumnDef<Transaction>[] = [
 export function getColumns(showParcelColumn = false): ColumnDef<Transaction>[] {
   if (!showParcelColumn) return columns
 
-  const conceptIndex = columns.findIndex((col) => col.accessorKey === "concept")
+  const conceptIndex = columns.findIndex(
+    (col) => "accessorKey" in col && col.accessorKey === "concept"
+  )
   if (conceptIndex === -1) return [...columns, parcelColumn]
 
   return [
