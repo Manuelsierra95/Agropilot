@@ -6,7 +6,7 @@ const getUserMe = cache(
   (): Promise<UserMeResponse> =>
     client.api.v1.user.me
       .$get()
-      .then((response) => response.json() as Promise<{ data: UserMeResponse }>)
+      .then((response) => response.json() as unknown as Promise<{ data: UserMeResponse }>)
       .then((body) => body.data)
 )
 
@@ -16,7 +16,7 @@ const updateUserOnboarding = async (
   const response = await client.api.v1.user.me.$patch({
     json: { onboardingStep },
   })
-  const body = (await response.json()) as { data: UserMeResponse }
+  const body = (await response.json()) as unknown as { data: UserMeResponse }
   return body.data
 }
 

@@ -38,7 +38,7 @@ const getActiveOrganization = cache(
       .$get()
       .then(
         (response) =>
-          response.json() as Promise<{ data: ActiveOrganizationData }>
+          response.json() as unknown as Promise<{ data: ActiveOrganizationData }>
       )
       .then((body) => body.data)
 )
@@ -49,7 +49,7 @@ const getOrganizationMembers = cache(
       .$get()
       .then(
         (response) =>
-          response.json() as Promise<{
+          response.json() as unknown as Promise<{
             data: { members: OrganizationMember[] }
           }>
       )
@@ -62,7 +62,7 @@ const getOrganizationMe = cache(
       .$get()
       .then(
         (response) =>
-          response.json() as Promise<{ data: OrganizationMeResponse }>
+          response.json() as unknown as Promise<{ data: OrganizationMeResponse }>
       )
       .then((body) => body.data)
 )
@@ -70,7 +70,7 @@ const getOrganizationMe = cache(
 const updateOrganization = (data: UpdateOrganizationInput) =>
   client.api.v1.organization.name
     .$put({ json: data })
-    .then((r) => r.json() as Promise<{ data: UpdateOrganizationInput }>)
+    .then((r) => r.json() as unknown as Promise<{ data: UpdateOrganizationInput }>)
     .then((body) => body.data)
 
 const listInvitations = async (): Promise<InvitationSelect[]> => {

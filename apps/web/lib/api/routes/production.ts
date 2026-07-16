@@ -14,7 +14,7 @@ const getHarvestDeliveries = (
     .$get({ query })
     .then(
       (res) =>
-        res.json() as Promise<{
+        res.json() as unknown as Promise<{
           data: { deliveries: HarvestDeliveryListItem[] }
         }>
     )
@@ -25,7 +25,7 @@ const createHarvestDelivery = (data: HarvestDeliveryCreateInput) =>
     .$post({ json: data })
     .then(
       (res) =>
-        res.json() as Promise<{
+        res.json() as unknown as Promise<{
           data: { delivery: { id: string } }
         }>
     )
@@ -39,7 +39,7 @@ const createHarvestSale = (data: HarvestSaleCreateInput) =>
     .$post({ json: data })
     .then(
       (res) =>
-        res.json() as Promise<{
+        res.json() as unknown as Promise<{
           data: {
             transaction: { id: string }
             sales: { id: string }[]

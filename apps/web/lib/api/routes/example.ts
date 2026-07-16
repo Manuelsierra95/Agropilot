@@ -1,11 +1,13 @@
 import { client } from "@workspace/web/lib/api/client"
 
+const apiAny = client.api.v1 as any
+
 export const exampleApi = {
-  public: () => client.api.v1.example.public!.$get({}),
+  public: () => apiAny.example.public!.$get({}),
   feed: (query: { page: string; role: "admin" | "member" }) =>
-    client.api.v1.example.feed!.$get({
+    apiAny.example.feed!.$get({
       query,
     }),
-  profile: () => client.api.v1.example.profile!.$get({}),
-  admin: () => client.api.v1.example.admin!.$get({}),
+  profile: () => apiAny.example.profile!.$get({}),
+  admin: () => apiAny.example.admin!.$get({}),
 }

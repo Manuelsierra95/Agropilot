@@ -31,9 +31,9 @@ const acceptRecommendation = (
   recommendationId: string,
   input: RecommendationAcceptInput = {}
 ): Promise<{ task: TaskSelect; recommendation: RecommendationSelect }> =>
-  client.api.v1.recommendations[":recommendationId"].accept
+  (client.api.v1.recommendations[":recommendationId"].accept as any)
     .$post({ param: { recommendationId }, json: input })
-    .then((res) => {
+    .then((res: Response) => {
       if (!res.ok) {
         throw new Error("Failed to accept recommendation")
       }
@@ -41,7 +41,7 @@ const acceptRecommendation = (
         data: { task: TaskSelect; recommendation: RecommendationSelect }
       }>
     })
-    .then((body) => {
+    .then((body: { data: { task: TaskSelect; recommendation: RecommendationSelect } }) => {
       notifyDashboardMutation(["events", "daily"], {
         parcelId: body.data.task.parcelId ?? undefined,
       })

@@ -7,7 +7,7 @@ const getBillingMe = cache(
     client.api.v1.billing.me
       .$get()
       .then(
-        (response) => response.json() as Promise<{ data: BillingMeResponse }>
+        (response) => response.json() as unknown as Promise<{ data: BillingMeResponse }>
       )
       .then((body) => body.data)
 )

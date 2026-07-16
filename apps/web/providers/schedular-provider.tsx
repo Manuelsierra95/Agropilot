@@ -181,7 +181,7 @@ export const SchedulerProvider = ({
 
   const getDayName = (day: number) => {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-    return days[day]
+    return days[day] ?? ""
   }
 
   const getters: Getters = {

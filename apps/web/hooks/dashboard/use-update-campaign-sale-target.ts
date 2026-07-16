@@ -19,6 +19,8 @@ function patchOverviewCampaignTarget(
 ): DashboardOverviewSingle | DashboardOverviewAll {
   if (!("sellingWindow" in overview.market)) return overview
 
+  const marketAny = overview.market as any
+
   return {
     ...overview,
     market: {
@@ -27,6 +29,7 @@ function patchOverviewCampaignTarget(
         ...overview.market.sellingWindow,
         campaignTarget,
       },
+      allSellingWindows: marketAny.allSellingWindows ?? [],
     },
   }
 }

@@ -8,7 +8,7 @@ const getDashboardOverview = (
 ): Promise<DashboardOverview> =>
   client.api.v1.dashboard.overview
     .$get({ query: toScopeQuery(scope) })
-    .then((res) => res.json() as Promise<{ data: DashboardOverview }>)
+    .then((res) => res.json() as unknown as Promise<{ data: DashboardOverview }>)
     .then((res) => res.data)
 
 export const dashboardApi = {

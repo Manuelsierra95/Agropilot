@@ -13,7 +13,7 @@ const getParcelWeather = (
       if (!res.ok) {
         throw new Error("Failed to fetch parcel weather")
       }
-      return res.json() as Promise<{ data: { weather: ParcelWeatherResponse } }>
+      return res.json() as unknown as Promise<{ data: { weather: ParcelWeatherResponse } }>
     })
     .then((res) => res.data.weather)
 

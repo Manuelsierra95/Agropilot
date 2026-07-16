@@ -1,10 +1,10 @@
 import { create } from "zustand"
-import { mockEvents, Event } from "@workspace/web/store/mockEvents"
+import { mockEvents, FarmEvent } from "@workspace/web/store/mockEvents"
 
 interface TodayEventStore {
-  events: Event[]
-  getEvents: (parcelId?: string) => Event[]
-  addEvent: (event: Event, parcelId: string) => void
+  events: FarmEvent[]
+  getEvents: (parcelId?: string) => FarmEvent[]
+  addEvent: (event: FarmEvent, parcelId: string) => void
 }
 
 export const useTodayEventStore = create<TodayEventStore>((set, get) => ({
@@ -15,7 +15,7 @@ export const useTodayEventStore = create<TodayEventStore>((set, get) => ({
     return get().events.filter((event) => event.parcelId === parcelId)
   },
 
-  addEvent: (event: Event, parcelId: string) => {
+  addEvent: (event: FarmEvent, parcelId: string) => {
     set((state) => ({
       events: [...state.events, { ...event, parcelId }],
     }))

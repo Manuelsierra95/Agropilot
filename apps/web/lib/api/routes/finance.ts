@@ -23,10 +23,10 @@ import { cache } from "react"
 const listTransactions = cache(
   (): Promise<TransactionSelect[]> =>
     client.api.v1.finance
-      .$get()
+      .$get({ query: {} })
       .then(
         (res) =>
-          res.json() as Promise<{ data: { transactions: TransactionSelect[] } }>
+          res.json() as unknown as Promise<{ data: { transactions: TransactionSelect[] } }>
       )
       .then((res) => res.data.transactions)
 )
@@ -39,7 +39,7 @@ const getTransactionById = cache(
       })
       .then(
         (res) =>
-          res.json() as Promise<{ data: { transaction: TransactionSelect } }>
+          res.json() as unknown as Promise<{ data: { transaction: TransactionSelect } }>
       )
       .then((res) => res.data.transaction)
 )
@@ -51,7 +51,7 @@ const createTransaction = (data: TransactionCreateInput) =>
     })
     .then(
       (res) =>
-        res.json() as Promise<{ data: { transaction: TransactionSelect } }>
+        res.json() as unknown as Promise<{ data: { transaction: TransactionSelect } }>
     )
     .then((res) => {
       notifyDashboardMutation(["finance", "production"])
@@ -65,7 +65,7 @@ const bulkCreateTransactions = (data: TransactionBulkCreateInput) =>
     })
     .then(
       (res) =>
-        res.json() as Promise<{ data: { transactions: TransactionSelect[] } }>
+        res.json() as unknown as Promise<{ data: { transactions: TransactionSelect[] } }>
     )
     .then((res) => {
       notifyDashboardMutation(["finance", "production"])
@@ -80,7 +80,7 @@ const updateTransaction = (id: string, data: TransactionUpdateInput) =>
     })
     .then(
       (res) =>
-        res.json() as Promise<{ data: { transaction: TransactionSelect } }>
+        res.json() as unknown as Promise<{ data: { transaction: TransactionSelect } }>
     )
     .then((res) => {
       notifyDashboardMutation(["finance", "production"])
@@ -92,7 +92,7 @@ const deleteTransaction = (id: string) =>
     .$delete({
       param: { id },
     })
-    .then((res) => res.json() as Promise<{ data: { id: string } }>)
+    .then((res) => res.json() as unknown as Promise<{ data: { id: string } }>)
     .then((res) => {
       notifyDashboardMutation(["finance", "production"])
       return res.data.id
@@ -103,7 +103,7 @@ const getOlivePrices = (): Promise<DashboardOlivePriceItem[]> =>
     .$get()
     .then(
       (res) =>
-        res.json() as Promise<{
+        res.json() as unknown as Promise<{
           data: { olivePrices: DashboardOlivePriceItem[] }
         }>
     )
@@ -116,7 +116,7 @@ const getSellingWindow = (
     .$get({ query: { ...toScopeQuery(scope), include: "sellingWindow" } })
     .then(
       (res) =>
-        res.json() as Promise<{
+        res.json() as unknown as Promise<{
           data: { sellingWindow: DashboardSellingWindow }
         }>
     )
@@ -129,7 +129,7 @@ const getParcelsSellingWindows = (
     .$get({ query: { ...toScopeQuery(scope), include: "sellingWindows" } })
     .then(
       (res) =>
-        res.json() as Promise<{
+        res.json() as unknown as Promise<{
           data: { sellingWindows: DashboardParcelsSellingWindows }
         }>
     )
@@ -142,7 +142,7 @@ const getFinanceResume = (
     .$get({ query: { ...toScopeQuery(scope), include: "resume" } })
     .then(
       (res) =>
-        res.json() as Promise<{ data: { resume: DashboardFinanceResume } }>
+        res.json() as unknown as Promise<{ data: { resume: DashboardFinanceResume } }>
     )
     .then((res) => res.data.resume)
 
@@ -153,7 +153,7 @@ const getCampaignMargin = (
     .$get({ query: { ...toScopeQuery(scope), include: "campaignMargin" } })
     .then(
       (res) =>
-        res.json() as Promise<{
+        res.json() as unknown as Promise<{
           data: { campaignMargin: DashboardCampaignMargin }
         }>
     )
@@ -166,7 +166,7 @@ const getRecentTransactions = (
     .$get({ query: { ...toScopeQuery(scope), include: "recentTransactions" } })
     .then(
       (res) =>
-        res.json() as Promise<{
+        res.json() as unknown as Promise<{
           data: { recentTransactions: DashboardTransactionSnapshot[] }
         }>
     )
@@ -179,7 +179,7 @@ const getScopedTransactions = (
     .$get({ query: { ...toScopeQuery(scope), include: "transactions" } })
     .then(
       (res) =>
-        res.json() as Promise<{
+        res.json() as unknown as Promise<{
           data: { transactions: DashboardFinanceTransaction[] }
         }>
     )
@@ -192,7 +192,7 @@ const getProductionValue = (
     .$get({ query: { ...toScopeQuery(scope), include: "productionValue" } })
     .then(
       (res) =>
-        res.json() as Promise<{
+        res.json() as unknown as Promise<{
           data: { productionValue: DashboardProductionValue }
         }>
     )
@@ -205,7 +205,7 @@ const getParcelsFinanceComparison = (
     .$get({ query: { ...toScopeQuery(scope), include: "parcelsComparison" } })
     .then(
       (res) =>
-        res.json() as Promise<{
+        res.json() as unknown as Promise<{
           data: { parcelsComparison: DashboardParcelsFinanceComparison }
         }>
     )
@@ -216,7 +216,7 @@ const updateCampaignSaleTarget = (data: UpdateCampaignSaleTargetInput) =>
     .$patch({ json: data })
     .then(
       (res) =>
-        res.json() as Promise<{
+        res.json() as unknown as Promise<{
           data: { campaignTarget: number }
         }>
     )

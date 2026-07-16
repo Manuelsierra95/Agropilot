@@ -1,4 +1,4 @@
-type FarmEvent = {
+export type FarmEvent = {
   id: string
 
   // Identidad
