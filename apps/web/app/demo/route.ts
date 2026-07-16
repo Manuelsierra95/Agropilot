@@ -1,18 +1,19 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { auth } from "@workspace/auth"
 import {
   DEMO_USER_EMAIL,
   isDemoEnabled,
 } from "@workspace/auth/demo"
+import { webAppUrl } from "@workspace/web/lib/env"
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   if (!isDemoEnabled()) {
-    return NextResponse.redirect(new URL("/", request.url))
+    return NextResponse.redirect(webAppUrl("/"))
   }
 
   const password = process.env.DEMO_USER_PASSWORD
   if (!password) {
-    return NextResponse.redirect(new URL("/", request.url))
+    return NextResponse.redirect(webAppUrl("/"))
   }
 
   const signInResponse = await auth.api.signInEmail({
@@ -24,10 +25,10 @@ export async function GET(request: NextRequest) {
   })
 
   if (!signInResponse.ok) {
-    return NextResponse.redirect(new URL("/", request.url))
+    return NextResponse.redirect(webAppUrl("/"))
   }
 
-  const redirect = NextResponse.redirect(new URL("/dashboard", request.url))
+  const redirect = NextResponse.redirect(webAppUrl("/dashboard"))
 
   for (const cookie of signInResponse.headers.getSetCookie()) {
     redirect.headers.append("Set-Cookie", cookie)

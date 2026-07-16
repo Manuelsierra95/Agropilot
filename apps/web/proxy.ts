@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { auth } from "@workspace/auth"
+import { webAppUrl } from "@workspace/web/lib/env"
 
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -10,7 +11,7 @@ export default async function proxy(request: NextRequest) {
   })
 
   if (!session) {
-    return NextResponse.redirect(new URL("/auth/sign-in", request.url))
+    return NextResponse.redirect(webAppUrl("/auth/sign-in"))
   }
 
   const { onboardingStatus, onboardingStep } = session.user
@@ -19,13 +20,11 @@ export default async function proxy(request: NextRequest) {
 
   if (needsOnboarding && pathname.startsWith("/dashboard")) {
     const step = onboardingStep ?? 1
-    return NextResponse.redirect(
-      new URL(`/onboarding?step=${step}`, request.url)
-    )
+    return NextResponse.redirect(webAppUrl(`/onboarding?step=${step}`))
   }
 
   if (!needsOnboarding && pathname.startsWith("/onboarding")) {
-    return NextResponse.redirect(new URL("/dashboard", request.url))
+    return NextResponse.redirect(webAppUrl("/dashboard"))
   }
 
   return NextResponse.next()

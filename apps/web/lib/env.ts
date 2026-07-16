@@ -26,3 +26,21 @@ export type env = z.infer<typeof envSchema>
 
 export const apiBaseUrl = env.PUBLIC_API_URL
 export const versionedApiUrl = `${apiBaseUrl}/api/${env.PUBLIC_API_VERSION}`
+
+function resolveWebAppOrigin(): string {
+  const explicit = process.env.WEB_APP_URL?.trim()
+  if (explicit) return explicit.replace(/\/$/, "")
+
+  try {
+    return new URL(env.PUBLIC_REDIRECT_URL).origin
+  } catch {
+    return "http://localhost:3000"
+  }
+}
+
+export const webAppOrigin = resolveWebAppOrigin()
+
+export function webAppUrl(path: string): URL {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`
+  return new URL(normalizedPath, `${webAppOrigin}/`)
+}
