@@ -12,6 +12,7 @@ import {
   setActiveOrgOnSession,
 } from "./hooks/organization"
 import { ac, organizationRoles } from "./permissions"
+import { parseOrigins, resolveCookieDomain } from "./env"
 
 const INVITATION_ROLE_LABELS: Record<string, string> = {
   admin: "Administrador",
@@ -21,10 +22,18 @@ const INVITATION_ROLE_LABELS: Record<string, string> = {
   owner: "Propietario",
 }
 
+const origins = parseOrigins(process.env.ORIGINS)
+const cookieDomain = resolveCookieDomain(
+  process.env.NODE_ENV,
+  process.env.AUTH_COOKIE_DOMAIN,
+  origins
+)
+const isProduction = process.env.NODE_ENV === "production"
+
 const env = {
   NODE_ENV: process.env.NODE_ENV,
-  ORIGINS: process.env.ORIGINS?.split(",") || [],
-  AUTH_COOKIE_DOMAIN: process.env.AUTH_COOKIE_DOMAIN?.trim(),
+  ORIGINS: origins,
+  AUTH_COOKIE_DOMAIN: cookieDomain,
   BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL!,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
@@ -35,12 +44,17 @@ const auth = betterAuth({
   advanced: {
     defaultCookieAttributes: {
       sameSite: "lax",
-      secure: env.NODE_ENV === "production" ? true : false,
-      domain:
-        env.NODE_ENV === "production"
-          ? env.AUTH_COOKIE_DOMAIN || undefined
-          : undefined,
+      secure: isProduction,
+      domain: isProduction ? cookieDomain : undefined,
     },
+    ...(isProduction && cookieDomain
+      ? {
+          crossSubDomainCookies: {
+            enabled: true,
+            domain: cookieDomain,
+          },
+        }
+      : {}),
   },
   trustedOrigins: env.ORIGINS,
   secret: env.BETTER_AUTH_SECRET,
