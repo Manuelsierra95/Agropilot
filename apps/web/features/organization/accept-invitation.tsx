@@ -60,7 +60,7 @@ export function AcceptInvitation({ invitationId }: AcceptInvitationProps) {
 
     void authClient.organization
       .getInvitation({ query: { id: invitationId } })
-      .then(({ data, error }) => {
+      .then(({ data, error }: { data: any; error: any }) => {
         if (cancelled) return
         if (error || !data) {
           setLoadError(
@@ -77,11 +77,8 @@ export function AcceptInvitation({ invitationId }: AcceptInvitationProps) {
           status: data.status,
           organizationId: data.organizationId,
           organizationName:
-            "organizationName" in data
-              ? (data.organizationName as string | undefined)
-              : "organization" in data && data.organization
-                ? ((data.organization as { name?: string }).name ?? undefined)
-                : undefined,
+            (data as { organizationName?: string }).organizationName ??
+            ((data as { organization?: { name?: string } }).organization?.name ?? undefined),
         })
       })
       .finally(() => {

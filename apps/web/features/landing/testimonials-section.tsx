@@ -52,7 +52,7 @@ export function TestimonialsSection() {
     return () => clearInterval(interval)
   }, [])
 
-  const activeTestimonial = testimonials[activeIndex]
+  const activeTestimonial = testimonials[activeIndex] ?? testimonials[0]!
 
   return (
     <section className="relative border-t border-foreground/10 py-32 lg:py-40 lg:pb-14">

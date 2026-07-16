@@ -32,7 +32,7 @@ export default function Parcel() {
   const activeParcel = React.useMemo(() => {
     if (isAllParcels || !parcelId) return undefined
     const parcel = parcels.find((p) => p.id === parcelId)
-    return parcel ? toParcelItem(parcel) : undefined
+    return parcel ? toParcelItem({ ...parcel, crop: null }) : undefined
   }, [isAllParcels, parcelId, parcels])
 
   const cropOverview = useCropOverview()

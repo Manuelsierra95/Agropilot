@@ -10,7 +10,7 @@ export const useUpdateOrganization = () => {
 
   return useMutation({
     mutationFn: (data: UpdateOrganizationInput) =>
-      api.organization.update(data),
+      api.organization.update(data) as Promise<AuthOrganization>,
     onSuccess: (updatedOrg: AuthOrganization) => {
       queryClient.setQueryData(["organization"], updatedOrg)
     },

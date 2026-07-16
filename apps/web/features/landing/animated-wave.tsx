@@ -55,7 +55,7 @@ export function AnimatedWave() {
           const alpha = 0.15 + normalized * 0.5
 
           ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`
-          ctx.fillText(chars[charIndex], px, py)
+          ctx.fillText(chars[charIndex] ?? chars[0]!, px, py)
         }
       }
 

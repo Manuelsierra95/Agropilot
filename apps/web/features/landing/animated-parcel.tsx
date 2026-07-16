@@ -89,8 +89,10 @@ export function AerialParcels() {
       const segLen: number[] = []
       let total = 0
       for (let i = 1; i < line.length; i++) {
-        const dx = (line[i][0] - line[i - 1][0]) * width
-        const dy = (line[i][1] - line[i - 1][1]) * height
+        const curr = line[i] as number[]
+        const prev = line[i - 1] as number[]
+        const dx = ((curr[0] as number) - (prev[0] as number)) * width
+        const dy = ((curr[1] as number) - (prev[1] as number)) * height
         const l = Math.hypot(dx, dy)
         segLen.push(l)
         total += l
@@ -110,18 +112,21 @@ export function AerialParcels() {
     ) => {
       if (pts.length < 2) return
       ctx.beginPath()
-      ctx.moveTo(pts[0][0] * width, pts[0][1] * height)
+      const first = pts[0] as number[]
+      ctx.moveTo((first[0] as number) * width, (first[1] as number) * height)
       let acc = 0
       for (let i = 1; i < pts.length; i++) {
-        const l = segLen[i - 1]
+        const l = segLen[i - 1]!
+        const curr = pts[i] as number[]
+        const prev = pts[i - 1] as number[]
         if (acc + l <= drawLen) {
-          ctx.lineTo(pts[i][0] * width, pts[i][1] * height)
+          ctx.lineTo((curr[0] as number) * width, (curr[1] as number) * height)
           acc += l
         } else {
           const remain = drawLen - acc
           const tt = l > 0 ? remain / l : 0
-          const x = pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * tt
-          const y = pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * tt
+          const x = (prev[0] as number) + ((curr[0] as number) - (prev[0] as number)) * tt
+          const y = (prev[1] as number) + ((curr[1] as number) - (prev[1] as number)) * tt
           ctx.lineTo(x * width, y * height)
           break
         }
@@ -168,7 +173,8 @@ export function AerialParcels() {
       }
 
       // Nodos pulsantes en las esquinas de parcela
-      for (const [nx, ny] of NODES) {
+      for (const node of NODES) {
+        const [nx, ny] = node as [number, number]
         const x = nx * width
         const y = ny * height
         ctx.save()

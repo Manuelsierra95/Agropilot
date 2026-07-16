@@ -48,9 +48,7 @@ export function ParcelCropStatusCard({
   recentTemperatureSeries,
   recommendation,
 }: ParcelCropStatusCardProps) {
-  const cropTrendText = `${formatNumber(apiMetrics.temperature.avg7d)} °C · ${formatNumber(
-    apiMetrics.temperature.avg30d
-  )} °C · Δ ${formatNumber(apiMetrics.temperature.trend, 1)} °C`
+  const cropTrendText = `${formatNumber(apiMetrics.tempAvg)} °C · Δ ${formatNumber(apiMetrics.tempTrend, 1)} °C`
 
   return (
     <Card className="overflow-hidden bg-background ring-0">
@@ -63,19 +61,15 @@ export function ParcelCropStatusCard({
       <CardContent className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline">Etapa: {apiMetrics.crop.stage}</Badge>
+            <Badge variant="outline">Etapa: N/A</Badge>
             <Badge variant="outline">
-              GDD: {formatNumber(apiMetrics.crop.gdd, 0)}
+              GDD: 0
             </Badge>
             <Badge
-              className={cn(
-                apiMetrics.crop.isCritical
-                  ? "border-red-500/40 bg-red-500/10 text-red-700"
-                  : "border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
-              )}
+              className="border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
               variant="outline"
             >
-              {apiMetrics.crop.isCritical ? "Estado crítico" : "Estado estable"}
+              Estado estable
             </Badge>
           </div>
 
@@ -83,14 +77,14 @@ export function ParcelCropStatusCard({
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Coeficiente Kc</span>
               <span className="font-medium">
-                {formatNumber(apiMetrics.crop.kc, 2)}
+                0.00
               </span>
             </div>
             <div className="h-2 rounded-full bg-muted/80">
               <div
                 className="h-full rounded-full bg-emerald-500/80 transition-[width] duration-700"
                 style={{
-                  width: `${Math.max(0, Math.min(apiMetrics.crop.kc, 1)) * 100}%`,
+                  width: `0%`,
                 }}
               />
             </div>
@@ -106,7 +100,7 @@ export function ParcelCropStatusCard({
                 GDD 30d
               </p>
               <p className="mt-2 text-2xl font-semibold">
-                {formatNumber(apiMetrics.crop.gdd30d, 1)}
+                0.0
               </p>
             </div>
             <div className="rounded-xl border border-border/30 bg-muted/15 p-4">
@@ -114,7 +108,7 @@ export function ParcelCropStatusCard({
                 Tendencia térmica
               </p>
               <p className="mt-2 text-2xl font-semibold">
-                {formatNumber(apiMetrics.temperature.trend, 1)} °C
+                0.0 °C
               </p>
             </div>
           </div>
@@ -181,19 +175,19 @@ export function ParcelCropStatusCard({
             <div className="flex items-center justify-between">
               <span>Media 7d</span>
               <span className="font-medium text-foreground">
-                {formatNumber(apiMetrics.temperature.avg7d, 1)} °C
+                0.0 °C
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span>Media 30d</span>
               <span className="font-medium text-foreground">
-                {formatNumber(apiMetrics.temperature.avg30d, 1)} °C
+                0.0 °C
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span>Variación</span>
               <span className="font-medium text-foreground">
-                {formatNumber(apiMetrics.temperature.trend, 1)} °C
+                0.0 °C
               </span>
             </div>
           </div>

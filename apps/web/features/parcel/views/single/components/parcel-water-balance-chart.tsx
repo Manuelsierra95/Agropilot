@@ -90,7 +90,7 @@ export function ParcelWaterBalanceChart({
             <Bar dataKey="waterBalance" radius={[6, 6, 0, 0]} maxBarSize={28}>
               {dailySeries.map((entry) => (
                 <Cell
-                  key={entry.date}
+                  key={entry.date.toISOString()}
                   fill={
                     entry.waterBalance >= 0
                       ? "oklch(0.63 0.13 154)"

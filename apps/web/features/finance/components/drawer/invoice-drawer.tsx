@@ -27,6 +27,12 @@ import {
 } from "@workspace/ui/components/select"
 import { Label } from "@workspace/ui/components/label"
 import { Input } from "@workspace/ui/components/input"
+import { z } from "zod"
+import { schema } from "@workspace/web/components/finance/transaction-table/components/transaction-table"
+import type { ChartConfig } from "@workspace/ui/components/chart"
+
+const chartConfig: ChartConfig = {}
+const chartData: { month: string; mobile: number; desktop: number }[] = []
 
 export function InvoiceDrawer({ item }: { item: z.infer<typeof schema> }) {
   const isMobile = useIsMobile()

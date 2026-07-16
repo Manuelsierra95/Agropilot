@@ -66,7 +66,7 @@ export function AnimatedSphere() {
             x: centerX + newX * radius,
             y: centerY + newY * radius,
             z: finalZ,
-            char: chars[charIndex],
+            char: chars[charIndex] ?? chars[0]!,
           })
         }
       }

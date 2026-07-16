@@ -38,7 +38,7 @@ function buildDailySeries(
     const temperatureAverage = (entry.tempMin + entry.tempMax) / 2
 
     return {
-      date: entry.date,
+      date: typeof entry.date === "string" ? new Date(entry.date) : entry.date,
       tempMin: entry.tempMin,
       tempMax: entry.tempMax,
       precipitation: entry.precipitation,

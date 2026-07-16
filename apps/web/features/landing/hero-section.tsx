@@ -89,7 +89,7 @@ export function HeroSection() {
               para{" "}
               <span className="relative inline-block">
                 <span key={wordIndex} className="inline-flex">
-                  {words[wordIndex].split("").map((char, i) => (
+                  {(words[wordIndex] ?? words[0]!).split("").map((char, i) => (
                     <span
                       key={`${wordIndex}-${i}`}
                       className="animate-char-in inline-block"
