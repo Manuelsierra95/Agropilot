@@ -1,8 +1,8 @@
 import { hc } from "hono/client"
 import type { AppType } from "@workspace/api"
-import { apiBaseUrl } from "@workspace/web/lib/env"
+import { getClientApiBaseUrl } from "@workspace/web/lib/env"
 
-export const client = hc<AppType>(apiBaseUrl, {
+export const client = hc<AppType>(getClientApiBaseUrl(), {
   init: { credentials: "include" },
   headers: async (): Promise<Record<string, string>> => {
     // Server Components

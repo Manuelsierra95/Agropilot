@@ -12,7 +12,7 @@ import {
 } from "react"
 
 import { useDashboardScopeParams } from "@workspace/web/hooks/use-dashboard-scope-params"
-import { apiBaseUrl } from "@workspace/web/lib/env"
+import { getVersionedApiPath } from "@workspace/web/lib/env"
 
 type CopilotChatContextValue = {
   input: string
@@ -37,7 +37,7 @@ export function CopilotChatProvider({ children }: { children: ReactNode }) {
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
-        api: `${apiBaseUrl}/api/v1/copilot/chat`,
+        api: `${getVersionedApiPath()}/copilot/chat`,
         credentials: "include",
         body: () => ({
           parcelId: parcelId ?? undefined,

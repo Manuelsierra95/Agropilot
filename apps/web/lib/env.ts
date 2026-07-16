@@ -27,6 +27,27 @@ export type env = z.infer<typeof envSchema>
 export const apiBaseUrl = env.PUBLIC_API_URL
 export const versionedApiUrl = `${apiBaseUrl}/api/${env.PUBLIC_API_VERSION}`
 
+/** Ruta versionada relativa al origen del navegador (p. ej. `/api/v1`). */
+export function getVersionedApiPath(): string {
+  return `/api/${env.PUBLIC_API_VERSION}`
+}
+
+/** URL base de la API para SSR y server actions (no usar en el navegador). */
+export function getServerApiBaseUrl(): string {
+  const internal = trimEnvValue(process.env.INTERNAL_API_URL)
+  if (internal) return internal.replace(/\/$/, "")
+  return apiBaseUrl.replace(/\/$/, "")
+}
+
+/**
+ * URL base del cliente Hono: vacía en el navegador (same-origin vía proxy)
+ * y la URL interna/pública en el servidor.
+ */
+export function getClientApiBaseUrl(): string {
+  if (typeof window === "undefined") return getServerApiBaseUrl()
+  return ""
+}
+
 function trimEnvValue(value: string | undefined): string | undefined {
   if (!value) return undefined
 
