@@ -27,9 +27,41 @@ export type env = z.infer<typeof envSchema>
 export const apiBaseUrl = env.PUBLIC_API_URL
 export const versionedApiUrl = `${apiBaseUrl}/api/${env.PUBLIC_API_VERSION}`
 
+function trimEnvValue(value: string | undefined): string | undefined {
+  if (!value) return undefined
+
+  const trimmed = value.trim()
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim()
+  }
+
+  return trimmed
+}
+
 function resolveWebAppOrigin(): string {
-  const explicit = process.env.WEB_APP_URL?.trim()
+  const explicit = trimEnvValue(process.env.WEB_APP_URL)
   if (explicit) return explicit.replace(/\/$/, "")
+
+  const frontendUri = trimEnvValue(process.env.FRONTEND_URI)
+  if (frontendUri) return frontendUri.replace(/\/$/, "")
+
+  const origins = trimEnvValue(process.env.ORIGINS)
+    ?.split(",")
+    .map((origin) => trimEnvValue(origin))
+    .filter((origin): origin is string => Boolean(origin))
+  if (origins?.[0]) return origins[0].replace(/\/$/, "")
+
+  const redirectUri = trimEnvValue(process.env.NEXT_PUBLIC_REDIRECT_URI)
+  if (redirectUri) {
+    try {
+      return new URL(redirectUri).origin
+    } catch {
+      // fall through
+    }
+  }
 
   try {
     return new URL(env.PUBLIC_REDIRECT_URL).origin
@@ -38,9 +70,7 @@ function resolveWebAppOrigin(): string {
   }
 }
 
-export const webAppOrigin = resolveWebAppOrigin()
-
 export function webAppUrl(path: string): URL {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`
-  return new URL(normalizedPath, `${webAppOrigin}/`)
+  return new URL(normalizedPath, `${resolveWebAppOrigin()}/`)
 }
