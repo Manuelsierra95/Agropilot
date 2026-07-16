@@ -51,7 +51,7 @@ export function pickDefaultCampaignId(
 
 export function getPreviousCampaignName(name: string): string {
   const [startYear] = name.split("/").map(Number)
-  if (!Number.isFinite(startYear)) return name
+  if (startYear === undefined || !Number.isFinite(startYear)) return name
   return `${startYear - 1}/${startYear}`
 }
 

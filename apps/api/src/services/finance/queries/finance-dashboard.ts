@@ -169,7 +169,7 @@ function buildMonthlyProductionKg(
     if (index < 0 || index > 11) continue
     const income = Number(row.income)
     if (income > 0 && lonjaPrice > 0) {
-      months[index] += Math.round(income / lonjaPrice)
+      months[index] = (months[index] ?? 0) + Math.round(income / lonjaPrice)
     }
   }
 
