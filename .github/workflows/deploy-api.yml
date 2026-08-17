@@ -1,0 +1,26 @@
+name: Deploy API
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+
+concurrency:
+  group: deploy-api
+  cancel-in-progress: false
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Coolify deploy (api)
+        run: |
+          curl -fsS -X POST "${{ secrets.COOLIFY_WEBHOOK_URL_API }}" \
+            -H "Content-Type: application/json" \
+            -d '{}'

@@ -1,0 +1,26 @@
+name: Deploy Web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: false
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Coolify deploy (web)
+        run: |
+          curl -fsS -X POST "${{ secrets.COOLIFY_WEBHOOK_URL_WEB }}" \
+            -H "Content-Type: application/json" \
+            -d '{}'
