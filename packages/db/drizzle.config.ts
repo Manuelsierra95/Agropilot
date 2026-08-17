@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 
 dotenv.config()
 
-const databaseUrl = process.env.DATABASE
+const databaseUrl = process.env.DATABASE_URL
 
 if (!databaseUrl) {
   throw new Error("Missing database URL. Set DATABASE_URL.")
