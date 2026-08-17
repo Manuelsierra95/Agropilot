@@ -12,6 +12,7 @@ function trimEnvValue(value) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
   transpilePackages: ["@workspace/ui", "@workspace/copilot"],
   experimental: {
     optimizePackageImports: ["@workspace/copilot", "lucide-react", "recharts"],
