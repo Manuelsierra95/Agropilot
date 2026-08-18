@@ -2,7 +2,7 @@
 FROM node:22-bookworm AS builder
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@11.5.1 --activate
-COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .npmrc ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .npmrc turbo.json tsconfig.json ./
 COPY apps ./apps
 COPY packages ./packages
 RUN pnpm install --frozen-lockfile
