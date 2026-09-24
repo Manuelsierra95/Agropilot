@@ -6,6 +6,8 @@ import { QueryProvider } from "@workspace/web/providers/query-provider"
 import { cn } from "@workspace/ui/lib/utils"
 import { TooltipProvider } from "@workspace/ui/components/tooltip"
 import { landingMetadata } from "@workspace/web/config/seo/landing"
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -41,6 +43,8 @@ export default function RootLayout({
             <TooltipProvider>{children}</TooltipProvider>
           </ThemeProvider>
         </QueryProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
