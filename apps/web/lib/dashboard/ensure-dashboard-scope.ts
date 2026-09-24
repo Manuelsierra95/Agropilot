@@ -11,6 +11,20 @@ function readParam(
   return typeof value === "string" ? value : undefined
 }
 
+function pickDefaultParcel<
+  T extends { id: string; createdAt?: Date | string | null },
+>(parcels: T[]): T {
+  // Deterministic ordering: oldest parcel first (by createdAt asc, id as tiebreaker).
+  // If no createdAt, falls back to the order returned by the API.
+  const sorted = [...parcels].sort((a, b) => {
+    const aTime = a.createdAt ? new Date(a.createdAt).getTime() : Infinity
+    const bTime = b.createdAt ? new Date(b.createdAt).getTime() : Infinity
+    if (aTime !== bTime) return aTime - bTime
+    return a.id.localeCompare(b.id)
+  })
+  return sorted[0]!
+}
+
 export async function ensureDashboardScopeSearchParams(
   pathname: string,
   searchParams: SearchParams
@@ -27,8 +41,14 @@ export async function ensureDashboardScopeSearchParams(
 
   const validParcelIds = new Set(parcels.map((parcel) => parcel.id))
   const parcelIdInvalid = Boolean(parcelId && !validParcelIds.has(parcelId))
-  const targetParcelId =
-    parcelId && validParcelIds.has(parcelId) ? parcelId : undefined
+  let targetParcelId: string | undefined
+  if (parcelId && validParcelIds.has(parcelId)) {
+    targetParcelId = parcelId
+  } else if (pathname === "/dashboard") {
+    // Overview root defaults to the first (oldest) parcel so the user
+    // lands on a single-parcel view instead of the org-wide aggregate.
+    targetParcelId = pickDefaultParcel(parcels).id
+  }
 
   const hasCustomRange = Boolean(from && to)
   let targetCampaignId = campaignId
@@ -58,10 +78,10 @@ export async function ensureDashboardScopeSearchParams(
   }
 
   const params = new URLSearchParams()
-  const isDashboardOverview = pathname === "/dashboard"
 
-  // Normalizing redirects on the overview default to org-wide scope (all parcels).
-  if (targetParcelId && !isDashboardOverview) {
+  // The overview root always normalises onto a single parcelId (the oldest);
+  // all other dashboard routes pin whatever parcelId is in scope.
+  if (targetParcelId) {
     params.set("parcelId", targetParcelId)
   }
 

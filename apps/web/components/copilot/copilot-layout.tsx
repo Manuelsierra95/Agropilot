@@ -16,7 +16,8 @@ export async function CopilotLayout({
   className?: string
 }) {
   const cookieStore = await cookies()
-  const defaultOpen = cookieStore.get(COPILOT_SIDEBAR_COOKIE)?.value !== "false"
+  // Copilot sidebar defaults to collapsed when no explicit choice has been made.
+  const defaultOpen = cookieStore.get(COPILOT_SIDEBAR_COOKIE)?.value === "true"
 
   return (
     <SidebarProvider

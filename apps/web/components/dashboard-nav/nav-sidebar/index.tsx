@@ -16,9 +16,9 @@ export default async function NavSidebar({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  // Persisting the sidebar state in the cookie.
+  // Persisting the sidebar state in the cookie. Default = open.
   const cookieStore = await cookies()
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
+  const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false"
 
   return (
     <SidebarProvider
