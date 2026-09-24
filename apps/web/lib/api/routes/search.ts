@@ -6,6 +6,15 @@ import type {
   Province,
   Street,
 } from "@workspace/schemas"
+import { isDemoMode } from "@workspace/web/lib/demo-mode"
+import {
+  getDemoAddress,
+  getDemoCoordsSearch,
+  getDemoMunicipalities,
+  getDemoProvinces,
+  getDemoRefcatSearch,
+  getDemoStreets,
+} from "@workspace/web/lib/mockdata"
 
 const CATASTRO_STALE_TIME = 1000 * 60 * 60 * 24
 
@@ -22,19 +31,23 @@ export const searchQueryOptions = {
   staleTime: CATASTRO_STALE_TIME,
 }
 
-const getProvinces = (): Promise<Province[]> =>
-  client.api.v1.search.provinces
+const getProvinces = (): Promise<Province[]> => {
+  if (isDemoMode()) return Promise.resolve(getDemoProvinces())
+  return client.api.v1.search.provinces
     .$get()
     .then((response) => response.json())
     .then((response) => response.data)
+}
 
-const getMunicipalities = (province: number): Promise<Municipality[]> =>
-  client.api.v1.search.municipalities
+const getMunicipalities = (province: number): Promise<Municipality[]> => {
+  if (isDemoMode()) return Promise.resolve(getDemoMunicipalities(province))
+  return client.api.v1.search.municipalities
     .$get({
       query: { province: String(province) },
     })
     .then((response) => response.json())
     .then((response) => response.data)
+}
 
 const getStreets = ({
   province,
@@ -42,8 +55,9 @@ const getStreets = ({
 }: {
   province: number
   municipality: number
-}): Promise<Street[]> =>
-  client.api.v1.search.streets
+}): Promise<Street[]> => {
+  if (isDemoMode()) return Promise.resolve(getDemoStreets({ province, municipality }))
+  return client.api.v1.search.streets
     .$get({
       query: {
         province: String(province),
@@ -52,6 +66,7 @@ const getStreets = ({
     })
     .then((response) => response.json())
     .then((response) => response.data)
+}
 
 async function parseParcelSearchResponse(
   response: Response,
@@ -73,8 +88,15 @@ async function parseParcelSearchResponse(
   return body.data
 }
 
-const searchByAddress = (query: AddressSearchQuery) =>
-  client.api.v1.search.address
+const searchByAddress = (
+  query: AddressSearchQuery
+): Promise<ParcelSearchResponse> => {
+  if (isDemoMode())
+    return Promise.resolve({
+      ...getDemoAddress(),
+      ...query,
+    } as unknown as ParcelSearchResponse)
+  return client.api.v1.search.address
     .$get({ query })
     .then((response) =>
       parseParcelSearchResponse(
@@ -82,9 +104,18 @@ const searchByAddress = (query: AddressSearchQuery) =>
         "No se pudo localizar la parcela por dirección."
       )
     )
+}
 
-const searchByCoords = (lat: number, lng: number) =>
-  client.api.v1.search.coords
+const searchByCoords = (
+  lat: number,
+  lng: number
+): Promise<ParcelSearchResponse> => {
+  if (isDemoMode())
+    return Promise.resolve({
+      ...getDemoCoordsSearch(),
+      coords: { lat, lng },
+    } as unknown as ParcelSearchResponse)
+  return client.api.v1.search.coords
     .$get({ query: { lat: String(lat), lng: String(lng) } })
     .then((response) =>
       parseParcelSearchResponse(
@@ -92,9 +123,15 @@ const searchByCoords = (lat: number, lng: number) =>
         "No se pudo localizar la parcela por coordenadas."
       )
     )
+}
 
-const searchByRefcat = (refcat: string) =>
-  client.api.v1.search.refcat[":refcat"]
+const searchByRefcat = (refcat: string): Promise<ParcelSearchResponse> => {
+  if (isDemoMode())
+    return Promise.resolve({
+      ...getDemoRefcatSearch(),
+      refcat,
+    } as unknown as ParcelSearchResponse)
+  return client.api.v1.search.refcat[":refcat"]
     .$get({ param: { refcat } })
     .then((response) =>
       parseParcelSearchResponse(
@@ -102,6 +139,7 @@ const searchByRefcat = (refcat: string) =>
         "No se pudo localizar la parcela por referencia catastral."
       )
     )
+}
 
 export const searchApi = {
   getProvinces,

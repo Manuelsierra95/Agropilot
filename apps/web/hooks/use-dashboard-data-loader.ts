@@ -11,6 +11,13 @@ import {
   useDashboardListsStore,
 } from "@workspace/web/store/useDashboardListsStore"
 import type { DashboardOrganization } from "@workspace/web/store/useDashboardListsStore"
+import { isDemoMode } from "@workspace/web/lib/demo-mode"
+import {
+  DEMO_CAMPAIGNS_BY_PARCEL,
+  DEMO_ORGANIZATIONS,
+  DEMO_PARCELS,
+  DEMO_PARCEL_IDS,
+} from "@workspace/web/lib/mockdata"
 
 function mapOrganizations(
   organizations: Array<{
@@ -58,6 +65,10 @@ export function useDashboardDataLoader() {
     async function loadOrganizations() {
       setLoadingOrganizations(true)
       try {
+        if (isDemoMode()) {
+          if (!cancelled) setOrganizations(DEMO_ORGANIZATIONS)
+          return
+        }
         const { data, error } = await authClient.organization.list()
         if (cancelled || error || !data) return
         setOrganizations(mapOrganizations(data))
@@ -83,6 +94,10 @@ export function useDashboardDataLoader() {
     async function loadParcels() {
       setLoadingParcels(true)
       try {
+        if (isDemoMode()) {
+          if (!cancelled) setParcels(DEMO_PARCELS)
+          return
+        }
         const parcels = await api.parcel.getListParcels()
         if (!cancelled) {
           setParcels(parcels)
@@ -112,6 +127,18 @@ export function useDashboardDataLoader() {
     async function loadCampaigns() {
       setLoadingCampaigns(campaignsKey, true)
       try {
+        if (isDemoMode()) {
+          const mapKey: string =
+            parcelId ?? (campaignsKey === ORG_CAMPAIGNS_KEY
+              ? "__org__"
+              : campaignsKey)
+          const list =
+            DEMO_CAMPAIGNS_BY_PARCEL[mapKey] ??
+            DEMO_CAMPAIGNS_BY_PARCEL[ORG_CAMPAIGNS_KEY] ??
+            []
+          if (!cancelled) setCampaignsForParcel(campaignsKey, list)
+          return
+        }
         const campaigns = parcelId
           ? await api.campaign.list(parcelId)
           : await api.campaign.list()

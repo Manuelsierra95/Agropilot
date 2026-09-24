@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
-import { auth } from "@workspace/auth"
-import { webAppUrl } from "@workspace/web/lib/env"
+import { isDemoMode } from "@workspace/web/lib/demo-mode"
 
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  if (isDemoMode()) {
+    return NextResponse.next()
+  }
+
+  const { auth } = await import("@workspace/auth")
+  const { webAppUrl } = await import("@workspace/web/lib/env")
 
   const session = await auth.api.getSession({
     headers: await headers(),

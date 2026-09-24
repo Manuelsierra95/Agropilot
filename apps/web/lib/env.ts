@@ -1,27 +1,51 @@
 import { z } from "zod"
+import { isDemoMode } from "@workspace/web/lib/demo-mode"
 
-const envSchema = z.object({
-  PUBLIC_API_URL: z.string().url().default("http://localhost:3001"),
-  PUBLIC_API_VERSION: z.string().default("v1"),
-  PUBLIC_REDIRECT_URL: z
-    .string()
-    .url()
-    .default("http://localhost:3000/dashboard"),
-})
-
-const result = envSchema.safeParse({
-  PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-  PUBLIC_API_VERSION: process.env.NEXT_PUBLIC_API_VERSION,
-  PUBLIC_REDIRECT_URL: process.env.NEXT_PUBLIC_REDIRECT_URI,
-})
-
-if (!result.success) {
-  throw new Error(
-    "Error de configuración de entorno: variables inválidas o ausentes"
-  )
+const DEFAULT_DEMO_ENV = {
+  PUBLIC_API_URL: "http://localhost:3001",
+  PUBLIC_API_VERSION: "v1",
+  PUBLIC_REDIRECT_URL: "http://localhost:3000/dashboard",
 }
 
-export const env = result.data
+const envSchema = z.object({
+  PUBLIC_API_URL: z.string().default(DEFAULT_DEMO_ENV.PUBLIC_API_URL),
+  PUBLIC_API_VERSION: z.string().default(DEFAULT_DEMO_ENV.PUBLIC_API_VERSION),
+  PUBLIC_REDIRECT_URL: z
+    .string()
+    .default(DEFAULT_DEMO_ENV.PUBLIC_REDIRECT_URL),
+})
+
+function loadEnv() {
+  const demo = isDemoMode()
+  const source = {
+    PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    PUBLIC_API_VERSION: process.env.NEXT_PUBLIC_API_VERSION,
+    PUBLIC_REDIRECT_URL: process.env.NEXT_PUBLIC_REDIRECT_URI,
+  }
+
+  if (demo) {
+    const url = source.PUBLIC_API_URL?.trim() || DEFAULT_DEMO_ENV.PUBLIC_API_URL
+    const apiVersion = source.PUBLIC_API_VERSION?.trim() || DEFAULT_DEMO_ENV.PUBLIC_API_VERSION
+    const redirectUrl = source.PUBLIC_REDIRECT_URL?.trim() || DEFAULT_DEMO_ENV.PUBLIC_REDIRECT_URL
+    return {
+      PUBLIC_API_URL: url,
+      PUBLIC_API_VERSION: apiVersion,
+      PUBLIC_REDIRECT_URL: redirectUrl,
+    }
+  }
+
+  const result = envSchema.safeParse(source)
+  if (!result.success) {
+    throw new Error(
+      "Error de configuración de entorno: variables inválidas o ausentes"
+    )
+  }
+  return result.data
+}
+
+const env = loadEnv()
+
+export { env }
 export type env = z.infer<typeof envSchema>
 
 export const apiBaseUrl = env.PUBLIC_API_URL
@@ -88,6 +112,16 @@ function resolveWebAppOrigin(): string {
   if (redirectUri) {
     try {
       return new URL(redirectUri).origin
+    } catch {
+      // fall through
+    }
+  }
+
+  const vercelUrl = trimEnvValue(process.env.VERCEL_URL)
+  if (vercelUrl) {
+    const host = vercelUrl.startsWith("http") ? vercelUrl : `https://${vercelUrl}`
+    try {
+      return new URL(host).origin
     } catch {
       // fall through
     }

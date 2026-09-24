@@ -19,6 +19,7 @@ import {
   selectCampaignsForParcel,
   useDashboardListsStore,
 } from "@workspace/web/store/useDashboardListsStore"
+import { isDemoMode } from "@workspace/web/lib/demo-mode"
 
 async function resolveCampaignsForParcel(parcelId: string) {
   const store = useDashboardListsStore.getState()
@@ -91,11 +92,13 @@ export function useDashboardScopeActions() {
   const selectOrganization = useCallback(
     (organizationId: string) => {
       navigateScope(SCOPE_LOADING_KEY, async () => {
-        const { error } = await authClient.organization.setActive({
-          organizationId,
-        })
-        if (error) {
-          throw new Error(error.message ?? "No se pudo cambiar la organización")
+        if (!isDemoMode()) {
+          const { error } = await authClient.organization.setActive({
+            organizationId,
+          })
+          if (error) {
+            throw new Error(error.message ?? "No se pudo cambiar la organización")
+          }
         }
 
         invalidateOnOrgChange()

@@ -1,12 +1,23 @@
-import { NextResponse } from "next/server"
-import { auth } from "@workspace/auth"
-import {
-  DEMO_USER_EMAIL,
-  isDemoEnabled,
-} from "@workspace/auth/demo"
+import { NextResponse, type NextRequest } from "next/server"
+import { isDemoMode } from "@workspace/web/lib/demo-mode"
 import { webAppUrl } from "@workspace/web/lib/env"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  if (isDemoMode()) {
+    const target = new URL("/dashboard", request.nextUrl.origin)
+    const redirect = NextResponse.redirect(target)
+    redirect.headers.append(
+      "Set-Cookie",
+      "demo-mode=true; Path=/; Max-Age=86400; SameSite=Lax"
+    )
+    return redirect
+  }
+
+  const { auth } = await import("@workspace/auth")
+  const { DEMO_USER_EMAIL, isDemoEnabled } = await import(
+    "@workspace/auth/demo"
+  )
+
   if (!isDemoEnabled()) {
     return NextResponse.redirect(webAppUrl("/"))
   }

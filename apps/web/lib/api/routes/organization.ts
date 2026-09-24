@@ -10,6 +10,16 @@ import type {
   InvitationBulkCreateResult,
 } from "@workspace/schemas"
 import { cache } from "react"
+import { isDemoMode } from "@workspace/web/lib/demo-mode"
+import {
+  bulkCreateDemoInvitations,
+  cancelDemoInvitation,
+  createDemoInvitation,
+  getDemoActiveOrganization,
+  getDemoOrganizationMe,
+  getDemoOrganizationMembers,
+  listDemoInvitations,
+} from "@workspace/web/lib/mockdata"
 
 type ApiErrorBody = {
   message?: string
@@ -33,19 +43,22 @@ async function parseApiResponse<T>(response: Response): Promise<T> {
 }
 
 const getActiveOrganization = cache(
-  (): Promise<ActiveOrganizationData> =>
-    client.api.v1.organization.active
+  (): Promise<ActiveOrganizationData> => {
+    if (isDemoMode()) return Promise.resolve(getDemoActiveOrganization())
+    return client.api.v1.organization.active
       .$get()
       .then(
         (response) =>
           response.json() as unknown as Promise<{ data: ActiveOrganizationData }>
       )
       .then((body) => body.data)
+  }
 )
 
 const getOrganizationMembers = cache(
-  (): Promise<OrganizationMember[]> =>
-    client.api.v1.organization.members
+  (): Promise<OrganizationMember[]> => {
+    if (isDemoMode()) return Promise.resolve(getDemoOrganizationMembers())
+    return client.api.v1.organization.members
       .$get()
       .then(
         (response) =>
@@ -54,26 +67,32 @@ const getOrganizationMembers = cache(
           }>
       )
       .then((body) => body.data.members)
+  }
 )
 
 const getOrganizationMe = cache(
-  (): Promise<OrganizationMeResponse> =>
-    client.api.v1.organization.me
+  (): Promise<OrganizationMeResponse> => {
+    if (isDemoMode()) return Promise.resolve(getDemoOrganizationMe())
+    return client.api.v1.organization.me
       .$get()
       .then(
         (response) =>
           response.json() as unknown as Promise<{ data: OrganizationMeResponse }>
       )
       .then((body) => body.data)
+  }
 )
 
-const updateOrganization = (data: UpdateOrganizationInput) =>
+const updateOrganization = (
+  data: UpdateOrganizationInput
+): Promise<UpdateOrganizationInput> =>
   client.api.v1.organization.name
     .$put({ json: data })
     .then((r) => r.json() as unknown as Promise<{ data: UpdateOrganizationInput }>)
     .then((body) => body.data)
 
 const listInvitations = async (): Promise<InvitationSelect[]> => {
+  if (isDemoMode()) return listDemoInvitations()
   const response = await client.api.v1.organization.invitations.$get()
   const body = await parseApiResponse<{
     data: { invitations: InvitationSelect[] }
@@ -84,6 +103,7 @@ const listInvitations = async (): Promise<InvitationSelect[]> => {
 const createInvitation = async (
   data: InvitationCreateInput
 ): Promise<InvitationSelect> => {
+  if (isDemoMode()) return createDemoInvitation(data)
   const response = await client.api.v1.organization.invitations.$post({
     json: data,
   })
@@ -96,6 +116,7 @@ const createInvitation = async (
 const bulkCreateInvitations = async (
   data: InvitationBulkCreateInput
 ): Promise<InvitationBulkCreateResult> => {
+  if (isDemoMode()) return bulkCreateDemoInvitations(data)
   const response = await client.api.v1.organization.invitations.bulk.$post({
     json: data,
   })
@@ -106,6 +127,7 @@ const bulkCreateInvitations = async (
 }
 
 const cancelInvitation = async (id: string): Promise<string> => {
+  if (isDemoMode()) return cancelDemoInvitation(id)
   const response = await client.api.v1.organization.invitations[":id"].$delete({
     param: { id },
   })

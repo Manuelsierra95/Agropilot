@@ -1,8 +1,11 @@
 import { client } from "@workspace/web/lib/api/client"
 import type { CampaignListItem } from "@workspace/schemas"
+import { isDemoMode } from "@workspace/web/lib/demo-mode"
+import { getDemoCampaignList } from "@workspace/web/lib/mockdata"
 
-const listCampaigns = (parcelId?: string): Promise<CampaignListItem[]> =>
-  client.api.v1.campaign
+const listCampaigns = (parcelId?: string): Promise<CampaignListItem[]> => {
+  if (isDemoMode()) return Promise.resolve(getDemoCampaignList(parcelId))
+  return client.api.v1.campaign
     .$get({
       query: parcelId ? { parcelId } : {},
     })
@@ -17,6 +20,7 @@ const listCampaigns = (parcelId?: string): Promise<CampaignListItem[]> =>
       }
       return (data as { data: { campaigns: CampaignListItem[] } }).data.campaigns
     })
+}
 
 export const campaignApi = {
   list: listCampaigns,

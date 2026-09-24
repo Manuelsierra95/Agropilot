@@ -6,6 +6,12 @@ import type {
   RecommendationSelect,
   TaskSelect,
 } from "@workspace/schemas"
+import { isDemoMode } from "@workspace/web/lib/demo-mode"
+import {
+  acceptDemoRecommendation,
+  dismissDemoRecommendation,
+  getDemoRecommendationsList,
+} from "@workspace/web/lib/mockdata"
 
 export type RecommendationListItem = DashboardRecommendation & {
   parcelId: string | null
@@ -14,8 +20,9 @@ export type RecommendationListItem = DashboardRecommendation & {
 
 const listRecommendations = (params?: {
   parcelId?: string
-}): Promise<RecommendationListItem[]> =>
-  client.api.v1.recommendations
+}): Promise<RecommendationListItem[]> => {
+  if (isDemoMode()) return Promise.resolve(getDemoRecommendationsList(params))
+  return client.api.v1.recommendations
     .$get({ query: params?.parcelId ? { parcelId: params.parcelId } : {} })
     .then((res) => {
       if (!res.ok) {
@@ -26,12 +33,23 @@ const listRecommendations = (params?: {
       }>
     })
     .then((body) => body.data.recommendations)
+}
 
 const acceptRecommendation = (
   recommendationId: string,
   input: RecommendationAcceptInput = {}
-): Promise<{ task: TaskSelect; recommendation: RecommendationSelect }> =>
-  (client.api.v1.recommendations[":recommendationId"].accept as any)
+): Promise<{ task: TaskSelect; recommendation: RecommendationSelect }> => {
+  if (isDemoMode()) {
+    const result = acceptDemoRecommendation(
+      recommendationId,
+      input as unknown as Record<string, unknown>
+    )
+    notifyDashboardMutation(["events", "daily"], {
+      parcelId: result.task.parcelId ?? undefined,
+    })
+    return Promise.resolve(result)
+  }
+  return (client.api.v1.recommendations[":recommendationId"].accept as any)
     .$post({ param: { recommendationId }, json: input })
     .then((res: Response) => {
       if (!res.ok) {
@@ -47,11 +65,16 @@ const acceptRecommendation = (
       })
       return body.data
     })
+}
 
 const dismissRecommendation = (
   recommendationId: string
-): Promise<RecommendationSelect> =>
-  client.api.v1.recommendations[":recommendationId"].dismiss
+): Promise<RecommendationSelect> => {
+  if (isDemoMode()) {
+    notifyDashboardMutation(["daily"])
+    return Promise.resolve(dismissDemoRecommendation(recommendationId))
+  }
+  return client.api.v1.recommendations[":recommendationId"].dismiss
     .$post({ param: { recommendationId } })
     .then((res) => {
       if (!res.ok) {
@@ -65,6 +88,7 @@ const dismissRecommendation = (
       notifyDashboardMutation(["daily"])
       return body.data.recommendation
     })
+}
 
 export const recommendationsApi = {
   listRecommendations,

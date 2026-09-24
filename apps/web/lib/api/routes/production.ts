@@ -6,11 +6,18 @@ import type {
   HarvestDeliveryCreateInput,
   HarvestSaleCreateInput,
 } from "@workspace/schemas"
+import { isDemoMode } from "@workspace/web/lib/demo-mode"
+import {
+  createDemoHarvestDelivery,
+  createDemoHarvestSale,
+  getDemoHarvestDeliveries,
+} from "@workspace/web/lib/mockdata"
 
 const getHarvestDeliveries = (
   query: HarvestDeliveriesQuery
-): Promise<HarvestDeliveryListItem[]> =>
-  client.api.v1.production.deliveries
+): Promise<HarvestDeliveryListItem[]> => {
+  if (isDemoMode()) return Promise.resolve(getDemoHarvestDeliveries(query))
+  return client.api.v1.production.deliveries
     .$get({ query })
     .then(
       (res) =>
@@ -19,9 +26,16 @@ const getHarvestDeliveries = (
         }>
     )
     .then((res) => res.data.deliveries)
+}
 
-const createHarvestDelivery = (data: HarvestDeliveryCreateInput) =>
-  client.api.v1.production.deliveries
+const createHarvestDelivery = (
+  data: HarvestDeliveryCreateInput
+): Promise<{ id: string }> => {
+  if (isDemoMode()) {
+    notifyDashboardMutation(["production"])
+    return Promise.resolve(createDemoHarvestDelivery(data))
+  }
+  return client.api.v1.production.deliveries
     .$post({ json: data })
     .then(
       (res) =>
@@ -33,9 +47,19 @@ const createHarvestDelivery = (data: HarvestDeliveryCreateInput) =>
       notifyDashboardMutation(["production"])
       return res.data.delivery
     })
+}
 
-const createHarvestSale = (data: HarvestSaleCreateInput) =>
-  client.api.v1.production.sales
+const createHarvestSale = (
+  data: HarvestSaleCreateInput
+): Promise<{
+  transaction: { id: string }
+  sales: { id: string }[]
+}> => {
+  if (isDemoMode()) {
+    notifyDashboardMutation(["finance", "production"])
+    return Promise.resolve(createDemoHarvestSale(data))
+  }
+  return client.api.v1.production.sales
     .$post({ json: data })
     .then(
       (res) =>
@@ -50,6 +74,7 @@ const createHarvestSale = (data: HarvestSaleCreateInput) =>
       notifyDashboardMutation(["finance", "production"])
       return res.data
     })
+}
 
 export const productionApi = {
   getHarvestDeliveries,

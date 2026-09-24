@@ -1,8 +1,11 @@
 import { cache } from "react"
 
 import { client } from "@workspace/web/lib/api/client"
+import { isDemoMode } from "@workspace/web/lib/demo-mode"
+import { getDemoCopilotSuggestions } from "@workspace/web/lib/mockdata"
 
 async function fetchSuggestions(): Promise<string[]> {
+  if (isDemoMode()) return getDemoCopilotSuggestions()
   const res = await client.api.v1.copilot.suggestions.$get()
   if (!res.ok) {
     throw new Error("Failed to fetch copilot suggestions")

@@ -19,21 +19,46 @@ import {
   type UpdateCampaignSaleTargetInput,
 } from "@workspace/schemas"
 import { cache } from "react"
+import { isDemoMode } from "@workspace/web/lib/demo-mode"
+import {
+  createDemoTransaction,
+  deleteDemoTransaction,
+  getDemoCampaignMargin,
+  getDemoFinanceResume,
+  getDemoOlivePrices,
+  getDemoParcelsFinanceComparisonFn,
+  getDemoParcelsSellingWindowsFn,
+  getDemoProductionValue,
+  getDemoRecentTransactions,
+  getDemoScopedTransactions,
+  getDemoSellingWindowFn,
+  getDemoTransactions,
+  updateDemoCampaignSaleTarget,
+  updateDemoTransaction,
+  DEMO_TRANSACTIONS_SELECT,
+} from "@workspace/web/lib/mockdata"
 
 const listTransactions = cache(
-  (): Promise<TransactionSelect[]> =>
-    client.api.v1.finance
+  (): Promise<TransactionSelect[]> => {
+    if (isDemoMode()) return Promise.resolve(DEMO_TRANSACTIONS_SELECT)
+    return client.api.v1.finance
       .$get({ query: {} })
       .then(
         (res) =>
           res.json() as unknown as Promise<{ data: { transactions: TransactionSelect[] } }>
       )
       .then((res) => res.data.transactions)
+  }
 )
 
 const getTransactionById = cache(
-  (id: string): Promise<TransactionSelect> =>
-    client.api.v1.finance[":id"]
+  (id: string): Promise<TransactionSelect> => {
+    if (isDemoMode()) {
+      const found = DEMO_TRANSACTIONS_SELECT.find((t) => t.id === id)
+      if (!found) return Promise.reject(new Error("Demo transaction not found"))
+      return Promise.resolve(found)
+    }
+    return client.api.v1.finance[":id"]
       .$get({
         param: { id },
       })
@@ -42,10 +67,16 @@ const getTransactionById = cache(
           res.json() as unknown as Promise<{ data: { transaction: TransactionSelect } }>
       )
       .then((res) => res.data.transaction)
+  }
 )
 
-const createTransaction = (data: TransactionCreateInput) =>
-  client.api.v1.finance
+const createTransaction = (data: TransactionCreateInput): Promise<TransactionSelect> => {
+  if (isDemoMode()) {
+    const tx = createDemoTransaction(data)
+    notifyDashboardMutation(["finance", "production"])
+    return Promise.resolve(tx)
+  }
+  return client.api.v1.finance
     .$post({
       json: data,
     })
@@ -57,9 +88,15 @@ const createTransaction = (data: TransactionCreateInput) =>
       notifyDashboardMutation(["finance", "production"])
       return res.data.transaction
     })
+}
 
-const bulkCreateTransactions = (data: TransactionBulkCreateInput) =>
-  client.api.v1.finance.bulk
+const bulkCreateTransactions = (data: TransactionBulkCreateInput): Promise<TransactionSelect[]> => {
+  if (isDemoMode()) {
+    const items = data.transactions.map((t) => createDemoTransaction(t))
+    notifyDashboardMutation(["finance", "production"])
+    return Promise.resolve(items)
+  }
+  return client.api.v1.finance.bulk
     .$post({
       json: data,
     })
@@ -71,9 +108,16 @@ const bulkCreateTransactions = (data: TransactionBulkCreateInput) =>
       notifyDashboardMutation(["finance", "production"])
       return res.data.transactions
     })
+}
 
-const updateTransaction = (id: string, data: TransactionUpdateInput) =>
-  client.api.v1.finance[":id"]
+const updateTransaction = (id: string, data: TransactionUpdateInput): Promise<TransactionSelect> => {
+  if (isDemoMode()) {
+    const tx = updateDemoTransaction(id, data)
+    if (!tx) return Promise.reject(new Error("Demo transaction not found"))
+    notifyDashboardMutation(["finance", "production"])
+    return Promise.resolve(tx)
+  }
+  return client.api.v1.finance[":id"]
     .$put({
       param: { id },
       json: data,
@@ -86,9 +130,14 @@ const updateTransaction = (id: string, data: TransactionUpdateInput) =>
       notifyDashboardMutation(["finance", "production"])
       return res.data.transaction
     })
+}
 
-const deleteTransaction = (id: string) =>
-  client.api.v1.finance[":id"]
+const deleteTransaction = (id: string): Promise<string> => {
+  if (isDemoMode()) {
+    notifyDashboardMutation(["finance", "production"])
+    return Promise.resolve(deleteDemoTransaction(id))
+  }
+  return client.api.v1.finance[":id"]
     .$delete({
       param: { id },
     })
@@ -97,9 +146,11 @@ const deleteTransaction = (id: string) =>
       notifyDashboardMutation(["finance", "production"])
       return res.data.id
     })
+}
 
-const getOlivePrices = (): Promise<DashboardOlivePriceItem[]> =>
-  client.api.v1.finance["olive-prices"]
+const getOlivePrices = (): Promise<DashboardOlivePriceItem[]> => {
+  if (isDemoMode()) return Promise.resolve(getDemoOlivePrices())
+  return client.api.v1.finance["olive-prices"]
     .$get()
     .then(
       (res) =>
@@ -108,11 +159,13 @@ const getOlivePrices = (): Promise<DashboardOlivePriceItem[]> =>
         }>
     )
     .then((res) => res.data.olivePrices)
+}
 
 const getSellingWindow = (
   scope: DashboardScopeParams
-): Promise<DashboardSellingWindow> =>
-  client.api.v1.finance
+): Promise<DashboardSellingWindow> => {
+  if (isDemoMode()) return Promise.resolve(getDemoSellingWindowFn(scope))
+  return client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "sellingWindow" } })
     .then(
       (res) =>
@@ -121,11 +174,14 @@ const getSellingWindow = (
         }>
     )
     .then((res) => res.data.sellingWindow)
+}
 
 const getParcelsSellingWindows = (
   scope: DashboardScopeParams
-): Promise<DashboardParcelsSellingWindows> =>
-  client.api.v1.finance
+): Promise<DashboardParcelsSellingWindows> => {
+  if (isDemoMode())
+    return Promise.resolve(getDemoParcelsSellingWindowsFn(scope))
+  return client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "sellingWindows" } })
     .then(
       (res) =>
@@ -134,22 +190,26 @@ const getParcelsSellingWindows = (
         }>
     )
     .then((res) => res.data.sellingWindows)
+}
 
 const getFinanceResume = (
   scope: DashboardScopeParams
-): Promise<DashboardFinanceResume> =>
-  client.api.v1.finance
+): Promise<DashboardFinanceResume> => {
+  if (isDemoMode()) return Promise.resolve(getDemoFinanceResume(scope))
+  return client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "resume" } })
     .then(
       (res) =>
         res.json() as unknown as Promise<{ data: { resume: DashboardFinanceResume } }>
     )
     .then((res) => res.data.resume)
+}
 
 const getCampaignMargin = (
   scope: DashboardScopeParams
-): Promise<DashboardCampaignMargin> =>
-  client.api.v1.finance
+): Promise<DashboardCampaignMargin> => {
+  if (isDemoMode()) return Promise.resolve(getDemoCampaignMargin(scope))
+  return client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "campaignMargin" } })
     .then(
       (res) =>
@@ -158,11 +218,13 @@ const getCampaignMargin = (
         }>
     )
     .then((res) => res.data.campaignMargin)
+}
 
 const getRecentTransactions = (
   scope: DashboardScopeParams
-): Promise<DashboardTransactionSnapshot[]> =>
-  client.api.v1.finance
+): Promise<DashboardTransactionSnapshot[]> => {
+  if (isDemoMode()) return Promise.resolve(getDemoRecentTransactions(scope))
+  return client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "recentTransactions" } })
     .then(
       (res) =>
@@ -171,11 +233,13 @@ const getRecentTransactions = (
         }>
     )
     .then((res) => res.data.recentTransactions)
+}
 
 const getScopedTransactions = (
   scope: DashboardScopeParams
-): Promise<DashboardFinanceTransaction[]> =>
-  client.api.v1.finance
+): Promise<DashboardFinanceTransaction[]> => {
+  if (isDemoMode()) return Promise.resolve(getDemoScopedTransactions(scope))
+  return client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "transactions" } })
     .then(
       (res) =>
@@ -184,11 +248,13 @@ const getScopedTransactions = (
         }>
     )
     .then((res) => res.data.transactions)
+}
 
 const getProductionValue = (
   scope: DashboardScopeParams
-): Promise<DashboardProductionValue> =>
-  client.api.v1.finance
+): Promise<DashboardProductionValue> => {
+  if (isDemoMode()) return Promise.resolve(getDemoProductionValue(scope))
+  return client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "productionValue" } })
     .then(
       (res) =>
@@ -197,11 +263,14 @@ const getProductionValue = (
         }>
     )
     .then((res) => res.data.productionValue)
+}
 
 const getParcelsFinanceComparison = (
   scope: DashboardScopeParams
-): Promise<DashboardParcelsFinanceComparison> =>
-  client.api.v1.finance
+): Promise<DashboardParcelsFinanceComparison> => {
+  if (isDemoMode())
+    return Promise.resolve(getDemoParcelsFinanceComparisonFn())
+  return client.api.v1.finance
     .$get({ query: { ...toScopeQuery(scope), include: "parcelsComparison" } })
     .then(
       (res) =>
@@ -210,9 +279,13 @@ const getParcelsFinanceComparison = (
         }>
     )
     .then((res) => res.data.parcelsComparison)
+}
 
-const updateCampaignSaleTarget = (data: UpdateCampaignSaleTargetInput) =>
-  client.api.v1.finance["selling-window"]["campaign-target"]
+const updateCampaignSaleTarget = (
+  data: UpdateCampaignSaleTargetInput
+): Promise<{ campaignTarget: number }> => {
+  if (isDemoMode()) return Promise.resolve(updateDemoCampaignSaleTarget(data))
+  return client.api.v1.finance["selling-window"]["campaign-target"]
     .$patch({ json: data })
     .then(
       (res) =>
@@ -221,6 +294,7 @@ const updateCampaignSaleTarget = (data: UpdateCampaignSaleTargetInput) =>
         }>
     )
     .then((res) => res.data)
+}
 
 export const financeApi = {
   listTransactions,
